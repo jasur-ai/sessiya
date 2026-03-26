@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📚 Falsafa Quiz</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Righteous&display=swap');
+
+  :root {
+    --bg: #0d0d1a;
+    --surface: #1a1a2e;
+    --card: #16213e;
+    --accent: #e94560;
+    --gold: #f5a623;
+    --green: #00d4aa;
+    --blue: #4a90d9;
+    --purple: #9b59b6;
+    --text: #f0f0f0;
+    --muted: #8892a4;
+    --opt-a: #e74c3c;
+    --opt-b: #3498db;
+    --opt-c: #f39c12;
+    --opt-d: #27ae60;
+    --radius: 16px;
+    --shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-image: 
+      radial-gradient(ellipse at 20% 50%, rgba(233,69,96,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(74,144,217,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 50% 90%, rgba(155,89,182,0.08) 0%, transparent 60%);
+  }
+
+  /* ── UPLOAD SCREEN ── */
+  #upload-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .logo {
+    font-family: 'Righteous', cursive;
+    font-size: 3.5rem;
+    background: linear-gradient(135deg, var(--accent), var(--gold), var(--green));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 1.1rem;
+    margin-bottom: 48px;
+    font-weight: 600;
+  }
+
+  .upload-zone {
+    width: 100%;
+    border: 3px dashed rgba(233,69,96,0.4);
+    border-radius: 24px;
+    padding: 60px 40px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(233,69,96,0.05);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .upload-zone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(233,69,96,0.1), rgba(74,144,217,0.1));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .upload-zone:hover, .upload-zone.drag-over {
+    border-color: var(--accent);
+    transform: scale(1.02);
+  }
+
+  .upload-zone:hover::before, .upload-zone.drag-over::before { opacity: 1; }
+
+  .upload-icon { font-size: 4rem; margin-bottom: 16px; }
+  .upload-text { font-size: 1.3rem; font-weight: 800; margin-bottom: 8px; }
+  .upload-sub { color: var(--muted); font-size: 0.9rem; }
+  #file-input { display: none; }
+
+  .features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 32px;
+    width: 100%;
+  }
+
+  .feature-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 16px 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--muted);
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .feature-card .fi { font-size: 1.5rem; display: block; margin-bottom: 6px; }
+
+  /* ── QUIZ SCREEN ── */
+  #quiz-screen { display: none; width: 100%; flex-direction: column; align-items: center; }
+
+  /* Stats Bar */
+  .stats-bar {
+    width: 100%;
+    background: var(--surface);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 12px 20px;
+    display: flex;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+
+  .stats-inner {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 900px;
+    width: 100%;
+  }
+
+  .stat-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 50px;
+    padding: 6px 14px;
+    font-size: 0.82rem;
+    font-weight: 800;
+    border: 1px solid rgba(255,255,255,0.08);
+    white-space: nowrap;
+  }
+
+  .stat-chip .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .stat-chip.total .dot { background: var(--blue); }
+  .stat-chip.answered .dot { background: var(--purple); }
+  .stat-chip.remaining .dot { background: var(--gold); }
+  .stat-chip.correct .dot { background: var(--green); }
+  .stat-chip.wrong .dot { background: var(--accent); }
+
+  .stat-chip .val {
+    font-size: 1rem;
+    font-weight: 900;
+  }
+
+  .stat-chip.correct .val { color: var(--green); }
+  .stat-chip.wrong .val { color: var(--accent); }
+  .stat-chip.remaining .val { color: var(--gold); }
+
+  /* Progress */
+  .progress-wrap {
+    width: 100%;
+    max-width: 700px;
+    padding: 24px 20px 0;
+  }
+
+  .progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .progress-bar-bg {
+    height: 8px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    border-radius: 100px;
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* Question Card */
+  .question-wrap {
+    width: 100%;
+    max-width: 700px;
+    padding: 20px;
+    flex: 1;
+  }
+
+  .question-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .q-number {
+    font-family: 'Righteous', cursive;
+    font-size: 0.9rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .timer-ring {
+    width: 52px; height: 52px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .timer-ring svg {
+    position: absolute;
+    inset: 0;
+    transform: rotate(-90deg);
+  }
+
+  .timer-ring circle {
+    fill: none;
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+
+  .timer-ring .bg { stroke: rgba(255,255,255,0.1); }
+  .timer-ring .fg {
+    stroke: var(--green);
+    stroke-dasharray: 138;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear, stroke 0.3s;
+  }
+
+  .timer-text {
+    font-family: 'Righteous', cursive;
+    font-size: 1.1rem;
+    font-weight: 700;
+    z-index: 1;
+  }
+
+  .question-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 28px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.07);
+    box-shadow: var(--shadow);
+    animation: slideIn 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  .question-text {
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  /* Answer Options */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    animation: slideIn 0.4s cubic-bezier(0.4,0,0.2,1) 0.05s both;
+  }
+
+  .option-btn {
+    background: var(--card);
+    border: 2px solid transparent;
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+    text-align: left;
+    transition: all 0.2s ease;
+    box-shadow: var(--shadow);
+    position: relative;
+    overflow: hidden;
+    line-height: 1.4;
+  }
+
+  .option-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0.12;
+    transition: opacity 0.2s;
+  }
+
+  .option-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.5); }
+  .option-btn:hover:not(:disabled)::before { opacity: 0.2; }
+
+  .option-btn:disabled { cursor: default; }
+
+  .opt-label {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    font-weight: 900;
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+
+  .option-btn[data-color="red"] { border-color: rgba(231,76,60,0.4); }
+  .option-btn[data-color="red"]::before { background: var(--opt-a); }
+  .option-btn[data-color="red"] .opt-label { background: var(--opt-a); }
+  .option-btn[data-color="red"]:hover:not(:disabled) { border-color: var(--opt-a); }
+
+  .option-btn[data-color="blue"] { border-color: rgba(52,152,219,0.4); }
+  .option-btn[data-color="blue"]::before { background: var(--opt-b); }
+  .option-btn[data-color="blue"] .opt-label { background: var(--opt-b); }
+  .option-btn[data-color="blue"]:hover:not(:disabled) { border-color: var(--opt-b); }
+
+  .option-btn[data-color="yellow"] { border-color: rgba(243,156,18,0.4); }
+  .option-btn[data-color="yellow"]::before { background: var(--opt-c); }
+  .option-btn[data-color="yellow"] .opt-label { background: var(--opt-c); }
+  .option-btn[data-color="yellow"]:hover:not(:disabled) { border-color: var(--opt-c); }
+
+  .option-btn[data-color="green"] { border-color: rgba(39,174,96,0.4); }
+  .option-btn[data-color="green"]::before { background: var(--opt-d); }
+  .option-btn[data-color="green"] .opt-label { background: var(--opt-d); }
+  .option-btn[data-color="green"]:hover:not(:disabled) { border-color: var(--opt-d); }
+
+  /* Answer states */
+  .option-btn.correct-ans {
+    background: rgba(0,212,170,0.15) !important;
+    border-color: var(--green) !important;
+    animation: correctPulse 0.5s ease;
+  }
+
+  .option-btn.wrong-ans {
+    background: rgba(233,69,96,0.15) !important;
+    border-color: var(--accent) !important;
+    animation: wrongShake 0.5s ease;
+  }
+
+  .option-btn.correct-ans .opt-label { background: var(--green) !important; }
+  .option-btn.wrong-ans .opt-label { background: var(--accent) !important; }
+
+  @keyframes correctPulse {
+    0% { transform: scale(1); }
+    30% { transform: scale(1.04); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes wrongShake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+
+  /* Feedback overlay */
+  .feedback-bar {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: var(--radius);
+    margin-top: 16px;
+    font-weight: 800;
+    font-size: 1rem;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .feedback-bar.show { display: flex; }
+  .feedback-bar.fb-correct { background: rgba(0,212,170,0.15); border: 1px solid rgba(0,212,170,0.3); color: var(--green); }
+  .feedback-bar.fb-wrong { background: rgba(233,69,96,0.12); border: 1px solid rgba(233,69,96,0.3); color: var(--accent); }
+
+  .next-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), #c0392b);
+    border: none;
+    border-radius: var(--radius);
+    padding: 16px;
+    color: white;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 900;
+    cursor: pointer;
+    margin-top: 16px;
+    display: none;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+
+  .next-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(233,69,96,0.4); }
+  .next-btn.show { display: block; animation: fadeIn 0.3s ease; }
+
+  /* ── RESULT SCREEN ── */
+  #result-screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 32px 20px 60px;
+    max-width: 700px;
+  }
+
+  .result-trophy { font-size: 5rem; margin-bottom: 16px; animation: bounce 1s ease; }
+
+  @keyframes bounce {
+    0%,100% { transform: translateY(0) rotate(0); }
+    25% { transform: translateY(-20px) rotate(-5deg); }
+    75% { transform: translateY(-10px) rotate(5deg); }
+  }
+
+  .result-title {
+    font-family: 'Righteous', cursive;
+    font-size: 2.2rem;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .result-score-big {
+    font-family: 'Righteous', cursive;
+    font-size: 4rem;
+    background: linear-gradient(135deg, var(--green), var(--blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 16px 0;
+  }
+
+  .result-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    width: 100%;
+    margin: 24px 0;
+  }
+
+  .result-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.07);
+  }
+
+  .result-card .rc-val {
+    font-family: 'Righteous', cursive;
+    font-size: 2.2rem;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .result-card .rc-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .result-card.rc-correct .rc-val { color: var(--green); }
+  .result-card.rc-wrong .rc-val { color: var(--accent); }
+  .result-card.rc-pct .rc-val { color: var(--gold); }
+  .result-card.rc-time .rc-val { color: var(--blue); }
+
+  /* Gauge */
+  .score-gauge {
+    width: 160px; height: 80px;
+    margin: 0 auto 24px;
+    position: relative;
+  }
+
+  /* Review Section */
+  .review-title {
+    font-family: 'Righteous', cursive;
+    font-size: 1.4rem;
+    color: var(--accent);
+    margin: 32px 0 16px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .review-card {
+    width: 100%;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 20px;
+    margin-bottom: 12px;
+    border-left: 4px solid var(--accent);
+    animation: slideIn 0.3s ease;
+  }
+
+  .review-q-num {
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .review-q-text {
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-bottom: 14px;
+    color: var(--text);
+  }
+
+  .review-answers {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .review-opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .review-opt.your-wrong {
+    background: rgba(233,69,96,0.12);
+    border: 1px solid rgba(233,69,96,0.3);
+    color: var(--accent);
+  }
+
+  .review-opt.correct-opt {
+    background: rgba(0,212,170,0.12);
+    border: 1px solid rgba(0,212,170,0.3);
+    color: var(--green);
+  }
+
+  .review-opt.neutral {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: var(--muted);
+  }
+
+  .review-opt .ri { font-size: 1rem; flex-shrink: 0; }
+
+  .action-btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+    margin-top: 32px;
+  }
+
+  .btn-restart, .btn-upload {
+    padding: 16px;
+    border-radius: var(--radius);
+    border: none;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1rem;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-restart {
+    background: linear-gradient(135deg, var(--green), #00a080);
+    color: white;
+  }
+
+  .btn-upload {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .btn-restart:hover, .btn-upload:hover { transform: translateY(-2px); }
+
+  /* No wrong answers message */
+  .no-wrong {
+    text-align: center;
+    padding: 32px;
+    color: var(--green);
+    font-size: 1.1rem;
+    font-weight: 800;
+    background: rgba(0,212,170,0.08);
+    border-radius: var(--radius);
+    width: 100%;
+    border: 1px solid rgba(0,212,170,0.2);
+  }
+
+  /* Correct badge for option */
+  .answer-icon { font-size: 1.1rem; flex-shrink: 0; }
+
+  /* Loading */
+  .loading {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    gap: 16px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+
+  .spinner {
+    width: 44px; height: 44px;
+    border: 4px solid rgba(255,255,255,0.1);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Responsive */
+  @media (max-width: 500px) {
+    .options-grid { grid-template-columns: 1fr; }
+    .result-cards { grid-template-columns: 1fr 1fr; }
+    .features { grid-template-columns: 1fr; }
+    .action-btns { grid-template-columns: 1fr; }
+    .logo { font-size: 2.5rem; }
+  }
+
+  /* Correct answer checkmark animation */
+  @keyframes popIn {
+    0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+    70% { transform: scale(1.2) rotate(5deg); }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+</style>
+</head>
+<body>
+
+<!-- UPLOAD SCREEN -->
+<div id="upload-screen">
+  <div class="logo">📚 QuizMaster</div>
+  <div class="subtitle">Falsafa va boshqa fanlar bo'yicha interaktiv test</div>
+
+  <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+    <input type="file" id="file-input" accept=".xlsx,.xls" onchange="handleFile(this)">
+    <div class="upload-icon">📊</div>
+    <div class="upload-text">Excel faylni yuklang</div>
+    <div class="upload-sub">XLSX yoki XLS — shu yerga tashlang yoki bosing</div>
+  </div>
+
+  <div class="features">
+    <div class="feature-card"><span class="fi">🔀</span>Savollar aralashadi</div>
+    <div class="feature-card"><span class="fi">⏱️</span>Vaqt hisoblagich</div>
+    <div class="feature-card"><span class="fi">📊</span>Jonli statistika</div>
+    <div class="feature-card"><span class="fi">🎯</span>Xatoliklar sharhi</div>
+    <div class="feature-card"><span class="fi">🏆</span>Ball tizimi</div>
+    <div class="feature-card"><span class="fi">🔁</span>Qayta urinish</div>
+  </div>
+</div>
+
+<!-- QUIZ SCREEN -->
+<div id="quiz-screen">
+  <!-- Stats Bar -->
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat-chip total">
+        <div class="dot"></div>
+        <span>Jami:</span>
+        <span class="val" id="stat-total">0</span>
+      </div>
+      <div class="stat-chip answered">
+        <div class="dot"></div>
+        <span>Javob berilgan:</span>
+        <span class="val" id="stat-answered">0</span>
+      </div>
+      <div class="stat-chip remaining">
+        <div class="dot"></div>
+        <span>Qolgan:</span>
+        <span class="val" id="stat-remaining">0</span>
+      </div>
+      <div class="stat-chip correct">
+        <div class="dot"></div>
+        <span>To'g'ri:</span>
+        <span class="val" id="stat-correct">0</span>
+      </div>
+      <div class="stat-chip wrong">
+        <div class="dot"></div>
+        <span>Xato:</span>
+        <span class="val" id="stat-wrong">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="progress-wrap">
+    <div class="progress-label">
+      <span id="prog-label">1-savol</span>
+      <span id="prog-pct">0%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- Question -->
+  <div class="question-wrap">
+    <div class="question-header">
+      <div class="q-number" id="q-number">SAVOL 1 / 28</div>
+
+    </div>
+
+    <div class="question-card">
+      <div class="question-text" id="question-text">Savol yuklanmoqda...</div>
+    </div>
+
+    <div class="options-grid" id="options-grid">
+      <!-- Options injected here -->
+    </div>
+
+    <div class="feedback-bar" id="feedback-bar">
+      <span id="feedback-icon"></span>
+      <span id="feedback-text"></span>
+    </div>
+
+    <button class="next-btn" id="next-btn" onclick="nextQuestion()">
+      Keyingi savol →
+    </button>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="result-screen">
+  <div class="result-trophy" id="result-trophy">🏆</div>
+  <div class="result-title" id="result-title">Siz yakunladingiz!</div>
+
+  <div class="result-score-big" id="result-score-big">0%</div>
+
+  <div class="result-cards">
+    <div class="result-card rc-correct">
+      <span class="rc-val" id="rc-correct">0</span>
+      <span class="rc-label">✅ To'g'ri</span>
+    </div>
+    <div class="result-card rc-wrong">
+      <span class="rc-val" id="rc-wrong">0</span>
+      <span class="rc-label">❌ Xato</span>
+    </div>
+    <div class="result-card rc-pct">
+      <span class="rc-val" id="rc-pct">0%</span>
+      <span class="rc-label">📊 Foiz</span>
+    </div>
+    <div class="result-card rc-time">
+      <span class="rc-val" id="rc-time">0s</span>
+      <span class="rc-label">⏱️ Umumiy vaqt</span>
+    </div>
+  </div>
+
+  <!-- Wrong answers review -->
+  <div id="review-section"></div>
+
+  <div class="action-btns">
+    <button class="btn-restart" onclick="restartQuiz()">🔁 Qayta boshlash</button>
+    <button class="btn-upload" onclick="backToUpload()">📂 Yangi fayl</button>
+  </div>
+</div>
+
+<script>
+// ─── State ───────────────────────────────────────────
+let questions = [];       // {text, options:[{text,isCorrect}], correctText}
+let shuffled = [];        // shuffled question order
+let currentIdx = 0;
+let correctCount = 0;
+let wrongCount = 0;
+let answeredCount = 0;
+let answered = false;
+let totalTime = 0;
+let startTime = null;
+let wrongQuestions = [];  // {q, yourAnswer, correctAnswer}
+const COLORS = ['red','blue','yellow','green'];
+const COLOR_LABELS = ['🔴','🔵','🟡','🟢'];
+
+// ─── Drag & Drop ──────────────────────────────────────
+const zone = document.getElementById('upload-zone');
+zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+zone.addEventListener('drop', e => {
+  e.preventDefault();
+  zone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+});
+
+// ─── File Handling ─────────────────────────────────────
+function handleFile(input) {
+  if (input.files[0]) processFile(input.files[0]);
+}
+
+function processFile(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const wb = XLSX.read(e.target.result, { type: 'binary' });
+      parseWorkbook(wb);
+    } catch(err) {
+      alert('Fayl o\'qishda xatolik: ' + err.message);
+    }
+  };
+  reader.readAsBinaryString(file);
+}
+
+function parseWorkbook(wb) {
+  // Strategy: find answer key sheet, then find question sheets
+  let answerKey = {};  // q_index -> correct answer text
+  let rawQuestions = [];
+
+  // Find sheets
+  const sheetNames = wb.SheetNames;
+  
+  // Find answer key
+  const keySheet = sheetNames.find(n => 
+    n.toUpperCase().includes('JAVOB') || n.toUpperCase().includes('KEY') || n.toUpperCase().includes('KALIT')
+  );
+
+  if (keySheet) {
+    const ws = wb.Sheets[keySheet];
+    const data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    // Row 0 = title, Row 1 = header, Rows 2+ = data
+    for (let i = 2; i < data.length; i++) {
+      const row = data[i];
+      if (!row[0] || !row[2]) continue;
+      const num = parseInt(row[0]);
+      if (!isNaN(num)) {
+        answerKey[num] = String(row[2]).trim();
+      }
+    }
+  }
+
+  // Find variant sheets (or any data sheet)
+  const variantSheets = sheetNames.filter(n => 
+    !n.toUpperCase().includes('JAVOB') && !n.toUpperCase().includes('KEY') && !n.toUpperCase().includes('KALIT')
+  );
+
+  // Use first variant sheet for questions
+  if (variantSheets.length > 0) {
+    const ws = wb.Sheets[variantSheets[0]];
+    const data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    // Row 0 = title (has "To'g'ri javob: X"), Row 1 = header (#, SAVOL, A, B, C, D), Rows 2+ = questions
+    
+    // Detect which column is correct from title
+    let correctColIdx = 2; // default A
+    if (data[0] && data[0][0]) {
+      const title = String(data[0][0]).toUpperCase();
+      if (title.includes('TO\'G\'RI JAVOB: A') || title.includes("TO'G'RI JAVOB: A")) correctColIdx = 2;
+      else if (title.includes('B)')) correctColIdx = 3;
+      else if (title.includes('C)')) correctColIdx = 4;
+      else if (title.includes('D)')) correctColIdx = 5;
+    }
+
+    for (let i = 2; i < data.length; i++) {
+      const row = data[i];
+      const qNum = parseInt(row[0]);
+      const qText = String(row[1] || '').trim();
+      if (!qText || isNaN(qNum)) continue;
+
+      const opts = [];
+      for (let c = 2; c <= 5; c++) {
+        const optText = String(row[c] || '').trim().replace(/^[A-D]\)\s*/,'');
+        opts.push({ text: optText, raw: String(row[c] || '').trim() });
+      }
+
+      // Determine correct answer
+      let correctText = '';
+      if (answerKey[qNum]) {
+        correctText = answerKey[qNum];
+      } else {
+        // Use the column that's always correct in this variant
+        correctText = opts[correctColIdx - 2]?.text || opts[0]?.text;
+      }
+
+      rawQuestions.push({ num: qNum, text: qText, opts, correctText });
+    }
+  } else {
+    // Fallback: try all sheets
+    const ws = wb.Sheets[sheetNames[0]];
+    const data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      if (!row[0] || !row[1]) continue;
+      rawQuestions.push({
+        num: parseInt(row[0]) || i,
+        text: String(row[1]).trim(),
+        opts: [
+          { text: String(row[2]||'').trim().replace(/^[A-D]\)\s*/,''), raw: String(row[2]||'') },
+          { text: String(row[3]||'').trim().replace(/^[A-D]\)\s*/,''), raw: String(row[3]||'') },
+          { text: String(row[4]||'').trim().replace(/^[A-D]\)\s*/,''), raw: String(row[4]||'') },
+          { text: String(row[5]||'').trim().replace(/^[A-D]\)\s*/,''), raw: String(row[5]||'') },
+        ],
+        correctText: String(row[2]||'').trim().replace(/^[A-D]\)\s*/,'')
+      });
+    }
+  }
+
+  if (rawQuestions.length === 0) {
+    alert('Savollar topilmadi. Fayl formatini tekshiring.');
+    return;
+  }
+
+  // Build final questions with shuffled options
+  questions = rawQuestions.map(q => {
+    const optionsWithCorrect = q.opts.map(o => ({
+      text: o.text,
+      isCorrect: fuzzyMatch(o.text, q.correctText)
+    }));
+    
+    // Make sure exactly one is correct
+    const hasCorrect = optionsWithCorrect.some(o => o.isCorrect);
+    if (!hasCorrect && optionsWithCorrect.length > 0) {
+      optionsWithCorrect[0].isCorrect = true; // fallback
+    }
+
+    return {
+      num: q.num,
+      text: q.text,
+      options: optionsWithCorrect,
+      correctText: q.correctText
+    };
+  });
+
+  startQuiz();
+}
+
+function fuzzyMatch(a, b) {
+  if (!a || !b) return false;
+  const clean = s => s.toLowerCase().replace(/[^a-zа-яёa-züöğşçıqwx\s]/gi,'').replace(/\s+/g,' ').trim();
+  return clean(a) === clean(b) || a.toLowerCase().includes(b.toLowerCase()) || b.toLowerCase().includes(a.toLowerCase());
+}
+
+// ─── Quiz Logic ────────────────────────────────────────
+function startQuiz() {
+  currentIdx = 0;
+  correctCount = 0;
+  wrongCount = 0;
+  answeredCount = 0;
+  wrongQuestions = [];
+  totalTime = 0;
+  startTime = Date.now();
+
+  // Shuffle questions
+  shuffled = [...questions].sort(() => Math.random() - 0.5);
+
+  document.getElementById('upload-screen').style.display = 'none';
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'flex';
+
+  updateStats();
+  showQuestion();
+}
+
+function updateStats() {
+  const total = shuffled.length;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-answered').textContent = answeredCount;
+  document.getElementById('stat-remaining').textContent = total - answeredCount;
+  document.getElementById('stat-correct').textContent = correctCount;
+  document.getElementById('stat-wrong').textContent = wrongCount;
+
+  const pct = Math.round((answeredCount / total) * 100);
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('prog-pct').textContent = pct + '%';
+  document.getElementById('prog-label').textContent = `${currentIdx + 1}-savol`;
+  document.getElementById('q-number').textContent = `SAVOL ${currentIdx + 1} / ${total}`;
+}
+
+function showQuestion() {
+  const q = shuffled[currentIdx];
+  answered = false;
+
+  document.getElementById('question-text').textContent = q.text;
+
+  // Shuffle options
+  const opts = [...q.options].sort(() => Math.random() - 0.5);
+
+  const grid = document.getElementById('options-grid');
+  grid.innerHTML = '';
+
+  opts.forEach((opt, i) => {
+    const color = COLORS[i];
+    const label = ['A', 'B', 'C', 'D'][i];
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.setAttribute('data-color', color);
+    btn.setAttribute('data-correct', opt.isCorrect ? '1' : '0');
+    btn.innerHTML = `<div class="opt-label">${label}</div><span>${opt.text}</span>`;
+    btn.onclick = () => selectAnswer(btn, opt, q);
+    grid.appendChild(btn);
+  });
+
+  // Hide feedback
+  const fb = document.getElementById('feedback-bar');
+  fb.className = 'feedback-bar';
+  document.getElementById('next-btn').className = 'next-btn';
+
+  // Start timer
+
+}
+
+
+
+function selectAnswer(btn, opt, q) {
+  if (answered) return;
+  answered = true;
+  answeredCount++;
+
+
+  // Disable all buttons
+  document.querySelectorAll('.option-btn').forEach(b => b.disabled = true);
+
+  if (opt.isCorrect) {
+    correctCount++;
+    btn.classList.add('correct-ans');
+    showFeedback(true, '🎉 To\'g\'ri javob! Ajoyib!');
+  } else {
+    wrongCount++;
+    btn.classList.add('wrong-ans');
+    // Show correct answer
+    document.querySelectorAll('.option-btn').forEach(b => {
+      if (b.getAttribute('data-correct') === '1') b.classList.add('correct-ans');
+    });
+    const correctOpt = q.options.find(o => o.isCorrect);
+    showFeedback(false, `❌ Xato! To'g'ri javob: ${correctOpt?.text || q.correctText}`);
+    wrongQuestions.push({ q, yourAnswer: opt.text, correctAnswer: correctOpt?.text || q.correctText });
+  }
+
+  updateStats();
+  setTimeout(() => {
+    document.getElementById('next-btn').className = 'next-btn show';
+  }, 400);
+}
+
+function showFeedback(isCorrect, text) {
+  const fb = document.getElementById('feedback-bar');
+  fb.className = 'feedback-bar show ' + (isCorrect ? 'fb-correct' : 'fb-wrong');
+  document.getElementById('feedback-text').textContent = text;
+}
+
+function nextQuestion() {
+  currentIdx++;
+  if (currentIdx >= shuffled.length) {
+    showResults();
+  } else {
+    updateStats();
+    showQuestion();
+  }
+}
+
+// ─── Results ───────────────────────────────────────────
+function showResults() {
+
+  totalTime = Math.round((Date.now() - startTime) / 1000);
+
+  document.getElementById('quiz-screen').style.display = 'none';
+  const rs = document.getElementById('result-screen');
+  rs.style.display = 'flex';
+
+  const total = shuffled.length;
+  const pct = Math.round((correctCount / total) * 100);
+
+  // Trophy & title based on score
+  let trophy = '🏆', title = 'Ajoyib natija!';
+  if (pct >= 90) { trophy = '🥇'; title = 'Mukammal! Siz ustasiz!'; }
+  else if (pct >= 75) { trophy = '🥈'; title = 'Zo\'r natija! Yaxshi ishlading!'; }
+  else if (pct >= 60) { trophy = '🥉'; title = 'Yaxshi! Ko\'proq mashq qiling!'; }
+  else if (pct >= 40) { trophy = '📚'; title = 'Davom eting! Yana o\'rganing!'; }
+  else { trophy = '💪'; title = 'Harakat qiling! Qayta sinab ko\'ring!'; }
+
+  document.getElementById('result-trophy').textContent = trophy;
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-score-big').textContent = pct + '%';
+  document.getElementById('rc-correct').textContent = correctCount;
+  document.getElementById('rc-wrong').textContent = wrongCount;
+  document.getElementById('rc-pct').textContent = pct + '%';
+  document.getElementById('rc-time').textContent = formatTime(totalTime);
+
+  // Review wrong answers
+  const rev = document.getElementById('review-section');
+  if (wrongQuestions.length === 0) {
+    rev.innerHTML = `<div class="no-wrong">🎊 Barcha savollarga to'g'ri javob berdingiz! Zo'rsiz!</div>`;
+  } else {
+    let html = `<div class="review-title">❌ Xato berilgan savollar (${wrongQuestions.length} ta)</div>`;
+    wrongQuestions.forEach((item, i) => {
+      const q = item.q;
+      html += `<div class="review-card">
+        <div class="review-q-num">❌ ${i+1}. Xato savol (Original: ${q.num}-savol)</div>
+        <div class="review-q-text">${q.text}</div>
+        <div class="review-answers">`;
+
+      // Show all options
+      q.options.forEach(opt => {
+        const isYourWrong = !opt.isCorrect && fuzzyMatch(opt.text, item.yourAnswer);
+        const isCorrect = opt.isCorrect;
+        let cls = 'neutral', icon = '  ';
+        if (isCorrect) { cls = 'correct-opt'; icon = '✅'; }
+        if (isYourWrong && !isCorrect) { cls = 'your-wrong'; icon = '❌'; }
+
+        html += `<div class="review-opt ${cls}">
+          <span class="ri">${icon}</span>
+          <span>${opt.text}${isCorrect ? ' ← To\'g\'ri javob' : ''}${isYourWrong && !isCorrect ? ' ← Siz tanlagan' : ''}</span>
+        </div>`;
+      });
+
+      if (item.yourAnswer === '(Vaqt tugadi)') {
+        html += `<div class="review-opt your-wrong"><span class="ri">⏰</span><span>Vaqt tugab ketdi</span></div>`;
+      }
+
+      html += `</div></div>`;
+    });
+    rev.innerHTML = html;
+  }
+
+  // Scroll to top
+  rs.scrollTop = 0;
+  window.scrollTo(0,0);
+}
+
+function formatTime(s) {
+  if (s < 60) return s + 's';
+  return Math.floor(s/60) + 'min ' + (s%60) + 's';
+}
+
+// ─── Navigation ────────────────────────────────────────
+function restartQuiz() {
+  startQuiz();
+  window.scrollTo(0,0);
+}
+
+function backToUpload() {
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('upload-screen').style.display = 'flex';
+  document.getElementById('file-input').value = '';
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
