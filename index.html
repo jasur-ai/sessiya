@@ -682,6 +682,103 @@
     .logo { font-size: 2.5rem; }
   }
 
+  /* ── SAVED TESTS SECTION ── */
+  .saved-tests-section {
+    width: 100%;
+    margin-top: 36px;
+  }
+  .saved-tests-title {
+    font-family: 'Righteous', cursive;
+    font-size: 1.3rem;
+    color: var(--text);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .saved-tests-title .count-badge {
+    background: var(--accent);
+    color: white;
+    font-size: 0.75rem;
+    padding: 2px 10px;
+    border-radius: 50px;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+  }
+  .saved-test-card {
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.07);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transition: border-color 0.2s;
+  }
+  .saved-test-card:hover { border-color: rgba(233,69,96,0.4); }
+  .st-name { font-weight: 800; font-size: 1rem; color: var(--text); margin-bottom: 4px; }
+  .st-meta { font-size: 0.78rem; font-weight: 600; color: var(--muted); }
+  .st-actions { display: flex; gap: 8px; flex-shrink: 0; }
+  .st-start-btn {
+    background: linear-gradient(135deg, var(--green), #00a080);
+    border: none; border-radius: 10px; padding: 8px 16px;
+    color: white; font-family: 'Nunito', sans-serif;
+    font-size: 0.85rem; font-weight: 800; cursor: pointer; transition: all 0.2s;
+  }
+  .st-start-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,212,170,0.3); }
+  .st-del-btn {
+    background: rgba(233,69,96,0.12); border: 1px solid rgba(233,69,96,0.25);
+    border-radius: 10px; padding: 8px 12px; color: var(--accent);
+    font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+  }
+  .st-del-btn:hover { background: rgba(233,69,96,0.25); }
+  .no-tests-msg {
+    text-align: center; padding: 24px; color: var(--muted);
+    font-size: 0.9rem; font-weight: 600;
+    background: rgba(255,255,255,0.03); border-radius: var(--radius);
+    border: 1px dashed rgba(255,255,255,0.08);
+  }
+  /* ── NAME MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+    z-index: 999; align-items: center; justify-content: center; padding: 20px;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: var(--card); border-radius: 24px; padding: 36px 32px;
+    width: 100%; max-width: 420px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    animation: slideIn 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .modal-title { font-family: 'Righteous', cursive; font-size: 1.5rem; margin-bottom: 6px; color: var(--text); }
+  .modal-sub { color: var(--muted); font-size: 0.88rem; font-weight: 600; margin-bottom: 24px; }
+  .modal-input {
+    width: 100%; background: rgba(255,255,255,0.06);
+    border: 2px solid rgba(255,255,255,0.1); border-radius: 12px;
+    padding: 14px 16px; color: var(--text); font-family: 'Nunito', sans-serif;
+    font-size: 1rem; font-weight: 700; outline: none; transition: border-color 0.2s; margin-bottom: 20px;
+  }
+  .modal-input:focus { border-color: var(--accent); }
+  .modal-input::placeholder { color: var(--muted); font-weight: 600; }
+  .modal-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .modal-save-btn {
+    background: linear-gradient(135deg, var(--accent), #c0392b);
+    border: none; border-radius: 12px; padding: 14px; color: white;
+    font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 900;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .modal-save-btn:hover { transform: translateY(-1px); }
+  .modal-cancel-btn {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; padding: 14px; color: var(--muted);
+    font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.2s;
+  }
+  .modal-cancel-btn:hover { background: rgba(255,255,255,0.1); }
+
   /* Correct answer checkmark animation */
   @keyframes popIn {
     0% { transform: scale(0) rotate(-10deg); opacity: 0; }
@@ -706,11 +803,33 @@
 
   <div class="features">
     <div class="feature-card"><span class="fi">🔀</span>Savollar aralashadi</div>
-    <div class="feature-card"><span class="fi">⏱️</span>Vaqt hisoblagich</div>
     <div class="feature-card"><span class="fi">📊</span>Jonli statistika</div>
     <div class="feature-card"><span class="fi">🎯</span>Xatoliklar sharhi</div>
     <div class="feature-card"><span class="fi">🏆</span>Ball tizimi</div>
     <div class="feature-card"><span class="fi">🔁</span>Qayta urinish</div>
+  </div>
+
+  <!-- Testlarim section -->
+  <div class="saved-tests-section">
+    <div class="saved-tests-title">
+      📋 Testlarim <span class="count-badge" id="tests-count">0</span>
+    </div>
+    <div id="saved-tests-list">
+      <div class="no-tests-msg">Hozircha saqlangan testlar yo'q</div>
+    </div>
+  </div>
+</div>
+
+<!-- NAME MODAL -->
+<div class="modal-overlay" id="name-modal">
+  <div class="modal-box">
+    <div class="modal-title">📝 Test nomini kiriting</div>
+    <div class="modal-sub">Bu nom "Testlarim" bo'limida ko'rinadi</div>
+    <input class="modal-input" id="test-name-input" type="text" placeholder="Masalan: Falsafa — 1-variant" maxlength="60">
+    <div class="modal-btns">
+      <button class="modal-save-btn" onclick="confirmSaveAndStart()">✅ Saqlash va boshlash</button>
+      <button class="modal-cancel-btn" onclick="cancelModal()">Bekor qilish</button>
+    </div>
   </div>
 </div>
 
@@ -981,8 +1100,73 @@ function parseWorkbook(wb) {
     };
   });
 
+  showNameModal();
+}
+
+// --- Name Modal & Saved Tests ---
+let pendingQuestions = null;
+
+function showNameModal() {
+  pendingQuestions = questions;
+  document.getElementById('test-name-input').value = '';
+  document.getElementById('name-modal').classList.add('show');
+  setTimeout(() => document.getElementById('test-name-input').focus(), 100);
+}
+
+function cancelModal() {
+  document.getElementById('name-modal').classList.remove('show');
+  pendingQuestions = null;
+  document.getElementById('file-input').value = '';
+}
+
+function confirmSaveAndStart() {
+  let name = document.getElementById('test-name-input').value.trim();
+  if (!name) name = 'Test ' + new Date().toLocaleDateString('uz');
+  document.getElementById('name-modal').classList.remove('show');
+  const saved = JSON.parse(localStorage.getItem('savedTests') || '[]');
+  const id = Date.now();
+  saved.push({ id, name, questions: pendingQuestions, date: new Date().toLocaleDateString('uz'), count: pendingQuestions.length });
+  localStorage.setItem('savedTests', JSON.stringify(saved));
+  renderSavedTests();
+  pendingQuestions = null;
   startQuiz();
 }
+
+function renderSavedTests() {
+  const saved = JSON.parse(localStorage.getItem('savedTests') || '[]');
+  const container = document.getElementById('saved-tests-list');
+  const badge = document.getElementById('tests-count');
+  if (badge) badge.textContent = saved.length;
+  if (!container) return;
+  if (saved.length === 0) {
+    container.innerHTML = '<div class="no-tests-msg">Hozircha saqlangan testlar yoq</div>';
+    return;
+  }
+  container.innerHTML = saved.map(t =>
+    '<div class="saved-test-card"><div class="st-info"><div class="st-name">' + escHtml(t.name) + '</div><div class="st-meta">' + t.count + ' ta savol • ' + t.date + '</div></div><div class="st-actions"><button class="st-start-btn" onclick="loadSavedTest(' + t.id + ')">&#9654; Boshlash</button><button class="st-del-btn" onclick="deleteSavedTest(' + t.id + ')">&#128465;</button></div></div>'
+  ).join('');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function loadSavedTest(id) {
+  const saved = JSON.parse(localStorage.getItem('savedTests') || '[]');
+  const test = saved.find(t => t.id === id);
+  if (!test) return;
+  questions = test.questions;
+  startQuiz();
+}
+
+function deleteSavedTest(id) {
+  if (!confirm('Bu testni ochirmoqchimisiz?')) return;
+  let saved = JSON.parse(localStorage.getItem('savedTests') || '[]');
+  saved = saved.filter(t => t.id !== id);
+  localStorage.setItem('savedTests', JSON.stringify(saved));
+  renderSavedTests();
+}
+
 
 function fuzzyMatch(a, b) {
   if (!a || !b) return false;
@@ -1193,8 +1377,17 @@ function backToUpload() {
   document.getElementById('quiz-screen').style.display = 'none';
   document.getElementById('upload-screen').style.display = 'flex';
   document.getElementById('file-input').value = '';
+  renderSavedTests();
   window.scrollTo(0,0);
 }
+
+// Enter key on modal input
+document.addEventListener('DOMContentLoaded', function() {
+  renderSavedTests();
+  document.getElementById('test-name-input').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') confirmSaveAndStart();
+  });
+});
 </script>
 </body>
 </html>
