@@ -983,124 +983,123 @@ function processFile(file) {
 }
 
 function parseWorkbook(wb) {
-  // Strategy: find answer key sheet, then find question sheets
-  let answerKey = {};  // q_index -> correct answer text
-  let rawQuestions = [];
+  // ─── Yangi format: 1 oyna, ustunlar: # | SAVOL | A | B | C | D | TO'G'RI ───
+  // TO'G'RI ustunida harf: A, B, C yoki D
+  // Eski formatlar ham qo'llab-quvvatlanadi (fallback)
 
-  // Find sheets
   const sheetNames = wb.SheetNames;
-  
-  // Find answer key
-  const keySheet = sheetNames.find(n => 
-    n.toUpperCase().includes('JAVOB') || n.toUpperCase().includes('KEY') || n.toUpperCase().includes('KALIT')
-  );
+  if (sheetNames.length === 0) { alert("Excel oynasi topilmadi!"); return; }
 
-  if (keySheet) {
-    const ws = wb.Sheets[keySheet];
-    const data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-    // Row 0 = title, Row 1 = header, Rows 2+ = data
-    for (let i = 2; i < data.length; i++) {
-      const row = data[i];
-      if (!row[0] || !row[2]) continue;
-      const num = parseInt(row[0]);
-      if (!isNaN(num)) {
-        answerKey[num] = String(row[2]).trim();
-      }
+  // Birinchi oynani ol (variantlar/savollar oynasi)
+  const ws = wb.Sheets[sheetNames[0]];
+  const data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+
+  // Header qatorini top (# va SAVOL borligini tekshirib)
+  let headerRow = -1;
+  for (let i = 0; i < Math.min(5, data.length); i++) {
+    const r = data[i].map(v => String(v).toUpperCase().trim());
+    if ((r[0] === '#' || r[0] === 'N' || r[0] === 'NO') &&
+        (r[1] === 'SAVOL' || r[1].includes('SAVOL') || r[1] === 'QUESTION')) {
+      headerRow = i;
+      break;
     }
   }
+  const dataStart = headerRow >= 0 ? headerRow + 1 : 2;
 
-  // Find variant sheets (or any data sheet)
-  const variantSheets = sheetNames.filter(n => 
-    !n.toUpperCase().includes('JAVOB') && !n.toUpperCase().includes('KEY') && !n.toUpperCase().includes('KALIT')
-  );
-
-  // Use first variant sheet for questions
-  if (variantSheets.length > 0) {
-    const ws = wb.Sheets[variantSheets[0]];
-    const data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-    // Row 0 = title (has "To'g'ri javob: X"), Row 1 = header (#, SAVOL, A, B, C, D), Rows 2+ = questions
-    
-    // Detect which column is correct from title
-    let correctColIdx = 2; // default A
-    if (data[0] && data[0][0]) {
-      const title = String(data[0][0]).toUpperCase();
-      if (title.includes('TO\'G\'RI JAVOB: A') || title.includes("TO'G'RI JAVOB: A")) correctColIdx = 2;
-      else if (title.includes('B)')) correctColIdx = 3;
-      else if (title.includes('C)')) correctColIdx = 4;
-      else if (title.includes('D)')) correctColIdx = 5;
-    }
-
-    for (let i = 2; i < data.length; i++) {
-      const row = data[i];
-      const qNum = parseInt(row[0]);
-      const qText = String(row[1] || '').trim();
-      if (!qText || isNaN(qNum)) continue;
-
-      const opts = [];
-      for (let c = 2; c <= 5; c++) {
-        const optText = String(row[c] || '').trim().replace(/^[A-D]\)\s*/,'');
-        opts.push({ text: optText, raw: String(row[c] || '').trim() });
+  // Header dan ustunlarni aniqla
+  let colMap = { num: 0, savol: 1, a: 2, b: 3, c: 4, d: 5, correct: 6 };
+  if (headerRow >= 0) {
+    data[headerRow].forEach((h, i) => {
+      const v = String(h).toUpperCase().trim().replace(/['"]/g,'');
+      if (v === '#' || v === 'NO' || v === 'N') colMap.num = i;
+      else if (v === 'SAVOL' || v === 'QUESTION' || v === 'SAVOL (QISQA)') colMap.savol = i;
+      else if (v === 'A') colMap.a = i;
+      else if (v === 'B') colMap.b = i;
+      else if (v === 'C') colMap.c = i;
+      else if (v === 'D') colMap.d = i;
+      else if (v.includes("TO'G'RI") || v.includes("TOGRI") || v.includes("TO`G`RI") ||
+               v === 'CORRECT' || v === 'ANSWER' || v.includes('JAVOB') && v.includes('HARF')) {
+        colMap.correct = i;
       }
+    });
+  }
 
-      // Determine correct answer
-      let correctText = '';
-      if (answerKey[qNum]) {
-        correctText = answerKey[qNum];
-      } else {
-        // Use the column that's always correct in this variant
-        correctText = opts[correctColIdx - 2]?.text || opts[0]?.text;
-      }
+  const rawQuestions = [];
 
-      rawQuestions.push({ num: qNum, text: qText, opts, correctText });
+  for (let i = dataStart; i < data.length; i++) {
+    const row = data[i];
+    const qText = String(row[colMap.savol] || '').trim();
+    if (!qText || qText.length < 3) continue;
+
+    const num = parseInt(row[colMap.num]) || (i - dataStart + 1);
+
+    // Variantlarni o'qi va A) B) prefiksini tozala
+    const cleanOpt = v => String(v || '').trim().replace(/^[A-Da-d][).\s]\s*/,'').trim();
+    const optA = cleanOpt(row[colMap.a]);
+    const optB = cleanOpt(row[colMap.b]);
+    const optC = cleanOpt(row[colMap.c]);
+    const optD = cleanOpt(row[colMap.d]);
+
+    if (!optA && !optB) continue; // bo'sh qatorlar
+
+    // TO'G'RI ustundan to'g'ri harfni ol
+    const correctRaw = String(row[colMap.correct] || '').trim().toUpperCase();
+    const correctLetter = correctRaw.replace(/[^ABCD]/g, '').charAt(0);
+
+    // Harfga mos to'g'ri variantni topish
+    const optMap = { A: optA, B: optB, C: optC, D: optD };
+    let correctText = '';
+    if (correctLetter && optMap[correctLetter]) {
+      correctText = optMap[correctLetter];
+    } else {
+      // Fallback: eski format — to'g'ri javob matn sifatida berilgan
+      correctText = correctRaw;
     }
-  } else {
-    // Fallback: try all sheets
-    const ws = wb.Sheets[sheetNames[0]];
-    const data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-    for (let i = 1; i < data.length; i++) {
-      const row = data[i];
-      if (!row[0] || !row[1]) continue;
-      rawQuestions.push({
-        num: parseInt(row[0]) || i,
-        text: String(row[1]).trim(),
-        opts: [
-          { text: String(row[2]||'').trim().replace(/^[A-D]\)\s*/,''), raw: String(row[2]||'') },
-          { text: String(row[3]||'').trim().replace(/^[A-D]\)\s*/,''), raw: String(row[3]||'') },
-          { text: String(row[4]||'').trim().replace(/^[A-D]\)\s*/,''), raw: String(row[4]||'') },
-          { text: String(row[5]||'').trim().replace(/^[A-D]\)\s*/,''), raw: String(row[5]||'') },
-        ],
-        correctText: String(row[2]||'').trim().replace(/^[A-D]\)\s*/,'')
-      });
-    }
+
+    rawQuestions.push({
+      num,
+      text: qText,
+      opts: [
+        { text: optA, col: 'A' },
+        { text: optB, col: 'B' },
+        { text: optC, col: 'C' },
+        { text: optD, col: 'D' }
+      ],
+      correctText,
+      correctCol: correctLetter
+    });
   }
 
   if (rawQuestions.length === 0) {
-    alert('Savollar topilmadi. Fayl formatini tekshiring.');
+    alert('Savollar topilmadi!\nFormat: # | SAVOL | A | B | C | D | TO\'G\'RI\nTO\'G\'RI ustunida harf (A, B, C, D) bo\'lishi kerak.');
     return;
   }
 
-  // Build final questions with shuffled options
-  questions = rawQuestions.map(q => {
-    const optionsWithCorrect = q.opts.map(o => ({
+  // Savollarga isCorrect belgisini qo'y — harfga qarab (ishonchli!)
+  questions = rawQuestions.map(q => ({
+    num: q.num,
+    text: q.text,
+    correctText: q.correctText,
+    options: q.opts.map(o => ({
       text: o.text,
-      isCorrect: fuzzyMatch(o.text, q.correctText)
-    }));
-    
-    // Make sure exactly one is correct
-    const hasCorrect = optionsWithCorrect.some(o => o.isCorrect);
-    if (!hasCorrect && optionsWithCorrect.length > 0) {
-      optionsWithCorrect[0].isCorrect = true; // fallback
-    }
+      isCorrect: q.correctCol ? (o.col === q.correctCol) : exactMatch(o.text, q.correctText)
+    }))
+  }));
 
-    return {
-      num: q.num,
-      text: q.text,
-      options: optionsWithCorrect,
-      correctText: q.correctText
-    };
+  // Har bir savolda kamida 1 ta to'g'ri javob bo'lishini ta'minla
+  questions.forEach(q => {
+    if (!q.options.some(o => o.isCorrect) && q.options.length > 0) {
+      q.options[0].isCorrect = true;
+    }
   });
 
   showNameModal();
+}
+
+function exactMatch(a, b) {
+  if (!a || !b) return false;
+  const norm = s => s.toLowerCase().replace(/\s+/g,' ').trim();
+  return norm(a) === norm(b);
 }
 
 // --- Name Modal & Saved Tests ---
