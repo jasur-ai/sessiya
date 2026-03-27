@@ -983,119 +983,119 @@ function processFile(file) {
 }
 
 function parseWorkbook(wb) {
-  // Format: 1 oyna, 7 ustun: # | SAVOL | A | B | C | D | TO'G'RI
-  // TO'G'RI ustunida faqat harf: A, B, C yoki D
+  // ── Qat'iy format: # | SAVOL | A | B | C | D | TO'G'RI ──
+  // Ustun indekslari:  0     1    2   3   4   5      6
+  // TO'G'RI da faqat: A, B, C yoki D harfi
 
-  const sheetNames = wb.SheetNames;
-  if (!sheetNames.length) { alert('Excel oynasi topilmadi!'); return; }
+  if (!wb.SheetNames.length) { alert('Excel oynasi topilmadi!'); return; }
 
-  const ws = wb.Sheets[sheetNames[0]];
+  const ws = wb.Sheets[wb.SheetNames[0]];
   const data = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
 
-  // Birinchi raqamli qatorni top — data qatori shu
-  // (Sarlavha va header qatorlarini o'tkazib yuborish)
+  // Birinchi raqamli qatorni topish (sarlavha/header ni o'tkazib yuborish)
   let dataStart = 0;
   for (let i = 0; i < Math.min(10, data.length); i++) {
-    const firstCell = String(data[i][0] || '').trim();
-    // Raqam yoki '#' bo'lmagan va 2-ustun matnga o'xshasa — header
-    if (!isNaN(parseInt(firstCell)) && parseInt(firstCell) >= 1) {
-      dataStart = i;
-      break;
-    }
+    const v = String(data[i][0] || '').trim();
+    if (/^\d+$/.test(v) && parseInt(v) >= 1) { dataStart = i; break; }
     dataStart = i + 1;
   }
 
-  // Ustun pozitsiyalarini header dan aniqla (yoki default 0-6)
-  let C_NUM = 0, C_Q = 1, C_A = 2, C_B = 3, C_C = 4, C_D = 5, C_ANS = 6;
+  // USTUN INDEKSLARI — qat'iy belgilangan
+  // Agar header qatori topilsa, TO'G'RI ustunini dinamik aniqlash
+  const IDX = { num:0, q:1, a:2, b:3, c:4, d:5, ans:6 };
 
-  // Header qatorini tekshir
+  // Header qatorini tekshir — TO'G'RI ustun nechinci?
   for (let i = 0; i < dataStart; i++) {
     const row = data[i];
-    // Agar birinchi katak '#' va ikkinchisi 'SAVOL' ga o'xshasa — header
-    const r0 = String(row[0] || '').trim();
-    const r1 = String(row[1] || '').toUpperCase().trim();
-    if (r0 === '#' && r1.includes('SAVOL')) {
-      // Oxirgi ustunni TO'G'RI deb qabul qilamiz
-      // Ustun soni bo'yicha aniqlash
-      const maxCol = row.length - 1;
-      if (maxCol >= 6) {
-        C_NUM = 0; C_Q = 1; C_A = 2; C_B = 3; C_C = 4; C_D = 5; C_ANS = maxCol;
-      }
-      break;
+    if (String(row[0]||'').trim() !== '#') continue;
+    // Header topildi — har bir ustun nomini tekshir
+    for (let col = 0; col < row.length; col++) {
+      const h = String(row[col]||'').trim().toUpperCase()
+                  .replace(/'/g,"'").replace(/`/g,"'");
+      if (h === '#')  IDX.num = col;
+      else if (col===1) IDX.q = col; // SAVOL har doim 2-ustun
+      else if (h === 'A') IDX.a = col;
+      else if (h === 'B') IDX.b = col;
+      else if (h === 'C') IDX.c = col;
+      else if (h === 'D') IDX.d = col;
+      // TO'G'RI - agar harflardan biri emas va oxirgi to'ldirilgan ustun
+      else if (h && !['A','B','C','D'].includes(h) && col >= 6) IDX.ans = col;
     }
+    break;
   }
 
-  const clean = v => String(v || '').trim().replace(/^[A-Da-d]\s*[).]\s*/,'').trim();
+  const cleanOpt = v => String(v||'').trim()
+    .replace(/^[A-Da-d]\s*[).]\s*/,'').trim(); // "A) text" → "text"
 
   const rawQ = [];
   for (let i = dataStart; i < data.length; i++) {
     const row = data[i];
-    const qText = String(row[C_Q] || '').trim();
+    const qText = String(row[IDX.q]||'').trim();
     if (!qText || qText.length < 4) continue;
 
-    const optA = clean(row[C_A]);
-    const optB = clean(row[C_B]);
-    const optC = clean(row[C_C]);
-    const optD = clean(row[C_D]);
-    if (!optA) continue;
+    const oA = cleanOpt(row[IDX.a]);
+    const oB = cleanOpt(row[IDX.b]);
+    const oC = cleanOpt(row[IDX.c]);
+    const oD = cleanOpt(row[IDX.d]);
+    if (!oA || !oB) continue;
 
-    // TO'G'RI harfini ol — OXIRGI ustundan
-    const ansCell = String(row[C_ANS] || '').trim().toUpperCase();
-    // Faqat A B C D harflarini qabul qil
-    const letter = ansCell.replace(/[^ABCD]/g,'').charAt(0);
+    // TO'G'RI harfini ol — ANIQ bir xil regex
+    const ansRaw = String(row[IDX.ans]||'').trim().toUpperCase();
+    const letter  = ansRaw.replace(/[^ABCD]/g,'').charAt(0); // 'A'|'B'|'C'|'D'
 
-    const optMap = { A: optA, B: optB, C: optC, D: optD };
-    const correctText = (letter && optMap[letter]) ? optMap[letter] : '';
+    const optMap  = {A:oA, B:oB, C:oC, D:oD};
+    const correctText = letter ? (optMap[letter]||'') : '';
 
     rawQ.push({
-      num: parseInt(row[C_NUM]) || (rawQ.length + 1),
-      text: qText,
-      correctLetter: letter,      // 'A' | 'B' | 'C' | 'D'
-      correctText: correctText,
-      optA, optB, optC, optD
+      num          : parseInt(String(row[IDX.num]||'')) || (rawQ.length+1),
+      text         : qText,
+      correctLetter: letter,      // ← bu eng muhim: harf!
+      correctText  : correctText,
+      oA, oB, oC, oD
     });
   }
 
   if (!rawQ.length) {
-    alert('Savollar topilmadi!\nExcel formati: # | SAVOL | A | B | C | D | TOGRI\nOxirgi ustunda to\'g\'ri javob harfi (A,B,C,D) bo\'lishi kerak.');
+    alert("Savollar topilmadi!\nFormat: # | SAVOL | A | B | C | D | TO'G'RI\nOxirgi ustunda to'g'ri javob harfi (A,B,C,D) bo'lishi kerak.");
     return;
   }
 
-  // questions massivini yasash — isCorrect HARF bo'yicha, ANIQ
+  // questions ni yasash — isCorrect FAQAT correctLetter ga qarab belgilanadi
   questions = rawQ.map(q => {
     const opts = [
-      { text: q.optA, letter: 'A' },
-      { text: q.optB, letter: 'B' },
-      { text: q.optC, letter: 'C' },
-      { text: q.optD, letter: 'D' }
+      {text:q.oA, letter:'A'},
+      {text:q.oB, letter:'B'},
+      {text:q.oC, letter:'C'},
+      {text:q.oD, letter:'D'}
     ];
 
-    // isCorrect ni belgilash: FAQAT harf bo'yicha
-    const withCorrect = opts.map(o => ({
-      text: o.text,
-      isCorrect: (q.correctLetter !== '' && o.letter === q.correctLetter)
+    const result = opts.map(o => ({
+      text     : o.text,
+      letter   : o.letter,                         // ← saqlanadi!
+      isCorrect: (!!q.correctLetter && o.letter === q.correctLetter)
     }));
 
-    // Agar hech biri to'g'ri emas — matn bo'yicha qidirish (eski format)
-    if (!withCorrect.some(o => o.isCorrect) && q.correctText) {
-      withCorrect.forEach(o => {
+    // Agar hech biri to'g'ri bo'lmasa (eski format) — matn qidirish
+    if (!result.some(o=>o.isCorrect) && q.correctText) {
+      result.forEach(o => {
         if (normStr(o.text) === normStr(q.correctText)) o.isCorrect = true;
       });
     }
 
     return {
-      num: q.num,
-      text: q.text,
-      correctText: q.correctText,
-      options: withCorrect
+      num         : q.num,
+      text        : q.text,
+      correctLetter: q.correctLetter,
+      correctText : q.correctText,
+      options     : result
     };
   });
 
   showNameModal();
 }
 
-function normStr(s) {
-  return String(s || '').toLowerCase().replace(/\s+/g,' ').trim();
+function normStr(s){
+  return String(s||'').toLowerCase().replace(/\s+/g,' ').trim();
 }
 
 // --- Name Modal & Saved Tests ---
@@ -1150,7 +1150,27 @@ function loadSavedTest(id) {
   const saved = JSON.parse(localStorage.getItem('savedTests') || '[]');
   const test = saved.find(t => t.id === id);
   if (!test) return;
-  questions = test.questions;
+
+  // Har safar qayta hisoblash — eski saqlangan isCorrect ni ishlatmaymiz
+  questions = test.questions.map(q => {
+    // Eski format (correctLetter yo'q) — options as-is
+    if (!q.correctLetter && !q.correctText) return q;
+
+    // Har bir option uchun isCorrect ni qayta hisoblash
+    const opts = q.options.map(o => ({
+      text     : o.text,
+      letter   : o.letter || '',
+      isCorrect: q.correctLetter
+        ? (o.letter === q.correctLetter)           // harf bo'yicha
+        : (normStr(o.text) === normStr(q.correctText)) // matn bo'yicha
+    }));
+
+    // Hech biri to'g'ri emas — birinchisini to'g'ri qilamiz (fallback)
+    if (!opts.some(o=>o.isCorrect) && opts.length) opts[0].isCorrect = true;
+
+    return { ...q, options: opts };
+  });
+
   startQuiz();
 }
 
