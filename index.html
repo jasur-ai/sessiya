@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>📚 QuizMaster Pro Cloud</title>
+<title>📚 QuizMaster Pro - Cloud Edition</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
 <script src="https://www.gstatic.com/firebasejs/9.18.0/firebase-app-compat.js"></script>
@@ -14,120 +14,220 @@
 :root{
   --bg:#0d0d1a;--surface:#1a1a2e;--card:#16213e;
   --accent:#e94560;--gold:#f5a623;--green:#00d4aa;
-  --blue:#4a90d9;--text:#f0f0f0;--muted:#8892a4;
+  --blue:#4a90d9;--purple:#9b59b6;
+  --text:#f0f0f0;--muted:#8892a4;
+  --opt-a:#e74c3c;--opt-b:#3498db;--opt-c:#f39c12;--opt-d:#27ae60;
   --radius:16px;--shadow:0 8px 32px rgba(0,0,0,.4);
 }
-*{box-sizing:border-box;margin:0;padding:0;outline:none;}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+*{box-sizing:border-box;margin:0;padding:0;scrollbar-width:thin;scrollbar-color:var(--accent) var(--bg);}
+body{
+  font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);
+  line-height:1.6;overflow-x:hidden;
+}
 
-/* Layout */
+/* ═══════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════ */
+@keyframes fadeIn { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+@keyframes slideIn { from{transform:translateX(30px);opacity:0;} to{transform:translateX(0);opacity:1;} }
+@keyframes pulse { 0%{transform:scale(1);} 50%{transform:scale(1.05);} 100%{transform:scale(1);} }
+
+.animate-fade{animation:fadeIn 0.4s ease-out;}
+.animate-slide{animation:slideIn 0.3s ease-out;}
+
+/* ═══════════════════════════════════════════════════════
+   UI COMPONENTS (Sizning barcha stilaringiz)
+   ═══════════════════════════════════════════════════════ */
 .screen{display:none;min-height:100vh;flex-direction:column;align-items:center;padding:20px;width:100%;}
-.show{display:flex !important;}
-.container{width:100%;max-width:550px;margin:auto;}
-.card{background:var(--surface);padding:25px;border-radius:var(--radius);box-shadow:var(--shadow);width:100%;margin-bottom:20px;}
+.container{width:100%;max-width:500px;margin:auto;z-index:2;}
+.card{
+  background:var(--surface);padding:25px;border-radius:var(--radius);
+  box-shadow:var(--shadow);width:100%;margin-bottom:20px;
+  border:1px solid rgba(255,255,255,0.05);backdrop-filter:blur(10px);
+}
 
-/* Elements */
-h1{font-family:'Righteous',cursive;font-size:2.8rem;color:var(--accent);text-align:center;margin-bottom:10px;}
-input{width:100%;padding:14px;background:var(--card);border:2px solid transparent;border-radius:12px;color:#fff;margin-bottom:15px;transition:0.3s;}
-input:focus{border-color:var(--accent);}
-button{cursor:pointer;border:none;border-radius:12px;font-weight:700;transition:0.3s;font-size:1rem;}
-.primary-btn{width:100%;padding:15px;background:var(--accent);color:#fff;box-shadow:0 4px 15px rgba(233,69,96,0.3);}
-.primary-btn:hover{transform:translateY(-2px);filter:brightness(1.1);}
-.secondary-btn{background:transparent;color:var(--muted);width:100%;padding:10px;}
+/* Header & Typography */
+header{text-align:center;margin-bottom:40px;}
+h1{font-family:'Righteous',cursive;font-size:3rem;color:var(--accent);text-shadow:0 0 20px rgba(233,69,96,0.3);letter-spacing:1px;}
+.subtitle{color:var(--muted);font-weight:600;text-transform:uppercase;font-size:0.8rem;letter-spacing:2px;}
 
-/* Quiz Design */
-.option-btn{width:100%;text-align:left;padding:15px;margin-bottom:12px;background:var(--card);border-radius:12px;color:#fff;border:1px solid rgba(255,255,255,0.05);}
-.option-btn:hover{background:var(--accent);color:#fff;}
-.progress-bar{width:100%;height:8px;background:#333;border-radius:4px;margin-bottom:20px;overflow:hidden;}
-#progress-fill{height:100%;background:var(--accent);width:0%;transition:0.3s;}
+/* Form Elements */
+.input-group{margin-bottom:20px;position:relative;}
+input[type="text"], input[type="password"]{
+  width:100%;padding:15px 20px;background:var(--card);border:2px solid transparent;
+  border-radius:12px;color:#fff;font-size:1rem;font-weight:600;transition:0.3s;
+}
+input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 15px rgba(233,69,96,0.2);}
 
-/* Result Review */
-.review-item{background:var(--card);padding:15px;border-radius:12px;margin-bottom:15px;border-left:5px solid #444;}
-.review-item.correct{border-color:var(--green);}
-.review-item.wrong{border-color:var(--accent);}
-.ans-label{display:block;font-size:0.85rem;margin-top:5px;}
+/* Buttons */
+.btn{
+  cursor:pointer;border:none;border-radius:12px;font-weight:800;transition:0.3s;
+  display:flex;align-items:center;justify-content:center;gap:10px;font-size:1rem;
+}
+.btn-primary{width:100%;padding:16px;background:var(--accent);color:#fff;box-shadow:0 4px 15px rgba(233,69,96,0.3);}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 6px 20px rgba(233,69,96,0.4);filter:brightness(1.1);}
+.btn-secondary{background:transparent;color:var(--muted);width:100%;padding:10px;}
+.btn-secondary:hover{color:var(--text);}
+
+/* Main Menu Styles */
+.user-badge{background:var(--card);padding:8px 15px;border-radius:20px;display:flex;align-items:center;gap:8px;font-weight:700;font-size:0.9rem;border:1px solid rgba(255,255,255,0.1);}
+.upload-zone{
+  border:2px dashed #444;padding:40px 20px;text-align:center;border-radius:20px;
+  cursor:pointer;transition:0.3s;margin-bottom:30px;
+}
+.upload-zone:hover{border-color:var(--blue);background:rgba(74,144,217,0.05);}
+
+/* Saved Test List */
+.saved-test-card{
+  background:var(--card);padding:18px;border-radius:16px;margin-bottom:12px;
+  display:flex;justify-content:space-between;align-items:center;
+  border-left:5px solid var(--accent);transition:0.3s;
+}
+.saved-test-card:hover{transform:translateX(5px);background:rgba(255,255,255,0.05);}
+.st-info .st-name{font-weight:800;font-size:1.1rem;margin-bottom:4px;}
+.st-info .st-meta{font-size:0.8rem;color:var(--muted);display:flex;gap:10px;}
+.st-actions{display:flex;gap:8px;}
+.action-btn{width:40px;height:40px;border-radius:10px;color:#fff;}
+
+/* Quiz Elements */
+.progress-container{width:100%;height:10px;background:rgba(255,255,255,0.05);border-radius:10px;margin-bottom:30px;overflow:hidden;}
+#progress-bar{height:100%;background:linear-gradient(90deg, var(--accent), var(--purple));width:0%;transition:0.4s;}
+.q-count{font-weight:800;color:var(--gold);margin-bottom:10px;font-size:1.1rem;}
+.question-text{font-size:1.4rem;font-weight:800;margin-bottom:25px;line-height:1.4;}
+.options-grid{display:grid;gap:12px;}
+.option{
+  background:var(--card);padding:18px;border-radius:14px;cursor:pointer;
+  border:1px solid rgba(255,255,255,0.05);transition:0.2s;font-weight:600;
+  display:flex;align-items:center;gap:15px;
+}
+.option:hover{background:rgba(255,255,255,0.1);transform:scale(1.02);border-color:rgba(255,255,255,0.2);}
+.option-label{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:0.8rem;}
+
+/* Result Screen */
+.score-box{text-align:center;padding:40px 0;}
+.score-circle{
+  width:150px;height:150px;border-radius:50%;border:10px solid var(--accent);
+  margin:0 auto 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.score-num{font-size:3rem;font-weight:900;line-height:1;}
+.score-label{font-size:0.8rem;font-weight:700;color:var(--muted);}
 
 /* Modals */
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(5px);}
+.modal{
+  position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);
+  display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(10px);
+}
 .modal.show{display:flex;}
+
+/* Review Section */
+.review-item{background:var(--card);border-radius:16px;padding:20px;margin-bottom:15px;border-left:5px solid #444;}
+.review-item.correct{border-left-color:var(--green);}
+.review-item.wrong{border-left-color:var(--accent);}
 </style>
 </head>
 <body>
 
-<div id="login-screen" class="screen show">
-  <div class="container">
-    <h1>QuizMaster</h1>
+<div id="login-screen" class="screen" style="display:flex">
+  <div class="container animate-fade">
+    <header>
+      <div class="subtitle">Xush kelibsiz</div>
+      <h1>QuizMaster</h1>
+    </header>
     <div class="card">
-      <input type="text" id="login-user" placeholder="Username">
-      <input type="password" id="login-pass" placeholder="Parol">
-      <button class="primary-btn" onclick="doLogin()">Kirish</button>
-      <button class="secondary-btn" onclick="switchScreen('reg-screen')">Ro'yxatdan o'tish</button>
+      <div class="input-group">
+        <input type="text" id="login-user" placeholder="Foydalanuvchi nomi">
+      </div>
+      <div class="input-group">
+        <input type="password" id="login-pass" placeholder="Parol">
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()">Kirish</button>
+      <button class="btn btn-secondary" onclick="showScreen('reg-screen')">Yangi hisob yaratish</button>
     </div>
   </div>
 </div>
 
 <div id="reg-screen" class="screen">
-  <div class="container">
-    <h1>Yangi Hisob</h1>
+  <div class="container animate-fade">
+    <header>
+      <div class="subtitle">Ro'yxatdan o'tish</div>
+      <h1>Yangi Hisob</h1>
+    </header>
     <div class="card">
-      <input type="text" id="reg-user" placeholder="Username">
+      <input type="text" id="reg-user" placeholder="Username tanlang">
       <input type="password" id="reg-pass" placeholder="Parol">
-      <input type="password" id="reg-pass2" placeholder="Parolni tasdiqlang">
-      <button class="primary-btn" onclick="doRegister()">Yaratish</button>
-      <button class="secondary-btn" onclick="switchScreen('login-screen')">Orqaga</button>
+      <input type="password" id="reg-pass2" placeholder="Parolni takrorlang">
+      <button class="btn btn-primary" onclick="doRegister()">Ro'yxatdan o'tish</button>
+      <button class="btn btn-secondary" onclick="showScreen('login-screen')">Kirishga qaytish</button>
     </div>
   </div>
 </div>
 
 <div id="upload-screen" class="screen">
-  <div class="container">
-    <div style="display:flex;justify-content:space-between;padding:10px">
-      <span id="user-info" style="color:var(--gold);font-weight:800"></span>
-      <button onclick="doLogout()" style="background:none;color:var(--accent)">Chiqish</button>
+  <div class="container animate-fade">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;">
+      <div class="user-badge" id="user-display">👤 ...</div>
+      <button class="btn" style="background:transparent;color:var(--accent);font-weight:800" onclick="doLogout()">Chiqish</button>
     </div>
-    <div class="card" style="border:2px dashed #444;text-align:center">
-      <p>Excel (.xlsx) yuklang</p><br>
-      <input type="file" id="file-input" style="display:none" onchange="handleFile(event)">
-      <button class="primary-btn" style="background:var(--blue)" onclick="document.getElementById('file-input').click()">📁 Fayl tanlash</button>
+    
+    <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+      <div style="font-size:3rem;margin-bottom:10px">📁</div>
+      <h3 style="margin-bottom:5px">Excel fayl yuklang</h3>
+      <p style="color:var(--muted);font-size:0.8rem">.xlsx formatida bo'lishi shart</p>
+      <input type="file" id="file-input" accept=".xlsx" style="display:none" onchange="handleFile(event)">
     </div>
-    <h3>Mening Testlarim (<span id="tests-cnt">0</span>)</h3><br>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <h3 style="font-family:'Righteous'">Saqlangan Testlar</h3>
+      <span style="background:var(--accent);padding:2px 10px;border-radius:10px;font-size:0.8rem;font-weight:800" id="tests-count">0</span>
+    </div>
     <div id="saved-tests-list"></div>
   </div>
 </div>
 
 <div id="quiz-screen" class="screen">
   <div class="container">
-    <div class="progress-bar"><div id="progress-fill"></div></div>
-    <div id="q-info" style="margin-bottom:10px;color:var(--muted)"></div>
-    <div class="card">
-      <h2 id="q-text" style="margin-bottom:20px"></h2>
-      <div id="options-box"></div>
+    <div class="progress-container"><div id="progress-bar"></div></div>
+    <div class="q-count" id="q-counter">Savol: 1/10</div>
+    <div class="card animate-slide">
+      <div class="question-text" id="q-text">Savol yuklanmoqda...</div>
+      <div class="options-grid" id="options-box"></div>
     </div>
+    <div style="text-align:center;color:var(--muted);font-size:0.8rem" id="timer-display">Vaqt: 00:00</div>
   </div>
 </div>
 
 <div id="result-screen" class="screen">
-  <div class="container">
-    <h1>Natija</h1>
-    <div class="card" style="text-align:center">
-      <div id="score-circle" style="font-size:4rem;font-weight:900;color:var(--green)">0%</div>
-      <p id="stats-detail" style="color:var(--muted);margin:15px 0"></p>
-      <button class="primary-btn" onclick="switchScreen('upload-screen')">Asosiy menyu</button>
+  <div class="container animate-fade">
+    <header><h1>Natija</h1></header>
+    <div class="card">
+      <div class="score-box">
+        <div class="score-circle" id="score-circle-border">
+          <span class="score-num" id="score-percent">0%</span>
+          <span class="score-label">To'g'ri</span>
+        </div>
+        <p id="stats-text" style="margin-top:20px;font-weight:700"></p>
+      </div>
+      <button class="btn btn-primary" onclick="showScreen('upload-screen')">Asosiy menyuga qaytish</button>
     </div>
-    <h3>Xatolar ustida ishlash:</h3><br>
-    <div id="review-box"></div>
+    
+    <h3 style="margin:30px 0 15px">Xatolar ustida ishlash</h3>
+    <div id="review-container"></div>
   </div>
 </div>
 
 <div id="name-modal" class="modal">
-  <div class="card" style="max-width:400px">
-    <h3>Testga nom bering</h3><br>
-    <input type="text" id="test-name" placeholder="Masalan: Tarix 1-mavzu">
-    <button class="primary-btn" onclick="saveNewTest()">Saqlash</button>
+  <div class="card" style="max-width:380px">
+    <h3 style="margin-bottom:15px">Test nomi</h3>
+    <input type="text" id="test-name-input" placeholder="Masalan: 1-mavzu Tarix">
+    <div style="display:flex;gap:10px">
+      <button class="btn btn-primary" onclick="confirmSaveAndStart()">Saqlash</button>
+      <button class="btn" style="background:#333;color:#fff;flex:1" onclick="closeModal()">Bekor qilish</button>
+    </div>
   </div>
 </div>
 
 <script>
+// FIREBASE CONFIG
 const firebaseConfig = {
   apiKey: "AIzaSyCKcBoog9nxEZRTq81igQ1ATsfFTX6dgK0",
   authDomain: "session-ccf23.firebaseapp.com",
@@ -141,122 +241,241 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-let currentUser = null, questions = [], pending = [], currentIdx = 0, userAns = [], startTime;
+// GLOBALS
+let currentUser = null;
+let currentQuestions = [];
+let pendingQuestions = [];
+let quizIdx = 0;
+let userAnswers = [];
+let startTime = 0;
+let timerInterval = null;
 
-// --- AUTH ---
-async function doLogin() {
-  const u = document.getElementById('login-user').value.trim();
-  const p = document.getElementById('login-pass').value;
-  const s = await db.ref('users/'+u).once('value');
-  if(s.exists() && s.val().h === btoa(p)) loginOk(u);
-  else alert('Xato!');
+// UTILS
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+  document.getElementById(id).style.display = 'flex';
 }
-async function doRegister() {
-  const u = document.getElementById('reg-user').value.trim();
-  const p = document.getElementById('reg-pass').value;
-  if(u.length<3 || p!==document.getElementById('reg-pass2').value) return alert('Xato!');
-  await db.ref('users/'+u).set({h: btoa(p)});
+function hash(p) { return btoa(p); }
+function closeModal() { document.getElementById('name-modal').classList.remove('show'); }
+
+// AUTH
+async function doLogin() {
+  const u = document.getElementById('login-user').value.trim().toLowerCase();
+  const p = document.getElementById('login-pass').value;
+  if(!u || !p) return alert('Username va parolni kiriting!');
+
+  const snap = await db.ref('users/' + u).once('value');
+  const data = snap.val();
+
+  if(!data || data.pw !== hash(p)) return alert('Username yoki parol xato!');
+  
   loginOk(u);
 }
-function loginOk(u) {
-  currentUser = u; localStorage.setItem('qm_user', u);
-  document.getElementById('user-info').innerText = '👤 '+u;
-  switchScreen('upload-screen'); renderSavedTests();
-}
-function doLogout() { localStorage.clear(); location.reload(); }
 
-// --- CORE ---
+async function doRegister() {
+  const u = document.getElementById('reg-user').value.trim().toLowerCase();
+  const p = document.getElementById('reg-pass').value;
+  const p2 = document.getElementById('reg-pass2').value;
+
+  if(u.length < 3) return alert('Username kamida 3 belgi bo\'lsin');
+  if(p.length < 4) return alert('Parol kamida 4 belgi bo\'lsin');
+  if(p !== p2) return alert('Parollar mos emas');
+
+  const snap = await db.ref('users/' + u).once('value');
+  if(snap.exists()) return alert('Bu username allaqachon mavjud!');
+
+  await db.ref('users/' + u).set({ pw: hash(p), joined: Date.now() });
+  loginOk(u);
+}
+
+function loginOk(user) {
+  currentUser = user;
+  localStorage.setItem('qm_session', user);
+  document.getElementById('user-display').innerText = '👤 ' + user;
+  showScreen('upload-screen');
+  renderSavedTests();
+}
+
+function doLogout() {
+  localStorage.removeItem('qm_session');
+  location.reload();
+}
+
+// DATABASE & FILES
 async function renderSavedTests() {
-  const s = await db.ref('tests/'+currentUser).once('value');
-  const tests = s.val() ? Object.values(s.val()) : [];
-  document.getElementById('tests-cnt').innerText = tests.length;
-  document.getElementById('saved-tests-list').innerHTML = tests.map(t => `
-    <div class="card" style="display:flex;justify-content:space-between;align-items:center;padding:15px">
-      <div><b>${t.n}</b><br><small>${t.c} savol • ${t.d}</small></div>
-      <div>
-        <button onclick='startQuiz(${JSON.stringify(t.q).replace(/'/g,"&apos;")})' style="background:var(--green);padding:10px">▶</button>
-        <button onclick="deleteTest('${t.id}')" style="background:#444;padding:10px">🗑</button>
+  if(!currentUser) return;
+  const snap = await db.ref('tests/' + currentUser).once('value');
+  const data = snap.val();
+  const list = data ? Object.values(data) : [];
+  
+  document.getElementById('tests-count').innerText = list.length;
+  const container = document.getElementById('saved-tests-list');
+  container.innerHTML = '';
+
+  if(list.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--muted)">Sizda hali saqlangan testlar yo\'q.</p>';
+    return;
+  }
+
+  list.sort((a,b) => b.ts - a.ts).forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'saved-test-card animate-fade';
+    div.innerHTML = `
+      <div class="st-info">
+        <div class="st-name">${t.name}</div>
+        <div class="st-meta"><span>❓ ${t.questions.length} ta</span> <span>📅 ${new Date(t.ts).toLocaleDateString()}</span></div>
       </div>
-    </div>
-  `).join('');
+      <div class="st-actions">
+        <button class="action-btn" style="background:var(--green)" onclick='startQuiz(${JSON.stringify(t.questions).replace(/'/g, "&apos;")})'>▶</button>
+        <button class="action-btn" style="background:#333" onclick="deleteTest('${t.id}')">🗑</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
 }
 
 function handleFile(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+  
   const reader = new FileReader();
-  reader.onload = (evt) => {
-    const data = new Uint8Array(evt.target.result);
-    const wb = XLSX.read(data, {type:'array'});
-    const json = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]);
-    pending = json.map(r => ({
-      q: r.Savol||r.savol, a:r.A, b:r.B, c:r.C, d:r.D, 
-      cor: (r.Javob||r.javob||'').toString().toLowerCase()
-    })).filter(x => x.q);
-    if(pending.length) document.getElementById('name-modal').classList.add('show');
+  reader.onload = function(evt) {
+    try {
+      const data = new Uint8Array(evt.target.result);
+      const wb = XLSX.read(data, {type:'array'});
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const json = XLSX.utils.sheet_to_json(sheet);
+
+      pendingQuestions = json.map(r => ({
+        q: (r.Savol || r.savol || "").toString(),
+        a: (r.A || "").toString(),
+        b: (r.B || "").toString(),
+        c: (r.C || "").toString(),
+        d: (r.D || "").toString(),
+        cor: (r.Javob || r.javob || "").toString().toLowerCase().trim()
+      })).filter(q => q.q && q.a);
+
+      if(pendingQuestions.length === 0) throw new Error("Savollar topilmadi");
+      
+      document.getElementById('name-modal').classList.add('show');
+    } catch(err) {
+      alert("Faylni o'qishda xatolik: " + err.message);
+    }
   };
-  reader.readAsArrayBuffer(e.target.files[0]);
+  reader.readAsArrayBuffer(file);
 }
 
-async function saveNewTest() {
-  const id = 't_'+Date.now();
-  await db.ref('tests/'+currentUser+'/'+id).set({
-    id, n: document.getElementById('test-name').value||'Test',
-    q: pending, c: pending.length, d: new Date().toLocaleDateString()
-  });
-  document.getElementById('name-modal').classList.remove('show');
+async function confirmSaveAndStart() {
+  const nameInput = document.getElementById('test-name-input');
+  const name = nameInput.value.trim() || 'Test ' + new Date().toLocaleTimeString();
+  const testId = 'id_' + Date.now();
+
+  const testObj = {
+    id: testId,
+    name: name,
+    questions: pendingQuestions,
+    ts: Date.now()
+  };
+
+  await db.ref('tests/' + currentUser + '/' + testId).set(testObj);
+  closeModal();
+  startQuiz(pendingQuestions);
   renderSavedTests();
 }
 
 async function deleteTest(id) {
-  if(confirm('Ochirish?')) { await db.ref('tests/'+currentUser+'/'+id).remove(); renderSavedTests(); }
+  if(confirm("Ushbu testni butunlay o'chirmoqchimisiz?")) {
+    await db.ref('tests/' + currentUser + '/' + id).remove();
+    renderSavedTests();
+  }
 }
 
+// QUIZ LOGIC
 function startQuiz(qs) {
-  questions = qs; currentIdx = 0; userAns = []; startTime = Date.now();
-  switchScreen('quiz-screen'); showQ();
+  currentQuestions = qs;
+  quizIdx = 0;
+  userAnswers = [];
+  startTime = Date.now();
+  showScreen('quiz-screen');
+  updateTimer();
+  timerInterval = setInterval(updateTimer, 1000);
+  renderQuestion();
 }
 
-function showQ() {
-  const q = questions[currentIdx];
-  document.getElementById('q-info').innerText = `Savol ${currentIdx+1}/${questions.length}`;
-  document.getElementById('progress-fill').style.width = (currentIdx/questions.length)*100+'%';
-  document.getElementById('q-text').innerText = q.q;
+function updateTimer() {
+  const diff = Math.floor((Date.now() - startTime) / 1000);
+  const m = Math.floor(diff/60).toString().padStart(2,'0');
+  const s = (diff%60).toString().padStart(2,'0');
+  document.getElementById('timer-display').innerText = `Vaqt: ${m}:${s}`;
+}
+
+function renderQuestion() {
+  const q = currentQuestions[quizIdx];
   const box = document.getElementById('options-box');
+  
+  document.getElementById('q-counter').innerText = `Savol: ${quizIdx+1}/${currentQuestions.length}`;
+  document.getElementById('progress-bar').style.width = ((quizIdx+1)/currentQuestions.length)*100 + '%';
+  document.getElementById('q-text').innerText = q.q;
+  
   box.innerHTML = '';
-  ['a','b','c','d'].forEach(k => {
-    if(q[k]) {
-      const btn = document.createElement('button');
-      btn.className = 'option-btn';
-      btn.innerText = k.toUpperCase()+') '+q[k];
-      btn.onclick = () => { userAns.push(k); currentIdx++; if(currentIdx<questions.length) showQ(); else finish(); };
-      box.appendChild(btn);
+  ['a','b','c','d'].forEach(key => {
+    if(q[key]) {
+      const opt = document.createElement('div');
+      opt.className = 'option animate-slide';
+      opt.innerHTML = `<span class="option-label" style="background:var(--opt-${key})">${key.toUpperCase()}</span> ${q[key]}`;
+      opt.onclick = () => selectOption(key);
+      box.appendChild(opt);
     }
   });
 }
 
-function finish() {
-  let cor = 0;
-  let html = '';
-  userAns.forEach((a, i) => {
-    const isCor = a === questions[i].cor;
-    if(isCor) cor++;
-    html += `<div class="review-item ${isCor?'correct':'wrong'}">
-      <b>${i+1}. ${questions[i].q}</b>
-      <span class="ans-label">Siz: ${a.toUpperCase()} | To'g'ri: ${questions[i].cor.toUpperCase()}</span>
-    </div>`;
+function selectOption(key) {
+  userAnswers.push(key);
+  quizIdx++;
+  if(quizIdx < currentQuestions.length) {
+    renderQuestion();
+  } else {
+    finishQuiz();
+  }
+}
+
+function finishQuiz() {
+  clearInterval(timerInterval);
+  showScreen('result-screen');
+  
+  let correct = 0;
+  const reviewBox = document.getElementById('review-container');
+  reviewBox.innerHTML = '';
+
+  userAnswers.forEach((ans, i) => {
+    const q = currentQuestions[i];
+    const isCorrect = ans === q.cor;
+    if(isCorrect) correct++;
+
+    const rev = document.createElement('div');
+    rev.className = `review-item ${isCorrect ? 'correct' : 'wrong'}`;
+    rev.innerHTML = `
+      <div style="font-weight:800;margin-bottom:8px">${i+1}. ${q.q}</div>
+      <div style="font-size:0.9rem">
+        <span style="color:var(--muted)">Sizning javob:</span> <b>${ans.toUpperCase()}</b> | 
+        <span style="color:var(--muted)">To'g'ri:</span> <b style="color:var(--green)">${q.cor.toUpperCase()}</b>
+      </div>
+    `;
+    reviewBox.appendChild(rev);
   });
-  const p = Math.round((cor/questions.length)*100);
-  document.getElementById('score-circle').innerText = p+'%';
-  document.getElementById('stats-detail').innerText = `${questions.length} tadan ${cor} ta to'g'ri.`;
-  document.getElementById('review-box').innerHTML = html;
-  switchScreen('result-screen');
+
+  const percent = Math.round((correct / currentQuestions.length) * 100);
+  document.getElementById('score-percent').innerText = percent + '%';
+  document.getElementById('score-circle-border').style.borderColor = percent > 50 ? 'var(--green)' : 'var(--accent)';
+  document.getElementById('stats-text').innerText = `${currentQuestions.length} tadan ${correct} ta to'g'ri topildi.`;
 }
 
-function switchScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('show'));
-  document.getElementById(id).classList.add('show');
-}
+// ON LOAD
+window.onload = () => {
+  const saved = localStorage.getItem('qm_session');
+  if(saved) loginOk(saved);
+};
 
-window.onload = () => { if(localStorage.getItem('qm_user')) loginOk(localStorage.getItem('qm_user')); };
 </script>
 </body>
 </html>
