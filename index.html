@@ -386,6 +386,17 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
     <div class="modal-title">✏️ Nomini o'zgartirish</div>
     <div class="modal-sub">Test uchun yangi nom kiriting</div>
     <input class="modal-input" id="rename-input" type="text" placeholder="Yangi nom" maxlength="60">
+    <div class="vis-label-title">Ko'rinish</div>
+    <div class="visibility-row">
+      <label class="vis-option">
+        <input type="radio" name="rename-visibility" value="private" checked>
+        <span class="vis-option-label">🔒 Private</span>
+      </label>
+      <label class="vis-option">
+        <input type="radio" name="rename-visibility" value="public">
+        <span class="vis-option-label">🌍 Public</span>
+      </label>
+    </div>
     <div class="modal-btns">
       <button class="modal-save-btn" id="rename-save-btn" onclick="confirmRename()">💾 Saqlash</button>
       <button class="modal-cancel-btn" onclick="closeRenameModal()">Bekor qilish</button>
@@ -566,9 +577,11 @@ function doConfirm(){
 }
 
 // ── RENAME MODAL ──
-function showRenameModal(fbKey,currentName){
+function showRenameModal(fbKey,currentName,isPublic){
   pendingRenameKey=fbKey;
   document.getElementById('rename-input').value=currentName;
+  const val=isPublic==='true'?'public':'private';
+  document.querySelector(`input[name="rename-visibility"][value="${val}"]`).checked=true;
   document.getElementById('rename-modal').classList.add('show');
   setTimeout(()=>document.getElementById('rename-input').focus(),100);
 }
@@ -580,16 +593,19 @@ async function confirmRename(){
   const newName=document.getElementById('rename-input').value.trim();
   if(!newName)return;
   const fbKey=pendingRenameKey;
+  const newVis=document.querySelector('input[name="rename-visibility"]:checked')?.value==='public';
   closeRenameModal();
   if(!fbKey||!currentUser)return;
   try{
     await fbSet(`users/${currentUser.uid}/tests/${fbKey}/name`,newName);
-    const t=await fbGet(`users/${currentUser.uid}/tests/${fbKey}`);
-    if(t&&t.isPublic){
-      try{await fbSet(`public_tests/${currentUser.uid+'__'+fbKey}/name`,newName);}catch(_){}
-    }
+    await fbSet(`users/${currentUser.uid}/tests/${fbKey}/isPublic`,newVis);
+    if(newVis){
+      const t=await fbGet(`users/${currentUser.uid}/tests/${fbKey}`);
+      await fbSet(`public_tests/${currentUser.uid+'__'+fbKey}`,{name:newName,authorName:currentUser.username,authorUid:currentUser.uid,testFbKey:fbKey,count:t?.count||0,created:t?.created||Date.now()});
+    }else{
+      try{await fbRemove(`public_tests/${currentUser.uid+'__'+fbKey}`);}catch(_){}}
     await renderSavedTests();
-  }catch(e){alert("Nomini o'zgartirishda xatolik: "+e.message);}
+  }catch(e){alert("O'zgartirishda xatolik: "+e.message);}
 }
 
 // ── SAVED TESTS ──
@@ -612,7 +628,7 @@ async function renderSavedTests(){
         </div>
         <div class="st-actions">
           <button class="st-start-btn" onclick="loadSavedTest('${t.fbKey}')">&#9654; Boshlash</button>
-          <button class="st-rename-btn" title="Nomini o'zgartirish" onclick="showRenameModal('${t.fbKey}','${esc(t.name).replace(/'/g,'&#39;')}')">✏️</button>
+          <button class="st-rename-btn" title="Nomini o'zgartirish" onclick="showRenameModal('${t.fbKey}','${esc(t.name).replace(/'/g,'&#39;')}','${t.isPublic?'true':'false'}')">✏️</button>
           <button class="st-del-btn" onclick="deleteSavedTest('${t.fbKey}')">&#128465;</button>
         </div>
       </div>`).join('');
