@@ -112,6 +112,44 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .public-badge{display:inline-block;font-size:.62rem;font-weight:800;background:rgba(0,212,170,.12);border:1px solid rgba(0,212,170,.25);color:var(--green);border-radius:50px;padding:2px 7px;margin-left:5px;vertical-align:middle;}
 .private-badge{display:inline-block;font-size:.62rem;font-weight:800;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:var(--muted);border-radius:50px;padding:2px 7px;margin-left:5px;vertical-align:middle;}
 
+/* MOCK SECTION */
+.mock-section{width:100%;margin-top:0;margin-bottom:8px;}
+.mock-card{background:linear-gradient(135deg,rgba(155,89,182,.18),rgba(74,144,217,.14));border:2px solid rgba(155,89,182,.4);border-radius:20px;padding:18px 20px;position:relative;overflow:hidden;}
+.mock-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(155,89,182,.06),rgba(74,144,217,.06));pointer-events:none;}
+.mock-header{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
+.mock-icon{font-size:2rem;}
+.mock-title{font-family:'Righteous',cursive;font-size:1.3rem;color:#fff;}
+.mock-badge{font-size:.62rem;font-weight:800;background:rgba(155,89,182,.3);border:1px solid rgba(155,89,182,.5);color:#ce9fff;border-radius:50px;padding:3px 8px;margin-left:4px;}
+.mock-desc{color:var(--muted);font-size:.8rem;font-weight:600;margin-bottom:14px;line-height:1.5;}
+.mock-start-btn{background:linear-gradient(135deg,var(--purple),#7d3c98);border:none;border-radius:12px;padding:11px 22px;color:#fff;font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:900;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:7px;}
+.mock-start-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(155,89,182,.4);}
+.mock-upload-zone{border:2px dashed rgba(155,89,182,.4);border-radius:14px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(155,89,182,.05);margin-top:10px;}
+.mock-upload-zone:hover{border-color:var(--purple);background:rgba(155,89,182,.1);}
+.mock-upload-zone p{color:var(--muted);font-size:.82rem;font-weight:700;}
+.mock-locked{color:var(--muted);font-size:.78rem;font-weight:700;text-align:center;margin-top:8px;opacity:.7;}
+.mock-stats{display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+.mock-stat{background:rgba(255,255,255,.07);border-radius:8px;padding:5px 12px;font-size:.76rem;font-weight:800;color:var(--muted);}
+.mock-stat span{color:#fff;font-weight:900;}
+
+/* TEST CARD RESULTS PREVIEW */
+.st-card-wrapper{margin-bottom:8px;}
+.saved-test-card{border-radius:var(--radius);border:1px solid rgba(255,255,255,.07);background:var(--surface);transition:border-color .2s;cursor:pointer;margin-bottom:0;}
+.saved-test-card.expanded{border-color:rgba(233,69,96,.4);border-radius:var(--radius) var(--radius) 0 0;}
+.test-results-preview{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-top:none;border-radius:0 0 var(--radius) var(--radius);padding:12px 14px;display:none;animation:fadeIn .2s ease;}
+.test-results-preview.show{display:block;}
+.trp-title{font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;}
+.trp-entry{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,.04);margin-bottom:4px;font-size:.76rem;font-weight:700;}
+.trp-rank{font-family:'Righteous',cursive;min-width:20px;color:var(--muted);}
+.trp-rank.gold{color:var(--gold);}.trp-rank.silver{color:#b0b0b0;}.trp-rank.bronze{color:#cd7f32;}
+.trp-user{flex:1;color:var(--text);}
+.trp-score{color:var(--green);font-family:'Righteous',cursive;}
+.trp-time{color:var(--muted);font-size:.7rem;}
+.trp-actions{display:flex;gap:6px;padding-top:8px;border-top:1px solid rgba(255,255,255,.06);margin-top:6px;}
+.trp-start-btn{background:linear-gradient(135deg,var(--green),#00a080);border:none;border-radius:8px;padding:6px 12px;color:#fff;font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:800;cursor:pointer;}
+.trp-rename-btn{background:rgba(74,144,217,.12);border:1px solid rgba(74,144,217,.25);border-radius:8px;padding:6px 9px;color:var(--blue);font-size:.78rem;cursor:pointer;}
+.trp-del-btn{background:rgba(233,69,96,.12);border:1px solid rgba(233,69,96,.25);border-radius:8px;padding:6px 9px;color:var(--accent);font-size:.78rem;cursor:pointer;}
+.trp-loading{color:var(--muted);font-size:.78rem;font-weight:600;padding:6px 0;}
+
 /* GLOBAL SEARCH */
 .global-search-section{width:100%;margin-top:20px;}
 .global-search-row{display:flex;gap:8px;margin-bottom:10px;}
@@ -263,7 +301,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 <!-- AUTH -->
 <div id="auth-screen">
   <div class="auth-logo">📚 QuizMaster</div>
-  <div class="auth-sub">Istalgan qurilmadan kirish mumkin ☁️<br>Bir hisob — barcha qurilmalarda</div>
+  <div class="auth-sub">☁️ Cloud hisobingiz bilan kiring</div>
   <div class="auth-card">
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchTab('login')">🔑 Kirish</button>
@@ -307,20 +345,20 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 <!-- UPLOAD -->
 <div id="upload-screen">
   <div class="logo">📚 QuizMaster</div>
-  <div class="subtitle">Excel faylni yuklang va testni boshlang</div>
-  <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
-    <input type="file" id="file-input" accept=".xlsx,.xls" onchange="handleFile(this)">
-    <div class="upload-icon">📊</div>
-    <div class="upload-text">Excel faylni yuklang</div>
-    <div class="upload-sub">XLSX yoki XLS — shu yerga tashlang yoki bosing</div>
-  </div>
-  <div class="features">
-    <div class="feature-card"><span class="fi">🔀</span>Savollar aralashadi</div>
-    <div class="feature-card"><span class="fi">📊</span>Jonli statistika</div>
-    <div class="feature-card"><span class="fi">🎯</span>Xatoliklar sharhi</div>
-    <div class="feature-card"><span class="fi">☁️</span>Cloud saqlash</div>
-    <div class="feature-card"><span class="fi">📱</span>Har qurilmada</div>
-    <div class="feature-card"><span class="fi">👤</span>Shaxsiy hisob</div>
+  <div class="subtitle">Testlarni boshlang yoki yangi test yuklang</div>
+
+  <!-- MOCK SECTION -->
+  <div class="mock-section">
+    <div class="mock-card">
+      <div class="mock-header">
+        <div class="mock-icon">🎓</div>
+        <div>
+          <div class="mock-title">Falsafa Yakuniy <span class="mock-badge">MOCK</span></div>
+        </div>
+      </div>
+      <div class="mock-desc" id="mock-desc">⏳ Yuklanmoqda...</div>
+      <div id="mock-action"></div>
+    </div>
   </div>
 
   <!-- Global search -->
@@ -341,6 +379,23 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
     <div id="saved-tests-list">
       <div class="no-tests-msg">⏳ Yuklanmoqda...</div>
     </div>
+  </div>
+
+  <!-- Excel upload (pastda) -->
+  <div class="saved-tests-title" style="margin-top:24px;">📤 Yangi test yuklash</div>
+  <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+    <input type="file" id="file-input" accept=".xlsx,.xls" onchange="handleFile(this)">
+    <div class="upload-icon">📊</div>
+    <div class="upload-text">Excel faylni yuklang</div>
+    <div class="upload-sub">XLSX yoki XLS — shu yerga tashlang yoki bosing</div>
+  </div>
+  <div class="features">
+    <div class="feature-card"><span class="fi">🔀</span>Savollar aralashadi</div>
+    <div class="feature-card"><span class="fi">📊</span>Jonli statistika</div>
+    <div class="feature-card"><span class="fi">🎯</span>Xatoliklar sharhi</div>
+    <div class="feature-card"><span class="fi">☁️</span>Cloud saqlash</div>
+    <div class="feature-card"><span class="fi">📱</span>Har qurilmada</div>
+    <div class="feature-card"><span class="fi">👤</span>Shaxsiy hisob</div>
   </div>
 </div>
 
@@ -403,6 +458,9 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
     </div>
   </div>
 </div>
+
+<!-- MOCK upload input (hidden) -->
+<input type="file" id="mock-file-input" accept=".xlsx,.xls" style="display:none" onchange="handleMockFile(this)">
 
 <!-- QUIZ -->
 <div id="quiz-screen">
@@ -545,6 +603,7 @@ async function loginOk(username){
   document.getElementById('user-name-display').textContent=username;
   document.getElementById('sync-badge').textContent='🟢 Online';
   showMsg('');
+  await renderMockSection();
   await renderSavedTests();
 }
 
@@ -609,6 +668,8 @@ async function confirmRename(){
 }
 
 // ── SAVED TESTS ──
+let expandedTestKey=null;
+
 async function renderSavedTests(){
   if(!currentUser)return;
   const list=document.getElementById('saved-tests-list');
@@ -621,21 +682,99 @@ async function renderSavedTests(){
     if(cnt)cnt.textContent=tests.length;
     if(!tests.length){list.innerHTML='<div class="no-tests-msg">Hozircha testlar yo\'q — Excel yuklang!</div>';return;}
     list.innerHTML=tests.map(t=>`
-      <div class="saved-test-card">
-        <div style="flex:1;min-width:0;">
-          <div class="st-name">${esc(t.name)}<span class="${t.isPublic?'public-badge':'private-badge'}">${t.isPublic?'🌍 Public':'🔒 Private'}</span></div>
-          <div class="st-meta">${t.count} ta savol &bull; ${t.date}</div>
+      <div class="st-card-wrapper" id="wrapper-${t.fbKey}">
+        <div class="saved-test-card" id="card-${t.fbKey}" onclick="toggleTestCard('${t.fbKey}','${esc(t.name).replace(/'/g,'&#39;')}','${t.isPublic?'true':'false'}')">
+          <div style="flex:1;min-width:0;">
+            <div class="st-name">${esc(t.name)}<span class="${t.isPublic?'public-badge':'private-badge'}">${t.isPublic?'🌍 Public':'🔒 Private'}</span></div>
+            <div class="st-meta">${t.count} ta savol &bull; ${t.date}</div>
+          </div>
+          <div style="color:var(--muted);font-size:.8rem;padding-right:4px;" id="arrow-${t.fbKey}">▸</div>
         </div>
-        <div class="st-actions">
-          <button class="st-start-btn" onclick="loadSavedTest('${t.fbKey}')">&#9654; Boshlash</button>
-          <button class="st-rename-btn" title="Nomini o'zgartirish" onclick="showRenameModal('${t.fbKey}','${esc(t.name).replace(/'/g,'&#39;')}','${t.isPublic?'true':'false'}')">✏️</button>
-          <button class="st-del-btn" onclick="deleteSavedTest('${t.fbKey}')">&#128465;</button>
+        <div class="test-results-preview" id="preview-${t.fbKey}">
+          <div class="trp-loading">⏳ Yuklanmoqda...</div>
         </div>
       </div>`).join('');
   }catch(e){
     document.getElementById('sync-badge').textContent='🔴 Offline';
     document.getElementById('sync-badge').className='sync-badge offline';
     list.innerHTML='<div class="no-tests-msg">⚠️ Internet yo\'q. Sahifani yangilang.</div>';
+  }
+}
+
+async function toggleTestCard(fbKey,name,isPublicStr){
+  const card=document.getElementById('card-'+fbKey);
+  const preview=document.getElementById('preview-'+fbKey);
+  const arrow=document.getElementById('arrow-'+fbKey);
+  if(!card||!preview)return;
+
+  if(preview.classList.contains('show')){
+    // collapse
+    preview.classList.remove('show');
+    card.classList.remove('expanded');
+    if(arrow)arrow.textContent='▸';
+    expandedTestKey=null;
+    return;
+  }
+
+  // collapse previously open
+  if(expandedTestKey&&expandedTestKey!==fbKey){
+    const oldPrev=document.getElementById('preview-'+expandedTestKey);
+    const oldCard=document.getElementById('card-'+expandedTestKey);
+    const oldArrow=document.getElementById('arrow-'+expandedTestKey);
+    if(oldPrev)oldPrev.classList.remove('show');
+    if(oldCard)oldCard.classList.remove('expanded');
+    if(oldArrow)oldArrow.textContent='▸';
+  }
+
+  expandedTestKey=fbKey;
+  card.classList.add('expanded');
+  if(arrow)arrow.textContent='▾';
+  preview.classList.add('show');
+  preview.innerHTML='<div class="trp-loading">⏳ Natijalar yuklanmoqda...</div>';
+
+  // Load results
+  try{
+    const personalData=await fbGet(`users/${currentUser.uid}/tests/${fbKey}/results/${currentUser.uid}/entries`);
+    let personalHtml='<div class="trp-title">👤 Mening natijalarim</div>';
+    if(personalData){
+      const entries=Object.values(personalData);
+      entries.sort((a,b)=>b.pct-a.pct||a.timeSec-b.timeSec);
+      personalHtml+=entries.slice(0,5).map((e,i)=>{
+        const rc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+        return`<div class="trp-entry"><div class="trp-rank ${rc}">${i+1}</div><div class="trp-user">${esc(e.username)}</div><div class="trp-score">${e.pct}%</div><div class="trp-time">${fmtT(e.timeSec)}</div></div>`;
+      }).join('');
+    }else{
+      personalHtml+='<div style="color:var(--muted);font-size:.76rem;padding:4px 0;">Hali natija yo\'q</div>';
+    }
+
+    let globalHtml='';
+    const isPublic=isPublicStr==='true';
+    if(isPublic){
+      const globalKey=currentUser.uid+'__'+fbKey;
+      const globalData=await fbGet(`public_tests/${globalKey}/results`);
+      globalHtml='<div class="trp-title" style="margin-top:10px;">🌍 Global natijalar</div>';
+      if(globalData){
+        const gEntries=Object.values(globalData);
+        gEntries.sort((a,b)=>b.pct-a.pct||a.timeSec-b.timeSec);
+        globalHtml+=gEntries.slice(0,5).map((e,i)=>{
+          const rc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+          const mine=e.uid===currentUser.uid?' mine':'';
+          return`<div class="trp-entry${mine}"><div class="trp-rank ${rc}">${i+1}</div><div class="trp-user">${esc(e.username)}</div><div class="trp-score">${e.pct}%</div><div class="trp-time">${fmtT(e.timeSec)}</div></div>`;
+        }).join('');
+      }else{
+        globalHtml+='<div style="color:var(--muted);font-size:.76rem;padding:4px 0;">Hali natija yo\'q</div>';
+      }
+    }
+
+    const safeNameForModal=name.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    preview.innerHTML=personalHtml+globalHtml+`
+      <div class="trp-actions">
+        <button class="trp-start-btn" onclick="event.stopPropagation();loadSavedTest('${fbKey}')">▶ Boshlash</button>
+        <button class="trp-rename-btn" title="Nomini o'zgartirish" onclick="event.stopPropagation();showRenameModal('${fbKey}','${esc(name).replace(/'/g,'&#39;')}','${isPublicStr}')">✏️</button>
+        <button class="trp-del-btn" onclick="event.stopPropagation();deleteSavedTest('${fbKey}')">🗑️</button>
+      </div>`;
+  }catch(e){
+    preview.innerHTML='<div class="trp-loading">⚠️ Natijalar yuklanmadi</div>';
   }
 }
 
@@ -694,6 +833,132 @@ async function deleteSavedTest(fbKey){
       await renderSavedTests();
     }catch(e){alert("O'chirishda xatolik: "+e.message);}
   });
+}
+
+// ── MOCK TEST ──
+const MOCK_PATH='mock_test';
+const MOCK_COUNT=25;
+
+async function renderMockSection(){
+  const descEl=document.getElementById('mock-desc');
+  const actionEl=document.getElementById('mock-action');
+  if(!descEl||!actionEl)return;
+  try{
+    const mock=await fbGet(MOCK_PATH);
+    if(mock&&mock.questions&&mock.questions.length){
+      const q=mock.questions;
+      descEl.textContent=`📚 ${q.length} ta savol bazasi tayyor. Har safar ${MOCK_COUNT} ta tasodifiy savol beriladi.`;
+      actionEl.innerHTML=`<button class="mock-start-btn" onclick="startMockTest()">🎓 Boshlash (${MOCK_COUNT} ta random savol)</button>`;
+    }else{
+      // Not loaded yet — show upload for admin
+      descEl.textContent='⚠️ Savol bazasi yuklanmagan. Admin bir marta yuklashi kerak.';
+      actionEl.innerHTML=`
+        <div class="mock-upload-zone" onclick="document.getElementById('mock-file-input').click()">
+          <p>📂 Excel faylni bu yerga bosing (bir martalik)</p>
+        </div>
+        <div class="mock-locked">⚠️ Yuklangandan so'ng baza o'zgartirib bo'lmaydi</div>`;
+    }
+  }catch(e){
+    descEl.textContent='⚠️ Yuklab bo\'lmadi';
+    actionEl.innerHTML='';
+  }
+}
+
+function handleMockFile(inp){
+  if(!inp.files[0])return;
+  const r=new FileReader();
+  r.onload=async e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const qs=parseMockWorkbook(wb);
+      if(!qs||!qs.length){alert("Savollar topilmadi! To'g'ri Excel formatida bo'lishi kerak.");return;}
+      // Check not already loaded
+      const existing=await fbGet(MOCK_PATH+'/questions');
+      if(existing&&existing.length){
+        alert("Savol bazasi allaqachon yuklangan! O'zgartirib bo'lmaydi.");
+        inp.value='';return;
+      }
+      // Save to Firebase
+      const slim=qs.map(q=>({num:q.num,text:q.text,correctLetter:q.correctLetter,correctText:q.correctText,options:q.options.map(o=>({text:o.text,letter:o.letter,isCorrect:o.isCorrect}))}));
+      await fbSet(MOCK_PATH,{questions:slim,count:slim.length,locked:true,lockedAt:Date.now()});
+      inp.value='';
+      alert(`✅ ${slim.length} ta savol muvaffaqiyatli yuklandi va baza yopildi!`);
+      await renderMockSection();
+    }catch(err){alert('Xato: '+err.message);}
+  };
+  r.readAsBinaryString(inp.files[0]);
+}
+
+function parseMockWorkbook(wb){
+  if(!wb.SheetNames.length)return[];
+  const data=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});
+  let dataStart=0;
+  for(let i=0;i<Math.min(10,data.length);i++){
+    const v=String(data[i][0]||'').trim();
+    if(/^\d+$/.test(v)&&parseInt(v)>=1){dataStart=i;break;}
+    dataStart=i+1;
+  }
+  const IDX={num:0,q:1,a:2,b:3,c:4,d:5,ans:6};
+  for(let i=0;i<dataStart;i++){
+    const row=data[i];
+    if(String(row[0]||'').trim()!=='#')continue;
+    row.forEach((h,col)=>{
+      const v=String(h||'').trim().toUpperCase().replace(/'/g,"'").replace(/`/g,"'");
+      if(v==='#')IDX.num=col;
+      else if(col===1)IDX.q=col;
+      else if(v==='A')IDX.a=col;
+      else if(v==='B')IDX.b=col;
+      else if(v==='C')IDX.c=col;
+      else if(v==='D')IDX.d=col;
+      else if(h&&!['A','B','C','D'].includes(v)&&col>=6)IDX.ans=col;
+    });
+    break;
+  }
+  const clean=v=>String(v||'').trim().replace(/^[A-Da-d]\s*[).]\s*/,'').trim();
+  const rawQ=[];
+  for(let i=dataStart;i<data.length;i++){
+    const row=data[i];
+    const qTxt=String(row[IDX.q]||'').trim();
+    if(!qTxt||qTxt.length<4)continue;
+    const oA=clean(row[IDX.a]),oB=clean(row[IDX.b]),oC=clean(row[IDX.c]),oD=clean(row[IDX.d]);
+    if(!oA||!oB)continue;
+    const ansRaw=String(row[IDX.ans]||'').trim().toUpperCase();
+    const letter=ansRaw.replace(/[^ABCD]/g,'').charAt(0);
+    const optMap={A:oA,B:oB,C:oC,D:oD};
+    const correctText=letter?(optMap[letter]||''):'';
+    rawQ.push({num:parseInt(String(row[IDX.num]||''))||(rawQ.length+1),text:qTxt,correctLetter:letter,correctText,oA,oB,oC,oD});
+  }
+  return rawQ.map(q=>{
+    const opts=[{text:q.oA,letter:'A'},{text:q.oB,letter:'B'},{text:q.oC,letter:'C'},{text:q.oD,letter:'D'}];
+    const res=opts.map(o=>({text:o.text,letter:o.letter,isCorrect:!!q.correctLetter&&o.letter===q.correctLetter}));
+    if(!res.some(o=>o.isCorrect)&&q.correctText)res.forEach(o=>{if(normStr(o.text)===normStr(q.correctText))o.isCorrect=true;});
+    return{num:q.num,text:q.text,correctLetter:q.correctLetter,correctText:q.correctText,options:res};
+  });
+}
+
+async function startMockTest(){
+  if(!currentUser){alert('Iltimos avval tizimga kiring!');return;}
+  try{
+    const mock=await fbGet(MOCK_PATH);
+    if(!mock||!mock.questions||!mock.questions.length){alert('Savol bazasi mavjud emas!');return;}
+    const all=mock.questions.map(q=>{
+      const opts=q.options.map(o=>({text:o.text,letter:o.letter||'',
+        isCorrect:q.correctLetter?(o.letter===q.correctLetter):(normStr(o.text)===normStr(q.correctText))}));
+      if(!opts.some(o=>o.isCorrect)&&opts.length)opts[0].isCorrect=true;
+      return{...q,options:opts};
+    });
+    // Pick MOCK_COUNT random
+    const shuffledAll=[...all].sort(()=>Math.random()-.5);
+    questions=shuffledAll.slice(0,Math.min(MOCK_COUNT,shuffledAll.length));
+    originalQuestions=[...questions];
+    // Mock test context
+    currentTestFbKey='mock';
+    currentTestAuthorUid='__mock__';
+    currentTestIsPublic=true;
+    currentTestGlobalKey='__mock__';
+    isRetryRound=false;
+    startQuiz();
+  }catch(e){alert('Mock testni yuklab bo\'lmadi: '+e.message);}
 }
 
 // ── GLOBAL SEARCH ──
@@ -995,13 +1260,11 @@ async function saveResultAndShowLeaderboard(pct,timeSec){
   const lbTabsRow=document.getElementById('lb-tabs-row');
   const lbContent=document.getElementById('lb-content');
 
-  // Only save/show if we have a test context and not retry round
   if(!currentUser||!currentTestFbKey||!currentTestAuthorUid){
     lbSection.style.display='none';
     return;
   }
 
-  // Save personal result (always)
   const resultData={
     username:currentUser.username,
     uid:currentUser.uid,
@@ -1014,34 +1277,85 @@ async function saveResultAndShowLeaderboard(pct,timeSec){
     created:Date.now()
   };
 
+  // MOCK TEST — save to mock_test/results
+  const isMockTest=(currentTestFbKey==='mock'&&currentTestAuthorUid==='__mock__');
+
+  if(isMockTest){
+    try{
+      await fbPush(`${MOCK_PATH}/results/${currentUser.uid}/entries`,resultData);
+      // Global: only first attempt
+      const existing=await fbGet(`${MOCK_PATH}/globalResults/${currentUser.uid}`);
+      if(!existing){
+        await fbSet(`${MOCK_PATH}/globalResults/${currentUser.uid}`,resultData);
+      }
+    }catch(e){console.warn('Mock natija saqlashda xato:',e);}
+
+    lbSection.style.display='block';
+    let activeTab='personal';
+    async function renderLb(){
+      lbContent.innerHTML='<div class="lb-empty">⏳ Yuklanmoqda...</div>';
+      if(activeTab==='personal'){
+        try{
+          const data=await fbGet(`${MOCK_PATH}/results/${currentUser.uid}/entries`);
+          if(!data){lbContent.innerHTML='<div class="lb-empty">Hali natija yo\'q</div>';return;}
+          const entries=Object.values(data);
+          entries.sort((a,b)=>b.pct-a.pct||a.timeSec-b.timeSec);
+          lbContent.innerHTML=entries.map((e,i)=>{
+            const rankCls=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+            return`<div class="lb-entry mine">
+              <div class="lb-rank ${rankCls}">${i+1}</div>
+              <div class="lb-info"><div class="lb-name">${esc(e.username)}</div><div class="lb-date">${e.date}</div></div>
+              <div class="lb-score-area"><div class="lb-score">${e.pct}%</div><div class="lb-time">${fmtT(e.timeSec)}</div></div>
+            </div>`;
+          }).join('');
+        }catch(_){lbContent.innerHTML='<div class="lb-empty">Natijalar yuklanmadi</div>';}
+      }else{
+        try{
+          const data=await fbGet(`${MOCK_PATH}/globalResults`);
+          if(!data){lbContent.innerHTML='<div class="lb-empty">Hali natija yo\'q</div>';return;}
+          const entries=Object.values(data);
+          entries.sort((a,b)=>b.pct-a.pct||a.timeSec-b.timeSec);
+          lbContent.innerHTML=entries.map((e,i)=>{
+            const rankCls=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+            const isMine=e.uid===currentUser.uid;
+            return`<div class="lb-entry${isMine?' mine':''}">
+              <div class="lb-rank ${rankCls}">${i+1}</div>
+              <div class="lb-info"><div class="lb-name">${esc(e.username)}</div><div class="lb-date">${e.date}</div></div>
+              <div class="lb-score-area"><div class="lb-score">${e.pct}%</div><div class="lb-time">${fmtT(e.timeSec)}</div></div>
+            </div>`;
+          }).join('');
+        }catch(_){lbContent.innerHTML='<div class="lb-empty">Natijalar yuklanmadi</div>';}
+      }
+    }
+    function buildTabs(){
+      const tabs=[{id:'personal',label:'👤 Shaxsiy'},{id:'global',label:'🌍 Global'}];
+      lbTabsRow.innerHTML=tabs.map(t=>`<button class="lb-tab${activeTab===t.id?' active':''}" onclick="switchLbTab('${t.id}')">${t.label}</button>`).join('');
+    }
+    window.switchLbTab=function(tab){activeTab=tab;buildTabs();renderLb();};
+    buildTabs();
+    await renderLb();
+    return;
+  }
+
+  // Normal test
   try{
-    // Personal results path: users/{authorUid}/tests/{testFbKey}/results/{uid}/entries
     await fbPush(`users/${currentTestAuthorUid}/tests/${currentTestFbKey}/results/${currentUser.uid}/entries`,resultData);
   }catch(e){console.warn('Natija saqlashda xato:',e);}
 
-  // If public test, also save global result (only first attempt per user = first entry ever)
   if(currentTestIsPublic&&currentTestGlobalKey){
     try{
-      // Check if user already has a global result for this test
       const existing=await fbGet(`public_tests/${currentTestGlobalKey}/results/${currentUser.uid}`);
       if(!existing){
-        await fbSet(`public_tests/${currentTestGlobalKey}/results/${currentUser.uid}`,{
-          username:currentUser.username,pct,correct:correctCount,wrong:wrongCount,
-          total:shuffled.length,timeSec,date:new Date().toLocaleDateString('uz'),created:Date.now()
-        });
+        await fbSet(`public_tests/${currentTestGlobalKey}/results/${currentUser.uid}`,{...resultData,uid:currentUser.uid});
       }
     }catch(e){console.warn('Global natija saqlashda xato:',e);}
   }
 
-  // Show leaderboard
   lbSection.style.display='block';
-
-  // Build tabs
   let activeTab='personal';
   async function renderLb(){
     lbContent.innerHTML='<div class="lb-empty">⏳ Yuklanmoqda...</div>';
     if(activeTab==='personal'){
-      // All personal entries for this user on this test, sorted by pct desc then timeSec asc
       try{
         const data=await fbGet(`users/${currentTestAuthorUid}/tests/${currentTestFbKey}/results/${currentUser.uid}/entries`);
         if(!data){lbContent.innerHTML='<div class="lb-empty">Hali natija yo\'q</div>';return;}
@@ -1049,8 +1363,7 @@ async function saveResultAndShowLeaderboard(pct,timeSec){
         entries.sort((a,b)=>b.pct-a.pct||a.timeSec-b.timeSec);
         lbContent.innerHTML=entries.map((e,i)=>{
           const rankCls=i===0?'gold':i===1?'silver':i===2?'bronze':'';
-          const isMine=e.uid===currentUser.uid;
-          return`<div class="lb-entry${isMine?' mine':''}">
+          return`<div class="lb-entry mine">
             <div class="lb-rank ${rankCls}">${i+1}</div>
             <div class="lb-info"><div class="lb-name">${esc(e.username)}</div><div class="lb-date">${e.date}</div></div>
             <div class="lb-score-area"><div class="lb-score">${e.pct}%</div><div class="lb-time">${fmtT(e.timeSec)}</div></div>
@@ -1058,7 +1371,6 @@ async function saveResultAndShowLeaderboard(pct,timeSec){
         }).join('');
       }catch(_){lbContent.innerHTML='<div class="lb-empty">Natijalar yuklanmadi</div>';}
     }else{
-      // Global tab: only first result per user
       if(!currentTestIsPublic||!currentTestGlobalKey){lbContent.innerHTML='<div class="lb-empty">Bu test public emas</div>';return;}
       try{
         const data=await fbGet(`public_tests/${currentTestGlobalKey}/results`);
@@ -1077,19 +1389,12 @@ async function saveResultAndShowLeaderboard(pct,timeSec){
       }catch(_){lbContent.innerHTML='<div class="lb-empty">Natijalar yuklanmadi</div>';}
     }
   }
-
   function buildTabs(){
     const tabs=[{id:'personal',label:'👤 Shaxsiy'}];
     if(currentTestIsPublic)tabs.push({id:'global',label:'🌍 Global'});
     lbTabsRow.innerHTML=tabs.map(t=>`<button class="lb-tab${activeTab===t.id?' active':''}" onclick="switchLbTab('${t.id}')">${t.label}</button>`).join('');
   }
-
-  window.switchLbTab=function(tab){
-    activeTab=tab;
-    buildTabs();
-    renderLb();
-  };
-
+  window.switchLbTab=function(tab){activeTab=tab;buildTabs();renderLb();};
   buildTabs();
   await renderLb();
 }
