@@ -170,6 +170,36 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .admin-msg.err{background:rgba(233,69,96,.12);border:1px solid rgba(233,69,96,.3);color:var(--accent);}
 .admin-msg.ok{background:rgba(0,212,170,.12);border:1px solid rgba(0,212,170,.3);color:var(--green);}
 
+/* ADMIN STATS */
+.admin-tabs-row{display:flex;gap:6px;margin-bottom:16px;}
+.admin-tab-btn{flex:1;padding:9px;border-radius:10px;border:none;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer;transition:all .2s;background:rgba(255,255,255,.06);color:var(--muted);}
+.admin-tab-btn.active{background:var(--blue);color:#fff;}
+.stats-overview-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+.stats-overview-card{background:rgba(255,255,255,.06);border-radius:12px;padding:12px 14px;border:1px solid rgba(255,255,255,.08);text-align:center;}
+.stats-ov-val{font-family:'Righteous',cursive;font-size:1.5rem;color:#fff;line-height:1;}
+.stats-ov-label{font-size:.7rem;color:var(--muted);font-weight:700;margin-top:4px;}
+.stats-ov-val.green{color:var(--green);}.stats-ov-val.gold{color:var(--gold);}.stats-ov-val.blue{color:var(--blue);}.stats-ov-val.purple{color:var(--purple);}
+.fan-stat-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px 14px;margin-bottom:7px;}
+.fan-stat-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.fan-stat-name{font-weight:800;font-size:.88rem;color:var(--text);}
+.fan-stat-chips{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px;}
+.fan-stat-chip{font-size:.68rem;font-weight:800;padding:3px 8px;border-radius:50px;}
+.fan-stat-chip.att{background:rgba(74,144,217,.15);color:var(--blue);}
+.fan-stat-chip.usr{background:rgba(0,212,170,.15);color:var(--green);}
+.fan-stat-chip.avg{background:rgba(245,166,35,.15);color:var(--gold);}
+.fan-stat-chip.top{background:rgba(155,89,182,.15);color:var(--purple);}
+.fan-stat-mini-bar{height:5px;background:rgba(255,255,255,.08);border-radius:100px;margin-top:8px;overflow:hidden;}
+.fan-stat-mini-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--blue),var(--green));}
+.user-stat-table{width:100%;border-collapse:collapse;}
+.user-stat-table th{font-size:.68rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding:5px 8px;text-align:left;border-bottom:1px solid rgba(255,255,255,.08);}
+.user-stat-table td{font-size:.76rem;font-weight:700;padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text);}
+.user-stat-table tr:last-child td{border-bottom:none;}
+.user-stat-table .td-score{color:var(--green);font-family:'Righteous',cursive;font-size:.84rem;}
+.user-stat-table .td-cnt{color:var(--blue);}
+.stats-loading{text-align:center;padding:24px;color:var(--muted);font-size:.84rem;font-weight:600;}
+.stats-refresh-btn{background:rgba(74,144,217,.12);border:1px solid rgba(74,144,217,.22);border-radius:9px;padding:6px 12px;color:var(--blue);font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:800;cursor:pointer;transition:all .2s;float:right;}
+.stats-refresh-btn:hover{background:rgba(74,144,217,.25);}
+
 /* TEST CARD RESULTS PREVIEW */
 .st-card-wrapper{margin-bottom:8px;}
 .saved-test-card{border-radius:var(--radius);border:1px solid rgba(255,255,255,.07);background:var(--surface);transition:border-color .2s;cursor:pointer;margin-bottom:0;}
@@ -527,29 +557,49 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
         <div class="modal-title">⚙️ Admin Panel</div>
         <button class="logout-btn" onclick="adminLogout()" style="font-size:.72rem;">Chiqish</button>
       </div>
-      <div class="modal-sub">Mock test fan bazasini boshqarish</div>
+      <div class="modal-sub">Mock test va statistikani boshqarish</div>
 
-      <!-- Add new fan -->
-      <div class="admin-section-label">➕ Yangi fan qo'shish</div>
-      <div class="admin-add-box">
-        <div id="admin-add-msg" class="admin-msg"></div>
-        <div class="auth-label">Fan nomi</div>
-        <input class="modal-input" id="admin-fan-name" type="text" placeholder="Masalan: Matematika, Fizika..." maxlength="50" style="margin-bottom:8px;">
-        <div class="admin-fan-upload-zone" onclick="document.getElementById('admin-excel-input').click()">
-          <p id="admin-excel-label">📂 Excel faylni bosing (savollar bazasi)</p>
+      <!-- Admin tabs -->
+      <div class="admin-tabs-row">
+        <button class="admin-tab-btn active" id="atab-fans" onclick="switchAdminTab('fans')">📚 Fanlar</button>
+        <button class="admin-tab-btn" id="atab-stats" onclick="switchAdminTab('stats')">📊 Statistika</button>
+      </div>
+
+      <!-- FANS TAB -->
+      <div id="admin-tab-fans">
+        <!-- Add new fan -->
+        <div class="admin-section-label" style="margin-top:0;padding-top:0;border-top:none;">➕ Yangi fan qo'shish</div>
+        <div class="admin-add-box">
+          <div id="admin-add-msg" class="admin-msg"></div>
+          <div class="auth-label">Fan nomi</div>
+          <input class="modal-input" id="admin-fan-name" type="text" placeholder="Masalan: Matematika, Fizika..." maxlength="50" style="margin-bottom:8px;">
+          <div class="admin-fan-upload-zone" onclick="document.getElementById('admin-excel-input').click()">
+            <p id="admin-excel-label">📂 Excel faylni bosing (savollar bazasi)</p>
+          </div>
+          <input type="file" id="admin-excel-input" accept=".xlsx,.xls" style="display:none" onchange="handleAdminExcel(this)">
+          <div id="admin-saving-indicator" style="display:none;" class="admin-saving-badge"><div class="spinner sm"></div> Saqlanmoqda...</div>
+          <button class="modal-save-btn" onclick="saveNewFan()" style="width:100%;margin-top:10px;">💾 Saqlash</button>
         </div>
-        <input type="file" id="admin-excel-input" accept=".xlsx,.xls" style="display:none" onchange="handleAdminExcel(this)">
-        <div id="admin-saving-indicator" style="display:none;" class="admin-saving-badge"><div class="spinner sm"></div> Saqlanmoqda...</div>
-        <button class="modal-save-btn" onclick="saveNewFan()" style="width:100%;margin-top:10px;">💾 Saqlash</button>
+
+        <!-- Fan list -->
+        <div class="admin-section-label">📋 Mavjud fanlar</div>
+        <div id="admin-fans-list">
+          <div class="no-fans-msg">⏳ Yuklanmoqda...</div>
+        </div>
       </div>
 
-      <!-- Fan list -->
-      <div class="admin-section-label">📚 Mavjud fanlar</div>
-      <div id="admin-fans-list">
-        <div class="no-fans-msg">⏳ Yuklanmoqda...</div>
+      <!-- STATS TAB -->
+      <div id="admin-tab-stats" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div class="admin-section-label" style="margin:0;padding:0;border:none;">📊 Umumiy statistika</div>
+          <button class="stats-refresh-btn" onclick="renderAdminStats()">🔄 Yangilash</button>
+        </div>
+        <div id="admin-stats-content">
+          <div class="stats-loading">⏳ Yuklanmoqda...</div>
+        </div>
       </div>
 
-      <button class="modal-cancel-btn" onclick="closeAdminModal()" style="width:100%;margin-top:6px;">✖ Yopish</button>
+      <button class="modal-cancel-btn" onclick="closeAdminModal()" style="width:100%;margin-top:10px;">✖ Yopish</button>
     </div>
   </div>
 </div>
@@ -622,6 +672,7 @@ let currentIdx=0,correctCount=0,wrongCount=0,answeredCount=0;
 let answered=false,totalTime=0,startTime=null,wrongQuestions=[];
 let pendingQuestions=null;
 let currentTestFbKey=null,currentTestAuthorUid=null,currentTestIsPublic=false,currentTestGlobalKey=null;
+let currentMockFanKey=null;
 let isRetryRound=false;
 let confirmCallback=null;
 let pendingRenameKey=null;
@@ -977,10 +1028,11 @@ async function startMockTest(fanKey){
     const shuffledAll=[...all].sort(()=>Math.random()-.5);
     questions=shuffledAll.slice(0,Math.min(MOCK_COUNT,shuffledAll.length));
     originalQuestions=[...questions];
-    currentTestFbKey='mock_'+fanKey;
+    currentTestFbKey='mock_fan';
     currentTestAuthorUid='__mock__';
     currentTestIsPublic=true;
     currentTestGlobalKey='__mock__';
+    currentMockFanKey=fanKey;
     isRetryRound=false;
     startQuiz();
   }catch(e){alert('Mock testni yuklab bo\'lmadi: '+e.message);}
@@ -1014,6 +1066,11 @@ function showAdminPanelState(){
   document.getElementById('admin-login-state').style.display='none';
   document.getElementById('admin-panel-state').style.display='';
   document.getElementById('admin-topbar-btn').classList.add('active');
+  // Reset to fans tab
+  document.getElementById('admin-tab-fans').style.display='';
+  document.getElementById('admin-tab-stats').style.display='none';
+  document.getElementById('atab-fans').classList.add('active');
+  document.getElementById('atab-stats').classList.remove('active');
   renderAdminFanList();
 }
 function doAdminLogin(){
@@ -1107,6 +1164,111 @@ async function renderAdminFanList(){
       </div>`).join('');
   }catch(e){listEl.innerHTML='<div class="no-fans-msg">⚠️ Yuklab bo\'lmadi</div>';}
 }
+function switchAdminTab(tab){
+  ['fans','stats'].forEach(t=>{
+    document.getElementById('admin-tab-'+t).style.display=tab===t?'':'none';
+    document.getElementById('atab-'+t).classList.toggle('active',tab===t);
+  });
+  if(tab==='stats')renderAdminStats();
+}
+
+async function renderAdminStats(){
+  const el=document.getElementById('admin-stats-content');
+  el.innerHTML='<div class="stats-loading">⏳ Yuklanmoqda...</div>';
+  try{
+    const allFans=await fbGet(FANS_PATH);
+    if(!allFans||!Object.keys(allFans).length){
+      el.innerHTML='<div class="stats-loading">Hali hech qanday fan qo\'shilmagan</div>';return;
+    }
+
+    // Aggregate per-fan stats + global user map
+    let totalAttempts=0, globalUserMap={};
+    const fanStats=[];
+
+    for(const [fKey,fData] of Object.entries(allFans)){
+      if(!fData||!fData.name)continue;
+      const resultsData=await fbGet(`${FANS_PATH}/${fKey}/results`);
+      let fanAttempts=0,fanUsers=new Set(),fanScoreSum=0,fanTopScore=0,fanTopUser='';
+      if(resultsData){
+        for(const [uid,userRes] of Object.entries(resultsData)){
+          const entries=userRes.entries?Object.values(userRes.entries):[];
+          fanAttempts+=entries.length;
+          if(entries.length)fanUsers.add(uid);
+          for(const e of entries){
+            fanScoreSum+=e.pct||0;
+            if((e.pct||0)>fanTopScore){fanTopScore=e.pct;fanTopUser=e.username||uid;}
+            // global user map
+            if(!globalUserMap[uid]){globalUserMap[uid]={username:e.username||uid,attempts:0,scoreSum:0,best:0,lastTs:0};}
+            globalUserMap[uid].attempts++;
+            globalUserMap[uid].scoreSum+=e.pct||0;
+            if((e.pct||0)>globalUserMap[uid].best)globalUserMap[uid].best=e.pct;
+            if((e.created||0)>globalUserMap[uid].lastTs)globalUserMap[uid].lastTs=e.created||0;
+          }
+        }
+      }
+      totalAttempts+=fanAttempts;
+      fanStats.push({
+        name:fData.name,key:fKey,count:fData.count||0,
+        attempts:fanAttempts,uniqueUsers:fanUsers.size,
+        avg:fanAttempts?Math.round(fanScoreSum/fanAttempts):0,
+        top:fanTopScore,topUser:fanTopUser
+      });
+    }
+
+    const totalUsers=Object.keys(globalUserMap).length;
+    const overallAvg=totalAttempts?Math.round(Object.values(globalUserMap).reduce((s,u)=>s+u.scoreSum,0)/totalAttempts):0;
+    const topOverall=Object.values(globalUserMap).sort((a,b)=>b.best-a.best)[0];
+
+    // Overview cards
+    let html=`<div class="stats-overview-grid">
+      <div class="stats-overview-card"><div class="stats-ov-val blue">${totalAttempts}</div><div class="stats-ov-label">Jami urinishlar</div></div>
+      <div class="stats-overview-card"><div class="stats-ov-val green">${totalUsers}</div><div class="stats-ov-label">Unique foydalanuvchilar</div></div>
+      <div class="stats-overview-card"><div class="stats-ov-val gold">${overallAvg}%</div><div class="stats-ov-label">O'rtacha natija</div></div>
+      <div class="stats-overview-card"><div class="stats-ov-val purple">${topOverall?topOverall.best+'%':'—'}</div><div class="stats-ov-label">Eng yuqori ball${topOverall?' ('+esc(topOverall.username)+')':''}</div></div>
+    </div>`;
+
+    // Per-fan stats
+    fanStats.sort((a,b)=>b.attempts-a.attempts);
+    html+=`<div class="admin-section-label">📘 Fanlar bo'yicha</div>`;
+    if(!fanStats.length){html+='<div class="stats-loading">Ma\'lumot yo\'q</div>';}
+    else{html+=fanStats.map(f=>`
+      <div class="fan-stat-item">
+        <div class="fan-stat-header">
+          <div class="fan-stat-name">📘 ${esc(f.name)}</div>
+          <div style="font-size:.7rem;color:var(--muted);font-weight:700;">${f.count} ta savol bazasi</div>
+        </div>
+        <div class="fan-stat-chips">
+          <span class="fan-stat-chip att">🔢 ${f.attempts} urinish</span>
+          <span class="fan-stat-chip usr">👥 ${f.uniqueUsers} foydalanuvchi</span>
+          <span class="fan-stat-chip avg">📊 O'rtacha: ${f.avg}%</span>
+          <span class="fan-stat-chip top">🏆 TOP: ${f.top}% (${esc(f.topUser||'—')})</span>
+        </div>
+        <div class="fan-stat-mini-bar"><div class="fan-stat-mini-fill" style="width:${f.avg}%"></div></div>
+      </div>`).join('');}
+
+    // Users table
+    const userList=Object.values(globalUserMap).sort((a,b)=>b.attempts-a.attempts);
+    html+=`<div class="admin-section-label">👤 Foydalanuvchilar</div>`;
+    if(!userList.length){html+='<div class="stats-loading">Hali hech kim ishlamagan</div>';}
+    else{html+=`<div style="overflow-x:auto;">
+      <table class="user-stat-table">
+        <thead><tr>
+          <th>#</th><th>Foydalanuvchi</th><th>Urinish</th><th>O'rtacha</th><th>Eng yaxshi</th><th>Oxirgi</th>
+        </tr></thead>
+        <tbody>${userList.map((u,i)=>`<tr>
+          <td style="color:var(--muted);">${i+1}</td>
+          <td>${esc(u.username)}</td>
+          <td class="td-cnt">${u.attempts}</td>
+          <td>${Math.round(u.scoreSum/u.attempts)}%</td>
+          <td class="td-score">${u.best}%</td>
+          <td style="color:var(--muted);font-size:.68rem;">${u.lastTs?new Date(u.lastTs).toLocaleDateString('uz'):'—'}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>`;}
+
+    el.innerHTML=html;
+  }catch(e){el.innerHTML=`<div class="stats-loading">⚠️ Yuklab bo'lmadi: ${e.message}</div>`;}
+}
+
 function deleteFan(fanKey,fanName){
   showConfirm(`"${fanName}" fanini o'chirmoqchimisiz? Barcha savollar o'chadi.`,"🗑️ Ha, o'chir",async()=>{
     try{
@@ -1492,58 +1654,49 @@ async function saveResultAndShowLeaderboard(pct,timeSec){
   const lbTabsRow=document.getElementById('lb-tabs-row');
   const lbContent=document.getElementById('lb-content');
 
-  if(!currentUser||!currentTestFbKey||!currentTestAuthorUid){
-    lbSection.style.display='none';
-    return;
-  }
+  if(!currentUser||!currentTestFbKey||!currentTestAuthorUid){lbSection.style.display='none';return;}
 
   const resultData={
-    username:currentUser.username,
-    uid:currentUser.uid,
-    pct,
-    correct:correctCount,
-    wrong:wrongCount,
-    total:shuffled.length,
-    timeSec,
-    date:new Date().toLocaleDateString('uz'),
-    created:Date.now()
+    username:currentUser.username,uid:currentUser.uid,pct,
+    correct:correctCount,wrong:wrongCount,total:shuffled.length,
+    timeSec,date:new Date().toLocaleDateString('uz'),created:Date.now()
   };
 
-  // MOCK TEST — save to mock_test/results
-  const isMockTest=(currentTestFbKey==='mock'&&currentTestAuthorUid==='__mock__');
-
-  if(isMockTest){
+  // ── MOCK FAN TEST ──
+  const isMockFan=(currentTestFbKey==='mock_fan'&&currentTestAuthorUid==='__mock__'&&currentMockFanKey);
+  if(isMockFan){
+    const fKey=currentMockFanKey;
     try{
-      await fbPush(`${MOCK_PATH}/results/${currentUser.uid}/entries`,resultData);
-      // Global: only first attempt
-      const existing=await fbGet(`${MOCK_PATH}/globalResults/${currentUser.uid}`);
-      if(!existing){
-        await fbSet(`${MOCK_PATH}/globalResults/${currentUser.uid}`,resultData);
+      await fbPush(`${FANS_PATH}/${fKey}/results/${currentUser.uid}/entries`,resultData);
+      // Global leaderboard: keep best result only
+      const existing=await fbGet(`${FANS_PATH}/${fKey}/globalResults/${currentUser.uid}`);
+      if(!existing||pct>existing.pct||(pct===existing.pct&&timeSec<existing.timeSec)){
+        await fbSet(`${FANS_PATH}/${fKey}/globalResults/${currentUser.uid}`,resultData);
       }
-    }catch(e){console.warn('Mock natija saqlashda xato:',e);}
+    }catch(e){console.warn('Mock fan natija saqlashda xato:',e);}
 
     lbSection.style.display='block';
     let activeTab='personal';
-    async function renderLb(){
+    async function renderMockLb(){
       lbContent.innerHTML='<div class="lb-empty">⏳ Yuklanmoqda...</div>';
       if(activeTab==='personal'){
         try{
-          const data=await fbGet(`${MOCK_PATH}/results/${currentUser.uid}/entries`);
+          const data=await fbGet(`${FANS_PATH}/${fKey}/results/${currentUser.uid}/entries`);
           if(!data){lbContent.innerHTML='<div class="lb-empty">Hali natija yo\'q</div>';return;}
           const entries=Object.values(data);
-          entries.sort((a,b)=>b.pct-a.pct||a.timeSec-b.timeSec);
-          lbContent.innerHTML=entries.map((e,i)=>{
+          entries.sort((a,b)=>b.created-a.created);
+          lbContent.innerHTML=`<div class="lb-empty" style="color:var(--muted);font-size:.76rem;margin-bottom:8px;">Jami ${entries.length} ta urinish</div>`+entries.map((e,i)=>{
             const rankCls=i===0?'gold':i===1?'silver':i===2?'bronze':'';
             return`<div class="lb-entry mine">
               <div class="lb-rank ${rankCls}">${i+1}</div>
-              <div class="lb-info"><div class="lb-name">${esc(e.username)}</div><div class="lb-date">${e.date}</div></div>
+              <div class="lb-info"><div class="lb-name">${esc(e.username)}</div><div class="lb-date">${e.date} &bull; ${e.correct}/${e.total} to'g'ri</div></div>
               <div class="lb-score-area"><div class="lb-score">${e.pct}%</div><div class="lb-time">${fmtT(e.timeSec)}</div></div>
             </div>`;
           }).join('');
         }catch(_){lbContent.innerHTML='<div class="lb-empty">Natijalar yuklanmadi</div>';}
       }else{
         try{
-          const data=await fbGet(`${MOCK_PATH}/globalResults`);
+          const data=await fbGet(`${FANS_PATH}/${fKey}/globalResults`);
           if(!data){lbContent.innerHTML='<div class="lb-empty">Hali natija yo\'q</div>';return;}
           const entries=Object.values(data);
           entries.sort((a,b)=>b.pct-a.pct||a.timeSec-b.timeSec);
@@ -1552,37 +1705,32 @@ async function saveResultAndShowLeaderboard(pct,timeSec){
             const isMine=e.uid===currentUser.uid;
             return`<div class="lb-entry${isMine?' mine':''}">
               <div class="lb-rank ${rankCls}">${i+1}</div>
-              <div class="lb-info"><div class="lb-name">${esc(e.username)}</div><div class="lb-date">${e.date}</div></div>
+              <div class="lb-info"><div class="lb-name">${esc(e.username)}${isMine?' 👈':''}</div><div class="lb-date">${e.date}</div></div>
               <div class="lb-score-area"><div class="lb-score">${e.pct}%</div><div class="lb-time">${fmtT(e.timeSec)}</div></div>
             </div>`;
           }).join('');
         }catch(_){lbContent.innerHTML='<div class="lb-empty">Natijalar yuklanmadi</div>';}
       }
     }
-    function buildTabs(){
-      const tabs=[{id:'personal',label:'👤 Shaxsiy'},{id:'global',label:'🌍 Global'}];
+    function buildMockTabs(){
+      const tabs=[{id:'personal',label:'👤 Mening natijalarim'},{id:'global',label:'🏆 TOP o\'yinchilar'}];
       lbTabsRow.innerHTML=tabs.map(t=>`<button class="lb-tab${activeTab===t.id?' active':''}" onclick="switchLbTab('${t.id}')">${t.label}</button>`).join('');
     }
-    window.switchLbTab=function(tab){activeTab=tab;buildTabs();renderLb();};
-    buildTabs();
-    await renderLb();
+    window.switchLbTab=function(tab){activeTab=tab;buildMockTabs();renderMockLb();};
+    buildMockTabs();
+    await renderMockLb();
     return;
   }
 
-  // Normal test
-  try{
-    await fbPush(`users/${currentTestAuthorUid}/tests/${currentTestFbKey}/results/${currentUser.uid}/entries`,resultData);
-  }catch(e){console.warn('Natija saqlashda xato:',e);}
-
+  // ── NORMAL TEST ──
+  try{await fbPush(`users/${currentTestAuthorUid}/tests/${currentTestFbKey}/results/${currentUser.uid}/entries`,resultData);}
+  catch(e){console.warn('Natija saqlashda xato:',e);}
   if(currentTestIsPublic&&currentTestGlobalKey){
     try{
       const existing=await fbGet(`public_tests/${currentTestGlobalKey}/results/${currentUser.uid}`);
-      if(!existing){
-        await fbSet(`public_tests/${currentTestGlobalKey}/results/${currentUser.uid}`,{...resultData,uid:currentUser.uid});
-      }
+      if(!existing)await fbSet(`public_tests/${currentTestGlobalKey}/results/${currentUser.uid}`,{...resultData,uid:currentUser.uid});
     }catch(e){console.warn('Global natija saqlashda xato:',e);}
   }
-
   lbSection.style.display='block';
   let activeTab='personal';
   async function renderLb(){
@@ -1595,11 +1743,7 @@ async function saveResultAndShowLeaderboard(pct,timeSec){
         entries.sort((a,b)=>b.pct-a.pct||a.timeSec-b.timeSec);
         lbContent.innerHTML=entries.map((e,i)=>{
           const rankCls=i===0?'gold':i===1?'silver':i===2?'bronze':'';
-          return`<div class="lb-entry mine">
-            <div class="lb-rank ${rankCls}">${i+1}</div>
-            <div class="lb-info"><div class="lb-name">${esc(e.username)}</div><div class="lb-date">${e.date}</div></div>
-            <div class="lb-score-area"><div class="lb-score">${e.pct}%</div><div class="lb-time">${fmtT(e.timeSec)}</div></div>
-          </div>`;
+          return`<div class="lb-entry mine"><div class="lb-rank ${rankCls}">${i+1}</div><div class="lb-info"><div class="lb-name">${esc(e.username)}</div><div class="lb-date">${e.date}</div></div><div class="lb-score-area"><div class="lb-score">${e.pct}%</div><div class="lb-time">${fmtT(e.timeSec)}</div></div></div>`;
         }).join('');
       }catch(_){lbContent.innerHTML='<div class="lb-empty">Natijalar yuklanmadi</div>';}
     }else{
@@ -1612,11 +1756,7 @@ async function saveResultAndShowLeaderboard(pct,timeSec){
         lbContent.innerHTML=entries.map((e,i)=>{
           const rankCls=i===0?'gold':i===1?'silver':i===2?'bronze':'';
           const isMine=e.uid===currentUser.uid;
-          return`<div class="lb-entry${isMine?' mine':''}">
-            <div class="lb-rank ${rankCls}">${i+1}</div>
-            <div class="lb-info"><div class="lb-name">${esc(e.username)}</div><div class="lb-date">${e.date}</div></div>
-            <div class="lb-score-area"><div class="lb-score">${e.pct}%</div><div class="lb-time">${fmtT(e.timeSec)}</div></div>
-          </div>`;
+          return`<div class="lb-entry${isMine?' mine':''}"><div class="lb-rank ${rankCls}">${i+1}</div><div class="lb-info"><div class="lb-name">${esc(e.username)}</div><div class="lb-date">${e.date}</div></div><div class="lb-score-area"><div class="lb-score">${e.pct}%</div><div class="lb-time">${fmtT(e.timeSec)}</div></div></div>`;
         }).join('');
       }catch(_){lbContent.innerHTML='<div class="lb-empty">Natijalar yuklanmadi</div>';}
     }
