@@ -142,6 +142,35 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .fan-start-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(155,89,182,.4);}
 .no-fans-msg{text-align:center;padding:18px;color:var(--muted);font-size:.84rem;font-weight:600;background:rgba(255,255,255,.03);border-radius:12px;border:1px dashed rgba(255,255,255,.08);}
 
+/* PRE SECTION */
+.pre-section{width:100%;margin-top:0;margin-bottom:8px;}
+.pre-main-card{background:linear-gradient(135deg,rgba(74,144,217,.18),rgba(155,89,182,.14));border:2px solid rgba(74,144,217,.4);border-radius:20px;padding:18px 20px;position:relative;overflow:hidden;}
+.pre-main-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(74,144,217,.06),rgba(155,89,182,.06));pointer-events:none;}
+.pre-main-header{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
+.pre-main-icon{font-size:2rem;}
+.pre-main-title{font-family:'Righteous',cursive;font-size:1.3rem;color:#fff;}
+.pre-main-badge{font-size:.62rem;font-weight:800;background:rgba(74,144,217,.3);border:1px solid rgba(74,144,217,.5);color:#a0cfff;border-radius:50px;padding:3px 8px;margin-left:4px;}
+.pre-main-desc{color:var(--muted);font-size:.8rem;font-weight:600;margin-bottom:12px;line-height:1.5;}
+.pre-groups-list{display:flex;flex-direction:column;gap:8px;}
+.pre-group-card{background:rgba(255,255,255,.05);border:1px solid rgba(74,144,217,.2);border-radius:14px;overflow:hidden;transition:border-color .2s;}
+.pre-group-card.open{border-color:rgba(74,144,217,.5);}
+.pre-group-toggle{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;gap:10px;transition:background .2s;}
+.pre-group-toggle:hover{background:rgba(74,144,217,.08);}
+.pre-group-toggle-left{display:flex;align-items:center;gap:9px;min-width:0;}
+.pre-group-toggle-icon{font-size:1.1rem;}
+.pre-group-toggle-name{font-weight:800;font-size:.92rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pre-group-toggle-meta{font-size:.7rem;color:var(--muted);font-weight:600;margin-top:1px;}
+.pre-group-arrow{color:var(--muted);font-size:.8rem;flex-shrink:0;transition:transform .25s;}
+.pre-group-card.open .pre-group-arrow{transform:rotate(90deg);}
+.pre-subtests-wrap{display:none;padding:0 10px 10px;animation:fadeIn .2s ease;}
+.pre-group-card.open .pre-subtests-wrap{display:block;}
+.pre-subtests-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:7px;}
+.pre-sub-btn{background:rgba(74,144,217,.1);border:1px solid rgba(74,144,217,.25);border-radius:10px;padding:9px 10px;display:flex;align-items:center;justify-content:space-between;gap:6px;cursor:pointer;transition:all .2s;}
+.pre-sub-btn:hover{background:rgba(74,144,217,.22);border-color:var(--blue);transform:translateY(-1px);}
+.pre-sub-name{font-size:.8rem;font-weight:800;color:#fff;}
+.pre-sub-count{font-size:.68rem;font-weight:700;color:var(--blue);}
+.pre-sub-play{font-size:.78rem;color:var(--blue);}
+
 /* ADMIN BUTTON */
 .admin-btn{background:rgba(74,144,217,.1);border:1px solid rgba(74,144,217,.22);border-radius:10px;padding:6px 11px;color:var(--blue);font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:800;cursor:pointer;transition:all .2s;}
 .admin-btn:hover{background:rgba(74,144,217,.22);}
@@ -199,6 +228,23 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .stats-loading{text-align:center;padding:24px;color:var(--muted);font-size:.84rem;font-weight:600;}
 .stats-refresh-btn{background:rgba(74,144,217,.12);border:1px solid rgba(74,144,217,.22);border-radius:9px;padding:6px 12px;color:var(--blue);font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:800;cursor:pointer;transition:all .2s;float:right;}
 .stats-refresh-btn:hover{background:rgba(74,144,217,.25);}
+
+/* PRE TAB */
+.pre-preview-box{background:rgba(155,89,182,.07);border:1px solid rgba(155,89,182,.25);border-radius:12px;padding:13px 15px;margin-top:10px;}
+.pre-preview-title{font-size:.76rem;font-weight:800;color:var(--purple);margin-bottom:8px;}
+.pre-chunk-list{display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;}
+.pre-chunk-item{display:flex;align-items:center;justify-content:space-between;font-size:.75rem;font-weight:700;padding:4px 8px;background:rgba(255,255,255,.04);border-radius:7px;}
+.pre-chunk-name{color:var(--text);}
+.pre-chunk-cnt{color:var(--purple);font-family:'Righteous',cursive;}
+.pre-group-item{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:11px 14px;margin-bottom:7px;}
+.pre-group-header{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.pre-group-name{font-weight:800;font-size:.88rem;color:var(--text);}
+.pre-group-meta{font-size:.7rem;color:var(--muted);font-weight:600;margin-top:2px;}
+.pre-group-del-btn{background:rgba(233,69,96,.12);border:1px solid rgba(233,69,96,.25);border-radius:8px;padding:5px 9px;color:var(--accent);font-size:.82rem;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.pre-group-del-btn:hover{background:rgba(233,69,96,.25);}
+.pre-saving-progress{margin-top:10px;font-size:.78rem;font-weight:700;color:var(--gold);}
+.pre-progress-bar-bg{height:6px;background:rgba(255,255,255,.08);border-radius:100px;margin-top:6px;overflow:hidden;}
+.pre-progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--blue));border-radius:100px;transition:width .3s;}
 
 /* TEST CARD RESULTS PREVIEW */
 .st-card-wrapper{margin-bottom:8px;}
@@ -433,6 +479,22 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
     </div>
   </div>
 
+  <!-- PRE SECTION -->
+  <div class="pre-section" id="pre-section" style="display:none;">
+    <div class="pre-main-card">
+      <div class="pre-main-header">
+        <div class="pre-main-icon">🔷</div>
+        <div>
+          <div class="pre-main-title">PRE Testlar <span class="pre-main-badge">SUBTEST</span></div>
+        </div>
+      </div>
+      <div class="pre-main-desc">Mavzular bo'yicha guruhlangan testlar — har birida 25 ta savol</div>
+      <div class="pre-groups-list" id="pre-groups-list">
+        <div class="no-fans-msg">⏳ Yuklanmoqda...</div>
+      </div>
+    </div>
+  </div>
+
   <!-- Global search -->
   <div class="global-search-section">
     <div class="saved-tests-title">🌍 Global qidiruv</div>
@@ -562,6 +624,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
       <!-- Admin tabs -->
       <div class="admin-tabs-row">
         <button class="admin-tab-btn active" id="atab-fans" onclick="switchAdminTab('fans')">📚 Fanlar</button>
+        <button class="admin-tab-btn" id="atab-pre" onclick="switchAdminTab('pre')">🔷 PRE</button>
         <button class="admin-tab-btn" id="atab-stats" onclick="switchAdminTab('stats')">📊 Statistika</button>
       </div>
 
@@ -584,6 +647,37 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
         <!-- Fan list -->
         <div class="admin-section-label">📋 Mavjud fanlar</div>
         <div id="admin-fans-list">
+          <div class="no-fans-msg">⏳ Yuklanmoqda...</div>
+        </div>
+      </div>
+
+      <!-- PRE TAB -->
+      <div id="admin-tab-pre" style="display:none;">
+        <div class="admin-section-label" style="margin-top:0;padding-top:0;border-top:none;">🔷 PRE test yaratish</div>
+        <div class="admin-add-box">
+          <div id="pre-add-msg" class="admin-msg"></div>
+          <div class="auth-label">Asosiy sarlavha (Title)</div>
+          <input class="modal-input" id="pre-title-input" type="text" placeholder="Masalan: Falsafa Savollar" maxlength="60" style="margin-bottom:8px;" oninput="updatePrePreview()">
+          <div class="admin-fan-upload-zone" onclick="document.getElementById('pre-excel-input').click()">
+            <p id="pre-excel-label">📂 Excel faylni bosing (barcha savollar)</p>
+          </div>
+          <input type="file" id="pre-excel-input" accept=".xlsx,.xls" style="display:none" onchange="handlePreExcel(this)">
+          <!-- Preview -->
+          <div id="pre-preview-box" class="pre-preview-box" style="display:none;">
+            <div class="pre-preview-title" id="pre-preview-title">📦 Subtestlar ko'rinishi:</div>
+            <div class="pre-chunk-list" id="pre-chunk-list"></div>
+          </div>
+          <!-- Save progress -->
+          <div id="pre-save-progress" style="display:none;" class="pre-saving-progress">
+            <span id="pre-save-text">⏳ Saqlanmoqda...</span>
+            <div class="pre-progress-bar-bg"><div class="pre-progress-bar-fill" id="pre-progress-fill" style="width:0%"></div></div>
+          </div>
+          <button class="modal-save-btn" id="pre-save-btn" onclick="savePreTests()" style="width:100%;margin-top:10px;background:linear-gradient(135deg,var(--purple),#7d3c98);">🔷 Barcha subtestlarni saqlash</button>
+        </div>
+
+        <!-- Existing PRE groups -->
+        <div class="admin-section-label">📋 Saqlangan PRE guruhlar</div>
+        <div id="admin-pre-list">
           <div class="no-fans-msg">⏳ Yuklanmoqda...</div>
         </div>
       </div>
@@ -750,6 +844,7 @@ async function loginOk(username){
   document.getElementById('sync-badge').textContent='🟢 Online';
   showMsg('');
   await renderMockSection();
+  await renderPreSection();
   await renderSavedTests();
 }
 
@@ -986,7 +1081,7 @@ const FANS_PATH='mock_fans';
 const MOCK_COUNT=25;
 
 // Admin state
-const ADMIN_CREDS={login:'admin',passHash:hashPass('abduvayitovv')};
+const ADMIN_CREDS={login:'admin',passHash:hashPass('quizmaster2024')};
 let isAdminLoggedIn=false;
 let pendingAdminQuestions=null;
 
@@ -1066,11 +1161,10 @@ function showAdminPanelState(){
   document.getElementById('admin-login-state').style.display='none';
   document.getElementById('admin-panel-state').style.display='';
   document.getElementById('admin-topbar-btn').classList.add('active');
-  // Reset to fans tab
-  document.getElementById('admin-tab-fans').style.display='';
-  document.getElementById('admin-tab-stats').style.display='none';
-  document.getElementById('atab-fans').classList.add('active');
-  document.getElementById('atab-stats').classList.remove('active');
+  ['fans','pre','stats'].forEach(t=>{
+    document.getElementById('admin-tab-'+t).style.display=t==='fans'?'':'none';
+    document.getElementById('atab-'+t).classList.toggle('active',t==='fans');
+  });
   renderAdminFanList();
 }
 function doAdminLogin(){
@@ -1165,11 +1259,12 @@ async function renderAdminFanList(){
   }catch(e){listEl.innerHTML='<div class="no-fans-msg">⚠️ Yuklab bo\'lmadi</div>';}
 }
 function switchAdminTab(tab){
-  ['fans','stats'].forEach(t=>{
+  ['fans','pre','stats'].forEach(t=>{
     document.getElementById('admin-tab-'+t).style.display=tab===t?'':'none';
     document.getElementById('atab-'+t).classList.toggle('active',tab===t);
   });
   if(tab==='stats')renderAdminStats();
+  if(tab==='pre')renderPreList();
 }
 
 async function renderAdminStats(){
@@ -1269,6 +1364,158 @@ async function renderAdminStats(){
   }catch(e){el.innerHTML=`<div class="stats-loading">⚠️ Yuklab bo'lmadi: ${e.message}</div>`;}
 }
 
+// ── PRE TEST SYSTEM ──
+const PRE_AUTHOR_UID='__pre_admin__';
+const PRE_CHUNK=25;
+const PRE_GROUPS_PATH='pre_groups';
+let pendingPreQuestions=null;
+
+function setPreMsg(txt,type){
+  const el=document.getElementById('pre-add-msg');
+  el.textContent=txt;el.className='admin-msg show '+(type||'err');
+  if(!txt)el.className='admin-msg';
+}
+
+function handlePreExcel(inp){
+  if(!inp.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const qs=parseMockWorkbook(wb);
+      if(!qs||!qs.length){
+        setPreMsg("Savollar topilmadi! Excel formatini tekshiring.",'err');
+        pendingPreQuestions=null;
+        document.getElementById('pre-excel-label').textContent='📂 Excel faylni bosing';
+        inp.value='';return;
+      }
+      pendingPreQuestions=qs;
+      document.getElementById('pre-excel-label').textContent=`✅ ${qs.length} ta savol yuklandi`;
+      setPreMsg(`${qs.length} ta savol — ${Math.ceil(qs.length/PRE_CHUNK)} ta subtest yaratiladi`,'ok');
+      updatePrePreview();
+    }catch(err){setPreMsg('Xato: '+err.message,'err');}
+    inp.value='';
+  };
+  r.readAsBinaryString(inp.files[0]);
+}
+
+function updatePrePreview(){
+  const box=document.getElementById('pre-preview-box');
+  const list=document.getElementById('pre-chunk-list');
+  const titleEl=document.getElementById('pre-preview-title');
+  if(!pendingPreQuestions||!pendingPreQuestions.length){box.style.display='none';return;}
+  const baseTitle=document.getElementById('pre-title-input').value.trim()||'Test';
+  const total=pendingPreQuestions.length;
+  const numChunks=Math.ceil(total/PRE_CHUNK);
+  box.style.display='';
+  titleEl.textContent=`📦 ${numChunks} ta subtest yaratiladi (${total} ta savol):`;
+  list.innerHTML=Array.from({length:numChunks},(_,i)=>{
+    const from=i*PRE_CHUNK+1;
+    const to=Math.min((i+1)*PRE_CHUNK,total);
+    const cnt=to-from+1;
+    return`<div class="pre-chunk-item">
+      <span class="pre-chunk-name">📘 ${esc(baseTitle)} ${i+1}</span>
+      <span class="pre-chunk-cnt">${from}–${to} (${cnt} ta)</span>
+    </div>`;
+  }).join('');
+}
+
+async function savePreTests(){
+  const baseTitle=document.getElementById('pre-title-input').value.trim();
+  if(!baseTitle){setPreMsg('Sarlavhani kiriting!','err');return;}
+  if(!pendingPreQuestions||!pendingPreQuestions.length){setPreMsg("Avval Excel faylni yuklang!",'err');return;}
+
+  const btn=document.getElementById('pre-save-btn');
+  const progressWrap=document.getElementById('pre-save-progress');
+  const progressText=document.getElementById('pre-save-text');
+  const progressFill=document.getElementById('pre-progress-fill');
+  btn.disabled=true;progressWrap.style.display='';
+
+  const chunks=[];
+  for(let i=0;i<pendingPreQuestions.length;i+=PRE_CHUNK)
+    chunks.push(pendingPreQuestions.slice(i,i+PRE_CHUNK));
+
+  const savedKeys=[];
+  try{
+    for(let i=0;i<chunks.length;i++){
+      const name=`${baseTitle} ${i+1}`;
+      const qs=chunks[i];
+      progressText.textContent=`⏳ ${i+1}/${chunks.length}: "${name}" saqlanmoqda...`;
+      progressFill.style.width=Math.round((i/chunks.length)*100)+'%';
+
+      const slim=qs.map(q=>({num:q.num,text:q.text,correctLetter:q.correctLetter,correctText:q.correctText,options:q.options.map(o=>({text:o.text,letter:o.letter,isCorrect:o.isCorrect}))}));
+      const fbKey=await fbPush(`users/${PRE_AUTHOR_UID}/tests`,{
+        name,count:slim.length,date:new Date().toLocaleDateString('uz'),
+        created:Date.now(),questions:slim,isPublic:true,isPre:true
+      });
+      await fbSet(`public_tests/${PRE_AUTHOR_UID}__${fbKey}`,{
+        name,authorName:'PRE Admin',authorUid:PRE_AUTHOR_UID,
+        testFbKey:fbKey,count:slim.length,created:Date.now(),isPre:true
+      });
+      savedKeys.push(fbKey);
+    }
+
+    // Save group record
+    await fbPush(PRE_GROUPS_PATH,{
+      baseTitle,totalQuestions:pendingPreQuestions.length,
+      chunksCount:chunks.length,keys:savedKeys,
+      created:Date.now(),date:new Date().toLocaleDateString('uz')
+    });
+
+    progressFill.style.width='100%';
+    progressText.textContent=`✅ ${chunks.length} ta subtest muvaffaqiyatli saqlandi!`;
+    setPreMsg(`✅ "${baseTitle}" — ${chunks.length} ta subtest yaratildi!`,'ok');
+    document.getElementById('pre-title-input').value='';
+    document.getElementById('pre-excel-label').textContent='📂 Excel faylni bosing';
+    document.getElementById('pre-preview-box').style.display='none';
+    pendingPreQuestions=null;
+    setTimeout(()=>{progressWrap.style.display='none';},2000);
+    await renderPreList();
+  }catch(e){
+    setPreMsg('Saqlashda xatolik: '+e.message,'err');
+    progressWrap.style.display='none';
+  }finally{btn.disabled=false;}
+}
+
+async function renderPreList(){
+  const el=document.getElementById('admin-pre-list');
+  el.innerHTML='<div class="no-fans-msg">⏳ Yuklanmoqda...</div>';
+  try{
+    const groups=await fbGet(PRE_GROUPS_PATH);
+    if(!groups||!Object.keys(groups).length){
+      el.innerHTML='<div class="no-fans-msg">Hali PRE guruh yaratilmagan</div>';return;
+    }
+    const list=Object.entries(groups).map(([k,v])=>({key:k,...v}));
+    list.sort((a,b)=>b.created-a.created);
+    el.innerHTML=list.map(g=>`
+      <div class="pre-group-item">
+        <div class="pre-group-header">
+          <div>
+            <div class="pre-group-name">🔷 ${esc(g.baseTitle)}</div>
+            <div class="pre-group-meta">${g.chunksCount} ta subtest &bull; ${g.totalQuestions} ta savol &bull; ${g.date||''}</div>
+          </div>
+          <button class="pre-group-del-btn" onclick="deletePreGroup('${g.key}','${esc(g.baseTitle).replace(/'/g,"\\'")}',${JSON.stringify(g.keys||[]).replace(/"/g,"'")})">🗑️ O'chir</button>
+        </div>
+      </div>`).join('');
+  }catch(e){el.innerHTML='<div class="no-fans-msg">⚠️ Yuklab bo\'lmadi</div>';}
+}
+
+async function deletePreGroup(groupKey,groupName,keysRaw){
+  // keysRaw may be passed as JSON string or array — normalize
+  let keys=[];
+  try{keys=typeof keysRaw==='string'?JSON.parse(keysRaw.replace(/'/g,'"')):keysRaw;}catch(_){}
+  showConfirm(`"${groupName}" guruhidagi barcha ${keys.length} ta subtestni o'chirmoqchimisiz?`,"🗑️ Ha, o'chir",async()=>{
+    try{
+      for(const k of keys){
+        try{await fbRemove(`users/${PRE_AUTHOR_UID}/tests/${k}`);}catch(_){}
+        try{await fbRemove(`public_tests/${PRE_AUTHOR_UID}__${k}`);}catch(_){}
+      }
+      await fbRemove(`${PRE_GROUPS_PATH}/${groupKey}`);
+      await renderPreList();
+    }catch(e){alert("O'chirishda xatolik: "+e.message);}
+  });
+}
+
 function deleteFan(fanKey,fanName){
   showConfirm(`"${fanName}" fanini o'chirmoqchimisiz? Barcha savollar o'chadi.`,"🗑️ Ha, o'chir",async()=>{
     try{
@@ -1353,6 +1600,64 @@ function parseMockWorkbook(wb){
     if(!res.some(o=>o.isCorrect)&&q.correctText)res.forEach(o=>{if(normStr(o.text)===normStr(q.correctText))o.isCorrect=true;});
     return{num:q.num,text:q.text,correctLetter:q.correctLetter,correctText:q.correctText,options:res};
   });
+}
+
+// ── PRE SECTION (upload screen) ──
+async function renderPreSection(){
+  const section=document.getElementById('pre-section');
+  const list=document.getElementById('pre-groups-list');
+  if(!section||!list)return;
+  try{
+    const groups=await fbGet(PRE_GROUPS_PATH);
+    if(!groups||!Object.keys(groups).length){
+      section.style.display='none';return;
+    }
+    const groupArr=Object.entries(groups).map(([k,v])=>({key:k,...v}));
+    groupArr.sort((a,b)=>(a.baseTitle||'').localeCompare(b.baseTitle||''));
+    section.style.display='';
+
+    list.innerHTML=groupArr.map(g=>{
+      const subtests=Array.from({length:g.chunksCount||0},(_,i)=>{
+        const fbKey=(g.keys||[])[i];
+        if(!fbKey)return'';
+        const globalKey=PRE_AUTHOR_UID+'__'+fbKey;
+        const from=i*PRE_CHUNK+1;
+        const to=Math.min((i+1)*PRE_CHUNK,g.totalQuestions||0);
+        const cnt=to-from+1;
+        return`<div class="pre-sub-btn" onclick="startPublicTest('${globalKey}')">
+          <div>
+            <div class="pre-sub-name">${esc(g.baseTitle)} ${i+1}</div>
+            <div class="pre-sub-count">${from}–${to} (${cnt} ta)</div>
+          </div>
+          <div class="pre-sub-play">▶</div>
+        </div>`;
+      }).join('');
+      return`<div class="pre-group-card" id="preg-${g.key}">
+        <div class="pre-group-toggle" onclick="togglePreGroup('${g.key}')">
+          <div class="pre-group-toggle-left">
+            <div class="pre-group-toggle-icon">📘</div>
+            <div>
+              <div class="pre-group-toggle-name">${esc(g.baseTitle)}</div>
+              <div class="pre-group-toggle-meta">${g.chunksCount} ta subtest &bull; ${g.totalQuestions} ta savol</div>
+            </div>
+          </div>
+          <div class="pre-group-arrow">▶</div>
+        </div>
+        <div class="pre-subtests-wrap">
+          <div class="pre-subtests-grid">${subtests}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){
+    const section=document.getElementById('pre-section');
+    if(section)section.style.display='none';
+  }
+}
+
+function togglePreGroup(key){
+  const card=document.getElementById('preg-'+key);
+  if(!card)return;
+  card.classList.toggle('open');
 }
 
 // ── GLOBAL SEARCH ──
