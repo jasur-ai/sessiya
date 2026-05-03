@@ -131,6 +131,45 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .mock-stat{background:rgba(255,255,255,.07);border-radius:8px;padding:5px 12px;font-size:.76rem;font-weight:800;color:var(--muted);}
 .mock-stat span{color:#fff;font-weight:900;}
 
+/* FAN GRID */
+.fans-grid{display:grid;gap:9px;width:100%;margin-top:4px;}
+.fan-card{background:linear-gradient(135deg,rgba(155,89,182,.16),rgba(74,144,217,.12));border:2px solid rgba(155,89,182,.28);border-radius:15px;padding:13px 15px;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:all .2s;}
+.fan-card:hover{border-color:rgba(155,89,182,.55);transform:translateY(-1px);}
+.fan-card-left{min-width:0;}
+.fan-name{font-weight:800;font-size:.92rem;color:#fff;}
+.fan-count{font-size:.72rem;color:var(--muted);font-weight:600;margin-top:2px;}
+.fan-start-btn{background:linear-gradient(135deg,var(--purple),#7d3c98);border:none;border-radius:10px;padding:7px 14px;color:#fff;font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;}
+.fan-start-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(155,89,182,.4);}
+.no-fans-msg{text-align:center;padding:18px;color:var(--muted);font-size:.84rem;font-weight:600;background:rgba(255,255,255,.03);border-radius:12px;border:1px dashed rgba(255,255,255,.08);}
+
+/* ADMIN BUTTON */
+.admin-btn{background:rgba(74,144,217,.1);border:1px solid rgba(74,144,217,.22);border-radius:10px;padding:6px 11px;color:var(--blue);font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:800;cursor:pointer;transition:all .2s;}
+.admin-btn:hover{background:rgba(74,144,217,.22);}
+.admin-btn.active{background:rgba(74,144,217,.28);border-color:var(--blue);}
+
+/* ADMIN MODAL */
+.admin-modal-box{background:var(--card);border-radius:24px;padding:26px;width:100%;max-width:500px;max-height:88vh;overflow-y:auto;border:1px solid rgba(255,255,255,.1);box-shadow:0 24px 80px rgba(0,0,0,.7);animation:slideIn .3s cubic-bezier(.4,0,.2,1);}
+.admin-modal-box::-webkit-scrollbar{width:4px;}.admin-modal-box::-webkit-scrollbar-track{background:transparent;}.admin-modal-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:10px;}
+.admin-section-label{font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px;padding-top:14px;border-top:1px solid rgba(255,255,255,.07);}
+.admin-section-label:first-child{margin-top:0;padding-top:0;border-top:none;}
+.admin-fan-item{background:rgba(255,255,255,.05);border-radius:12px;padding:11px 13px;display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px;border:1px solid rgba(255,255,255,.08);}
+.admin-fan-item-info{flex:1;min-width:0;}
+.admin-fan-item-name{font-weight:800;font-size:.88rem;color:var(--text);}
+.admin-fan-item-meta{font-size:.7rem;color:var(--muted);font-weight:600;margin-top:1px;}
+.admin-fan-del-btn{background:rgba(233,69,96,.12);border:1px solid rgba(233,69,96,.25);border-radius:8px;padding:5px 9px;color:var(--accent);font-size:.82rem;cursor:pointer;transition:all .2s;flex-shrink:0;}
+.admin-fan-del-btn:hover{background:rgba(233,69,96,.25);}
+.admin-fan-reset-btn{background:rgba(245,166,35,.1);border:1px solid rgba(245,166,35,.25);border-radius:8px;padding:5px 9px;color:var(--gold);font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;flex-shrink:0;}
+.admin-fan-reset-btn:hover{background:rgba(245,166,35,.2);}
+.admin-add-box{background:rgba(74,144,217,.06);border:1px dashed rgba(74,144,217,.28);border-radius:14px;padding:15px;}
+.admin-fan-upload-zone{border:2px dashed rgba(155,89,182,.35);border-radius:11px;padding:14px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(155,89,182,.05);margin-top:8px;}
+.admin-fan-upload-zone:hover{border-color:var(--purple);background:rgba(155,89,182,.1);}
+.admin-fan-upload-zone p{color:var(--muted);font-size:.78rem;font-weight:700;}
+.admin-saving-badge{display:inline-flex;align-items:center;gap:5px;font-size:.76rem;font-weight:700;color:var(--gold);margin-top:8px;}
+.admin-msg{border-radius:9px;padding:9px 13px;font-size:.82rem;font-weight:700;margin-bottom:10px;display:none;}
+.admin-msg.show{display:block;}
+.admin-msg.err{background:rgba(233,69,96,.12);border:1px solid rgba(233,69,96,.3);color:var(--accent);}
+.admin-msg.ok{background:rgba(0,212,170,.12);border:1px solid rgba(0,212,170,.3);color:var(--green);}
+
 /* TEST CARD RESULTS PREVIEW */
 .st-card-wrapper{margin-bottom:8px;}
 .saved-test-card{border-radius:var(--radius);border:1px solid rgba(255,255,255,.07);background:var(--surface);transition:border-color .2s;cursor:pointer;margin-bottom:0;}
@@ -338,6 +377,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   </div>
   <div style="display:flex;align-items:center;gap:8px;">
     <div class="sync-badge" id="sync-badge">🟢 Online</div>
+    <button class="admin-btn" id="admin-topbar-btn" onclick="openAdminPanel()">⚙️ Admin</button>
     <button class="logout-btn" onclick="doLogout()">🚪 Chiqish</button>
   </div>
 </div>
@@ -353,11 +393,13 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
       <div class="mock-header">
         <div class="mock-icon">🎓</div>
         <div>
-          <div class="mock-title">Falsafa Yakuniy <span class="mock-badge">MOCK</span></div>
+          <div class="mock-title">Mock Test <span class="mock-badge">RANDOM 25</span></div>
         </div>
       </div>
-      <div class="mock-desc" id="mock-desc">⏳ Yuklanmoqda...</div>
-      <div id="mock-action"></div>
+      <div class="mock-desc">Fanlardan birini tanlang — bazadan 25 ta tasodifiy savol beriladi</div>
+      <div id="mock-fans-grid" class="fans-grid">
+        <div class="no-fans-msg">⏳ Yuklanmoqda...</div>
+      </div>
     </div>
   </div>
 
@@ -461,6 +503,59 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 
 <!-- MOCK upload input (hidden) -->
 <input type="file" id="mock-file-input" accept=".xlsx,.xls" style="display:none" onchange="handleMockFile(this)">
+
+<!-- ADMIN PANEL MODAL -->
+<div class="modal-overlay" id="admin-modal">
+  <div class="admin-modal-box">
+    <!-- Admin Login State -->
+    <div id="admin-login-state">
+      <div class="modal-title">⚙️ Admin Panel</div>
+      <div class="modal-sub">Faqat adminlar kirishi mumkin</div>
+      <div id="admin-msg" class="admin-msg"></div>
+      <div class="auth-label">Admin login</div>
+      <input class="modal-input" id="admin-login-input" type="text" placeholder="Login" autocomplete="off">
+      <div class="auth-label">Parol</div>
+      <input class="modal-input" id="admin-pass-input" type="password" placeholder="Parol" autocomplete="off">
+      <div class="modal-btns">
+        <button class="modal-save-btn" id="admin-login-btn" onclick="doAdminLogin()">🔑 Kirish</button>
+        <button class="modal-cancel-btn" onclick="closeAdminModal()">Bekor qilish</button>
+      </div>
+    </div>
+    <!-- Admin Panel State -->
+    <div id="admin-panel-state" style="display:none;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div class="modal-title">⚙️ Admin Panel</div>
+        <button class="logout-btn" onclick="adminLogout()" style="font-size:.72rem;">Chiqish</button>
+      </div>
+      <div class="modal-sub">Mock test fan bazasini boshqarish</div>
+
+      <!-- Add new fan -->
+      <div class="admin-section-label">➕ Yangi fan qo'shish</div>
+      <div class="admin-add-box">
+        <div id="admin-add-msg" class="admin-msg"></div>
+        <div class="auth-label">Fan nomi</div>
+        <input class="modal-input" id="admin-fan-name" type="text" placeholder="Masalan: Matematika, Fizika..." maxlength="50" style="margin-bottom:8px;">
+        <div class="admin-fan-upload-zone" onclick="document.getElementById('admin-excel-input').click()">
+          <p id="admin-excel-label">📂 Excel faylni bosing (savollar bazasi)</p>
+        </div>
+        <input type="file" id="admin-excel-input" accept=".xlsx,.xls" style="display:none" onchange="handleAdminExcel(this)">
+        <div id="admin-saving-indicator" style="display:none;" class="admin-saving-badge"><div class="spinner sm"></div> Saqlanmoqda...</div>
+        <button class="modal-save-btn" onclick="saveNewFan()" style="width:100%;margin-top:10px;">💾 Saqlash</button>
+      </div>
+
+      <!-- Fan list -->
+      <div class="admin-section-label">📚 Mavjud fanlar</div>
+      <div id="admin-fans-list">
+        <div class="no-fans-msg">⏳ Yuklanmoqda...</div>
+      </div>
+
+      <button class="modal-cancel-btn" onclick="closeAdminModal()" style="width:100%;margin-top:6px;">✖ Yopish</button>
+    </div>
+  </div>
+</div>
+
+<!-- Admin reset excel input (hidden) -->
+<input type="file" id="admin-reset-input" accept=".xlsx,.xls" style="display:none" onchange="handleResetExcel(this)">
 
 <!-- QUIZ -->
 <div id="quiz-screen">
@@ -835,59 +930,221 @@ async function deleteSavedTest(fbKey){
   });
 }
 
-// ── MOCK TEST ──
-const MOCK_PATH='mock_test';
+// ── MOCK TEST (Multi-fan) ──
+const FANS_PATH='mock_fans';
 const MOCK_COUNT=25;
 
+// Admin state
+const ADMIN_CREDS={login:'admin',passHash:hashPass('quizmaster2024')};
+let isAdminLoggedIn=false;
+let pendingAdminQuestions=null;
+
 async function renderMockSection(){
-  const descEl=document.getElementById('mock-desc');
-  const actionEl=document.getElementById('mock-action');
-  if(!descEl||!actionEl)return;
+  const grid=document.getElementById('mock-fans-grid');
+  if(!grid)return;
   try{
-    const mock=await fbGet(MOCK_PATH);
-    if(mock&&mock.questions&&mock.questions.length){
-      const q=mock.questions;
-      descEl.textContent=`📚 ${q.length} ta savol bazasi tayyor. Har safar ${MOCK_COUNT} ta tasodifiy savol beriladi.`;
-      actionEl.innerHTML=`<button class="mock-start-btn" onclick="startMockTest()">🎓 Boshlash (${MOCK_COUNT} ta random savol)</button>`;
-    }else{
-      // Not loaded yet — show upload for admin
-      descEl.textContent='⚠️ Savol bazasi yuklanmagan. Admin bir marta yuklashi kerak.';
-      actionEl.innerHTML=`
-        <div class="mock-upload-zone" onclick="document.getElementById('mock-file-input').click()">
-          <p>📂 Excel faylni bu yerga bosing (bir martalik)</p>
-        </div>
-        <div class="mock-locked">⚠️ Yuklangandan so'ng baza o'zgartirib bo'lmaydi</div>`;
+    const fans=await fbGet(FANS_PATH);
+    if(!fans||!Object.keys(fans).length){
+      grid.innerHTML='<div class="no-fans-msg">📭 Hozircha fan bazasi yo\'q. Admin Excel yuklashi kerak.</div>';
+      return;
     }
+    const fanList=Object.entries(fans).map(([k,v])=>({key:k,...v}));
+    fanList.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+    grid.innerHTML=fanList.map(f=>`
+      <div class="fan-card">
+        <div class="fan-card-left">
+          <div class="fan-name">📘 ${esc(f.name||f.key)}</div>
+          <div class="fan-count">${f.count||0} ta savol bazasi &bull; random ${MOCK_COUNT} ta beriladi</div>
+        </div>
+        <button class="fan-start-btn" onclick="startMockTest('${f.key}')">▶ Boshlash</button>
+      </div>`).join('');
   }catch(e){
-    descEl.textContent='⚠️ Yuklab bo\'lmadi';
-    actionEl.innerHTML='';
+    grid.innerHTML='<div class="no-fans-msg">⚠️ Yuklab bo\'lmadi</div>';
   }
 }
 
-function handleMockFile(inp){
+async function startMockTest(fanKey){
+  if(!currentUser){alert('Iltimos avval tizimga kiring!');return;}
+  try{
+    const fan=await fbGet(`${FANS_PATH}/${fanKey}`);
+    if(!fan||!fan.questions||!fan.questions.length){alert('Bu fanda savollar topilmadi!');return;}
+    const all=fan.questions.map(q=>{
+      const opts=q.options.map(o=>({text:o.text,letter:o.letter||'',
+        isCorrect:q.correctLetter?(o.letter===q.correctLetter):(normStr(o.text)===normStr(q.correctText))}));
+      if(!opts.some(o=>o.isCorrect)&&opts.length)opts[0].isCorrect=true;
+      return{...q,options:opts};
+    });
+    const shuffledAll=[...all].sort(()=>Math.random()-.5);
+    questions=shuffledAll.slice(0,Math.min(MOCK_COUNT,shuffledAll.length));
+    originalQuestions=[...questions];
+    currentTestFbKey='mock_'+fanKey;
+    currentTestAuthorUid='__mock__';
+    currentTestIsPublic=true;
+    currentTestGlobalKey='__mock__';
+    isRetryRound=false;
+    startQuiz();
+  }catch(e){alert('Mock testni yuklab bo\'lmadi: '+e.message);}
+}
+
+// ── ADMIN PANEL ──
+function openAdminPanel(){
+  document.getElementById('admin-modal').classList.add('show');
+  if(isAdminLoggedIn){
+    showAdminPanelState();
+  }else{
+    showAdminLoginState();
+    setTimeout(()=>document.getElementById('admin-login-input').focus(),150);
+  }
+  document.getElementById('admin-login-input').addEventListener('keydown',function h(e){if(e.key==='Enter'){doAdminLogin();this.removeEventListener('keydown',h);}});
+  document.getElementById('admin-pass-input').addEventListener('keydown',function h(e){if(e.key==='Enter'){doAdminLogin();this.removeEventListener('keydown',h);}});
+}
+function closeAdminModal(){
+  document.getElementById('admin-modal').classList.remove('show');
+  document.getElementById('admin-login-input').value='';
+  document.getElementById('admin-pass-input').value='';
+  document.getElementById('admin-msg').className='admin-msg';
+  document.getElementById('admin-msg').textContent='';
+}
+function showAdminLoginState(){
+  document.getElementById('admin-login-state').style.display='';
+  document.getElementById('admin-panel-state').style.display='none';
+  document.getElementById('admin-topbar-btn').classList.remove('active');
+}
+function showAdminPanelState(){
+  document.getElementById('admin-login-state').style.display='none';
+  document.getElementById('admin-panel-state').style.display='';
+  document.getElementById('admin-topbar-btn').classList.add('active');
+  renderAdminFanList();
+}
+function doAdminLogin(){
+  const login=document.getElementById('admin-login-input').value.trim();
+  const pass=document.getElementById('admin-pass-input').value;
+  const msgEl=document.getElementById('admin-msg');
+  if(!login||!pass){setAdminMsg('Login va parolni kiriting!','err');return;}
+  if(login===ADMIN_CREDS.login&&hashPass(pass)===ADMIN_CREDS.passHash){
+    isAdminLoggedIn=true;
+    document.getElementById('admin-pass-input').value='';
+    document.getElementById('admin-login-input').value='';
+    showAdminPanelState();
+  }else{
+    setAdminMsg("Login yoki parol noto'g'ri!",'err');
+  }
+}
+function setAdminMsg(txt,type){
+  const el=document.getElementById('admin-msg');
+  el.textContent=txt;el.className='admin-msg show '+(type||'err');
+}
+function adminLogout(){
+  isAdminLoggedIn=false;
+  document.getElementById('admin-topbar-btn').classList.remove('active');
+  showAdminLoginState();
+}
+
+// Pending excel for admin
+let adminPendingQuestions=null;
+function handleAdminExcel(inp){
   if(!inp.files[0])return;
   const r=new FileReader();
   r.onload=async e=>{
     try{
       const wb=XLSX.read(e.target.result,{type:'binary'});
       const qs=parseMockWorkbook(wb);
-      if(!qs||!qs.length){alert("Savollar topilmadi! To'g'ri Excel formatida bo'lishi kerak.");return;}
-      // Check not already loaded
-      const existing=await fbGet(MOCK_PATH+'/questions');
-      if(existing&&existing.length){
-        alert("Savol bazasi allaqachon yuklangan! O'zgartirib bo'lmaydi.");
+      if(!qs||!qs.length){
+        setAdminAddMsg("Savollar topilmadi! To'g'ri Excel formatida bo'lishi kerak.",'err');
+        adminPendingQuestions=null;
+        document.getElementById('admin-excel-label').textContent='📂 Excel faylni bosing';
         inp.value='';return;
       }
-      // Save to Firebase
-      const slim=qs.map(q=>({num:q.num,text:q.text,correctLetter:q.correctLetter,correctText:q.correctText,options:q.options.map(o=>({text:o.text,letter:o.letter,isCorrect:o.isCorrect}))}));
-      await fbSet(MOCK_PATH,{questions:slim,count:slim.length,locked:true,lockedAt:Date.now()});
-      inp.value='';
-      alert(`✅ ${slim.length} ta savol muvaffaqiyatli yuklandi va baza yopildi!`);
-      await renderMockSection();
-    }catch(err){alert('Xato: '+err.message);}
+      adminPendingQuestions=qs;
+      document.getElementById('admin-excel-label').textContent=`✅ ${qs.length} ta savol yuklandi — Saqlash tugmasini bosing`;
+      setAdminAddMsg(`${qs.length} ta savol tayyor`,'ok');
+    }catch(err){setAdminAddMsg('Xato: '+err.message,'err');}
+    inp.value='';
   };
   r.readAsBinaryString(inp.files[0]);
 }
+function setAdminAddMsg(txt,type){
+  const el=document.getElementById('admin-add-msg');
+  el.textContent=txt;el.className='admin-msg show '+(type||'err');
+}
+async function saveNewFan(){
+  const name=document.getElementById('admin-fan-name').value.trim();
+  if(!name){setAdminAddMsg('Fan nomini kiriting!','err');return;}
+  if(!adminPendingQuestions||!adminPendingQuestions.length){setAdminAddMsg("Avval Excel faylni yuklang!",'err');return;}
+  const fanKey=name.toLowerCase().replace(/[^a-z0-9а-яёa-я\u0400-\u04FF]/gi,'_').replace(/_+/g,'_').slice(0,30)+'_'+Date.now().toString(36);
+  const ind=document.getElementById('admin-saving-indicator');
+  ind.style.display='flex';
+  try{
+    const slim=adminPendingQuestions.map(q=>({num:q.num,text:q.text,correctLetter:q.correctLetter,correctText:q.correctText,options:q.options.map(o=>({text:o.text,letter:o.letter,isCorrect:o.isCorrect}))}));
+    await fbSet(`${FANS_PATH}/${fanKey}`,{name,count:slim.length,questions:slim,createdAt:Date.now()});
+    setAdminAddMsg(`✅ "${name}" — ${slim.length} ta savol saqlandi!`,'ok');
+    document.getElementById('admin-fan-name').value='';
+    document.getElementById('admin-excel-label').textContent='📂 Excel faylni bosing';
+    adminPendingQuestions=null;
+    await renderAdminFanList();
+    await renderMockSection();
+  }catch(e){setAdminAddMsg('Saqlashda xatolik: '+e.message,'err');}
+  finally{ind.style.display='none';}
+}
+async function renderAdminFanList(){
+  const listEl=document.getElementById('admin-fans-list');
+  listEl.innerHTML='<div class="no-fans-msg">⏳ Yuklanmoqda...</div>';
+  try{
+    const fans=await fbGet(FANS_PATH);
+    if(!fans||!Object.keys(fans).length){listEl.innerHTML='<div class="no-fans-msg">Hali hech qanday fan qo\'shilmagan</div>';return;}
+    const fanList=Object.entries(fans).map(([k,v])=>({key:k,...v}));
+    fanList.sort((a,b)=>(a.name||'').localeCompare(b.name||''));
+    listEl.innerHTML=fanList.map(f=>`
+      <div class="admin-fan-item">
+        <div class="admin-fan-item-info">
+          <div class="admin-fan-item-name">📘 ${esc(f.name||f.key)}</div>
+          <div class="admin-fan-item-meta">${f.count||0} ta savol &bull; ${new Date(f.createdAt||0).toLocaleDateString('uz')}</div>
+        </div>
+        <div style="display:flex;gap:5px;">
+          <button class="admin-fan-reset-btn" onclick="resetFan('${f.key}','${esc(f.name||f.key).replace(/'/g,"\\'")}')">🔄 Yangilash</button>
+          <button class="admin-fan-del-btn" onclick="deleteFan('${f.key}','${esc(f.name||f.key).replace(/'/g,"\\'")}')">🗑️</button>
+        </div>
+      </div>`).join('');
+  }catch(e){listEl.innerHTML='<div class="no-fans-msg">⚠️ Yuklab bo\'lmadi</div>';}
+}
+function deleteFan(fanKey,fanName){
+  showConfirm(`"${fanName}" fanini o'chirmoqchimisiz? Barcha savollar o'chadi.`,"🗑️ Ha, o'chir",async()=>{
+    try{
+      await fbRemove(`${FANS_PATH}/${fanKey}`);
+      await renderAdminFanList();
+      await renderMockSection();
+    }catch(e){alert("O'chirishda xatolik: "+e.message);}
+  });
+}
+let resetTargetKey=null;
+function resetFan(fanKey,fanName){
+  resetTargetKey=fanKey;
+  showConfirm(`"${fanName}" savollarini yangi Excel bilan almashtirasizmi?`,"🔄 Ha, yangilash",()=>{
+    document.getElementById('admin-reset-input').click();
+  });
+}
+function handleResetExcel(inp){
+  if(!inp.files[0]||!resetTargetKey)return;
+  const r=new FileReader();
+  r.onload=async e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const qs=parseMockWorkbook(wb);
+      if(!qs||!qs.length){alert("Savollar topilmadi!");inp.value='';return;}
+      const slim=qs.map(q=>({num:q.num,text:q.text,correctLetter:q.correctLetter,correctText:q.correctText,options:q.options.map(o=>({text:o.text,letter:o.letter,isCorrect:o.isCorrect}))}));
+      const existing=await fbGet(`${FANS_PATH}/${resetTargetKey}`);
+      await fbSet(`${FANS_PATH}/${resetTargetKey}/questions`,slim);
+      await fbSet(`${FANS_PATH}/${resetTargetKey}/count`,slim.length);
+      alert(`✅ ${slim.length} ta savol yangilandi!`);
+      await renderAdminFanList();
+      await renderMockSection();
+    }catch(err){alert('Xato: '+err.message);}
+    inp.value='';resetTargetKey=null;
+  };
+  r.readAsBinaryString(inp.files[0]);
+}
+
+function handleMockFile(inp){/* legacy — no longer used */}
 
 function parseMockWorkbook(wb){
   if(!wb.SheetNames.length)return[];
@@ -934,31 +1191,6 @@ function parseMockWorkbook(wb){
     if(!res.some(o=>o.isCorrect)&&q.correctText)res.forEach(o=>{if(normStr(o.text)===normStr(q.correctText))o.isCorrect=true;});
     return{num:q.num,text:q.text,correctLetter:q.correctLetter,correctText:q.correctText,options:res};
   });
-}
-
-async function startMockTest(){
-  if(!currentUser){alert('Iltimos avval tizimga kiring!');return;}
-  try{
-    const mock=await fbGet(MOCK_PATH);
-    if(!mock||!mock.questions||!mock.questions.length){alert('Savol bazasi mavjud emas!');return;}
-    const all=mock.questions.map(q=>{
-      const opts=q.options.map(o=>({text:o.text,letter:o.letter||'',
-        isCorrect:q.correctLetter?(o.letter===q.correctLetter):(normStr(o.text)===normStr(q.correctText))}));
-      if(!opts.some(o=>o.isCorrect)&&opts.length)opts[0].isCorrect=true;
-      return{...q,options:opts};
-    });
-    // Pick MOCK_COUNT random
-    const shuffledAll=[...all].sort(()=>Math.random()-.5);
-    questions=shuffledAll.slice(0,Math.min(MOCK_COUNT,shuffledAll.length));
-    originalQuestions=[...questions];
-    // Mock test context
-    currentTestFbKey='mock';
-    currentTestAuthorUid='__mock__';
-    currentTestIsPublic=true;
-    currentTestGlobalKey='__mock__';
-    isRetryRound=false;
-    startQuiz();
-  }catch(e){alert('Mock testni yuklab bo\'lmadi: '+e.message);}
 }
 
 // ── GLOBAL SEARCH ──
