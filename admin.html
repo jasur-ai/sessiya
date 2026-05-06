@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QuizBlitz — Admin</title>
+<title>QuizBlitz — Admin Panel</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Righteous&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -13,15 +14,21 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:radial-gradient(ellipse 55% 40% at 15% 20%,rgba(192,132,252,.09) 0%,transparent 60%),
     radial-gradient(ellipse 45% 35% at 85% 75%,rgba(255,68,102,.06) 0%,transparent 60%);}
+
+/* LOADING */
+#loading{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
+#loading.hide{display:none;}
+.spin{width:38px;height:38px;border:3px solid rgba(255,255,255,.08);border-top-color:var(--purple);border-radius:50%;animation:sp .7s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg)}}
 
 /* AUTH */
 #auth{display:none;min-height:100vh;align-items:center;justify-content:center;padding:20px;position:relative;z-index:1;}
 #auth.on{display:flex;}
 .auth-wrap{width:100%;max-width:380px;text-align:center;}
-.auth-logo{font-family:'Righteous',cursive;font-size:2rem;margin-bottom:4px;
+.auth-logo{font-family:'Righteous',cursive;font-size:2.2rem;margin-bottom:4px;
   background:linear-gradient(135deg,var(--purple),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .auth-sub{color:var(--muted);font-size:.8rem;font-weight:700;margin-bottom:20px;}
 .auth-box{background:var(--card);border-radius:20px;padding:26px;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.5);}
@@ -35,7 +42,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
   font-size:.93rem;font-weight:900;cursor:pointer;transition:all .2s;
   background:linear-gradient(135deg,var(--purple),#7c3aed);min-height:46px;}
 .login-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(192,132,252,.4);}
-.login-btn:disabled{opacity:.45;cursor:not-allowed;}
 .msg{border-radius:9px;padding:9px 12px;font-size:.8rem;font-weight:700;margin-bottom:11px;display:none;}
 .msg.on{display:block;}
 .msg.err{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.3);color:var(--accent);}
@@ -50,82 +56,154 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
   background:linear-gradient(135deg,var(--purple),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .nav-badge{background:rgba(255,68,102,.15);border:1px solid rgba(255,68,102,.3);color:var(--accent);
   font-size:.68rem;font-weight:900;border-radius:50px;padding:3px 10px;}
-.logout-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:9px;
+.icon-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:9px;
   padding:7px 13px;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:800;
   cursor:pointer;color:var(--muted);transition:all .2s;}
-.logout-btn:hover{color:var(--accent);border-color:rgba(255,68,102,.3);}
+.icon-btn:hover{color:var(--text);background:rgba(255,255,255,.1);}
+.icon-btn.danger:hover{color:var(--accent);border-color:rgba(255,68,102,.3);}
+
+/* TABS */
+.tabs-bar{display:flex;gap:6px;padding:16px 16px 0;max-width:960px;margin:0 auto;position:relative;z-index:1;}
+.tab-btn{border:1px solid var(--border);background:rgba(255,255,255,.04);border-radius:10px 10px 0 0;
+  padding:9px 16px;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;cursor:pointer;
+  color:var(--muted);transition:all .2s;}
+.tab-btn.on{background:var(--card);color:var(--text);border-bottom-color:var(--card);}
+.tab-btn:hover:not(.on){background:rgba(255,255,255,.07);color:var(--text);}
+.tab-pane{display:none;}
+.tab-pane.on{display:block;}
 
 /* MAIN */
-#panel{display:none;max-width:900px;margin:0 auto;padding:24px 16px 60px;position:relative;z-index:1;}
+#panel{display:none;max-width:960px;margin:0 auto;padding:0 16px 60px;position:relative;z-index:1;}
 #panel.on{display:block;}
 
 /* STATS ROW */
-.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:24px;}
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:20px 0;}
 .stat-card{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);text-align:center;}
 .stat-num{font-family:'Righteous',cursive;font-size:1.8rem;}
 .stat-lbl{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
 
 /* SECTION */
-.sec-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;margin-top:28px;}
-.sec-title{font-family:'Righteous',cursive;font-size:1.1rem;display:flex;align-items:center;gap:7px;}
-.danger-badge{background:rgba(255,68,102,.15);border:1px solid rgba(255,68,102,.3);color:var(--accent);
-  font-size:.68rem;font-weight:900;border-radius:50px;padding:3px 10px;}
-.purple-badge{background:rgba(192,132,252,.15);border:1px solid rgba(192,132,252,.3);color:var(--purple);
-  font-size:.68rem;font-weight:900;border-radius:50px;padding:3px 10px;}
+.sec-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;margin-top:20px;flex-wrap:wrap;}
+.sec-title{font-family:'Righteous',cursive;font-size:1.05rem;display:flex;align-items:center;gap:7px;}
+.danger-badge{background:rgba(255,68,102,.15);border:1px solid rgba(255,68,102,.3);color:var(--accent);font-size:.65rem;font-weight:900;border-radius:50px;padding:3px 9px;}
+.purple-badge{background:rgba(192,132,252,.15);border:1px solid rgba(192,132,252,.3);color:var(--purple);font-size:.65rem;font-weight:900;border-radius:50px;padding:3px 9px;}
+.green-badge{background:rgba(0,255,170,.12);border:1px solid rgba(0,255,170,.25);color:var(--green);font-size:.65rem;font-weight:900;border-radius:50px;padding:3px 9px;}
+.refresh-btn{margin-left:auto;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:9px;
+  padding:6px 12px;font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:800;cursor:pointer;color:var(--muted);transition:all .2s;}
+.refresh-btn:hover{color:var(--text);background:rgba(255,255,255,.1);}
 
 /* TABLE */
 .tbl-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--border);background:var(--card);}
 table{width:100%;border-collapse:collapse;font-size:.82rem;}
-thead th{
-  background:rgba(255,255,255,.04);padding:9px 14px;text-align:left;
-  font-weight:800;color:var(--muted);border-bottom:1px solid var(--border);
-  white-space:nowrap;font-size:.74rem;text-transform:uppercase;letter-spacing:.5px;
-}
+thead th{background:rgba(255,255,255,.04);padding:9px 14px;text-align:left;font-weight:800;color:var(--muted);
+  border-bottom:1px solid var(--border);white-space:nowrap;font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;}
 tbody td{padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.03);font-weight:700;}
 tbody tr:last-child td{border-bottom:none;}
 tbody tr:hover td{background:rgba(255,255,255,.02);}
 .u-name{font-weight:800;}
-.u-date{color:var(--muted);font-size:.78rem;}
-.u-tests{background:rgba(56,189,248,.1);color:var(--blue);border-radius:50px;
-  padding:2px 9px;font-size:.68rem;font-weight:800;}
-.del-user{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.2);
-  border-radius:7px;padding:4px 9px;color:var(--accent);font-size:.72rem;
-  font-weight:800;cursor:pointer;transition:all .18s;}
+.u-date{color:var(--muted);font-size:.76rem;}
+.u-tests{background:rgba(56,189,248,.1);color:var(--blue);border-radius:50px;padding:2px 9px;font-size:.68rem;font-weight:800;}
+.del-user{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.2);border-radius:7px;padding:4px 9px;color:var(--accent);font-size:.72rem;font-weight:800;cursor:pointer;transition:all .18s;}
 .del-user:hover{background:rgba(255,68,102,.2);}
 
 /* RESULTS */
-.res-card{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);
-  margin-bottom:8px;transition:border-color .2s;animation:fadeUp .25s ease-out both;}
-.res-card:hover{border-color:rgba(192,132,252,.3);}
+.res-card{background:var(--card);border-radius:14px;padding:14px 16px;border:1px solid var(--border);margin-bottom:8px;animation:fadeUp .25s ease-out both;}
 @keyframes fadeUp{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
-.res-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
-.res-title{font-weight:800;font-size:.9rem;}
-.res-meta{font-size:.74rem;font-weight:700;color:var(--muted);margin-top:2px;}
-.res-code{background:rgba(255,214,10,.1);border:1px solid rgba(255,214,10,.25);
-  color:var(--gold);font-family:'Righteous',cursive;border-radius:8px;
-  padding:4px 10px;font-size:.8rem;flex-shrink:0;}
-.top3{display:flex;gap:7px;flex-wrap:wrap;}
-.top-chip{border-radius:50px;padding:4px 12px;font-size:.75rem;font-weight:800;
-  display:flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,.08);
-  background:rgba(255,255,255,.05);}
+.res-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.res-title{font-weight:800;font-size:.88rem;}
+.res-meta{font-size:.73rem;font-weight:700;color:var(--muted);margin-top:2px;}
+.res-code{background:rgba(255,214,10,.1);border:1px solid rgba(255,214,10,.25);color:var(--gold);
+  font-family:'Righteous',cursive;border-radius:8px;padding:4px 10px;font-size:.8rem;flex-shrink:0;}
+.top3{display:flex;gap:6px;flex-wrap:wrap;}
+.top-chip{border-radius:50px;padding:4px 12px;font-size:.74rem;font-weight:800;display:flex;align-items:center;gap:5px;
+  border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);}
 .top-chip:nth-child(1){border-color:rgba(255,214,10,.3);color:var(--gold);}
 .top-chip:nth-child(2){border-color:rgba(192,192,192,.3);color:#c0c0c0;}
 .top-chip:nth-child(3){border-color:rgba(205,127,50,.3);color:#cd7f32;}
 
-.empty{text-align:center;padding:32px;color:var(--muted);font-size:.84rem;font-weight:700;
+/* FANS (Mock) section */
+.fans-add-box{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);margin-bottom:14px;}
+.fans-add-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.fans-inp{flex:1;min-width:160px;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.08);
+  border-radius:9px;padding:9px 12px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.88rem;
+  font-weight:700;outline:none;transition:border-color .2s;}
+.fans-inp:focus{border-color:var(--green);}
+.fans-inp::placeholder{color:var(--muted);}
+.upload-zone-sm{border:2px dashed rgba(0,255,170,.3);border-radius:10px;padding:12px;text-align:center;
+  cursor:pointer;transition:all .2s;background:rgba(0,255,170,.04);}
+.upload-zone-sm:hover{border-color:var(--green);background:rgba(0,255,170,.08);}
+.upload-zone-sm p{color:var(--muted);font-size:.8rem;font-weight:700;}
+.save-fan-btn{background:linear-gradient(135deg,var(--green),#00a070);border:none;border-radius:9px;
+  padding:9px 18px;color:#000;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:900;
+  cursor:pointer;transition:all .2s;white-space:nowrap;}
+.save-fan-btn:hover:not(:disabled){transform:translateY(-2px);}
+.save-fan-btn:disabled{opacity:.45;cursor:not-allowed;}
+.fan-item{display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:rgba(255,255,255,.03);border-radius:10px;padding:10px 14px;margin-bottom:6px;
+  border:1px solid rgba(255,255,255,.05);}
+.fan-item-name{font-weight:800;font-size:.88rem;}
+.fan-item-meta{font-size:.73rem;color:var(--muted);font-weight:700;margin-top:2px;}
+.fan-btns{display:flex;gap:5px;}
+.fan-reset-btn{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);border-radius:7px;
+  padding:5px 10px;color:var(--blue);font-size:.72rem;font-weight:800;cursor:pointer;transition:all .18s;}
+.fan-reset-btn:hover{background:rgba(56,189,248,.2);}
+.fan-del-btn{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.2);border-radius:7px;
+  padding:5px 10px;color:var(--accent);font-size:.72rem;font-weight:800;cursor:pointer;transition:all .18s;}
+.fan-del-btn:hover{background:rgba(255,68,102,.2);}
+
+/* PRE section */
+.pre-add-box{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);margin-bottom:14px;}
+.pre-title-inp{width:100%;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.08);border-radius:9px;
+  padding:9px 12px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;
+  outline:none;margin-bottom:9px;transition:border-color .2s;}
+.pre-title-inp:focus{border-color:var(--purple);}
+.pre-upload-zone{border:2px dashed rgba(192,132,252,.3);border-radius:10px;padding:12px;text-align:center;
+  cursor:pointer;background:rgba(192,132,252,.04);transition:all .2s;margin-bottom:9px;}
+.pre-upload-zone:hover{border-color:var(--purple);background:rgba(192,132,252,.08);}
+.pre-upload-zone p{color:var(--muted);font-size:.8rem;font-weight:700;}
+.save-pre-btn{width:100%;background:linear-gradient(135deg,var(--purple),#7c3aed);border:none;border-radius:9px;
+  padding:10px;color:#fff;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer;transition:all .2s;}
+.save-pre-btn:hover:not(:disabled){transform:translateY(-2px);}
+.save-pre-btn:disabled{opacity:.45;cursor:not-allowed;}
+.pre-preview-box{background:rgba(192,132,252,.07);border:1px solid rgba(192,132,252,.2);border-radius:10px;
+  padding:11px 13px;margin-bottom:9px;display:none;}
+.pre-chunk-item{display:flex;justify-content:space-between;font-size:.78rem;font-weight:700;
+  padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.pre-chunk-item:last-child{border-bottom:none;}
+.pre-group-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:10px;
+  padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.pre-group-name{font-weight:800;font-size:.88rem;}
+.pre-group-meta{font-size:.73rem;color:var(--muted);font-weight:700;margin-top:2px;}
+.pre-del-btn{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.2);border-radius:7px;
+  padding:5px 10px;color:var(--accent);font-size:.72rem;font-weight:800;cursor:pointer;transition:all .18s;}
+.pre-del-btn:hover{background:rgba(255,68,102,.2);}
+.progress-bar{background:rgba(255,255,255,.07);border-radius:50px;height:7px;margin-top:8px;overflow:hidden;}
+.progress-fill{background:linear-gradient(90deg,var(--purple),var(--blue));height:100%;border-radius:50px;transition:width .3s;}
+
+/* STATS */
+.ov-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px;}
+.ov-card{background:var(--card);border-radius:12px;padding:14px;border:1px solid var(--border);text-align:center;}
+.ov-val{font-family:'Righteous',cursive;font-size:1.6rem;}
+.ov-lbl{font-size:.68rem;color:var(--muted);font-weight:700;margin-top:2px;}
+.fan-stat-item{background:rgba(255,255,255,.03);border-radius:10px;padding:10px 14px;margin-bottom:6px;border:1px solid rgba(255,255,255,.05);}
+.fan-stat-chips{display:flex;gap:5px;flex-wrap:wrap;margin:6px 0;}
+.fan-stat-chip{border-radius:50px;padding:3px 9px;font-size:.72rem;font-weight:800;background:rgba(255,255,255,.06);}
+.chip-att{color:var(--blue);}
+.chip-usr{color:var(--green);}
+.chip-avg{color:var(--gold);}
+.mini-bar{background:rgba(255,255,255,.07);height:4px;border-radius:50px;overflow:hidden;margin-top:4px;}
+.mini-fill{background:var(--accent);height:100%;border-radius:50px;transition:width .5s;}
+
+.adm-msg{border-radius:9px;padding:9px 12px;font-size:.8rem;font-weight:700;margin-top:9px;display:none;}
+.adm-msg.on{display:block;}
+.adm-msg.err{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.3);color:var(--accent);}
+.adm-msg.ok{background:rgba(0,255,170,.1);border:1px solid rgba(0,255,170,.25);color:var(--green);}
+
+.empty{text-align:center;padding:28px;color:var(--muted);font-size:.82rem;font-weight:700;
   background:rgba(255,255,255,.02);border-radius:12px;border:1px dashed rgba(255,255,255,.08);}
 
-/* LOADING */
-#loading{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
-#loading.hide{display:none;}
-.spin{width:38px;height:38px;border:3px solid rgba(255,255,255,.08);border-top-color:var(--purple);border-radius:50%;animation:sp .7s linear infinite;}
-@keyframes sp{to{transform:rotate(360deg)}}
-
-/* REFRESH */
-.refresh-btn{margin-left:auto;background:rgba(255,255,255,.05);border:1px solid var(--border);
-  border-radius:9px;padding:6px 13px;font-family:'Nunito',sans-serif;font-size:.76rem;
-  font-weight:800;cursor:pointer;color:var(--muted);transition:all .2s;}
-.refresh-btn:hover{color:var(--text);background:rgba(255,255,255,.1);}
+.sec-saving{display:none;align-items:center;gap:8px;font-size:.8rem;font-weight:700;color:var(--muted);margin-top:8px;}
+.sec-saving .spin{width:16px;height:16px;border-width:2px;}
 </style>
 </head>
 <body>
@@ -151,50 +229,122 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
 <!-- NAVBAR -->
 <nav id="navbar">
   <div style="display:flex;align-items:center;gap:9px">
-    <a href="index.html" style="text-decoration:none"><div class="nav-logo">⚙️ Admin Panel</div></a>
+    <a href="index.html" style="text-decoration:none"><div class="nav-logo">⚙️ QuizBlitz Admin</div></a>
     <div class="nav-badge">ADMIN</div>
   </div>
   <div style="display:flex;gap:8px;align-items:center">
-    <button class="refresh-btn" onclick="loadAll()">🔄 Yangilash</button>
-    <button class="logout-btn" onclick="doLogout()">Chiqish</button>
+    <button class="icon-btn" onclick="loadActiveTab()">🔄 Yangilash</button>
+    <button class="icon-btn danger" onclick="doLogout()">🚪 Chiqish</button>
   </div>
 </nav>
 
-<!-- PANEL -->
+<!-- TABS BAR -->
+<div class="tabs-bar" id="tabs-bar" style="display:none">
+  <button class="tab-btn on" onclick="switchTab('danger')" id="tbtn-danger">⚠️ Foydalanuvchilar</button>
+  <button class="tab-btn" onclick="switchTab('fans')" id="tbtn-fans">📚 Mock Fanlar</button>
+  <button class="tab-btn" onclick="switchTab('pre')" id="tbtn-pre">🔷 PRE Testlar</button>
+  <button class="tab-btn" onclick="switchTab('results')" id="tbtn-results">🏆 Natijalar</button>
+  <button class="tab-btn" onclick="switchTab('stats')" id="tbtn-stats">📊 Statistika</button>
+</div>
+
+<!-- MAIN PANEL -->
 <div id="panel">
-  <!-- Stats -->
-  <div class="stats-row">
+
+  <!-- ── STATS ROW ── -->
+  <div class="stats-row" id="stats-row" style="display:none">
     <div class="stat-card"><div class="stat-num" id="s-users" style="color:var(--blue)">—</div><div class="stat-lbl">Foydalanuvchilar</div></div>
     <div class="stat-card"><div class="stat-num" id="s-games" style="color:var(--gold)">—</div><div class="stat-lbl">O'yinlar</div></div>
     <div class="stat-card"><div class="stat-num" id="s-tests" style="color:var(--green)">—</div><div class="stat-lbl">Testlar</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-fans" style="color:var(--purple)">—</div><div class="stat-lbl">Mock Fanlar</div></div>
   </div>
 
-  <!-- DANGER: Users -->
-  <div class="sec-hd">
-    <div class="sec-title">⚠️ Danger Zone — Foydalanuvchilar <span class="danger-badge">XAVFLI</span></div>
-  </div>
-  <div class="tbl-wrap">
-    <table>
-      <thead><tr><th>#</th><th>Login</th><th>Parol</th><th>Ro'yxatdan o'tgan</th><th>Testlar</th><th>O'chirish</th></tr></thead>
-      <tbody id="users-tbody"><tr><td colspan="6" class="empty">Yuklanmoqda...</td></tr></tbody>
-    </table>
+  <!-- ── TAB: DANGER (USERS) ── -->
+  <div class="tab-pane on" id="pane-danger">
+    <div class="sec-hd">
+      <div class="sec-title">⚠️ Foydalanuvchilar <span class="danger-badge">DANGER ZONE</span></div>
+      <button class="refresh-btn" onclick="loadUsers()">🔄</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Login</th><th>Parol</th><th>Ro'yxatdan o'tgan</th><th>Testlar</th><th>O'chirish</th></tr></thead>
+        <tbody id="users-tbody"><tr><td colspan="6"><div class="empty">Yuklanmoqda...</div></td></tr></tbody>
+      </table>
+    </div>
   </div>
 
-  <!-- Results / Shoxsupa -->
-  <div class="sec-hd" style="margin-top:32px">
-    <div class="sec-title">🏆 O'yin Natijalari <span class="purple-badge">SHOXSUPA</span></div>
+  <!-- ── TAB: FANS (MOCK) ── -->
+  <div class="tab-pane" id="pane-fans">
+    <div class="sec-hd">
+      <div class="sec-title">📚 Mock Fanlar <span class="green-badge">RANDOM 25</span></div>
+      <button class="refresh-btn" onclick="loadFans()">🔄</button>
+    </div>
+    <div class="fans-add-box">
+      <div class="fans-add-row">
+        <input class="fans-inp" id="fan-name" placeholder="Fan nomi (masalan: Matematika)" maxlength="50">
+        <div class="upload-zone-sm" onclick="document.getElementById('fan-excel-inp').click()" style="flex:1;min-width:160px">
+          <p id="fan-excel-lbl">📂 Excel faylni yuklang</p>
+        </div>
+        <button class="save-fan-btn" id="save-fan-btn" onclick="saveFan()">💾 Saqlash</button>
+      </div>
+      <div class="adm-msg" id="fan-msg"></div>
+    </div>
+    <input type="file" id="fan-excel-inp" accept=".xlsx,.xls" style="display:none" onchange="handleFanExcel(this)">
+    <input type="file" id="fan-reset-inp" accept=".xlsx,.xls" style="display:none" onchange="handleResetExcel(this)">
+    <div id="fans-list"><div class="empty">Yuklanmoqda...</div></div>
   </div>
-  <div id="results-wrap"><div class="empty">Yuklanmoqda...</div></div>
-</div>
+
+  <!-- ── TAB: PRE ── -->
+  <div class="tab-pane" id="pane-pre">
+    <div class="sec-hd">
+      <div class="sec-title">🔷 PRE Testlar <span class="purple-badge">SUBTESTLAR</span></div>
+      <button class="refresh-btn" onclick="loadPre()">🔄</button>
+    </div>
+    <div class="pre-add-box">
+      <input class="pre-title-inp" id="pre-title" placeholder="Guruh sarlavhasi (masalan: Fizika 2024)" maxlength="60">
+      <div class="pre-upload-zone" onclick="document.getElementById('pre-excel-inp').click()">
+        <p id="pre-excel-lbl">📂 Excel faylni yuklang (25 savol = 1 subtest)</p>
+      </div>
+      <div class="pre-preview-box" id="pre-preview">
+        <div style="font-size:.78rem;font-weight:800;color:var(--purple);margin-bottom:7px" id="pre-preview-title"></div>
+        <div id="pre-chunk-list"></div>
+      </div>
+      <div class="adm-msg" id="pre-msg"></div>
+      <div class="sec-saving" id="pre-saving"><div class="spin"></div><span id="pre-save-text">Saqlanmoqda...</span></div>
+      <div class="progress-bar" id="pre-prog-bar" style="display:none"><div class="progress-fill" id="pre-prog-fill" style="width:0%"></div></div>
+      <button class="save-pre-btn" id="save-pre-btn" onclick="savePre()">🔷 Barcha subtestlarni saqlash</button>
+    </div>
+    <input type="file" id="pre-excel-inp" accept=".xlsx,.xls" style="display:none" onchange="handlePreExcel(this)">
+    <div id="pre-list"><div class="empty">Yuklanmoqda...</div></div>
+  </div>
+
+  <!-- ── TAB: RESULTS ── -->
+  <div class="tab-pane" id="pane-results">
+    <div class="sec-hd">
+      <div class="sec-title">🏆 O'yin Natijalari <span class="purple-badge">SHOXSUPA</span></div>
+      <button class="refresh-btn" onclick="loadResults()">🔄</button>
+    </div>
+    <div id="results-wrap"><div class="empty">Yuklanmoqda...</div></div>
+  </div>
+
+  <!-- ── TAB: STATS ── -->
+  <div class="tab-pane" id="pane-stats">
+    <div class="sec-hd">
+      <div class="sec-title">📊 Statistika</div>
+      <button class="refresh-btn" onclick="loadStats()">🔄</button>
+    </div>
+    <div id="stats-content"><div class="empty">Yuklanmoqda...</div></div>
+  </div>
+
+</div><!-- #panel -->
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getDatabase,ref,get,remove}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import{getDatabase,ref,get,set,push,remove}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const FB={apiKey:"AIzaSyA-2Uf7dZf1kqf7c32txyTFXSd2PCJbJLw",authDomain:"sessiya-11767.firebaseapp.com",
   databaseURL:"https://sessiya-11767-default-rtdb.firebaseio.com",projectId:"sessiya-11767",
   storageBucket:"sessiya-11767.firebasestorage.app",messagingSenderId:"883067400258",
-  appId:"1:883067400258:web:941d591d38755c73247ddb"};
+  appId:"1:883067400298:web:941d591d38755c73247ddb"};
 const app=initializeApp(FB);
 const db=getDatabase(app);
 
@@ -203,10 +353,15 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 
 const ADMIN_USER='admin';
 const ADMIN_PASS='0408nmn';
+const FANS_PATH='mock_fans';
+const PRE_GROUPS_PATH='pre_groups';
+const PRE_AUTHOR_UID='__pre_admin__';
+const PRE_CHUNK=25;
+const MOCK_COUNT=25;
 
-// ── AUTH ──
+// ── INIT ──
 $('loading').classList.add('hide');
-const saved=sessionStorage.getItem('qb_admin');
+const saved=localStorage.getItem('qb_admin_auth');
 if(saved==='1') showPanel();
 else showAuth();
 
@@ -214,84 +369,315 @@ function showAuth(){
   $('auth').classList.add('on');
   $('navbar').classList.remove('on');
   $('panel').classList.remove('on');
+  $('panel').style.display='none';
+  $('tabs-bar').style.display='none';
+  $('stats-row').style.display='none';
 }
 function showPanel(){
   $('auth').classList.remove('on');
   $('navbar').classList.add('on');
   $('panel').classList.add('on');
-  loadAll();
+  $('panel').style.display='block';
+  $('tabs-bar').style.display='flex';
+  $('stats-row').style.display='grid';
+  loadGlobalStats();
+  loadActiveTab();
 }
 
 window.doLogin=function(){
   const u=$('adm-user').value.trim();
   const p=$('adm-pass').value;
+  const msg=$('auth-msg');
   if(u===ADMIN_USER&&p===ADMIN_PASS){
-    sessionStorage.setItem('qb_admin','1');
-    $('auth-msg').className='msg';
+    localStorage.setItem('qb_admin_auth','1');
+    msg.className='msg';
     showPanel();
   }else{
-    $('auth-msg').textContent='Login yoki parol noto\'g\'ri';
-    $('auth-msg').className='msg err on';
+    msg.textContent='Login yoki parol noto\'g\'ri';
+    msg.className='msg err on';
   }
 };
-$('adm-pass')?.addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin();});
+$('adm-user').addEventListener('keydown',e=>{if(e.key==='Enter')$('adm-pass').focus();});
+$('adm-pass').addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin();});
 
-window.doLogout=function(){sessionStorage.removeItem('qb_admin');showAuth();};
-
-// ── LOAD ALL DATA ──
-window.loadAll=async function(){
-  await Promise.all([loadUsers(),loadResults()]);
+window.doLogout=function(){
+  localStorage.removeItem('qb_admin_auth');
+  showAuth();
 };
 
+// ── TABS ──
+let curTab='danger';
+window.switchTab=function(tab){
+  curTab=tab;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
+  $(`tbtn-${tab}`).classList.add('on');
+  $(`pane-${tab}`).classList.add('on');
+  loadActiveTab();
+};
+window.loadActiveTab=function(){
+  if(curTab==='danger') loadUsers();
+  else if(curTab==='fans') loadFans();
+  else if(curTab==='pre') loadPre();
+  else if(curTab==='results') loadResults();
+  else if(curTab==='stats') loadStats();
+};
+
+// ── GLOBAL STATS (header) ──
+async function loadGlobalStats(){
+  try{
+    const [usersSnap,gamesSnap,fansSnap]=await Promise.all([
+      get(ref(db,'users')),get(ref(db,'game_sessions')),get(ref(db,FANS_PATH))
+    ]);
+    const uData=usersSnap.val()||{};
+    let totalTests=0;
+    Object.values(uData).forEach(u=>{totalTests+=u.tests?Object.keys(u.tests).length:0;});
+    $('s-users').textContent=Object.keys(uData).length;
+    $('s-games').textContent=gamesSnap.exists()?Object.keys(gamesSnap.val()||{}).length:0;
+    $('s-tests').textContent=totalTests;
+    $('s-fans').textContent=fansSnap.exists()?Object.keys(fansSnap.val()||{}).length:0;
+  }catch(_){}
+}
+
+// ─── USERS ───
 async function loadUsers(){
+  $('users-tbody').innerHTML='<tr><td colspan="6"><div class="empty">Yuklanmoqda...</div></td></tr>';
   try{
     const snap=await get(ref(db,'users'));
     if(!snap.exists()){
-      $('users-tbody').innerHTML='<tr><td colspan="6"><div class="empty">Foydalanuvchilar yo\'q</div></td></tr>';
-      $('s-users').textContent='0';
-      $('s-tests').textContent='0';
+      $('users-tbody').innerHTML='<tr><td colspan="6"><div class="empty">Hali foydalanuvchi yo\'q</div></td></tr>';
       return;
     }
     const users=snap.val();
-    const entries=Object.entries(users);
-    $('s-users').textContent=entries.length;
-
-    let totalTests=0;
+    const entries=Object.entries(users).sort((a,b)=>(b[1].created_at||0)-(a[1].created_at||0));
     let rows='';
-    entries.sort((a,b)=>(b[1].created_at||0)-(a[1].created_at||0));
     entries.forEach(([key,u],i)=>{
       const tests=u.tests?Object.keys(u.tests).length:0;
-      totalTests+=tests;
-      const date=u.created_at?new Date(u.created_at).toLocaleString('uz-UZ',{dateStyle:'short',timeStyle:'short'}):'—';
+      const ts=u.created_at||0;
+      const date=ts?new Date(ts).toLocaleString('uz-UZ',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
+      const pass=u.password||u.pass||'—';
       rows+=`<tr>
         <td style="color:var(--muted)">${i+1}</td>
         <td><span class="u-name">${esc(u.username||key)}</span></td>
-        <td style="font-family:monospace;color:var(--muted)">${esc(u.password||'—')}</td>
-        <td><span class="u-date">${date}</span></td>
-        <td><span class="u-tests">${tests} ta</span></td>
+        <td style="font-family:monospace;font-size:.82rem;color:var(--gold)">${esc(pass)}</td>
+        <td><span class="u-date">${esc(date)}</span></td>
+        <td><span class="u-tests">${tests} ta test</span></td>
         <td><button class="del-user" onclick="delUser('${key}','${esc(u.username||key)}')">🗑️ O'chirish</button></td>
       </tr>`;
     });
     $('users-tbody').innerHTML=rows||'<tr><td colspan="6"><div class="empty">Bo\'sh</div></td></tr>';
-    $('s-tests').textContent=totalTests;
-  }catch(e){$('users-tbody').innerHTML=`<tr><td colspan="6" style="color:var(--accent)">Xato: ${e.message}</td></tr>`;}
+  }catch(e){$('users-tbody').innerHTML=`<tr><td colspan="6" style="color:var(--accent);padding:14px">Xato: ${e.message}</td></tr>`;}
 }
+window.loadUsers=loadUsers;
 
-async function loadResults(){
+window.delUser=async function(key,name){
+  if(!confirm(`"${name}" foydalanuvchisini o'chirishni tasdiqlaysizmi?\nBarcha testlari ham o'chadi!`)) return;
+  try{await remove(ref(db,`users/${key}`));loadUsers();loadGlobalStats();}
+  catch(e){alert('Xato: '+e.message);}
+};
+
+// ─── FANS (MOCK) ───
+let fanPendingQs=null;
+let resetFanKey=null;
+
+function handleFanExcel(inp){
+  if(!inp.files[0]) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const qs=parseMockWb(wb);
+      if(!qs||!qs.length){setMsg('fan-msg','Savollar topilmadi!','err');fanPendingQs=null;$('fan-excel-lbl').textContent='📂 Excel faylni yuklang';inp.value='';return;}
+      fanPendingQs=qs;
+      $('fan-excel-lbl').textContent=`✅ ${qs.length} ta savol yuklandi`;
+      setMsg('fan-msg',`${qs.length} ta savol tayyor — Saqlash tugmasini bosing`,'ok');
+    }catch(err){setMsg('fan-msg','Xato: '+err.message,'err');}
+    inp.value='';
+  };
+  r.readAsBinaryString(inp.files[0]);
+}
+window.handleFanExcel=handleFanExcel;
+
+async function saveFan(){
+  const name=$('fan-name').value.trim();
+  if(!name){setMsg('fan-msg','Fan nomini kiriting!','err');return;}
+  if(!fanPendingQs||!fanPendingQs.length){setMsg('fan-msg','Avval Excel faylni yuklang!','err');return;}
+  const btn=$('save-fan-btn');btn.disabled=true;btn.textContent='Saqlanmoqda...';
   try{
-    const [gSnap,rSnap]=await Promise.all([
-      get(ref(db,'game_sessions')),
-      get(ref(db,'results'))
-    ]);
-    const gCount=gSnap.exists()?Object.keys(gSnap.val()||{}).length:0;
-    $('s-games').textContent=gCount;
+    const fanKey=name.toLowerCase().replace(/[^a-z0-9а-яёa-я\u0400-\u04FF]/gi,'_').replace(/_+/g,'_').slice(0,30)+'_'+Date.now().toString(36);
+    const slim=fanPendingQs.map(q=>({num:q.num,text:q.text,correctLetter:q.correctLetter,correctText:q.correctText,options:q.options.map(o=>({text:o.text,letter:o.letter,isCorrect:o.isCorrect}))}));
+    await set(ref(db,`${FANS_PATH}/${fanKey}`),{name,count:slim.length,questions:slim,createdAt:Date.now()});
+    setMsg('fan-msg',`✅ "${name}" — ${slim.length} ta savol saqlandi!`,'ok');
+    $('fan-name').value='';$('fan-excel-lbl').textContent='📂 Excel faylni yuklang';fanPendingQs=null;
+    loadFans();loadGlobalStats();
+  }catch(e){setMsg('fan-msg','Saqlashda xatolik: '+e.message,'err');}
+  btn.disabled=false;btn.textContent='💾 Saqlash';
+}
+window.saveFan=saveFan;
 
-    if(!rSnap.exists()){
-      $('results-wrap').innerHTML='<div class="empty">Hali saqlangan natija yo\'q</div>';
-      return;
+async function loadFans(){
+  $('fans-list').innerHTML='<div class="empty">Yuklanmoqda...</div>';
+  try{
+    const snap=await get(ref(db,FANS_PATH));
+    if(!snap.exists()){$('fans-list').innerHTML='<div class="empty">Hali fan qo\'shilmagan</div>';return;}
+    const fans=Object.entries(snap.val()).sort((a,b)=>(a[1].name||'').localeCompare(b[1].name||''));
+    $('fans-list').innerHTML=fans.map(([k,f])=>`
+      <div class="fan-item">
+        <div>
+          <div class="fan-item-name">📘 ${esc(f.name||k)}</div>
+          <div class="fan-item-meta">${f.count||0} ta savol &bull; ${f.createdAt?new Date(f.createdAt).toLocaleDateString('uz'):''}</div>
+        </div>
+        <div class="fan-btns">
+          <button class="fan-reset-btn" onclick="resetFan('${k}','${esc(f.name||k).replace(/'/g,"\\'")}')" title="Excel bilan yangilash">🔄 Yangilash</button>
+          <button class="fan-del-btn" onclick="delFan('${k}','${esc(f.name||k).replace(/'/g,"\\'")}')" >🗑️ O'chirish</button>
+        </div>
+      </div>`).join('');
+  }catch(e){$('fans-list').innerHTML=`<div class="empty" style="color:var(--accent)">Yuklab bo'lmadi</div>`;}
+}
+window.loadFans=loadFans;
+
+window.resetFan=function(key,name){
+  resetFanKey=key;
+  if(!confirm(`"${name}" savollarini yangi Excel bilan almashtirasizmi?`)) return;
+  $('fan-reset-inp').click();
+};
+function handleResetExcel(inp){
+  if(!inp.files[0]||!resetFanKey) return;
+  const r=new FileReader();
+  r.onload=async e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const qs=parseMockWb(wb);
+      if(!qs||!qs.length){alert('Savollar topilmadi!');inp.value='';return;}
+      const slim=qs.map(q=>({num:q.num,text:q.text,correctLetter:q.correctLetter,correctText:q.correctText,options:q.options.map(o=>({text:o.text,letter:o.letter,isCorrect:o.isCorrect}))}));
+      await set(ref(db,`${FANS_PATH}/${resetFanKey}/questions`),slim);
+      await set(ref(db,`${FANS_PATH}/${resetFanKey}/count`),slim.length);
+      alert(`✅ ${slim.length} ta savol yangilandi!`);
+      loadFans();
+    }catch(err){alert('Xato: '+err.message);}
+    inp.value='';resetFanKey=null;
+  };
+  r.readAsBinaryString(inp.files[0]);
+}
+window.handleResetExcel=handleResetExcel;
+
+window.delFan=async function(key,name){
+  if(!confirm(`"${name}" fanini o'chirishni tasdiqlaysizmi? Barcha savollar o'chadi.`)) return;
+  try{await remove(ref(db,`${FANS_PATH}/${key}`));loadFans();loadGlobalStats();}
+  catch(e){alert('Xato: '+e.message);}
+};
+
+// ─── PRE ───
+let prePendingQs=null;
+function handlePreExcel(inp){
+  if(!inp.files[0]) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const wb=XLSX.read(e.target.result,{type:'binary'});
+      const qs=parseMockWb(wb);
+      if(!qs||!qs.length){setMsg('pre-msg','Savollar topilmadi!','err');prePendingQs=null;$('pre-excel-lbl').textContent='📂 Excel faylni yuklang';inp.value='';return;}
+      prePendingQs=qs;
+      $('pre-excel-lbl').textContent=`✅ ${qs.length} ta savol yuklandi`;
+      const cnt=Math.ceil(qs.length/PRE_CHUNK);
+      setMsg('pre-msg',`${qs.length} ta savol — ${cnt} ta subtest yaratiladi`,'ok');
+      updatePrePreview();
+    }catch(err){setMsg('pre-msg','Xato: '+err.message,'err');}
+    inp.value='';
+  };
+  r.readAsBinaryString(inp.files[0]);
+}
+window.handlePreExcel=handlePreExcel;
+
+function updatePrePreview(){
+  const box=$('pre-preview');
+  if(!prePendingQs||!prePendingQs.length){box.style.display='none';return;}
+  const baseTitle=$('pre-title').value.trim()||'Test';
+  const numChunks=Math.ceil(prePendingQs.length/PRE_CHUNK);
+  box.style.display='';
+  $('pre-preview-title').textContent=`📦 ${numChunks} ta subtest yaratiladi (${prePendingQs.length} ta savol):`;
+  $('pre-chunk-list').innerHTML=Array.from({length:numChunks},(_,i)=>{
+    const from=i*PRE_CHUNK+1,to=Math.min((i+1)*PRE_CHUNK,prePendingQs.length);
+    return`<div class="pre-chunk-item"><span>📘 ${esc(baseTitle)} ${i+1}</span><span style="color:var(--muted)">${from}–${to} (${to-from+1} ta)</span></div>`;
+  }).join('');
+}
+$('pre-title').addEventListener('input',()=>{if(prePendingQs)updatePrePreview();});
+
+async function savePre(){
+  const baseTitle=$('pre-title').value.trim();
+  if(!baseTitle){setMsg('pre-msg','Sarlavhani kiriting!','err');return;}
+  if(!prePendingQs||!prePendingQs.length){setMsg('pre-msg','Avval Excel faylni yuklang!','err');return;}
+  const btn=$('save-pre-btn');
+  btn.disabled=true;
+  $('pre-saving').style.display='flex';
+  $('pre-prog-bar').style.display='block';
+  $('pre-prog-fill').style.width='0%';
+  const chunks=[];
+  for(let i=0;i<prePendingQs.length;i+=PRE_CHUNK) chunks.push(prePendingQs.slice(i,i+PRE_CHUNK));
+  const savedKeys=[];
+  try{
+    for(let i=0;i<chunks.length;i++){
+      const name=`${baseTitle} ${i+1}`;
+      $('pre-save-text').textContent=`⏳ ${i+1}/${chunks.length}: "${name}" saqlanmoqda...`;
+      $('pre-prog-fill').style.width=Math.round((i/chunks.length)*100)+'%';
+      const slim=chunks[i].map(q=>({num:q.num,text:q.text,correctLetter:q.correctLetter,correctText:q.correctText,options:q.options.map(o=>({text:o.text,letter:o.letter,isCorrect:o.isCorrect}))}));
+      const pushRef=await push(ref(db,`users/${PRE_AUTHOR_UID}/tests`),{name,count:slim.length,date:new Date().toLocaleDateString('uz'),created:Date.now(),questions:slim,isPublic:true,isPre:true});
+      const fbKey=pushRef.key;
+      await set(ref(db,`public_tests/${PRE_AUTHOR_UID}__${fbKey}`),{name,authorName:'PRE Admin',authorUid:PRE_AUTHOR_UID,testFbKey:fbKey,count:slim.length,created:Date.now(),isPre:true});
+      savedKeys.push(fbKey);
     }
-    const results=rSnap.val();
-    const entries=Object.entries(results).sort((a,b)=>(b[1].date||0)-(a[1].date||0));
+    await push(ref(db,PRE_GROUPS_PATH),{baseTitle,totalQuestions:prePendingQs.length,chunksCount:chunks.length,keys:savedKeys,created:Date.now(),date:new Date().toLocaleDateString('uz')});
+    $('pre-prog-fill').style.width='100%';
+    $('pre-save-text').textContent=`✅ ${chunks.length} ta subtest muvaffaqiyatli saqlandi!`;
+    setMsg('pre-msg',`✅ "${baseTitle}" — ${chunks.length} ta subtest yaratildi!`,'ok');
+    $('pre-title').value='';$('pre-excel-lbl').textContent='📂 Excel faylni yuklang';$('pre-preview').style.display='none';prePendingQs=null;
+    setTimeout(()=>{$('pre-saving').style.display='none';$('pre-prog-bar').style.display='none';},2500);
+    loadPre();
+  }catch(e){setMsg('pre-msg','Saqlashda xatolik: '+e.message,'err');$('pre-saving').style.display='none';$('pre-prog-bar').style.display='none';}
+  btn.disabled=false;
+}
+window.savePre=savePre;
+
+async function loadPre(){
+  $('pre-list').innerHTML='<div class="empty">Yuklanmoqda...</div>';
+  try{
+    const snap=await get(ref(db,PRE_GROUPS_PATH));
+    if(!snap.exists()){$('pre-list').innerHTML='<div class="empty">Hali PRE guruh yaratilmagan</div>';return;}
+    const list=Object.entries(snap.val()).map(([k,v])=>({key:k,...v}));
+    list.sort((a,b)=>b.created-a.created);
+    $('pre-list').innerHTML=list.map(g=>`
+      <div class="pre-group-item">
+        <div>
+          <div class="pre-group-name">🔷 ${esc(g.baseTitle)}</div>
+          <div class="pre-group-meta">${g.chunksCount} ta subtest &bull; ${g.totalQuestions} ta savol &bull; ${g.date||''}</div>
+        </div>
+        <button class="pre-del-btn" onclick="delPreGroup('${g.key}','${esc(g.baseTitle).replace(/'/g,"\\'")}',${JSON.stringify(g.keys||[]).replace(/"/g,"'")})">🗑️ O'chirish</button>
+      </div>`).join('');
+  }catch(e){$('pre-list').innerHTML=`<div class="empty" style="color:var(--accent)">Yuklab bo'lmadi</div>`;}
+}
+window.loadPre=loadPre;
+
+window.delPreGroup=async function(groupKey,groupName,keysRaw){
+  let keys=[];
+  try{keys=typeof keysRaw==='string'?JSON.parse(keysRaw.replace(/'/g,'"')):keysRaw;}catch(_){}
+  if(!confirm(`"${groupName}" guruhidagi barcha ${keys.length} ta subtestni o'chirasizmi?`)) return;
+  try{
+    for(const k of keys){
+      try{await remove(ref(db,`users/${PRE_AUTHOR_UID}/tests/${k}`));}catch(_){}
+      try{await remove(ref(db,`public_tests/${PRE_AUTHOR_UID}__${k}`));}catch(_){}
+    }
+    await remove(ref(db,`${PRE_GROUPS_PATH}/${groupKey}`));
+    loadPre();
+  }catch(e){alert('O\'chirishda xatolik: '+e.message);}
+};
+
+// ─── RESULTS ───
+async function loadResults(){
+  $('results-wrap').innerHTML='<div class="empty">Yuklanmoqda...</div>';
+  try{
+    const snap=await get(ref(db,'results'));
+    if(!snap.exists()){$('results-wrap').innerHTML='<div class="empty">Hali saqlangan natija yo\'q</div>';return;}
+    const entries=Object.entries(snap.val()).sort((a,b)=>(b[1].date||0)-(a[1].date||0));
     $('results-wrap').innerHTML=entries.map(([code,r])=>{
       const lb=r.leaderboard||[];
       const date=r.date?new Date(r.date).toLocaleString('uz-UZ',{dateStyle:'short',timeStyle:'short'}):'—';
@@ -299,25 +685,126 @@ async function loadResults(){
       return`<div class="res-card">
         <div class="res-head">
           <div>
-            <div class="res-title">📝 ${esc(r.test_name||'Test')} &nbsp;<span style="color:var(--muted);font-size:.78rem">Host: ${esc(r.host||'—')}</span></div>
-            <div class="res-meta">📅 ${date}</div>
+            <div class="res-title">📝 ${esc(r.test_name||'Test')} <span style="color:var(--muted);font-size:.76rem">Host: ${esc(r.host||'—')}</span></div>
+            <div class="res-meta">📅 ${date} &bull; ${lb.length} ta o'yinchi</div>
           </div>
           <div class="res-code"># ${code}</div>
         </div>
-        <div class="top3">${top3||'<span style="color:var(--muted);font-size:.78rem">Natija yo\'q</span>'}</div>
+        <div class="top3">${top3||'<span style="color:var(--muted);font-size:.76rem">Natija yo\'q</span>'}</div>
       </div>`;
     }).join('');
   }catch(e){$('results-wrap').innerHTML=`<div class="empty" style="color:var(--accent)">Xato: ${e.message}</div>`;}
 }
+window.loadResults=loadResults;
 
-// ── DELETE USER ──
-window.delUser=async function(key,name){
-  if(!confirm(`"${name}" foydalanuvchisini o'chirishni tasdiqlaysizmi?\nBarcha testlari ham o'chadi!`)) return;
+// ─── STATS ───
+async function loadStats(){
+  $('stats-content').innerHTML='<div class="empty">Yuklanmoqda...</div>';
   try{
-    await remove(ref(db,`users/${key}`));
-    loadUsers();
-  }catch(e){alert('Xato: '+e.message);}
-};
+    const allFans=await get(ref(db,FANS_PATH));
+    if(!allFans.exists()){$('stats-content').innerHTML='<div class="empty">Hali fan qo\'shilmagan</div>';return;}
+    let totalAttempts=0,globalUserMap={};
+    const fanStats=[];
+    for(const [fKey,fData] of Object.entries(allFans.val())){
+      if(!fData||!fData.name) continue;
+      const resSnap=await get(ref(db,`${FANS_PATH}/${fKey}/results`));
+      let fanAttempts=0,fanUsers=new Set(),fanScoreSum=0,fanTopScore=0,fanTopUser='';
+      if(resSnap.exists()){
+        for(const [uid,userRes] of Object.entries(resSnap.val())){
+          const entries=userRes.entries?Object.values(userRes.entries):[];
+          fanAttempts+=entries.length;
+          if(entries.length) fanUsers.add(uid);
+          for(const e of entries){
+            fanScoreSum+=e.pct||0;
+            if((e.pct||0)>fanTopScore){fanTopScore=e.pct;fanTopUser=e.username||uid;}
+            if(!globalUserMap[uid]) globalUserMap[uid]={username:e.username||uid,attempts:0,scoreSum:0,best:0,lastTs:0};
+            globalUserMap[uid].attempts++;globalUserMap[uid].scoreSum+=e.pct||0;
+            if((e.pct||0)>globalUserMap[uid].best) globalUserMap[uid].best=e.pct;
+            if((e.created||0)>globalUserMap[uid].lastTs) globalUserMap[uid].lastTs=e.created||0;
+          }
+        }
+      }
+      totalAttempts+=fanAttempts;
+      fanStats.push({name:fData.name,key:fKey,count:fData.count||0,attempts:fanAttempts,uniqueUsers:fanUsers.size,avg:fanAttempts?Math.round(fanScoreSum/fanAttempts):0,top:fanTopScore,topUser:fanTopUser});
+    }
+    const totalUsers=Object.keys(globalUserMap).length;
+    const overallAvg=totalAttempts?Math.round(Object.values(globalUserMap).reduce((s,u)=>s+u.scoreSum,0)/totalAttempts):0;
+    const topOverall=Object.values(globalUserMap).sort((a,b)=>b.best-a.best)[0];
+
+    let html=`<div class="ov-grid">
+      <div class="ov-card"><div class="ov-val" style="color:var(--blue)">${totalAttempts}</div><div class="ov-lbl">Jami urinishlar</div></div>
+      <div class="ov-card"><div class="ov-val" style="color:var(--green)">${totalUsers}</div><div class="ov-lbl">Unique foydalanuvchilar</div></div>
+      <div class="ov-card"><div class="ov-val" style="color:var(--gold)">${overallAvg}%</div><div class="ov-lbl">O'rtacha natija</div></div>
+      <div class="ov-card"><div class="ov-val" style="color:var(--purple)">${topOverall?topOverall.best+'%':'—'}</div><div class="ov-lbl">Eng yuqori${topOverall?' ('+esc(topOverall.username)+')':''}</div></div>
+    </div>`;
+    fanStats.sort((a,b)=>b.attempts-a.attempts);
+    html+='<div style="font-weight:800;font-size:.82rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px">📘 Fanlar bo\'yicha</div>';
+    html+=fanStats.map(f=>`<div class="fan-stat-item">
+      <div style="font-weight:800;font-size:.88rem">📘 ${esc(f.name)} <span style="color:var(--muted);font-size:.7rem;font-weight:700">${f.count} ta savol</span></div>
+      <div class="fan-stat-chips">
+        <span class="fan-stat-chip chip-att">🔢 ${f.attempts} urinish</span>
+        <span class="fan-stat-chip chip-usr">👥 ${f.uniqueUsers} foydalanuvchi</span>
+        <span class="fan-stat-chip chip-avg">📊 ${f.avg}%</span>
+        <span class="fan-stat-chip" style="color:var(--purple)">🏆 TOP: ${f.top}% (${esc(f.topUser||'—')})</span>
+      </div>
+      <div class="mini-bar"><div class="mini-fill" style="width:${f.avg}%"></div></div>
+    </div>`).join('');
+    $('stats-content').innerHTML=html;
+  }catch(e){$('stats-content').innerHTML=`<div class="empty" style="color:var(--accent)">Yuklab bo'lmadi: ${e.message}</div>`;}
+}
+window.loadStats=loadStats;
+
+// ─── HELPERS ───
+function setMsg(id,txt,type){
+  const el=$(id);el.textContent=txt;el.className=`adm-msg on ${type||'ok'}`;
+}
+
+function parseMockWb(wb){
+  if(!wb.SheetNames.length) return[];
+  const data=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,defval:''});
+  let dataStart=0;
+  for(let i=0;i<Math.min(10,data.length);i++){
+    const v=String(data[i][0]||'').trim();
+    if(/^\d+$/.test(v)&&parseInt(v)>=1){dataStart=i;break;}
+    dataStart=i+1;
+  }
+  const IDX={num:0,q:1,a:2,b:3,c:4,d:5,ans:6};
+  for(let i=0;i<dataStart;i++){
+    const row=data[i];
+    if(String(row[0]||'').trim()!=='#') continue;
+    row.forEach((h,col)=>{
+      const v=String(h||'').trim().toUpperCase();
+      if(v==='#') IDX.num=col;
+      else if(col===1) IDX.q=col;
+      else if(v==='A') IDX.a=col;
+      else if(v==='B') IDX.b=col;
+      else if(v==='C') IDX.c=col;
+      else if(v==='D') IDX.d=col;
+      else if(h&&!['A','B','C','D'].includes(v)&&col>=6) IDX.ans=col;
+    });
+    break;
+  }
+  const clean=v=>String(v||'').trim().replace(/^[A-Da-d]\s*[).]\s*/,'').trim();
+  const rawQ=[];
+  for(let i=dataStart;i<data.length;i++){
+    const row=data[i];
+    const qTxt=String(row[IDX.q]||'').trim();
+    if(!qTxt||qTxt.length<4) continue;
+    const oA=clean(row[IDX.a]),oB=clean(row[IDX.b]),oC=clean(row[IDX.c]),oD=clean(row[IDX.d]);
+    if(!oA||!oB) continue;
+    const ansRaw=String(row[IDX.ans]||'').trim().toUpperCase();
+    const letter=ansRaw.replace(/[^ABCD]/g,'').charAt(0);
+    const optMap={A:oA,B:oB,C:oC,D:oD};
+    const correctText=letter?(optMap[letter]||''):'';
+    rawQ.push({num:parseInt(String(row[IDX.num]||''))||(rawQ.length+1),text:qTxt,correctLetter:letter,correctText,oA,oB,oC,oD});
+  }
+  return rawQ.map(q=>{
+    const opts=[{text:q.oA,letter:'A'},{text:q.oB,letter:'B'},{text:q.oC,letter:'C'},{text:q.oD,letter:'D'}];
+    const res=opts.filter(o=>o.text).map(o=>({text:o.text,letter:o.letter,isCorrect:!!q.correctLetter&&o.letter===q.correctLetter}));
+    if(!res.some(o=>o.isCorrect)&&q.correctText) res.forEach(o=>{if(o.text.toLowerCase()===q.correctText.toLowerCase()) o.isCorrect=true;});
+    return{num:q.num,text:q.text,correctLetter:q.correctLetter,correctText:q.correctText,options:res};
+  });
+}
 </script>
 </body>
 </html>
