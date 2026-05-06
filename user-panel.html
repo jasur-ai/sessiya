@@ -530,7 +530,7 @@ window.doLogin=async function(){
     if(!snap.exists()){showMsg('login-msg','❌ Foydalanuvchi topilmadi');btn.disabled=false;btn.textContent='Kirish →';return;}
     const d=snap.val();
     if(d.password!==p){showMsg('login-msg','❌ Parol noto\'g\'ri');btn.disabled=false;btn.textContent='Kirish →';return;}
-    curUser={username:d.username,safeKey:sk(u)};
+    curUser={username:d.username||u,safeKey:sk(u)};
     localStorage.setItem('qb_user',JSON.stringify(curUser));
     setNavUser();showPanel();
   }catch(e){showMsg('login-msg','Xato: '+e.message);}
@@ -564,7 +564,7 @@ window.logout=function(){
 
 function setNavUser(){
   if(!curUser) return;
-  $('nav-av').textContent=curUser.username[0].toUpperCase();
+  $('nav-av').textContent=(curUser.username||'?')[0].toUpperCase();
   $('nav-un').textContent=curUser.username;
 }
 
