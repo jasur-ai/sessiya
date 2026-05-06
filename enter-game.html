@@ -305,6 +305,16 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   </div>
 </div>
 
+<!-- ══ S8b: RESULT ══ -->
+<div class="screen" id="s-result">
+  <div id="res-icon" style="font-size:5rem;margin-bottom:16px;">✅</div>
+  <div id="res-title" style="font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:8px;">Togri!</div>
+  <div id="res-pts" style="font-size:1.1rem;font-weight:700;color:var(--green);margin-bottom:6px;"></div>
+  <div id="res-correct" style="font-size:.9rem;color:var(--muted);margin-bottom:24px;"></div>
+  <div class="dots" style="justify-content:center;"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <div style="font-size:.8rem;color:var(--muted);margin-top:14px;">Shoxsupa kutilmoqda...</div>
+</div>
+
 <!-- ══ S8: LEADERBOARD (SHOXSUPA) ══ -->
 <div class="screen" id="s-lb">
   <div style="width:100%;">
@@ -341,7 +351,7 @@ const RANK_CLS=['r1','r2','r3','','','',''];
 let code='', name='', emoji='', selEmoji='';
 let stateRef=null, playersRef=null;
 let timerIv=null, qTime=20, qStartAt=0;
-let hasAnswered=false, curQIdx=-1;
+let hasAnswered=false, curQIdx=-1, lastPickedIdx=-1, lastCorrectIdx=-1, lastEarned=0;
 
 // ── HELPERS ──
 const $=id=>document.getElementById(id);
@@ -485,6 +495,8 @@ function showQActive(st){
   updatePBadge();
   goTo('s-qact');
 
+  lastCorrectIdx=st.q_correct||0;
+  lastPickedIdx=-1;
   // Start timer display
   qTime=st.q_time||20;
   qStartAt=st.q_started_at||Date.now();
@@ -499,12 +511,11 @@ window.pickAns=async function(idx,btn){
   document.querySelectorAll('.opt').forEach(b=>{b.disabled=true;b.classList.add('dim');});
   btn.classList.remove('dim');btn.classList.add('pick');
 
+  lastPickedIdx=idx;
   try{await set(ref(db,`game_sessions/${code}/answers/${curQIdx}/${name}`),{option:idx,time_ms:elapsed});}
   catch(e){}
 
   stopTimer();
-  // Short visual feedback then wait screen
-  $('wait-icon').textContent='✅';
   updatePBadge2();
   goTo('s-wait');
 };
@@ -539,8 +550,31 @@ function renderLb(lb){
 
 function showLb(lb){
   stopTimer();
-  $('lb-list').innerHTML=renderLb(lb);
-  goTo('s-lb');
+  // Show result first
+  const isCorrect = lastPickedIdx !== -1 && lastPickedIdx === lastCorrectIdx;
+  const noAnswer = lastPickedIdx === -1;
+  if(noAnswer){
+    $('res-icon').textContent='⏱️';
+    $('res-title').textContent="Vaqt tugadi!";
+    $('res-pts').textContent='';
+    $('res-correct').textContent='Javob bermadingiz';
+  } else if(isCorrect){
+    $('res-icon').textContent='✅';
+    $('res-title').textContent="To'g'ri!";
+    const me=lb.find(p=>p.name===name);
+    $('res-pts').textContent=me?me.score+' ball':'';
+    $('res-correct').textContent='';
+  } else {
+    $('res-icon').textContent='❌';
+    $('res-title').textContent="Xato!";
+    $('res-pts').textContent='';
+    $('res-correct').textContent='';
+  }
+  goTo('s-result');
+  setTimeout(()=>{
+    $('lb-list').innerHTML=renderLb(lb);
+    goTo('s-lb');
+  }, 2500);
 }
 
 function showEnded(lb){
