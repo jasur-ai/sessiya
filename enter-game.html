@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuizBlitz — O'yinga Kirish</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Righteous&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06060f;--card:#14142a;--surface:#0f0f20;
+  --accent:#ff4466;--gold:#ffd60a;--green:#00ffaa;--blue:#38bdf8;--purple:#c084fc;
+  --text:#f0f0f8;--muted:#636384;
+  --oa:#e84040;--ob:#2d9cdb;--oc:#f2a827;--od:#27ae60;--oe:#9b59b6;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* ─── SCREENS ─── */
+.screen{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:20px;position:relative;}
+.screen.on{display:flex;}
+
+.toplink{position:absolute;top:18px;left:18px;color:var(--muted);font-size:.8rem;font-weight:800;text-decoration:none;background:rgba(255,255,255,.06);border-radius:9px;padding:7px 12px;transition:all .2s;}
+.toplink:hover{color:var(--text);background:rgba(255,255,255,.12);}
+
+/* LOGO */
+.logo{font-family:'Righteous',cursive;font-size:1.9rem;background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+
+/* BOX */
+.box{background:var(--card);border-radius:22px;padding:28px;width:100%;max-width:420px;border:1px solid rgba(255,255,255,.07);box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.box-title{font-family:'Righteous',cursive;font-size:1.25rem;margin-bottom:4px;}
+.box-sub{color:var(--muted);font-size:.8rem;font-weight:700;line-height:1.6;margin-bottom:18px;}
+
+/* INPUTS */
+.code-input{
+  width:100%;background:rgba(255,255,255,.05);
+  border:3px solid rgba(255,255,255,.1);border-radius:14px;
+  padding:16px 12px;color:var(--text);
+  font-family:'Righteous',cursive;font-size:2.6rem;
+  text-align:center;letter-spacing:12px;outline:none;
+  transition:border-color .3s;margin-bottom:14px;
+}
+.code-input:focus{border-color:var(--accent);}
+.inp{
+  width:100%;background:rgba(255,255,255,.05);
+  border:2px solid rgba(255,255,255,.08);border-radius:11px;
+  padding:12px 14px;color:var(--text);
+  font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;
+  outline:none;transition:border-color .25s;margin-bottom:12px;
+}
+.inp:focus{border-color:var(--accent);}
+.inp::placeholder{color:var(--muted);font-weight:600;}
+
+/* BTNs */
+.btn{
+  width:100%;border:none;border-radius:11px;padding:13px;color:#fff;
+  font-family:'Nunito',sans-serif;font-size:.96rem;font-weight:900;
+  cursor:pointer;transition:all .22s;
+  display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;
+}
+.btn-red{background:linear-gradient(135deg,var(--accent),#c72a48);}
+.btn-green{background:linear-gradient(135deg,var(--green),#00b57a);color:#000;}
+.btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.4);}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+
+/* MSG */
+.msg{border-radius:9px;padding:9px 13px;font-size:.81rem;font-weight:700;margin-bottom:11px;display:none;}
+.msg.on{display:block;}
+.err{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.3);color:var(--accent);}
+.ok{background:rgba(0,255,170,.1);border:1px solid rgba(0,255,170,.25);color:var(--green);}
+
+/* ─── EMOJI GRID ─── */
+.emoji-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:14px 0 18px;}
+.e-btn{
+  aspect-ratio:1;border-radius:12px;border:2px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.04);font-size:1.7rem;cursor:pointer;
+  transition:all .18s;display:flex;align-items:center;justify-content:center;
+}
+.e-btn:hover{border-color:var(--accent);transform:scale(1.08);background:rgba(255,68,102,.1);}
+.e-btn.sel{border-color:var(--gold);background:rgba(255,214,10,.12);transform:scale(1.1);}
+
+/* ─── LOBBY ─── */
+#s-lobby{
+  background:
+    radial-gradient(ellipse at 25% 30%,rgba(255,68,102,.15) 0%,transparent 55%),
+    radial-gradient(ellipse at 75% 70%,rgba(56,189,248,.1) 0%,transparent 55%),var(--bg);
+}
+.lobby-wrap{text-align:center;max-width:560px;width:100%;}
+.lob-label{color:var(--muted);font-size:.76rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.lob-code{font-family:'Righteous',cursive;font-size:4.5rem;color:var(--gold);letter-spacing:10px;animation:glow 2.5s ease-in-out infinite;}
+@keyframes glow{0%,100%{text-shadow:0 0 20px rgba(255,214,10,.3)}50%{text-shadow:0 0 50px rgba(255,214,10,.7)}}
+.lob-count{font-family:'Righteous',cursive;font-size:1.3rem;color:var(--green);margin:14px 0 10px;}
+.lob-players{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;}
+.p-chip{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:50px;padding:5px 12px;font-size:.78rem;font-weight:800;display:flex;align-items:center;gap:5px;}
+.dots{display:flex;gap:5px;justify-content:center;margin-top:18px;}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--muted);animation:blink 1.4s ease-in-out infinite;}
+.dot:nth-child(2){animation-delay:.2s;}.dot:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,100%{opacity:.2;background:var(--muted);}50%{opacity:1;background:var(--accent);}}
+
+/* ─── QUESTION PREVIEW ─── */
+#s-qprev{
+  background:linear-gradient(135deg,#0a0a20 0%,#180a2a 100%);
+  text-align:center;
+}
+.qprev-num{color:var(--muted);font-size:.85rem;font-weight:800;margin-bottom:8px;}
+.qprev-text{font-family:'Righteous',cursive;font-size:clamp(1.4rem,5vw,2.4rem);max-width:660px;line-height:1.45;color:var(--text);}
+.badge-double{display:inline-block;padding:5px 14px;border-radius:50px;font-size:.75rem;font-weight:900;background:rgba(255,214,10,.18);border:1px solid rgba(255,214,10,.4);color:var(--gold);margin-bottom:10px;}
+.prep-hint{margin-top:24px;color:var(--muted);font-size:.82rem;}
+
+/* ─── QUESTION ACTIVE ─── */
+#s-qact{
+  flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:14px 12px 80px;
+}
+.q-top{width:100%;max-width:920px;text-align:center;padding:8px 10px 12px;}
+.q-text{font-family:'Righteous',cursive;font-size:clamp(1.1rem,4vw,1.9rem);line-height:1.4;}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:920px;margin-top:12px;}
+.opts.single{grid-template-columns:1fr;}
+.opt{
+  border:none;border-radius:14px;padding:18px 14px;
+  font-family:'Nunito',sans-serif;font-size:.97rem;font-weight:800;
+  cursor:pointer;transition:all .2s;color:#fff;
+  text-align:left;display:flex;align-items:center;gap:10px;
+  min-height:76px;word-break:break-word;
+}
+.opt:hover:not(:disabled){transform:scale(1.025);box-shadow:0 10px 30px rgba(0,0,0,.4);}
+.opt:disabled{cursor:not-allowed;}
+.opt.dim{opacity:.45;transform:scale(.97)!important;}
+.opt.pick{box-shadow:0 0 0 5px rgba(255,255,255,.5)!important;transform:scale(1.04)!important;}
+[data-c="0"]{background:linear-gradient(135deg,#e84040,#a82020);}
+[data-c="1"]{background:linear-gradient(135deg,#2d9cdb,#1a6599);}
+[data-c="2"]{background:linear-gradient(135deg,#f2a827,#b87b10);}
+[data-c="3"]{background:linear-gradient(135deg,#27ae60,#1a7a42);}
+[data-c="4"]{background:linear-gradient(135deg,#9b59b6,#6c3483);}
+.opt-sym{font-size:1.3rem;flex-shrink:0;}
+
+/* Player badge bottom-left (always visible in game) */
+.pbadge{
+  position:fixed;bottom:14px;left:14px;z-index:80;
+  background:rgba(6,6,15,.85);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.1);border-radius:50px;
+  padding:7px 13px;display:none;align-items:center;gap:7px;
+  font-size:.8rem;font-weight:800;
+}
+.pbadge.on{display:flex;}
+.pb-em{font-size:1.15rem;}
+
+/* Timer - bottom right, player only */
+.timer-wrap{position:fixed;bottom:14px;right:14px;z-index:80;}
+.t-ring{position:relative;width:56px;height:56px;}
+.t-ring svg{transform:rotate(-90deg);}
+.t-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Righteous',cursive;font-size:1.1rem;}
+.t-ring circle.bg{stroke:rgba(255,255,255,.08);}
+.t-ring circle.fg{stroke:var(--accent);stroke-linecap:round;transition:stroke .5s;}
+
+/* ─── ANSWERED WAIT ─── */
+#s-wait{
+  text-align:center;
+  background:radial-gradient(ellipse at 50% 50%,rgba(56,189,248,.12) 0%,transparent 60%),var(--bg);
+}
+.wait-icon{font-size:4rem;animation:pop .35s ease-out;}
+@keyframes pop{0%{transform:scale(0)}60%{transform:scale(1.25)}100%{transform:scale(1)}}
+.wait-title{font-family:'Righteous',cursive;font-size:1.5rem;color:var(--green);margin-top:10px;}
+.wait-sub{color:var(--muted);font-size:.84rem;margin-top:5px;}
+
+/* ─── LEADERBOARD (SHOXSUPA) ─── */
+#s-lb,#s-end{
+  text-align:center;
+  background:radial-gradient(ellipse at 50% 20%,rgba(255,214,10,.18) 0%,transparent 55%),var(--bg);
+}
+.lb-title{font-family:'Righteous',cursive;font-size:2rem;color:var(--gold);margin-bottom:2px;animation:gleam 2s ease-in-out infinite;}
+@keyframes gleam{0%,100%{text-shadow:0 0 20px rgba(255,214,10,.3)}50%{text-shadow:0 0 50px rgba(255,214,10,.9)}}
+.lb-sub{color:var(--muted);font-size:.8rem;margin-bottom:16px;}
+.lb-list{width:100%;max-width:480px;margin:0 auto;}
+.lbi{
+  display:flex;align-items:center;gap:11px;
+  background:rgba(255,255,255,.05);border-radius:13px;
+  padding:11px 15px;margin-bottom:7px;
+  border:1px solid rgba(255,255,255,.06);
+  animation:slideIn .4s ease-out both;
+}
+.lbi:nth-child(1){border-color:rgba(255,214,10,.4);background:rgba(255,214,10,.07);animation-delay:0s;}
+.lbi:nth-child(2){border-color:rgba(192,192,192,.35);background:rgba(192,192,192,.05);animation-delay:.06s;}
+.lbi:nth-child(3){border-color:rgba(205,127,50,.35);background:rgba(205,127,50,.05);animation-delay:.12s;}
+.lbi:nth-child(4){animation-delay:.18s;}.lbi:nth-child(5){animation-delay:.24s;}
+.lbi:nth-child(6){animation-delay:.30s;}.lbi:nth-child(7){animation-delay:.36s;}
+@keyframes slideIn{from{transform:translateX(-28px);opacity:0}to{transform:translateX(0);opacity:1}}
+.lbi.me{border-color:rgba(255,68,102,.5)!important;background:rgba(255,68,102,.09)!important;}
+.lb-rank{font-family:'Righteous',cursive;font-size:1.05rem;width:26px;text-align:center;}
+.lb-em{font-size:1.55rem;}
+.lb-nm{font-weight:800;flex:1;text-align:left;}
+.lb-sc{font-family:'Righteous',cursive;font-size:.95rem;color:var(--gold);}
+
+/* ENDED */
+#s-end{background:radial-gradient(ellipse at 50% 30%,rgba(0,255,170,.14) 0%,transparent 55%),var(--bg);}
+.end-title{font-family:'Righteous',cursive;font-size:2.2rem;color:var(--green);margin-top:10px;}
+.confetti{font-size:3.5rem;animation:bounce 1.2s ease-in-out infinite;}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+
+/* Spinner */
+.spin{width:38px;height:38px;border:4px solid rgba(255,255,255,.08);border-top-color:var(--accent);border-radius:50%;animation:sp .8s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+@media(max-width:600px){
+  .opts{grid-template-columns:1fr;}
+  .emoji-grid{grid-template-columns:repeat(4,1fr);}
+  .code-input{font-size:2rem;letter-spacing:8px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ S1: ENTER CODE ══ -->
+<div class="screen on" id="s-code">
+  <a href="index.html" class="toplink">← Orqaga</a>
+  <div class="logo">⚡ QuizBlitz</div>
+  <p style="color:var(--muted);font-size:.82rem;font-weight:700;margin-bottom:24px;">O'yinga qo'shilish</p>
+  <div class="box">
+    <div class="box-title">🎮 O'yin kodini kiriting</div>
+    <p class="box-sub">Host tomonidan berilgan 5 xonali kodni kiriting</p>
+    <div class="msg err" id="code-msg"></div>
+    <input class="code-input" id="code-inp" type="tel" inputmode="numeric" maxlength="5" placeholder="·····" autocomplete="off">
+    <button class="btn btn-red" id="code-btn" onclick="checkCode()">Davom etish →</button>
+  </div>
+</div>
+
+<!-- ══ S2: ENTER NAME ══ -->
+<div class="screen" id="s-name">
+  <button class="toplink" onclick="goTo('s-code')" style="border:none;cursor:pointer;">← Orqaga</button>
+  <div class="box">
+    <div class="box-title">👤 Ismingizni kiriting</div>
+    <p class="box-sub">O'yinda ko'rsatiladi. Bir xil ism ishlatib bo'lmaydi!</p>
+    <div class="msg err" id="name-msg"></div>
+    <input class="inp" id="name-inp" type="text" maxlength="20" placeholder="Ismingiz..." autocomplete="off">
+    <button class="btn btn-red" id="name-btn" onclick="checkName()">Davom etish →</button>
+  </div>
+</div>
+
+<!-- ══ S3: CHOOSE EMOJI ══ -->
+<div class="screen" id="s-emoji">
+  <button class="toplink" onclick="goTo('s-name')" style="border:none;cursor:pointer;">← Orqaga</button>
+  <div class="box" style="max-width:460px;">
+    <div class="box-title">🎭 Karakteringizni tanlang</div>
+    <p class="box-sub">O'yinda sizni vakil qiladigan emoji — hammaning o'zicha!</p>
+    <div class="emoji-grid" id="emoji-grid"></div>
+    <button class="btn btn-green" id="join-btn" disabled onclick="joinGame()">O'yinga qo'shilish ✓</button>
+  </div>
+</div>
+
+<!-- ══ S4: LOBBY ══ -->
+<div class="screen" id="s-lobby">
+  <div class="lobby-wrap">
+    <div class="logo" style="font-size:1.5rem;margin-bottom:4px;">🏟️ Lobby</div>
+    <p style="color:var(--muted);font-size:.8rem;font-weight:700;margin-bottom:20px;">O'yin boshlashini kuting</p>
+    <div class="lob-label">O'YIN KODI</div>
+    <div class="lob-code" id="lob-code">—</div>
+    <div class="lob-count" id="lob-count">0 o'yinchi</div>
+    <div class="lob-players" id="lob-players"></div>
+    <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <p style="color:var(--muted);font-size:.74rem;margin-top:14px;">Host boshlash tugmasini bosganida avtomatik kiradi</p>
+  </div>
+</div>
+
+<!-- ══ S5: QUESTION PREVIEW (3 sec, only text) ══ -->
+<div class="screen" id="s-qprev">
+  <div id="qp-badge"></div>
+  <div class="qprev-num" id="qp-num">Savol 1</div>
+  <div class="qprev-text" id="qp-text">Savol yuklanmoqda...</div>
+  <p class="prep-hint">⏳ Javoblar tez orada...</p>
+</div>
+
+<!-- ══ S6: QUESTION ACTIVE ══ -->
+<div class="screen" id="s-qact">
+  <div class="q-top">
+    <div id="qa-badge"></div>
+    <div class="q-text" id="qa-text">Savol...</div>
+  </div>
+  <div class="opts" id="opts-grid"></div>
+
+  <!-- Timer ring (bottom-right, player only) -->
+  <div class="timer-wrap" id="timer-wrap">
+    <div class="t-ring">
+      <svg width="56" height="56" viewBox="0 0 56 56">
+        <circle class="bg" cx="28" cy="28" r="23" fill="none" stroke-width="4"/>
+        <circle class="fg" id="t-arc" cx="28" cy="28" r="23" fill="none" stroke-width="4"
+          stroke-dasharray="144.5" stroke-dashoffset="0"/>
+      </svg>
+      <div class="t-num" id="t-num">20</div>
+    </div>
+  </div>
+
+  <!-- Player badge -->
+  <div class="pbadge on" id="pb-act">
+    <span class="pb-em" id="pb-em1">🦊</span><span id="pb-nm1">—</span>
+  </div>
+</div>
+
+<!-- ══ S7: ANSWERED / WAITING ══ -->
+<div class="screen" id="s-wait">
+  <div class="wait-icon" id="wait-icon">✅</div>
+  <div class="wait-title">Javob berildi!</div>
+  <div class="wait-sub">Boshqalar javob berishi va natijalarni kuting...</div>
+  <div class="dots" style="margin-top:20px;justify-content:center;"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  <div class="pbadge on" id="pb-wait" style="position:fixed;">
+    <span class="pb-em" id="pb-em2">🦊</span><span id="pb-nm2">—</span>
+  </div>
+</div>
+
+<!-- ══ S8: LEADERBOARD (SHOXSUPA) ══ -->
+<div class="screen" id="s-lb">
+  <div style="width:100%;">
+    <div class="lb-title">🏆 Shoxsupa</div>
+    <p class="lb-sub">Eng yaxshi o'yinchilar</p>
+    <div class="lb-list" id="lb-list"></div>
+  </div>
+</div>
+
+<!-- ══ S9: GAME ENDED ══ -->
+<div class="screen" id="s-end">
+  <div class="confetti">🎉</div>
+  <div class="end-title">O'yin Tugadi!</div>
+  <p style="color:var(--muted);font-size:.84rem;margin:6px 0 18px;">Yakuniy natijalar</p>
+  <div class="lb-list" id="end-lb"></div>
+  <a href="index.html" class="btn btn-red" style="display:inline-flex;max-width:280px;margin-top:22px;text-decoration:none;">🏠 Bosh sahifaga</a>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, off } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const FB={apiKey:"AIzaSyA-2Uf7dZf1kqf7c32txyTFXSd2PCJbJLw",authDomain:"sessiya-11767.firebaseapp.com",databaseURL:"https://sessiya-11767-default-rtdb.firebaseio.com",projectId:"sessiya-11767",storageBucket:"sessiya-11767.firebasestorage.app",messagingSenderId:"883067400258",appId:"1:883067400258:web:941d591d38755c73247ddb"};
+const app=initializeApp(FB);
+const db=getDatabase(app);
+
+// ── CONSTANTS ──
+const EMOJIS=['🦊','🐺','🦁','🐯','🦝','🐲','🦄','🦅','🐸','🦑','🤖','👾','🦸','🧙','🥷','🦈','🐙','🦉','🦩','🎭'];
+const SHAPES=['▲','●','■','♦','★'];
+const RANK_EMOJI=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣'];
+const RANK_CLS=['r1','r2','r3','','','',''];
+
+// ── STATE ──
+let code='', name='', emoji='', selEmoji='';
+let stateRef=null, playersRef=null;
+let timerIv=null, qTime=20, qStartAt=0;
+let hasAnswered=false, curQIdx=-1;
+
+// ── HELPERS ──
+const $=id=>document.getElementById(id);
+function goTo(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');}
+function showMsg(id,txt,type='err'){const e=$(id);e.textContent=txt;e.className=`msg on ${type}`;}
+function hideMsg(id){$(id).className='msg';}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// Seeded shuffle so each player sees different option order
+function seededShuffle(arr,seed){
+  const a=[...arr];let s=0;
+  for(let i=0;i<seed.length;i++) s+=seed.charCodeAt(i);
+  for(let i=a.length-1;i>0;i--){s=(s*1103515245+12345)&0x7fffffff;const j=s%(i+1);[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
+// Build emoji grid
+const grid=$('emoji-grid');
+EMOJIS.forEach(em=>{
+  const b=document.createElement('button');b.className='e-btn';b.textContent=em;
+  b.onclick=()=>{document.querySelectorAll('.e-btn').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');selEmoji=em;$('join-btn').disabled=false;};
+  grid.appendChild(b);
+});
+
+// Pre-fill name from user panel session
+try{const ud=JSON.parse(localStorage.getItem('qb_user')||'{}');if(ud.username) $('name-inp').value=ud.username;}catch(_){}
+
+// Restore session on reload
+try{
+  const ss=JSON.parse(sessionStorage.getItem('qb_player')||'null');
+  if(ss){code=ss.code;name=ss.name;emoji=ss.emoji;rejoinSession();}
+}catch(_){}
+
+// ── STEP 1: Code ──
+window.checkCode=async function(){
+  const v=$('code-inp').value.trim();
+  if(!/^\d{5}$/.test(v)){showMsg('code-msg','5 xonali raqam kiriting');return;}
+  const btn=$('code-btn');btn.disabled=true;btn.textContent='Tekshirilmoqda...';
+  try{
+    const snap=await get(ref(db,`game_sessions/${v}`));
+    if(!snap.exists()){showMsg('code-msg','❌ Bunday kod topilmadi');btn.disabled=false;btn.textContent='Davom etish →';return;}
+    const st=snap.val().state?.status||'waiting';
+    if(st==='ended'){showMsg('code-msg','Bu o\'yin tugagan');btn.disabled=false;btn.textContent='Davom etish →';return;}
+    if(st!=='waiting'){showMsg('code-msg','O\'yin allaqachon boshlangan');btn.disabled=false;btn.textContent='Davom etish →';return;}
+    code=v;hideMsg('code-msg');goTo('s-name');
+  }catch(e){showMsg('code-msg','Xato: '+e.message);}
+  btn.disabled=false;btn.textContent='Davom etish →';
+};
+$('code-inp').addEventListener('keydown',e=>{if(e.key==='Enter')checkCode();});
+
+// ── STEP 2: Name ──
+window.checkName=async function(){
+  const v=$('name-inp').value.trim();
+  if(!v){showMsg('name-msg','Ism kiriting');return;}
+  if(v.length>20){showMsg('name-msg','Ism 20 harfdan oshmasin');return;}
+  const btn=$('name-btn');btn.disabled=true;btn.textContent='Tekshirilmoqda...';
+  try{
+    const snap=await get(ref(db,`game_sessions/${code}/players/${v}`));
+    if(snap.exists()){showMsg('name-msg','❌ Bu ism band, boshqa ism tanlang');btn.disabled=false;btn.textContent='Davom etish →';return;}
+    name=v;hideMsg('name-msg');goTo('s-emoji');
+  }catch(e){showMsg('name-msg','Xato: '+e.message);}
+  btn.disabled=false;btn.textContent='Davom etish →';
+};
+$('name-inp').addEventListener('keydown',e=>{if(e.key==='Enter')checkName();});
+
+// ── STEP 3: Join ──
+window.joinGame=async function(){
+  if(!selEmoji) return;
+  emoji=selEmoji;
+  const btn=$('join-btn');btn.disabled=true;btn.textContent='Qo\'shilmoqda...';
+  try{
+    await set(ref(db,`game_sessions/${code}/players/${name}`),{emoji,joined_at:Date.now(),score:0});
+    sessionStorage.setItem('qb_player',JSON.stringify({code,name,emoji}));
+    startLobby();
+  }catch(e){showMsg('name-msg','Xato: '+e.message);btn.disabled=false;btn.textContent='O\'yinga qo\'shilish ✓';}
+};
+
+// ── LOBBY ──
+function startLobby(){
+  $('lob-code').textContent=code;
+  updatePBadge();
+  goTo('s-lobby');
+
+  // Listen players
+  if(playersRef){off(playersRef);}
+  playersRef=ref(db,`game_sessions/${code}/players`);
+  onValue(playersRef,snap=>{
+    const data=snap.val()||{};
+    const list=Object.entries(data);
+    $('lob-count').textContent=`${list.length} o'yinchi`;
+    $('lob-players').innerHTML=list.map(([n,p])=>`<div class="p-chip">${p.emoji} ${esc(n)}</div>`).join('');
+  });
+
+  // Listen game state
+  if(stateRef){off(stateRef);}
+  stateRef=ref(db,`game_sessions/${code}/state`);
+  onValue(stateRef,snap=>{
+    const st=snap.val();
+    if(!st) return;
+    handleState(st);
+  });
+}
+
+// ── GAME STATE MACHINE ──
+function handleState(st){
+  const s=st.status;
+  if(s==='waiting') return;
+  if(s==='question_preview') showQPreview(st);
+  else if(s==='question_active') showQActive(st);
+  else if(s==='leaderboard') showLb(st.leaderboard||[]);
+  else if(s==='ended') showEnded(st.leaderboard||[]);
+}
+
+function showQPreview(st){
+  stopTimer();
+  $('qp-num').textContent=`Savol ${(st.q_index||0)+1}`;
+  $('qp-text').textContent=st.q_text||'...';
+  $('qp-badge').innerHTML=st.q_is_double?'<div class="badge-double">⚡ IKKI BAROBAR BALL</div>':'';
+  goTo('s-qprev');
+}
+
+function showQActive(st){
+  // Avoid re-rendering same question if already answered
+  if(curQIdx===st.q_index && hasAnswered) return;
+  if(curQIdx!==st.q_index){curQIdx=st.q_index;hasAnswered=false;}
+  stopTimer();
+
+  $('qa-text').textContent=st.q_text||'...';
+  $('qa-badge').innerHTML=st.q_is_double?'<div class="badge-double">⚡ IKKI BAROBAR</div>':'';
+
+  // Build shuffled options (seed = player name for uniqueness)
+  const rawOpts=(st.q_options||[]).map((o,i)=>({text:o,idx:i}));
+  const opts=seededShuffle(rawOpts,name);
+  const grid=$('opts-grid');
+  grid.className='opts'+(opts.length<=2?' single':'');
+  grid.innerHTML=opts.map((o,pos)=>`
+    <button class="opt" data-c="${pos}" data-idx="${o.idx}" onclick="pickAns(${o.idx},this)">
+      <span class="opt-sym">${SHAPES[pos]||'•'}</span>${esc(o.text)}
+    </button>`).join('');
+
+  updatePBadge();
+  goTo('s-qact');
+
+  // Start timer display
+  qTime=st.q_time||20;
+  qStartAt=st.q_started_at||Date.now();
+  startTimer(qStartAt,qTime);
+}
+
+window.pickAns=async function(idx,btn){
+  if(hasAnswered) return;
+  hasAnswered=true;
+  const elapsed=Date.now()-qStartAt;
+
+  document.querySelectorAll('.opt').forEach(b=>{b.disabled=true;b.classList.add('dim');});
+  btn.classList.remove('dim');btn.classList.add('pick');
+
+  try{await set(ref(db,`game_sessions/${code}/answers/${curQIdx}/${name}`),{option:idx,time_ms:elapsed});}
+  catch(e){}
+
+  stopTimer();
+  // Short visual feedback then wait screen
+  $('wait-icon').textContent='✅';
+  updatePBadge2();
+  goTo('s-wait');
+};
+
+// Timer
+function startTimer(startAt,totalSec){
+  const arc=$('t-arc'),numEl=$('t-num');
+  const circ=144.5;
+  stopTimer();
+  timerIv=setInterval(()=>{
+    const el=(Date.now()-startAt)/1000;
+    const rem=Math.max(0,totalSec-el);
+    arc.style.strokeDashoffset=circ*(1-rem/totalSec);
+    numEl.textContent=Math.ceil(rem);
+    // Color changes as time runs out
+    arc.style.stroke=rem<totalSec*.3?'#ff4466':rem<totalSec*.6?'#f2a827':'var(--green)';
+    if(rem<=0) stopTimer();
+  },100);
+}
+function stopTimer(){if(timerIv){clearInterval(timerIv);timerIv=null;}}
+
+// Leaderboard rendering
+function renderLb(lb){
+  return lb.slice(0,7).map((p,i)=>`
+    <div class="lbi${p.name===name?' me':''}">
+      <div class="lb-rank ${RANK_CLS[i]||''}">${RANK_EMOJI[i]||i+1}</div>
+      <div class="lb-em">${p.emoji||'❓'}</div>
+      <div class="lb-nm">${esc(p.name)}${p.name===name?' 👈':''}</div>
+      <div class="lb-sc">${p.score||0} ball</div>
+    </div>`).join('');
+}
+
+function showLb(lb){
+  stopTimer();
+  $('lb-list').innerHTML=renderLb(lb);
+  goTo('s-lb');
+}
+
+function showEnded(lb){
+  stopTimer();
+  $('end-lb').innerHTML=renderLb(lb);
+  goTo('s-end');
+  sessionStorage.removeItem('qb_player');
+}
+
+function updatePBadge(){
+  $('pb-em1').textContent=emoji||'❓';$('pb-nm1').textContent=name||'—';
+}
+function updatePBadge2(){
+  $('pb-em2').textContent=emoji||'❓';$('pb-nm2').textContent=name||'—';
+}
+
+// Rejoin on reload
+async function rejoinSession(){
+  try{
+    const snap=await get(ref(db,`game_sessions/${code}/state`));
+    const st=snap.val();
+    if(!st||st.status==='ended'){sessionStorage.removeItem('qb_player');return;}
+    startLobby();
+  }catch(_){sessionStorage.removeItem('qb_player');}
+}
+
+// Make goTo global
+window.goTo=goTo;
+</script>
+</body>
+</html>
