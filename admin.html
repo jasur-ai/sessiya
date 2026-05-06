@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuizBlitz — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Righteous&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06060f;--surf:#0f0f20;--card:#14142a;--border:rgba(255,255,255,.07);
+  --accent:#ff4466;--gold:#ffd60a;--green:#00ffaa;--blue:#38bdf8;--purple:#c084fc;
+  --text:#f0f0f8;--muted:#636384;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 55% 40% at 15% 20%,rgba(192,132,252,.09) 0%,transparent 60%),
+    radial-gradient(ellipse 45% 35% at 85% 75%,rgba(255,68,102,.06) 0%,transparent 60%);}
+
+/* AUTH */
+#auth{display:none;min-height:100vh;align-items:center;justify-content:center;padding:20px;position:relative;z-index:1;}
+#auth.on{display:flex;}
+.auth-wrap{width:100%;max-width:380px;text-align:center;}
+.auth-logo{font-family:'Righteous',cursive;font-size:2rem;margin-bottom:4px;
+  background:linear-gradient(135deg,var(--purple),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.auth-sub{color:var(--muted);font-size:.8rem;font-weight:700;margin-bottom:20px;}
+.auth-box{background:var(--card);border-radius:20px;padding:26px;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.5);}
+.lbl{font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block;text-align:left;}
+.inp{width:100%;background:rgba(255,255,255,.05);border:2px solid var(--border);border-radius:10px;
+  padding:11px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.93rem;font-weight:700;
+  outline:none;transition:border-color .2s;margin-bottom:11px;}
+.inp:focus{border-color:var(--purple);}
+.inp::placeholder{color:var(--muted);font-weight:600;}
+.login-btn{width:100%;border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Nunito',sans-serif;
+  font-size:.93rem;font-weight:900;cursor:pointer;transition:all .2s;
+  background:linear-gradient(135deg,var(--purple),#7c3aed);min-height:46px;}
+.login-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 24px rgba(192,132,252,.4);}
+.login-btn:disabled{opacity:.45;cursor:not-allowed;}
+.msg{border-radius:9px;padding:9px 12px;font-size:.8rem;font-weight:700;margin-bottom:11px;display:none;}
+.msg.on{display:block;}
+.msg.err{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.3);color:var(--accent);}
+
+/* NAVBAR */
+#navbar{display:none;position:sticky;top:0;z-index:100;
+  background:rgba(6,6,15,.9);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);padding:10px 20px;
+  align-items:center;justify-content:space-between;}
+#navbar.on{display:flex;}
+.nav-logo{font-family:'Righteous',cursive;font-size:1.2rem;
+  background:linear-gradient(135deg,var(--purple),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.nav-badge{background:rgba(255,68,102,.15);border:1px solid rgba(255,68,102,.3);color:var(--accent);
+  font-size:.68rem;font-weight:900;border-radius:50px;padding:3px 10px;}
+.logout-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:9px;
+  padding:7px 13px;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:800;
+  cursor:pointer;color:var(--muted);transition:all .2s;}
+.logout-btn:hover{color:var(--accent);border-color:rgba(255,68,102,.3);}
+
+/* MAIN */
+#panel{display:none;max-width:900px;margin:0 auto;padding:24px 16px 60px;position:relative;z-index:1;}
+#panel.on{display:block;}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:24px;}
+.stat-card{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);text-align:center;}
+.stat-num{font-family:'Righteous',cursive;font-size:1.8rem;}
+.stat-lbl{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
+
+/* SECTION */
+.sec-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;margin-top:28px;}
+.sec-title{font-family:'Righteous',cursive;font-size:1.1rem;display:flex;align-items:center;gap:7px;}
+.danger-badge{background:rgba(255,68,102,.15);border:1px solid rgba(255,68,102,.3);color:var(--accent);
+  font-size:.68rem;font-weight:900;border-radius:50px;padding:3px 10px;}
+.purple-badge{background:rgba(192,132,252,.15);border:1px solid rgba(192,132,252,.3);color:var(--purple);
+  font-size:.68rem;font-weight:900;border-radius:50px;padding:3px 10px;}
+
+/* TABLE */
+.tbl-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--border);background:var(--card);}
+table{width:100%;border-collapse:collapse;font-size:.82rem;}
+thead th{
+  background:rgba(255,255,255,.04);padding:9px 14px;text-align:left;
+  font-weight:800;color:var(--muted);border-bottom:1px solid var(--border);
+  white-space:nowrap;font-size:.74rem;text-transform:uppercase;letter-spacing:.5px;
+}
+tbody td{padding:9px 14px;border-bottom:1px solid rgba(255,255,255,.03);font-weight:700;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:rgba(255,255,255,.02);}
+.u-name{font-weight:800;}
+.u-date{color:var(--muted);font-size:.78rem;}
+.u-tests{background:rgba(56,189,248,.1);color:var(--blue);border-radius:50px;
+  padding:2px 9px;font-size:.68rem;font-weight:800;}
+.del-user{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.2);
+  border-radius:7px;padding:4px 9px;color:var(--accent);font-size:.72rem;
+  font-weight:800;cursor:pointer;transition:all .18s;}
+.del-user:hover{background:rgba(255,68,102,.2);}
+
+/* RESULTS */
+.res-card{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);
+  margin-bottom:8px;transition:border-color .2s;animation:fadeUp .25s ease-out both;}
+.res-card:hover{border-color:rgba(192,132,252,.3);}
+@keyframes fadeUp{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+.res-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.res-title{font-weight:800;font-size:.9rem;}
+.res-meta{font-size:.74rem;font-weight:700;color:var(--muted);margin-top:2px;}
+.res-code{background:rgba(255,214,10,.1);border:1px solid rgba(255,214,10,.25);
+  color:var(--gold);font-family:'Righteous',cursive;border-radius:8px;
+  padding:4px 10px;font-size:.8rem;flex-shrink:0;}
+.top3{display:flex;gap:7px;flex-wrap:wrap;}
+.top-chip{border-radius:50px;padding:4px 12px;font-size:.75rem;font-weight:800;
+  display:flex;align-items:center;gap:5px;border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.05);}
+.top-chip:nth-child(1){border-color:rgba(255,214,10,.3);color:var(--gold);}
+.top-chip:nth-child(2){border-color:rgba(192,192,192,.3);color:#c0c0c0;}
+.top-chip:nth-child(3){border-color:rgba(205,127,50,.3);color:#cd7f32;}
+
+.empty{text-align:center;padding:32px;color:var(--muted);font-size:.84rem;font-weight:700;
+  background:rgba(255,255,255,.02);border-radius:12px;border:1px dashed rgba(255,255,255,.08);}
+
+/* LOADING */
+#loading{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
+#loading.hide{display:none;}
+.spin{width:38px;height:38px;border:3px solid rgba(255,255,255,.08);border-top-color:var(--purple);border-radius:50%;animation:sp .7s linear infinite;}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* REFRESH */
+.refresh-btn{margin-left:auto;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:9px;padding:6px 13px;font-family:'Nunito',sans-serif;font-size:.76rem;
+  font-weight:800;cursor:pointer;color:var(--muted);transition:all .2s;}
+.refresh-btn:hover{color:var(--text);background:rgba(255,255,255,.1);}
+</style>
+</head>
+<body>
+<div id="loading"><div class="spin"></div><div style="color:var(--muted);font-size:.82rem;font-weight:700">Tekshirilmoqda...</div></div>
+
+<!-- AUTH -->
+<div id="auth">
+  <div class="auth-wrap">
+    <div class="auth-logo">⚙️ Admin</div>
+    <div class="auth-sub">QuizBlitz boshqaruv paneli</div>
+    <div class="auth-box">
+      <div class="msg err" id="auth-msg"></div>
+      <label class="lbl">Admin login</label>
+      <input type="text" class="inp" id="adm-user" placeholder="admin" autocomplete="off">
+      <label class="lbl">Parol</label>
+      <input type="password" class="inp" id="adm-pass" placeholder="••••••••">
+      <button class="login-btn" onclick="doLogin()">Kirish →</button>
+    </div>
+    <div style="margin-top:14px"><a href="index.html" style="color:var(--muted);font-size:.78rem;font-weight:700;text-decoration:none">← Asosiy sahifa</a></div>
+  </div>
+</div>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div style="display:flex;align-items:center;gap:9px">
+    <a href="index.html" style="text-decoration:none"><div class="nav-logo">⚙️ Admin Panel</div></a>
+    <div class="nav-badge">ADMIN</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="refresh-btn" onclick="loadAll()">🔄 Yangilash</button>
+    <button class="logout-btn" onclick="doLogout()">Chiqish</button>
+  </div>
+</nav>
+
+<!-- PANEL -->
+<div id="panel">
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="s-users" style="color:var(--blue)">—</div><div class="stat-lbl">Foydalanuvchilar</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-games" style="color:var(--gold)">—</div><div class="stat-lbl">O'yinlar</div></div>
+    <div class="stat-card"><div class="stat-num" id="s-tests" style="color:var(--green)">—</div><div class="stat-lbl">Testlar</div></div>
+  </div>
+
+  <!-- DANGER: Users -->
+  <div class="sec-hd">
+    <div class="sec-title">⚠️ Danger Zone — Foydalanuvchilar <span class="danger-badge">XAVFLI</span></div>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>#</th><th>Login</th><th>Parol</th><th>Ro'yxatdan o'tgan</th><th>Testlar</th><th>O'chirish</th></tr></thead>
+      <tbody id="users-tbody"><tr><td colspan="6" class="empty">Yuklanmoqda...</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- Results / Shoxsupa -->
+  <div class="sec-hd" style="margin-top:32px">
+    <div class="sec-title">🏆 O'yin Natijalari <span class="purple-badge">SHOXSUPA</span></div>
+  </div>
+  <div id="results-wrap"><div class="empty">Yuklanmoqda...</div></div>
+</div>
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getDatabase,ref,get,remove}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const FB={apiKey:"AIzaSyA-2Uf7dZf1kqf7c32txyTFXSd2PCJbJLw",authDomain:"sessiya-11767.firebaseapp.com",
+  databaseURL:"https://sessiya-11767-default-rtdb.firebaseio.com",projectId:"sessiya-11767",
+  storageBucket:"sessiya-11767.firebasestorage.app",messagingSenderId:"883067400258",
+  appId:"1:883067400258:web:941d591d38755c73247ddb"};
+const app=initializeApp(FB);
+const db=getDatabase(app);
+
+function $(id){return document.getElementById(id);}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+const ADMIN_USER='admin';
+const ADMIN_PASS='0408nmn';
+
+// ── AUTH ──
+$('loading').classList.add('hide');
+const saved=sessionStorage.getItem('qb_admin');
+if(saved==='1') showPanel();
+else showAuth();
+
+function showAuth(){
+  $('auth').classList.add('on');
+  $('navbar').classList.remove('on');
+  $('panel').classList.remove('on');
+}
+function showPanel(){
+  $('auth').classList.remove('on');
+  $('navbar').classList.add('on');
+  $('panel').classList.add('on');
+  loadAll();
+}
+
+window.doLogin=function(){
+  const u=$('adm-user').value.trim();
+  const p=$('adm-pass').value;
+  if(u===ADMIN_USER&&p===ADMIN_PASS){
+    sessionStorage.setItem('qb_admin','1');
+    $('auth-msg').className='msg';
+    showPanel();
+  }else{
+    $('auth-msg').textContent='Login yoki parol noto\'g\'ri';
+    $('auth-msg').className='msg err on';
+  }
+};
+$('adm-pass')?.addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin();});
+
+window.doLogout=function(){sessionStorage.removeItem('qb_admin');showAuth();};
+
+// ── LOAD ALL DATA ──
+window.loadAll=async function(){
+  await Promise.all([loadUsers(),loadResults()]);
+};
+
+async function loadUsers(){
+  try{
+    const snap=await get(ref(db,'users'));
+    if(!snap.exists()){
+      $('users-tbody').innerHTML='<tr><td colspan="6"><div class="empty">Foydalanuvchilar yo\'q</div></td></tr>';
+      $('s-users').textContent='0';
+      $('s-tests').textContent='0';
+      return;
+    }
+    const users=snap.val();
+    const entries=Object.entries(users);
+    $('s-users').textContent=entries.length;
+
+    let totalTests=0;
+    let rows='';
+    entries.sort((a,b)=>(b[1].created_at||0)-(a[1].created_at||0));
+    entries.forEach(([key,u],i)=>{
+      const tests=u.tests?Object.keys(u.tests).length:0;
+      totalTests+=tests;
+      const date=u.created_at?new Date(u.created_at).toLocaleString('uz-UZ',{dateStyle:'short',timeStyle:'short'}):'—';
+      rows+=`<tr>
+        <td style="color:var(--muted)">${i+1}</td>
+        <td><span class="u-name">${esc(u.username||key)}</span></td>
+        <td style="font-family:monospace;color:var(--muted)">${esc(u.password||'—')}</td>
+        <td><span class="u-date">${date}</span></td>
+        <td><span class="u-tests">${tests} ta</span></td>
+        <td><button class="del-user" onclick="delUser('${key}','${esc(u.username||key)}')">🗑️ O'chirish</button></td>
+      </tr>`;
+    });
+    $('users-tbody').innerHTML=rows||'<tr><td colspan="6"><div class="empty">Bo\'sh</div></td></tr>';
+    $('s-tests').textContent=totalTests;
+  }catch(e){$('users-tbody').innerHTML=`<tr><td colspan="6" style="color:var(--accent)">Xato: ${e.message}</td></tr>`;}
+}
+
+async function loadResults(){
+  try{
+    const [gSnap,rSnap]=await Promise.all([
+      get(ref(db,'game_sessions')),
+      get(ref(db,'results'))
+    ]);
+    const gCount=gSnap.exists()?Object.keys(gSnap.val()||{}).length:0;
+    $('s-games').textContent=gCount;
+
+    if(!rSnap.exists()){
+      $('results-wrap').innerHTML='<div class="empty">Hali saqlangan natija yo\'q</div>';
+      return;
+    }
+    const results=rSnap.val();
+    const entries=Object.entries(results).sort((a,b)=>(b[1].date||0)-(a[1].date||0));
+    $('results-wrap').innerHTML=entries.map(([code,r])=>{
+      const lb=r.leaderboard||[];
+      const date=r.date?new Date(r.date).toLocaleString('uz-UZ',{dateStyle:'short',timeStyle:'short'}):'—';
+      const top3=lb.slice(0,3).map((p,i)=>`<div class="top-chip">${['🥇','🥈','🥉'][i]} ${p.emoji||''} ${esc(p.name)} — <strong>${p.score}</strong></div>`).join('');
+      return`<div class="res-card">
+        <div class="res-head">
+          <div>
+            <div class="res-title">📝 ${esc(r.test_name||'Test')} &nbsp;<span style="color:var(--muted);font-size:.78rem">Host: ${esc(r.host||'—')}</span></div>
+            <div class="res-meta">📅 ${date}</div>
+          </div>
+          <div class="res-code"># ${code}</div>
+        </div>
+        <div class="top3">${top3||'<span style="color:var(--muted);font-size:.78rem">Natija yo\'q</span>'}</div>
+      </div>`;
+    }).join('');
+  }catch(e){$('results-wrap').innerHTML=`<div class="empty" style="color:var(--accent)">Xato: ${e.message}</div>`;}
+}
+
+// ── DELETE USER ──
+window.delUser=async function(key,name){
+  if(!confirm(`"${name}" foydalanuvchisini o'chirishni tasdiqlaysizmi?\nBarcha testlari ham o'chadi!`)) return;
+  try{
+    await remove(ref(db,`users/${key}`));
+    loadUsers();
+  }catch(e){alert('Xato: '+e.message);}
+};
+</script>
+</body>
+</html>
