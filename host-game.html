@@ -484,7 +484,11 @@ async function computeScores(idx){
     if(pts>0) updates[`game_sessions/${code}/players/${pname}/score`]=(playersSnap[pname]?.score||0)+pts;
   }
   if(Object.keys(updates).length){
-    await update(ref(db,'/'),updates);
+    // Update each player score individually to avoid root write permission issues
+    for(const [path, val] of Object.entries(updates)){
+      const parts=path.split('/'); // game_sessions/code/players/name/score
+      try{ await set(ref(db,path), val); }catch(_){}
+    }
   }
 }
 
