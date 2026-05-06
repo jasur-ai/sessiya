@@ -360,7 +360,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   <div class="sec-hd">
     <div class="sec-title">📚 Mening Testlarim <span class="cnt-badge" id="cnt">0</span></div>
     <div style="display:flex;gap:7px;">
-      <button class="new-btn" onclick="location.href='create-test.html?user='+curUser.safeKey">✏️ Yangi test</button>
+      <button class="new-btn" onclick="goNewTest()">✏️ Yangi test</button>
     </div>
   </div>
   <div id="tests-list"></div>
@@ -611,6 +611,11 @@ function buildTestCard(key,t,i){
     </div>
   </div>`;
 }
+
+window.goNewTest=function(){
+  if(!curUser){showAuth();return;}
+  location.href='create-test.html?user='+curUser.safeKey;
+};
 
 window.editTest=function(key){location.href=`create-test.html?key=${key}&user=${curUser.safeKey}`;};
 window.cancelRename=function(key){$(`rr-${key}`).classList.remove('on');};
