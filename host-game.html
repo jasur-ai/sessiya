@@ -352,20 +352,22 @@ window.startGame=async function(){
 };
 
 // ── Q PREVIEW ──
-async function pushQPreview(idx){
+function pushQPreview(idx){
   const q=questions[idx];
-  if(!q){await finishGame();return;}
-  await set(ref(db,`game_sessions/${code}/state`),{
+  if(!q){finishGame();return;}
+  // Show UI immediately
+  showQPreviewHost(idx,q);
+  // Write to Firebase in background
+  set(ref(db,`game_sessions/${code}/state`),{
     status:'question_preview',
     q_index:idx,
     q_text:q.text||'',
-    q_options:q.options||[],
+    q_options:Array.isArray(q.options)?q.options:Object.values(q.options||[]),
     q_correct:q.correct||0,
     q_is_double:!!q.is_double,
     q_time:qTime,
     q_started_at:0
-  });
-  showQPreviewHost(idx,q);
+  }).catch(e=>console.warn('pushQPreview err:',e));
 }
 
 function showQPreviewHost(idx,q){
@@ -385,17 +387,20 @@ function showQPreviewHost(idx,q){
     arc.style.strokeDashoffset=circ*(1-cnt/3);
     if(cnt<=0){
       clearInterval(cntIv);cntIv=null;
-      await pushQActive(idx,q);
+      pushQActive(idx,q);
     }
   },1000);
 }
 
 // ── Q ACTIVE ──
-async function pushQActive(idx,q){
+function pushQActive(idx,q){
   const now=Date.now();
   qStartAt=now;qIdx=idx;
-  await update(ref(db,`game_sessions/${code}/state`),{status:'question_active',q_started_at:now});
+  // Show UI immediately
   showQActiveHost(q,now);
+  // Write to Firebase in background
+  update(ref(db,`game_sessions/${code}/state`),{status:'question_active',q_started_at:now})
+    .catch(e=>console.warn('pushQActive err:',e));
 }
 
 function showQActiveHost(q,startAt){
@@ -521,21 +526,20 @@ function renderLb(lb){
 }
 
 // ── FINISH ──
-async function finishGame(){
-  const snap=await get(ref(db,`game_sessions/${code}/players`));
-  const all=snap.val()||{};
-  const lb=buildLb(all);
-  // Save results
-  await set(ref(db,`results/${code}`),{
+function finishGame(){
+  stopTimer();
+  const lb=buildLb(playersSnap);
+  $('end-list').innerHTML=renderLb(lb);
+  goTo('s-end');
+  // Background saves
+  set(ref(db,`results/${code}`),{
     test_name:session.test_name||'Test',
     host:session.host||'',
     date:Date.now(),
     leaderboard:lb
-  });
-  await update(ref(db,`game_sessions/${code}/state`),{status:'ended',leaderboard:lb});
-  $('end-list').innerHTML=renderLb(lb);
-  stopTimer();
-  goTo('s-end');
+  }).catch(()=>{});
+  set(ref(db,`game_sessions/${code}/state`),{status:'ended',leaderboard:lb})
+    .catch(()=>{});
 }
 
 window.confirmEnd=function(){
