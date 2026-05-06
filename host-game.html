@@ -436,17 +436,23 @@ function updateAnsCount(cnt){
 }
 
 // ── HOST NEXT ──
-window.hostNext=async function(){
+window.hostNext=function(){
   if(cntIv){clearInterval(cntIv);cntIv=null;}
   stopTimer();
   if(ansUnsubscribe){ansUnsubscribe();ansUnsubscribe=null;}
   clearTimeout(autoNextTm);
 
-  try{
-    const q=questions[qIdx];
-    const ansSnap=await get(ref(db,`game_sessions/${code}/answers/${qIdx}`));
+  // Avval UI ko'rsat (freeze bo'lmasin)
+  const lb=buildLb(playersSnap);
+  const isLast=qIdx>=questions.length-1;
+  showLbHost(lb,isLast);
+
+  // Background da Firebase ga yoz
+  const q=questions[qIdx];
+  get(ref(db,`game_sessions/${code}/answers/${qIdx}`)).then(ansSnap=>{
     const answers=ansSnap.val()||{};
     const type=session.settings?.type||'score';
+    const proms=[];
     for(const [pname,ans] of Object.entries(answers)){
       if(ans.option!==q.correct) continue;
       let pts=50;
@@ -457,27 +463,20 @@ window.hostNext=async function(){
       }
       if(q.is_double) pts*=2;
       const cur=(playersSnap[pname]?.score||0);
-      await set(ref(db,`game_sessions/${code}/players/${pname}/score`),cur+pts);
+      playersSnap[pname]=playersSnap[pname]||{};
+      playersSnap[pname].score=cur+pts;
+      proms.push(set(ref(db,`game_sessions/${code}/players/${pname}/score`),cur+pts));
     }
-  }catch(e){console.warn('Score xato:',e);}
-
-  try{
-    const pSnap=await get(ref(db,`game_sessions/${code}/players`));
-    playersSnap=pSnap.val()||{};
-  }catch(e){}
-
-  const lb=buildLb(playersSnap);
-  const isLast=qIdx>=questions.length-1;
-
-  try{
-    await set(ref(db,`game_sessions/${code}/state`),{
-      status:'leaderboard',
-      leaderboard:lb,
-      q_index:qIdx
+    return Promise.all(proms);
+  }).then(()=>{
+    const lb2=buildLb(playersSnap);
+    // Update leaderboard display silently
+    if(document.getElementById('lb-list'))
+      document.getElementById('lb-list').innerHTML=renderLb(lb2);
+    return set(ref(db,`game_sessions/${code}/state`),{
+      status:'leaderboard',leaderboard:lb2,q_index:qIdx
     });
-  }catch(e){console.warn('State xato:',e);}
-
-  showLbHost(lb,isLast);
+  }).catch(e=>console.warn('Firebase xato:',e));
 };
 
 function buildLb(players){
