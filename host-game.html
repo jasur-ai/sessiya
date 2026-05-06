@@ -436,61 +436,49 @@ function updateAnsCount(cnt){
 }
 
 // ── HOST NEXT ──
-let hostNextRunning=false;
 window.hostNext=async function(){
-  if(hostNextRunning) return;
-  hostNextRunning=true;
   if(cntIv){clearInterval(cntIv);cntIv=null;}
   stopTimer();
   if(ansUnsubscribe){ansUnsubscribe();ansUnsubscribe=null;}
   clearTimeout(autoNextTm);
-  try{
-    await computeScores(qIdx);
-    const snap=await get(ref(db,`game_sessions/${code}/players`));
-    playersSnap=snap.val()||{};
-    const lb=buildLb(playersSnap);
-    await update(ref(db,`game_sessions/${code}/state`),{status:'leaderboard',leaderboard:lb});
-    const isLast=qIdx>=questions.length-1;
-    showLbHost(lb,isLast);
-  }finally{hostNextRunning=false;}
-};
 
-// ── SCORE COMPUTATION ──
-async function computeScores(idx){
-  const q=questions[idx];
-  const snap=await get(ref(db,`game_sessions/${code}/answers/${idx}`));
-  const answers=snap.val()||{};
-  const type=session.settings?.type||'score';
-  const updates={};
-  for(const [pname,ans] of Object.entries(answers)){
-    const isCorrect=ans.option===q.correct;
-    if(!isCorrect) continue;
-    let pts=10;
-    if(type==='correct'){pts=100;}
-    else{
-      const ratio=Math.min(1,(ans.time_ms||qTime*1000)/(qTime*1000));
-      if(ratio<.1) pts=100;
-      else if(ratio<.2) pts=90;
-      else if(ratio<.3) pts=80;
-      else if(ratio<.4) pts=70;
-      else if(ratio<.5) pts=60;
-      else if(ratio<.6) pts=50;
-      else if(ratio<.7) pts=40;
-      else if(ratio<.8) pts=30;
-      else if(ratio<.9) pts=20;
-      else pts=10;
+  try{
+    const q=questions[qIdx];
+    const ansSnap=await get(ref(db,`game_sessions/${code}/answers/${qIdx}`));
+    const answers=ansSnap.val()||{};
+    const type=session.settings?.type||'score';
+    for(const [pname,ans] of Object.entries(answers)){
+      if(ans.option!==q.correct) continue;
+      let pts=50;
+      if(type==='correct'){pts=100;}
+      else{
+        const ratio=Math.min(1,(ans.time_ms||qTime*1000)/(qTime*1000));
+        pts=Math.round(100-ratio*50);
+      }
+      if(q.is_double) pts*=2;
+      const cur=(playersSnap[pname]?.score||0);
+      await set(ref(db,`game_sessions/${code}/players/${pname}/score`),cur+pts);
     }
-    if(type==='bonus'&&q.is_double) pts*=2;
-    if(pts>0) updates[`game_sessions/${code}/players/${pname}/score`]=(playersSnap[pname]?.score||0)+pts;
-  }
-  if(Object.keys(updates).length){
-    // Update each player score individually to avoid root write permission issues
-    for(const [path, val] of Object.entries(updates)){
-      const parts=path.split('/'); // game_sessions/code/players/name/score
-      try{ await set(ref(db,path), val); }catch(_){}
-    }
-  }
-}
+  }catch(e){console.warn('Score xato:',e);}
+
+  try{
+    const pSnap=await get(ref(db,`game_sessions/${code}/players`));
+    playersSnap=pSnap.val()||{};
+  }catch(e){}
+
+  const lb=buildLb(playersSnap);
+  const isLast=qIdx>=questions.length-1;
+
+  try{
+    await set(ref(db,`game_sessions/${code}/state`),{
+      status:'leaderboard',
+      leaderboard:lb,
+      q_index:qIdx
+    });
+  }catch(e){console.warn('State xato:',e);}
+
+  showLbHost(lb,isLast);
+};
 
 function buildLb(players){
   return Object.entries(players)
