@@ -311,6 +311,8 @@ let darkMode=true;
     if(!snap.exists()){alert('O\'yin topilmadi');location.href='user-panel.html';return;}
     session=snap.val();
     questions=Array.isArray(session.questions)?session.questions:Object.values(session.questions||[]);
+    // Ensure options inside each question are arrays too
+    questions=questions.map(q=>({...q,options:Array.isArray(q.options)?q.options:Object.values(q.options||[])}));
     qTime=session.settings?.time_per_q||20;
     $('lob-code').textContent=code;
     $('theme-lbl').textContent='Test: '+(session.test_name||'');
@@ -434,23 +436,23 @@ function updateAnsCount(cnt){
 }
 
 // ── HOST NEXT ──
+let hostNextRunning=false;
 window.hostNext=async function(){
+  if(hostNextRunning) return;
+  hostNextRunning=true;
   if(cntIv){clearInterval(cntIv);cntIv=null;}
   stopTimer();
   if(ansUnsubscribe){ansUnsubscribe();ansUnsubscribe=null;}
   clearTimeout(autoNextTm);
-  // Compute scores
-  await computeScores(qIdx);
-  // Load updated players
-  const snap=await get(ref(db,`game_sessions/${code}/players`));
-  playersSnap=snap.val()||{};
-  // Build leaderboard
-  const lb=buildLb(playersSnap);
-  // Push leaderboard state
-  await update(ref(db,`game_sessions/${code}/state`),{status:'leaderboard',leaderboard:lb});
-  // Show leaderboard
-  const isLast=qIdx>=questions.length-1;
-  showLbHost(lb,isLast);
+  try{
+    await computeScores(qIdx);
+    const snap=await get(ref(db,`game_sessions/${code}/players`));
+    playersSnap=snap.val()||{};
+    const lb=buildLb(playersSnap);
+    await update(ref(db,`game_sessions/${code}/state`),{status:'leaderboard',leaderboard:lb});
+    const isLast=qIdx>=questions.length-1;
+    showLbHost(lb,isLast);
+  }finally{hostNextRunning=false;}
 };
 
 // ── SCORE COMPUTATION ──
@@ -550,17 +552,18 @@ window.confirmEnd=function(){
 };
 
 // ── TIMER ──
+let hostNextCalled=false;
 function startHostTimer(startAt,total){
   const arc=$('t-arc'),num=$('t-num');
   const circ=144.5;
-  stopTimer();
+  stopTimer();hostNextCalled=false;
   timerIv=setInterval(()=>{
     const el=(Date.now()-startAt)/1000;
     const rem=Math.max(0,total-el);
     arc.style.strokeDashoffset=circ*(1-rem/total);
     arc.style.stroke=rem<total*.3?'#ff4466':rem<total*.6?'#f2a827':'var(--green)';
     num.textContent=Math.ceil(rem);
-    if(rem<=0){stopTimer();hostNext();}
+    if(rem<=0&&!hostNextCalled){stopTimer();hostNextCalled=true;hostNext();}
   },100);
 }
 function stopTimer(){if(timerIv){clearInterval(timerIv);timerIv=null;}}
