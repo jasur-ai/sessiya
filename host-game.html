@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QuizBlitz — Host</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Righteous&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
 :root{
   --bg:#06060f;--surf:#0f0f20;--card:#14142a;--border:rgba(255,255,255,.07);
@@ -63,8 +64,14 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   animation:glow 2.5s ease-in-out infinite;line-height:1;
 }
 @keyframes glow{0%,100%{text-shadow:0 0 30px rgba(255,214,10,.3)}50%{text-shadow:0 0 70px rgba(255,214,10,.8)}}
-.lob-url{color:var(--muted);font-size:.82rem;font-weight:700;margin-top:6px;margin-bottom:28px;}
+.lob-url{color:var(--muted);font-size:.82rem;font-weight:700;margin-top:6px;margin-bottom:16px;}
 .lob-url strong{color:var(--text);}
+.qr-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:20px;}
+.qr-box{background:#fff;border-radius:16px;padding:10px;width:148px;height:148px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px rgba(255,214,10,.4),0 8px 30px rgba(0,0,0,.5);}
+.qr-box canvas{display:block;}
+.qr-hint{font-size:.72rem;font-weight:800;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
+.join-url{font-size:.75rem;font-weight:700;color:var(--accent);background:rgba(255,68,102,.08);border:1px solid rgba(255,68,102,.2);border-radius:8px;padding:5px 12px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;margin-top:2px;}
+.join-url:hover{background:rgba(255,68,102,.15);}
 .lob-count{font-family:'Righteous',cursive;font-size:1.6rem;color:var(--green);margin-bottom:12px;}
 .lob-players{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;max-width:700px;margin:0 auto 28px;}
 .p-chip{
@@ -222,7 +229,11 @@ body.light .ans-bar{background:rgba(240,240,248,.92);}
   <div class="lob-main">
     <div class="lob-sub">O'yin kodi</div>
     <div class="lob-code" id="lob-code">—</div>
-    <div class="lob-url">quizblitz.uz dan kiring → <strong>Enter Game</strong></div>
+    <div class="qr-wrap">
+      <div class="qr-box"><canvas id="qr-canvas"></canvas></div>
+      <div class="qr-hint">📷 QR skan qiling yoki</div>
+      <a class="join-url" id="join-url" href="#" target="_blank">🔗 Havola nusxalash</a>
+    </div>
     <div class="lob-count" id="lob-cnt">0 o'yinchi</div>
     <div class="lob-players" id="lob-players"></div>
     <button class="start-btn" id="start-btn" onclick="startGame()">▶ O'yinni Boshlash</button>
@@ -314,6 +325,20 @@ let darkMode=true;
     qTime=session.settings?.time_per_q||20;
     $('lob-code').textContent=code;
     $('theme-lbl').textContent='Test: '+(session.test_name||'');
+    // QR kod va havola
+    const joinURL=`${location.origin}/enter-game.html?code=${code}`;
+    if(typeof QRCode!=='undefined'){
+      new QRCode($('qr-canvas'),{text:joinURL,width:128,height:128,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
+    }
+    const urlEl=$('join-url');
+    urlEl.href=joinURL;
+    urlEl.onclick=function(e){
+      e.preventDefault();
+      navigator.clipboard.writeText(joinURL).then(()=>{
+        urlEl.textContent='✅ Nusxalandi!';
+        setTimeout(()=>urlEl.textContent='🔗 Havola nusxalash',2000);
+      }).catch(()=>{urlEl.textContent='🔗 '+joinURL;});
+    };
     setupLobby();
     applyBg(session.settings?.bg||0);
     $('loading').classList.add('hide');
