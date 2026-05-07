@@ -239,7 +239,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 <div class="screen" id="s-emoji">
   <button class="toplink" onclick="goTo('s-name')" style="border:none;cursor:pointer;">← Orqaga</button>
   <div class="box" style="max-width:460px;">
-    <div class="box-title">🎭 Obraz tanlang</div>
+    <div class="box-title">🎭 Karakteringizni tanlang</div>
     <p class="box-sub">O'yinda sizni vakil qiladigan emoji — hammaning o'zicha!</p>
     <div class="emoji-grid" id="emoji-grid"></div>
     <button class="btn btn-green" id="join-btn" disabled onclick="joinGame()">O'yinga qo'shilish ✓</button>
@@ -352,7 +352,7 @@ const app=initializeApp(FB);
 const db=getDatabase(app);
 
 // ── CONSTANTS ──
-const EMOJIS=['🦊','🐺','🦁','🐯','🦝','🐲','🦄','🦅','🐸','🦑','🤖','👾','🦸','🧙','🥷','🦈','🐙','🦉','🦩','🎭','👩‍❤️‍👨];
+const EMOJIS=['🦊','🐺','🦁','🐯','🦝','🐲','🦄','🦅','🐸','🦑','🤖','👾','🦸','🧙','🥷','🦈','🐙','🦉','🦩','🎭'];
 const SHAPES=['▲','●','■','♦','★'];
 const RANK_EMOJI=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣'];
 const RANK_CLS=['r1','r2','r3','','','',''];
@@ -394,6 +394,15 @@ try{
   const ss=JSON.parse(sessionStorage.getItem('qb_player')||'null');
   if(ss){code=ss.code;name=ss.name;emoji=ss.emoji;rejoinSession();}
 }catch(_){}
+
+// Auto-fill code from URL ?code=XXXXX
+(function(){
+  const urlCode=new URLSearchParams(location.search).get('code');
+  if(urlCode&&/^\d{5}$/.test(urlCode)){
+    $('code-inp').value=urlCode;
+    checkCode();
+  }
+})();
 
 // ── STEP 1: Code ──
 window.checkCode=async function(){
