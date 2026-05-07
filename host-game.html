@@ -67,7 +67,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .lob-url{color:var(--muted);font-size:.82rem;font-weight:700;margin-top:6px;margin-bottom:16px;}
 .lob-url strong{color:var(--text);}
 .qr-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:20px;}
-.qr-box{background:#fff;border-radius:16px;padding:10px;width:148px;height:148px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px rgba(255,214,10,.4),0 8px 30px rgba(0,0,0,.5);}
+.qr-box{background:#fff;border-radius:16px;padding:10px;width:240px;height:240px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px rgba(255,214,10,.4),0 8px 30px rgba(0,0,0,.5);}
 .qr-box img{display:block;}
 .qr-box canvas{display:block;}
 .qr-hint{font-size:.72rem;font-weight:800;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
@@ -329,7 +329,7 @@ let darkMode=true;
     // QR kod va havola
     const joinURL=`${location.origin}/enter-game.html?code=${code}`;
     if(typeof QRCode!=='undefined'){
-      new QRCode($('qr-canvas'),{text:joinURL,width:128,height:128,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
+      new QRCode($('qr-canvas'),{text:joinURL,width:200,height:200,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
     }
     const urlEl=$('join-url');
     urlEl.href=joinURL;
