@@ -305,6 +305,16 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   </div>
 </div>
 
+<!-- ══ S7b: LEADERBOARD WAITING (player waits while host sees shoxsupa) ══ -->
+<div class="screen" id="s-wait-lb" style="background:radial-gradient(ellipse at 50% 40%,rgba(255,214,10,.12) 0%,transparent 55%),var(--bg);">
+  <div style="text-align:center;">
+    <div id="wlb-icon" style="font-size:3.5rem;margin-bottom:14px;animation:bounce 1.4s ease-in-out infinite;">🏆</div>
+    <div style="font-family:'Righteous',cursive;font-size:1.5rem;color:var(--gold);animation:gleam 2s ease-in-out infinite;">Shoxsupa...</div>
+    <p style="color:var(--muted);font-size:.82rem;margin-top:8px;font-weight:700;">Natijalar ko'rsatilmoqda</p>
+    <div class="dots" style="justify-content:center;margin-top:16px;"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+</div>
+
 <!-- ══ S8b: RESULT ══ -->
 <div class="screen" id="s-result">
   <div id="res-icon" style="font-size:5rem;margin-bottom:16px;">✅</div>
@@ -461,7 +471,12 @@ function handleState(st){
   if(s==='waiting') return;
   if(s==='question_preview') showQPreview(st);
   else if(s==='question_active') showQActive(st);
-  else if(s==='leaderboard') showLb(st.leaderboard||[]);
+  else if(s==='leaderboard'){
+    // HOST shows shoxsupa — players just wait
+    stopTimer();
+    $('wlb-icon').textContent='🏆';
+    goTo('s-wait-lb');
+  }
   else if(s==='ended') showEnded(st.leaderboard||[]);
 }
 
