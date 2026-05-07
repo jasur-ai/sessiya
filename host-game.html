@@ -442,35 +442,49 @@ window.hostNext=async function(){
   stopTimer();
   if(ansUnsubscribe){ansUnsubscribe();ansUnsubscribe=null;}
   clearTimeout(autoNextTm);
+
+  const savedIdx=qIdx; // snapshot current index before any async
   try{
-    await computeScores(qIdx);
+    await computeScores(savedIdx);
+  }catch(e){console.error('computeScores xato (ignored):',e);}
+
+  try{
     const snap=await get(ref(db,`game_sessions/${code}/players`));
     playersSnap=snap.val()||{};
     const lb=buildLb(playersSnap);
-    const isLast=qIdx>=questions.length-1;
-    await update(ref(db,`game_sessions/${code}/state`),{status:'leaderboard',leaderboard:lb});
-    showLbHost(lb,isLast);
+    const isLast=savedIdx>=questions.length-1;
+    await set(ref(db,`game_sessions/${code}/state`),{
+      status:'leaderboard',
+      leaderboard:lb,
+      q_index:savedIdx
+    });
+    showLbHost(lb,isLast,savedIdx);
   }catch(e){
-    console.error('hostNext xato:',e);
+    console.error('hostNext state push xato:',e);
   }
   isProcessing=false;
 };
 
-// ── SCORE COMPUTATION ──
+// ── SCORE COMPUTATION — individual set per player (most reliable) ──
 async function computeScores(idx){
   const q=questions[idx];
   if(!q) return;
   const snap=await get(ref(db,`game_sessions/${code}/answers/${idx}`));
   const answers=snap.val()||{};
+  if(!Object.keys(answers).length) return;
+
   const type=session.settings?.type||'score';
-  const multiUpdate={};
+  const scorePromises=[];
+
   for(const [pname,ans] of Object.entries(answers)){
-    const isCorrect=ans.option===q.correct;
+    const isCorrect=(ans.option===q.correct);
     if(!isCorrect) continue;
-    let pts=10;
-    if(type==='correct'){pts=100;}
-    else{
-      const ratio=Math.min(1,(ans.time_ms||qTime*1000)/(qTime*1000));
+
+    let pts=100;
+    if(type==='score'){
+      const elapsed=ans.time_ms||0;
+      const total=qTime*1000;
+      const ratio=Math.min(1,elapsed/total);
       if(ratio<.1) pts=100;
       else if(ratio<.2) pts=90;
       else if(ratio<.3) pts=80;
@@ -483,13 +497,18 @@ async function computeScores(idx){
       else pts=10;
     }
     if(type==='bonus'&&q.is_double) pts*=2;
+
     const cur=playersSnap[pname]?.score||0;
-    multiUpdate[`game_sessions/${code}/players/${pname}/score`]=cur+pts;
+    const newScore=cur+pts;
+    // Update local snapshot immediately
+    if(playersSnap[pname]) playersSnap[pname].score=newScore;
+    // Fire individual set — no root multi-path needed
+    scorePromises.push(
+      set(ref(db,`game_sessions/${code}/players/${pname}/score`),newScore)
+        .catch(e=>console.warn(`Score write failed for ${pname}:`,e))
+    );
   }
-  if(Object.keys(multiUpdate).length){
-    // update at root with full paths — no dynamic import needed
-    await update(ref(db,'/'),multiUpdate);
-  }
+  await Promise.all(scorePromises);
 }
 
 function buildLb(players){
@@ -500,12 +519,12 @@ function buildLb(players){
 }
 
 // ── LEADERBOARD HOST ──
-function showLbHost(lb,isLast){
+function showLbHost(lb,isLast,savedIdx){
   $('lb-title').textContent='🏆 Shoxsupa';
   $('lb-sub').textContent=isLast?'Final natijalar':'Oraliq natijalar';
   $('lb-list').innerHTML=renderLb(lb);
   $('lb-auto').textContent='';
-  afterLbFn=isLast?()=>finishGame():()=>pushQPreview(qIdx+1);
+  afterLbFn=isLast?()=>finishGame():()=>pushQPreview(savedIdx+1);
   goTo('s-lb');
   if(lbAutoTm) clearTimeout(lbAutoTm);
   let sec=5;
