@@ -463,6 +463,23 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <div class="type-opt" data-type="bonus" onclick="selType('bonus')"><div class="ti">💎</div><div class="tn">Bonus savollar</div></div>
       </div>
     </div>
+    <!-- Auto mode -->
+    <div class="cast-section">
+      <div class="cast-lbl">🤖 Avtomatik rejim</div>
+      <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);border-radius:12px;padding:12px 14px;border:1px solid var(--border);">
+        <label style="position:relative;width:48px;height:26px;flex-shrink:0;cursor:pointer;">
+          <input type="checkbox" id="auto-check" checked style="opacity:0;width:0;height:0;position:absolute;">
+          <span id="auto-slider" style="position:absolute;inset:0;background:var(--green);border-radius:50px;cursor:pointer;transition:background .25s;">
+            <span id="auto-thumb" style="position:absolute;height:20px;width:20px;left:25px;bottom:3px;background:#fff;border-radius:50%;transition:left .25s;box-shadow:0 1px 4px rgba(0,0,0,.4);"></span>
+          </span>
+        </label>
+        <div style="flex:1;">
+          <div style="font-size:.82rem;font-weight:800;color:var(--text);margin-bottom:2px;" id="auto-lbl">Yoqiq — Avto rejim</div>
+          <div style="font-size:.7rem;font-weight:600;color:var(--muted);line-height:1.5;" id="auto-desc">Hammasi javob berganda yoki vaqt tugaganda avto o'tadi. Shoxsupa 5 sek ko'rinib keyin keyingi savolga o'tadi.</div>
+        </div>
+      </div>
+    </div>
+
     <div class="cast-actions">
       <button class="btn btn-ghost" style="flex:1;" onclick="closeCast()">Bekor</button>
       <button class="btn btn-green" style="flex:2;" id="cast-start-btn" onclick="startCast()">▶️ O'yinni boshlash</button>
@@ -967,7 +984,7 @@ async function saveAndShowLb(pct,timeSec){
 
 // ── CAST MODAL ──
 const TIMES=[5,10,15,20,25,30,35,40];
-let castSettings={time:20,bg:0,type:'score'};
+let castSettings={time:20,bg:0,type:'score',auto:true};
 let _castTestKey=null,_castTestSource='user';
 let _castOverrideQs=null,_castOverrideName=null;
 
@@ -981,6 +998,24 @@ TIMES.forEach(t=>{
 });
 window.selBg=function(n){document.querySelectorAll('.bg-opt').forEach(x=>x.classList.remove('on'));document.querySelector(`.bg-opt[data-bg="${n}"]`).classList.add('on');castSettings.bg=n;};
 window.selType=function(t){document.querySelectorAll('.type-opt').forEach(x=>x.classList.remove('on'));document.querySelector(`.type-opt[data-type="${t}"]`).classList.add('on');castSettings.type=t;};
+
+// Auto toggle
+document.getElementById('auto-check').addEventListener('change',function(){
+  castSettings.auto=this.checked;
+  const thumb=document.getElementById('auto-thumb');
+  const slider=document.getElementById('auto-slider');
+  const lbl=document.getElementById('auto-lbl');
+  const desc=document.getElementById('auto-desc');
+  if(this.checked){
+    thumb.style.left='25px';slider.style.background='var(--green)';
+    lbl.textContent='Yoqiq — Avto rejim';
+    desc.textContent='Hammasi javob berganda yoki vaqt tugaganda avto o\'tadi. Shoxsupa 5 sek ko\'rinib keyin keyingi savolga o\'tadi.';
+  } else {
+    thumb.style.left='3px';slider.style.background='rgba(255,255,255,.12)';
+    lbl.textContent='O\'chirilgan — Qo\'lda boshqarish';
+    desc.textContent='Shoxsupada "Davom etish" tugmasini bosmaguningizcha keyingi savolga o\'tmaydi.';
+  }
+});
 
 // Open cast for user's own test
 window.openCast=function(key,name,source){
@@ -1016,7 +1051,7 @@ window.startCast=async function(){
     await set(ref(db,`game_sessions/${code}`),{
       host:curUser.username,host_key:curUser.safeKey,
       test_name:testName,questions:testQs,
-      settings:{time_per_q:castSettings.time,bg:castSettings.bg,type:castSettings.type},
+      settings:{time_per_q:castSettings.time,bg:castSettings.bg,type:castSettings.type,auto:castSettings.auto},
       state:{status:'waiting',q_index:-1,q_started_at:0},
       created_at:Date.now()
     });
