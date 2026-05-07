@@ -68,6 +68,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .lob-url strong{color:var(--text);}
 .qr-wrap{display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:20px;}
 .qr-box{background:#fff;border-radius:16px;padding:10px;width:148px;height:148px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px rgba(255,214,10,.4),0 8px 30px rgba(0,0,0,.5);}
+.qr-box img{display:block;}
 .qr-box canvas{display:block;}
 .qr-hint{font-size:.72rem;font-weight:800;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;}
 .join-url{font-size:.75rem;font-weight:700;color:var(--accent);background:rgba(255,68,102,.08);border:1px solid rgba(255,68,102,.2);border-radius:8px;padding:5px 12px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block;margin-top:2px;}
@@ -230,7 +231,7 @@ body.light .ans-bar{background:rgba(240,240,248,.92);}
     <div class="lob-sub">O'yin kodi</div>
     <div class="lob-code" id="lob-code">—</div>
     <div class="qr-wrap">
-      <div class="qr-box"><canvas id="qr-canvas"></canvas></div>
+      <div class="qr-box" id="qr-canvas"></div>
       <div class="qr-hint">📷 QR skan qiling yoki</div>
       <a class="join-url" id="join-url" href="#" target="_blank">🔗 Havola nusxalash</a>
     </div>
