@@ -303,6 +303,7 @@ function goTo(id){document.querySelectorAll('.screen').forEach(s=>s.classList.re
 let session=null,questions=[],qIdx=0,qStartAt=0,qTime=20,timerIv=null,cntIv=null;
 let playersSnap={},lbAutoTm=null,afterLbFn=null;
 let darkMode=true;
+let autoMode=true; // read from session.settings.auto
 
 // ── Load session ──
 (async function init(){
@@ -314,6 +315,7 @@ let darkMode=true;
     // Ensure options inside each question are arrays too
     questions=questions.map(q=>({...q,options:Array.isArray(q.options)?q.options:Object.values(q.options||[])}));
     qTime=session.settings?.time_per_q||20;
+    autoMode=session.settings?.auto!==false; // default true
     $('lob-code').textContent=code;
     $('theme-lbl').textContent='Test: '+(session.test_name||'');
     setupLobby();
@@ -414,7 +416,7 @@ function showQActiveHost(q,startAt){
   // Answer count watch
   updateAnsCount(0);
   startHostTimer(startAt,qTime);
-  watchAnswers(idx);
+  watchAnswers(qIdx); // ← fixed: was watchAnswers(idx) — idx not in scope!
 }
 
 // ── ANSWER WATCHING ──
@@ -427,7 +429,8 @@ function watchAnswers(idx){
     const cnt=Object.keys(answers).length;
     const total=Object.keys(playersSnap).length;
     updateAnsCount(cnt);
-    if(total>0&&cnt>=total){
+    // Auto-advance ONLY when autoMode is on AND all players answered
+    if(autoMode&&total>0&&cnt>=total){
       clearTimeout(autoNextTm);
       autoNextTm=setTimeout(()=>hostNext(),800);
     }
@@ -442,28 +445,31 @@ function updateAnsCount(cnt){
 
 // ── HOST NEXT ──
 window.hostNext=function(){
+  const qi=qIdx; // Capture IMMEDIATELY — prevents race condition with async chain
   if(cntIv){clearInterval(cntIv);cntIv=null;}
   stopTimer();
   if(ansUnsubscribe){ansUnsubscribe();ansUnsubscribe=null;}
   clearTimeout(autoNextTm);
 
-  // Avval UI ko'rsat (freeze bo'lmasin)
+  // Show leaderboard UI on HOST immediately (no freeze)
   const lb=buildLb(playersSnap);
-  const isLast=qIdx>=questions.length-1;
+  const isLast=qi>=questions.length-1;
   showLbHost(lb,isLast);
 
-  // Background da Firebase ga yoz
-  const q=questions[qIdx];
-  get(ref(db,`game_sessions/${code}/answers/${qIdx}`)).then(ansSnap=>{
+  // Background: calculate scores, then update Firebase state
+  const q=questions[qi];
+  get(ref(db,`game_sessions/${code}/answers/${qi}`)).then(ansSnap=>{
     const answers=ansSnap.val()||{};
     const type=session.settings?.type||'score';
     const proms=[];
     for(const [pname,ans] of Object.entries(answers)){
-      if(ans.option!==q.correct) continue;
+      if(ans.option!==q.correct) continue; // wrong answer = 0 pts
       let pts=50;
-      if(type==='correct'){pts=100;}
-      else{
-        const ratio=Math.min(1,(ans.time_ms||qTime*1000)/(qTime*1000));
+      if(type==='correct'){
+        pts=100; // flat 100 for correct
+      } else {
+        // Speed-based: fastest=100, last second=50
+        const ratio=Math.min(1,Math.max(0,(ans.time_ms||0)/(qTime*1000)));
         pts=Math.round(100-ratio*50);
       }
       if(q.is_double) pts*=2;
@@ -475,13 +481,16 @@ window.hostNext=function(){
     return Promise.all(proms);
   }).then(()=>{
     const lb2=buildLb(playersSnap);
-    // Update leaderboard display silently
-    if(document.getElementById('lb-list'))
-      document.getElementById('lb-list').innerHTML=renderLb(lb2);
+    // Silently update host leaderboard with real scores
+    const lbEl=document.getElementById('lb-list');
+    if(lbEl) lbEl.innerHTML=renderLb(lb2);
+    // Tell Firebase → players see "waiting" screen (NOT shoxsupa)
     return set(ref(db,`game_sessions/${code}/state`),{
-      status:'leaderboard',leaderboard:lb2,q_index:qIdx
+      status:'leaderboard',
+      leaderboard:lb2,
+      q_index:qi
     });
-  }).catch(e=>console.warn('Firebase xato:',e));
+  }).catch(e=>console.warn('Firebase score xato:',e));
 };
 
 function buildLb(players){
@@ -494,20 +503,30 @@ function buildLb(players){
 // ── LEADERBOARD HOST ──
 function showLbHost(lb,isLast){
   $('lb-title').textContent='🏆 Shoxsupa';
-  $('lb-sub').textContent=isLast?'Final natijalar':'Oraliq natijalar';
+  $('lb-sub').textContent=isLast?'🎉 Final natijalar':'Oraliq natijalar';
   $('lb-list').innerHTML=renderLb(lb);
   $('lb-auto').textContent='';
   afterLbFn=isLast?()=>finishGame():()=>pushQPreview(qIdx+1);
   goTo('s-lb');
+
   if(lbAutoTm) clearTimeout(lbAutoTm);
-  let sec=5;
-  $('lb-auto').textContent=`${sec}s da davom etadi...`;
-  const iv=setInterval(()=>{
-    sec--;
-    if(sec>0) $('lb-auto').textContent=`${sec}s da davom etadi...`;
-    else{clearInterval(iv);$('lb-auto').textContent='';}
-  },1000);
-  lbAutoTm=setTimeout(()=>afterLbFn&&afterLbFn(),5000);
+
+  if(autoMode){
+    // AUTO: 5 sec countdown then auto-advance
+    $('cont-btn').style.display='none';
+    let sec=5;
+    $('lb-auto').textContent=`${sec}s da davom etadi...`;
+    const iv=setInterval(()=>{
+      sec--;
+      if(sec>0) $('lb-auto').textContent=`${sec}s da davom etadi...`;
+      else{clearInterval(iv);$('lb-auto').textContent='';}
+    },1000);
+    lbAutoTm=setTimeout(()=>afterLbFn&&afterLbFn(),5000);
+  } else {
+    // MANUAL: show "Davom etish" button, wait for host click
+    $('cont-btn').style.display='';
+    $('lb-auto').textContent='Tayyor bo\'lganda "Davom etish" ni bosing';
+  }
 }
 
 window.afterLbNext=function(){
