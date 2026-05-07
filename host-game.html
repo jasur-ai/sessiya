@@ -284,7 +284,7 @@ body.light .ans-bar{background:rgba(240,240,248,.92);}
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getDatabase,ref,set,get,onValue,off,update}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import{getDatabase,ref,set,get,onValue,off,update,runTransaction}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const FB={apiKey:"AIzaSyA-2Uf7dZf1kqf7c32txyTFXSd2PCJbJLw",authDomain:"sessiya-11767.firebaseapp.com",
   databaseURL:"https://sessiya-11767-default-rtdb.firebaseio.com",projectId:"sessiya-11767",
@@ -303,7 +303,6 @@ function goTo(id){document.querySelectorAll('.screen').forEach(s=>s.classList.re
 let session=null,questions=[],qIdx=0,qStartAt=0,qTime=20,timerIv=null,cntIv=null;
 let playersSnap={},lbAutoTm=null,afterLbFn=null;
 let darkMode=true;
-let autoMode=true; // read from session.settings.auto
 
 // ── Load session ──
 (async function init(){
@@ -312,10 +311,7 @@ let autoMode=true; // read from session.settings.auto
     if(!snap.exists()){alert('O\'yin topilmadi');location.href='user-panel.html';return;}
     session=snap.val();
     questions=Array.isArray(session.questions)?session.questions:Object.values(session.questions||[]);
-    // Ensure options inside each question are arrays too
-    questions=questions.map(q=>({...q,options:Array.isArray(q.options)?q.options:Object.values(q.options||[])}));
     qTime=session.settings?.time_per_q||20;
-    autoMode=session.settings?.auto!==false; // default true
     $('lob-code').textContent=code;
     $('theme-lbl').textContent='Test: '+(session.test_name||'');
     setupLobby();
@@ -354,22 +350,20 @@ window.startGame=async function(){
 };
 
 // ── Q PREVIEW ──
-function pushQPreview(idx){
+async function pushQPreview(idx){
   const q=questions[idx];
-  if(!q){finishGame();return;}
-  // Show UI immediately
-  showQPreviewHost(idx,q);
-  // Write to Firebase in background
-  set(ref(db,`game_sessions/${code}/state`),{
+  if(!q){await finishGame();return;}
+  await set(ref(db,`game_sessions/${code}/state`),{
     status:'question_preview',
     q_index:idx,
     q_text:q.text||'',
-    q_options:Array.isArray(q.options)?q.options:Object.values(q.options||[]),
+    q_options:q.options||[],
     q_correct:q.correct||0,
     q_is_double:!!q.is_double,
     q_time:qTime,
     q_started_at:0
-  }).catch(e=>console.warn('pushQPreview err:',e));
+  });
+  showQPreviewHost(idx,q);
 }
 
 function showQPreviewHost(idx,q){
@@ -389,20 +383,17 @@ function showQPreviewHost(idx,q){
     arc.style.strokeDashoffset=circ*(1-cnt/3);
     if(cnt<=0){
       clearInterval(cntIv);cntIv=null;
-      pushQActive(idx,q);
+      await pushQActive(idx,q);
     }
   },1000);
 }
 
 // ── Q ACTIVE ──
-function pushQActive(idx,q){
+async function pushQActive(idx,q){
   const now=Date.now();
   qStartAt=now;qIdx=idx;
-  // Show UI immediately
+  await update(ref(db,`game_sessions/${code}/state`),{status:'question_active',q_started_at:now});
   showQActiveHost(q,now);
-  // Write to Firebase in background
-  update(ref(db,`game_sessions/${code}/state`),{status:'question_active',q_started_at:now})
-    .catch(e=>console.warn('pushQActive err:',e));
 }
 
 function showQActiveHost(q,startAt){
@@ -416,7 +407,7 @@ function showQActiveHost(q,startAt){
   // Answer count watch
   updateAnsCount(0);
   startHostTimer(startAt,qTime);
-  watchAnswers(qIdx); // ← fixed: was watchAnswers(idx) — idx not in scope!
+  watchAnswers(idx);
 }
 
 // ── ANSWER WATCHING ──
@@ -429,8 +420,7 @@ function watchAnswers(idx){
     const cnt=Object.keys(answers).length;
     const total=Object.keys(playersSnap).length;
     updateAnsCount(cnt);
-    // Auto-advance ONLY when autoMode is on AND all players answered
-    if(autoMode&&total>0&&cnt>=total){
+    if(total>0&&cnt>=total){
       clearTimeout(autoNextTm);
       autoNextTm=setTimeout(()=>hostNext(),800);
     }
@@ -444,54 +434,63 @@ function updateAnsCount(cnt){
 }
 
 // ── HOST NEXT ──
-window.hostNext=function(){
-  const qi=qIdx; // Capture IMMEDIATELY — prevents race condition with async chain
+let isProcessing=false;
+window.hostNext=async function(){
+  if(isProcessing) return;
+  isProcessing=true;
   if(cntIv){clearInterval(cntIv);cntIv=null;}
   stopTimer();
   if(ansUnsubscribe){ansUnsubscribe();ansUnsubscribe=null;}
   clearTimeout(autoNextTm);
-
-  // Show leaderboard UI on HOST immediately (no freeze)
-  const lb=buildLb(playersSnap);
-  const isLast=qi>=questions.length-1;
-  showLbHost(lb,isLast);
-
-  // Background: calculate scores, then update Firebase state
-  const q=questions[qi];
-  get(ref(db,`game_sessions/${code}/answers/${qi}`)).then(ansSnap=>{
-    const answers=ansSnap.val()||{};
-    const type=session.settings?.type||'score';
-    const proms=[];
-    for(const [pname,ans] of Object.entries(answers)){
-      if(ans.option!==q.correct) continue; // wrong answer = 0 pts
-      let pts=50;
-      if(type==='correct'){
-        pts=100; // flat 100 for correct
-      } else {
-        // Speed-based: fastest=100, last second=50
-        const ratio=Math.min(1,Math.max(0,(ans.time_ms||0)/(qTime*1000)));
-        pts=Math.round(100-ratio*50);
-      }
-      if(q.is_double) pts*=2;
-      const cur=(playersSnap[pname]?.score||0);
-      playersSnap[pname]=playersSnap[pname]||{};
-      playersSnap[pname].score=cur+pts;
-      proms.push(set(ref(db,`game_sessions/${code}/players/${pname}/score`),cur+pts));
-    }
-    return Promise.all(proms);
-  }).then(()=>{
-    const lb2=buildLb(playersSnap);
-    // Silently update host leaderboard with real scores
-    const lbEl=document.getElementById('lb-list');
-    if(lbEl) lbEl.innerHTML=renderLb(lb2);
-    // Tell Firebase → players see "waiting" screen (NOT shoxsupa)
-    return set(ref(db,`game_sessions/${code}/state`),{
-      status:'leaderboard',
-      leaderboard:lb2,
-      q_index:qi
-    });
-  }).catch(e=>console.warn('Firebase score xato:',e));
+  try{
+    await computeScores(qIdx);
+    const snap=await get(ref(db,`game_sessions/${code}/players`));
+    playersSnap=snap.val()||{};
+    const lb=buildLb(playersSnap);
+    const isLast=qIdx>=questions.length-1;
+    await update(ref(db,`game_sessions/${code}/state`),{status:'leaderboard',leaderboard:lb});
+    showLbHost(lb,isLast);
+  }catch(e){
+    console.error('hostNext xato:',e);
+  }
+  isProcessing=false;
 };
+
+// ── SCORE COMPUTATION ──
+async function computeScores(idx){
+  const q=questions[idx];
+  if(!q) return;
+  const snap=await get(ref(db,`game_sessions/${code}/answers/${idx}`));
+  const answers=snap.val()||{};
+  const type=session.settings?.type||'score';
+  const multiUpdate={};
+  for(const [pname,ans] of Object.entries(answers)){
+    const isCorrect=ans.option===q.correct;
+    if(!isCorrect) continue;
+    let pts=10;
+    if(type==='correct'){pts=100;}
+    else{
+      const ratio=Math.min(1,(ans.time_ms||qTime*1000)/(qTime*1000));
+      if(ratio<.1) pts=100;
+      else if(ratio<.2) pts=90;
+      else if(ratio<.3) pts=80;
+      else if(ratio<.4) pts=70;
+      else if(ratio<.5) pts=60;
+      else if(ratio<.6) pts=50;
+      else if(ratio<.7) pts=40;
+      else if(ratio<.8) pts=30;
+      else if(ratio<.9) pts=20;
+      else pts=10;
+    }
+    if(type==='bonus'&&q.is_double) pts*=2;
+    const cur=playersSnap[pname]?.score||0;
+    multiUpdate[`game_sessions/${code}/players/${pname}/score`]=cur+pts;
+  }
+  if(Object.keys(multiUpdate).length){
+    // update at root with full paths — no dynamic import needed
+    await update(ref(db,'/'),multiUpdate);
+  }
+}
 
 function buildLb(players){
   return Object.entries(players)
@@ -503,30 +502,20 @@ function buildLb(players){
 // ── LEADERBOARD HOST ──
 function showLbHost(lb,isLast){
   $('lb-title').textContent='🏆 Shoxsupa';
-  $('lb-sub').textContent=isLast?'🎉 Final natijalar':'Oraliq natijalar';
+  $('lb-sub').textContent=isLast?'Final natijalar':'Oraliq natijalar';
   $('lb-list').innerHTML=renderLb(lb);
   $('lb-auto').textContent='';
   afterLbFn=isLast?()=>finishGame():()=>pushQPreview(qIdx+1);
   goTo('s-lb');
-
   if(lbAutoTm) clearTimeout(lbAutoTm);
-
-  if(autoMode){
-    // AUTO: 5 sec countdown then auto-advance
-    $('cont-btn').style.display='none';
-    let sec=5;
-    $('lb-auto').textContent=`${sec}s da davom etadi...`;
-    const iv=setInterval(()=>{
-      sec--;
-      if(sec>0) $('lb-auto').textContent=`${sec}s da davom etadi...`;
-      else{clearInterval(iv);$('lb-auto').textContent='';}
-    },1000);
-    lbAutoTm=setTimeout(()=>afterLbFn&&afterLbFn(),5000);
-  } else {
-    // MANUAL: show "Davom etish" button, wait for host click
-    $('cont-btn').style.display='';
-    $('lb-auto').textContent='Tayyor bo\'lganda "Davom etish" ni bosing';
-  }
+  let sec=5;
+  $('lb-auto').textContent=`${sec}s da davom etadi...`;
+  const iv=setInterval(()=>{
+    sec--;
+    if(sec>0) $('lb-auto').textContent=`${sec}s da davom etadi...`;
+    else{clearInterval(iv);$('lb-auto').textContent='';}
+  },1000);
+  lbAutoTm=setTimeout(()=>afterLbFn&&afterLbFn(),5000);
 }
 
 window.afterLbNext=function(){
@@ -545,20 +534,21 @@ function renderLb(lb){
 }
 
 // ── FINISH ──
-function finishGame(){
-  stopTimer();
-  const lb=buildLb(playersSnap);
-  $('end-list').innerHTML=renderLb(lb);
-  goTo('s-end');
-  // Background saves
-  set(ref(db,`results/${code}`),{
+async function finishGame(){
+  const snap=await get(ref(db,`game_sessions/${code}/players`));
+  const all=snap.val()||{};
+  const lb=buildLb(all);
+  // Save results
+  await set(ref(db,`results/${code}`),{
     test_name:session.test_name||'Test',
     host:session.host||'',
     date:Date.now(),
     leaderboard:lb
-  }).catch(()=>{});
-  set(ref(db,`game_sessions/${code}/state`),{status:'ended',leaderboard:lb})
-    .catch(()=>{});
+  });
+  await update(ref(db,`game_sessions/${code}/state`),{status:'ended',leaderboard:lb});
+  $('end-list').innerHTML=renderLb(lb);
+  stopTimer();
+  goTo('s-end');
 }
 
 window.confirmEnd=function(){
@@ -566,18 +556,17 @@ window.confirmEnd=function(){
 };
 
 // ── TIMER ──
-let hostNextCalled=false;
 function startHostTimer(startAt,total){
   const arc=$('t-arc'),num=$('t-num');
   const circ=144.5;
-  stopTimer();hostNextCalled=false;
+  stopTimer();
   timerIv=setInterval(()=>{
     const el=(Date.now()-startAt)/1000;
     const rem=Math.max(0,total-el);
     arc.style.strokeDashoffset=circ*(1-rem/total);
     arc.style.stroke=rem<total*.3?'#ff4466':rem<total*.6?'#f2a827':'var(--green)';
     num.textContent=Math.ceil(rem);
-    if(rem<=0&&!hostNextCalled){stopTimer();hostNextCalled=true;hostNext();}
+    if(rem<=0){stopTimer();hostNext();}
   },100);
 }
 function stopTimer(){if(timerIv){clearInterval(timerIv);timerIv=null;}}
