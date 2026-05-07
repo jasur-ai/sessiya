@@ -395,15 +395,6 @@ try{
   if(ss){code=ss.code;name=ss.name;emoji=ss.emoji;rejoinSession();}
 }catch(_){}
 
-// Auto-fill code from URL ?code=XXXXX
-(function(){
-  const urlCode=new URLSearchParams(location.search).get('code');
-  if(urlCode&&/^\d{5}$/.test(urlCode)){
-    $('code-inp').value=urlCode;
-    checkCode();
-  }
-})();
-
 // ── STEP 1: Code ──
 window.checkCode=async function(){
   const v=$('code-inp').value.trim();
@@ -420,6 +411,15 @@ window.checkCode=async function(){
   btn.disabled=false;btn.textContent='Davom etish →';
 };
 $('code-inp').addEventListener('keydown',e=>{if(e.key==='Enter')checkCode();});
+
+// Auto-fill code from URL ?code=XXXXX — after checkCode is defined
+(function(){
+  const urlCode=new URLSearchParams(location.search).get('code');
+  if(urlCode&&/^\d{5}$/.test(urlCode)){
+    $('code-inp').value=urlCode;
+    setTimeout(()=>checkCode(),300);
+  }
+})();
 
 // ── STEP 2: Name ──
 window.checkName=async function(){
