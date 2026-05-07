@@ -5,10 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QuizBlitz — Test Yaratish</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Righteous&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
   --bg:#06060f;--surf:#0f0f20;--card:#14142a;--border:rgba(255,255,255,.07);
-  --accent:#65202c;--gold:#1e0b38;--green:#1c5e48;--blue:#144256;--purple:#613989;
+  --accent:#ff4466;--gold:#ffd60a;--green:#00ffaa;--blue:#38bdf8;--purple:#c084fc;
   --text:#f0f0f8;--muted:#636384;
   --c0:#e84040;--c1:#2d9cdb;--c2:#f2a827;--c3:#27ae60;--c4:#9b59b6;
 }
@@ -505,23 +506,24 @@ function handleFile(f){
   const ext=f.name.split('.').pop().toLowerCase();
   if(ext==='csv'){
     const reader=new FileReader();
-    reader.onload=e=>parseCSV(e.target.result);
+    reader.onload=e=>{try{parseCSV(e.target.result);}catch(err){toast('CSV xatosi: '+err.message,'err');}};
+    reader.onerror=()=>toast("Fayl o'qishda xato",'err');
     reader.readAsText(f,'UTF-8');
-  }else{
-    // Use SheetJS for xlsx
-    const script=document.createElement('script');
-    script.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-    script.onload=()=>{
-      const reader=new FileReader();
-      reader.onload=ev=>{
-        const wb=XLSX.read(ev.target.result,{type:'binary'});
+  }else if(ext==='xlsx'||ext==='xls'){
+    if(typeof window.XLSX==='undefined'){toast('XLSX kutubxona yuklanmadi, sahifani yangilang','err');return;}
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      try{
+        const wb=window.XLSX.read(ev.target.result,{type:'binary'});
         const ws=wb.Sheets[wb.SheetNames[0]];
-        const arr=XLSX.utils.sheet_to_array(ws);
+        const arr=window.XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
         processRows(arr);
-      };
-      reader.readAsBinaryString(f);
+      }catch(err){toast('Excel xatosi: '+err.message,'err');}
     };
-    document.head.appendChild(script);
+    reader.onerror=()=>toast("Fayl o'qishda xato",'err');
+    reader.readAsBinaryString(f);
+  }else{
+    toast("Faqat .xlsx, .xls yoki .csv fayllar qabul qilinadi",'err');
   }
 }
 
