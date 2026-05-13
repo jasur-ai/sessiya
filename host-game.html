@@ -317,7 +317,7 @@ function $(id){return document.getElementById(id);}
 function goTo(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');$('ans-bar').style.display=id==='s-qact'?'flex':'none';}
 
 let session=null,questions=[],qIdx=0,qStartAt=0,qTime=20,timerIv=null,cntIv=null;
-let playersSnap={},lbAutoTm=null,afterLbFn=null;
+let playersSnap={},lbAutoTm=null,lbCountIv=null,afterLbFn=null;
 let darkMode=true;
 
 // ── Load session ──
@@ -565,18 +565,20 @@ function showLbHost(lb,isLast,savedIdx){
   afterLbFn=isLast?()=>finishGame():()=>pushQPreview(savedIdx+1);
   goTo('s-lb');
   if(lbAutoTm) clearTimeout(lbAutoTm);
+  if(lbCountIv) clearInterval(lbCountIv);
   let sec=5;
   $('lb-auto').textContent=`${sec}s da davom etadi...`;
-  const iv=setInterval(()=>{
+  lbCountIv=setInterval(()=>{
     sec--;
     if(sec>0) $('lb-auto').textContent=`${sec}s da davom etadi...`;
-    else{clearInterval(iv);$('lb-auto').textContent='';}
+    else{clearInterval(lbCountIv);lbCountIv=null;$('lb-auto').textContent='';}
   },1000);
   lbAutoTm=setTimeout(()=>afterLbFn&&afterLbFn(),5000);
 }
 
 window.afterLbNext=function(){
   if(lbAutoTm) clearTimeout(lbAutoTm);
+  if(lbCountIv){clearInterval(lbCountIv);lbCountIv=null;}
   afterLbFn&&afterLbFn();
 };
 
@@ -659,3 +661,5 @@ function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').
 </script>
 </body>
 </html>
+
+
