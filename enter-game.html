@@ -192,6 +192,10 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 
 /* ENDED */
 #s-end{background:radial-gradient(ellipse at 50% 30%,rgba(0,255,170,.14) 0%,transparent 55%),var(--bg);}
+#s-end .lb-list{max-height:55vh;overflow-y:auto;padding-right:4px;}
+#s-end .lb-list::-webkit-scrollbar{width:4px;}
+#s-end .lb-list::-webkit-scrollbar-track{background:rgba(255,255,255,.04);}
+#s-end .lb-list::-webkit-scrollbar-thumb{background:rgba(255,214,10,.35);border-radius:4px;}
 .end-title{font-family:'Righteous',cursive;font-size:2.2rem;color:var(--green);margin-top:10px;}
 .confetti{font-size:3.5rem;animation:bounce 1.2s ease-in-out infinite;}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
@@ -572,6 +576,17 @@ function renderLb(lb){
     </div>`).join('');
 }
 
+// Yakuniy ekran uchun — hamma o'yinchi ko'rinadi (slice yo'q)
+function renderLbAll(lb){
+  return lb.map((p,i)=>`
+    <div class="lbi${p.name===name?' me':''}">
+      <div class="lb-rank ${RANK_CLS[i]||''}">${RANK_EMOJI[i]||i+1}</div>
+      <div class="lb-em">${p.emoji||'❓'}</div>
+      <div class="lb-nm">${esc(p.name)}${p.name===name?' 👈':''}</div>
+      <div class="lb-sc">${p.score||0} ball</div>
+    </div>`).join('');
+}
+
 function showLb(lb){
   stopTimer();
   // Show result first
@@ -603,7 +618,8 @@ function showLb(lb){
 
 function showEnded(lb){
   stopTimer();
-  $('end-lb').innerHTML=renderLb(lb);
+  // lb endi barcha o'yinchilarni o'z ichiga oladi (host tomonidan yuborilgan)
+  $('end-lb').innerHTML=renderLbAll(lb);
   goTo('s-end');
   sessionStorage.removeItem('qb_player');
 }
