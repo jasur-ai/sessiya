@@ -364,7 +364,7 @@ const RANK_CLS=['r1','r2','r3','','','',''];
 // ── STATE ──
 let code='', name='', emoji='', selEmoji='';
 let stateRef=null, playersRef=null;
-let timerIv=null, qTime=20, qStartAt=0;
+let timerIv=null, qTime=20, qStartAt=0, gameEnded=false, lbTimeoutId=null;
 let hasAnswered=false, curQIdx=-1, lastPickedIdx=-1, lastCorrectIdx=-1, lastEarned=0;
 
 // ── HELPERS ──
@@ -560,7 +560,16 @@ function startTimer(startAt,totalSec){
     numEl.textContent=Math.ceil(rem);
     // Color changes as time runs out
     arc.style.stroke=rem<totalSec*.3?'#ff4466':rem<totalSec*.6?'#f2a827':'var(--green)';
-    if(rem<=0) stopTimer();
+    if(rem<=0){
+      stopTimer();
+      // Agar o'yinchi javob bermagan bo'lsa, kutish ekraniga o'tamiz
+      if(!hasAnswered){
+        hasAnswered=true;
+        lastPickedIdx=-1; // vaqt tugadi — javob yo'q
+        updatePBadge2();
+        goTo('s-wait');
+      }
+    }
   },100);
 }
 function stopTimer(){if(timerIv){clearInterval(timerIv);timerIv=null;}}
@@ -610,13 +619,17 @@ function showLb(lb){
     $('res-correct').textContent='';
   }
   goTo('s-result');
-  setTimeout(()=>{
+  if(lbTimeoutId) clearTimeout(lbTimeoutId);
+  lbTimeoutId=setTimeout(()=>{
+    if(gameEnded) return; // O'yin tugagan bo'lsa s-lb ga o'tmaymiz
     $('lb-list').innerHTML=renderLb(lb);
     goTo('s-lb');
   }, 2500);
 }
 
 function showEnded(lb){
+  gameEnded=true;
+  if(lbTimeoutId){clearTimeout(lbTimeoutId);lbTimeoutId=null;}
   stopTimer();
   // lb endi barcha o'yinchilarni o'z ichiga oladi (host tomonidan yuborilgan)
   $('end-lb').innerHTML=renderLbAll(lb);
