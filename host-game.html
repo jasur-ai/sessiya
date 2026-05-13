@@ -199,6 +199,10 @@ body.light .ans-bar{background:rgba(240,240,248,.92);}
 
 /* END SCREEN */
 .end-badge{font-size:3.5rem;margin-bottom:12px;animation:pop .4s ease-out;}
+#s-end .lb-list{max-height:52vh;overflow-y:auto;padding-right:4px;}
+#s-end .lb-list::-webkit-scrollbar{width:4px;}
+#s-end .lb-list::-webkit-scrollbar-track{background:rgba(255,255,255,.04);}
+#s-end .lb-list::-webkit-scrollbar-thumb{background:rgba(255,214,10,.35);border-radius:4px;}
 @keyframes pop{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
 .end-title{font-family:'Righteous',cursive;font-size:1.7rem;margin-bottom:6px;}
 .home-btn{
@@ -422,14 +426,22 @@ async function pushQActive(idx,q){
   showQActiveHost(q,now);
 }
 
+// Har savol uchun deterministik shuffle — to'g'ri javob har safar boshqa rangda chiqadi
+function shuffleForQ(arr,seed){
+  const a=[...arr];let s=(seed+1)*1103515245+12345;
+  for(let i=a.length-1;i>0;i--){s=(s*1103515245+12345)&0x7fffffff;const j=s%(i+1);[a[i],a[j]]=[a[j],a[i]];}
+  return a;
+}
+
 function showQActiveHost(q,startAt){
   goTo('s-qact');
   $('qa-text').textContent=q.text||'';
   $('qa-badge').innerHTML=q.is_double?'<div class="badge-double">⚡ IKKI BAROBAR</div>':'';
-  // Options display (unshuffled for host, just show colors)
-  const opts=q.options||[];
-  $('opts-host').innerHTML=opts.map((o,i)=>`<div class="opt-host" data-c="${i}" id="ho-${i}"><span class="opt-sym">${['▲','●','◆','★','✦'][i]||'•'}</span>${esc(o)}</div>`).join('');
-  $('opts-host').className='opts-host'+(opts.length<=2?' single':'');
+  // Shuffle options so correct answer gets a random color each question
+  const rawOpts=(q.options||[]).map((o,i)=>({text:o,origIdx:i}));
+  const shuffled=shuffleForQ(rawOpts,qIdx);
+  $('opts-host').innerHTML=shuffled.map((o,pos)=>`<div class="opt-host" data-c="${pos}" data-orig="${o.origIdx}" id="ho-${pos}"><span class="opt-sym">${['▲','●','◆','★','✦'][pos]||'•'}</span>${esc(o.text)}</div>`).join('');
+  $('opts-host').className='opts-host'+(shuffled.length<=2?' single':'');
   // Answer count watch
   updateAnsCount(0);
   startHostTimer(startAt,qTime);
@@ -578,20 +590,40 @@ function renderLb(lb){
   </div>`).join('');
 }
 
+// Hammani ko'rsatadigan full render (yakuniy ekran uchun)
+function renderLbFull(lb){
+  return lb.map((p,i)=>`<div class="lbi">
+    <div class="lb-rank ${RANK_CLS[i]||'rank-n'}">${['🥇','🥈','🥉'][i]||i+1}</div>
+    <div class="lb-em">${p.emoji||'❓'}</div>
+    <div class="lb-nm">${esc(p.name)}</div>
+    <div class="lb-sc">${p.score||0} ball</div>
+  </div>`).join('');
+}
+
 // ── FINISH ──
 async function finishGame(){
   const snap=await get(ref(db,`game_sessions/${code}/players`));
   const all=snap.val()||{};
-  const lb=buildLb(all);
-  // Save results
+
+  // Barcha o'yinchilarni tartiblash
+  const allSorted=Object.entries(all)
+    .map(([n,p])=>({name:n,emoji:p.emoji||'❓',score:p.score||0}))
+    .sort((a,b)=>b.score-a.score);
+
+  // Firebase-ga faqat top 7 saqlansin (doimiy)
+  const top7=allSorted.slice(0,7);
   await set(ref(db,`results/${code}`),{
     test_name:session.test_name||'Test',
     host:session.host||'',
     date:Date.now(),
-    leaderboard:lb
+    leaderboard:top7
   });
-  await update(ref(db,`game_sessions/${code}/state`),{status:'ended',leaderboard:lb});
-  $('end-list').innerHTML=renderLb(lb);
+
+  // O'yinchilar ekraniga HAMMA natijasi yuborilsin (yakuniy ko'rsatish uchun)
+  await update(ref(db,`game_sessions/${code}/state`),{status:'ended',leaderboard:allSorted});
+
+  // Host yakuniy ekranida ham hamma ko'rinsin
+  $('end-list').innerHTML=renderLbFull(allSorted);
   stopTimer();
   goTo('s-end');
 }
