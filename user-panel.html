@@ -833,15 +833,20 @@ function updateStats(){
 function showQuestion(){
   const q=shuffledQs[curIdx];answered=false;
   $('q-text').textContent=q.text;
-  const opts=[...q.options].sort(()=>Math.random()-.5);
+  // Support both formats: string array (create-test) and object array (PRE/admin)
+  const rawOpts=q.options||[];
+  const isStrArr=rawOpts.length>0&&typeof rawOpts[0]==='string';
+  const opts=[...rawOpts].sort(()=>Math.random()-.5);
   const grid=$('opts-grid');grid.innerHTML='';
   opts.forEach((opt,i)=>{
+    const optText=isStrArr?opt:(opt.text||'');
+    const isCorrect=isStrArr?(rawOpts.indexOf(opt)===q.correct):(opt.isCorrect||false);
     const btn=document.createElement('button');
     btn.className='opt-btn';
     btn.style.background=COLORS[i]||'#555';
-    btn.setAttribute('data-correct',opt.isCorrect?'1':'0');
-    btn.innerHTML=`<div class="opt-letter">${['A','B','C','D','E'][i]}</div><span>${opt.text}</span>`;
-    btn.onclick=()=>selectAnswer(btn,opt,q);
+    btn.setAttribute('data-correct',isCorrect?'1':'0');
+    btn.innerHTML=`<div class="opt-letter">${['A','B','C','D','E'][i]}</div><span>${optText}</span>`;
+    btn.onclick=()=>selectAnswer(btn,{text:optText,isCorrect},q);
     grid.appendChild(btn);
   });
   $('fb-bar').className='fb-bar';
