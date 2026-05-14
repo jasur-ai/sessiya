@@ -686,8 +686,9 @@ async function loadSavedTest(key){
 }
 
 async function startPublicTest(globalKey){
-  const parts=globalKey.split('__');
-  const authorUid=parts[0],fbKey=parts.slice(1).join('__');
+  let authorUid,fbKey;
+  if(globalKey.startsWith(PRE_AUTHOR_UID+'__')){authorUid=PRE_AUTHOR_UID;fbKey=globalKey.slice(PRE_AUTHOR_UID.length+2);}
+  else{const idx=globalKey.indexOf('__');authorUid=globalKey.slice(0,idx);fbKey=globalKey.slice(idx+2);}
   try{
     const snap=await get(ref(db,`users/${authorUid}/tests/${fbKey}`));
     if(!snap.exists()){alert('Test topilmadi');return;}
@@ -793,8 +794,9 @@ window.togglePreGroup=function(key){
 
 // Cast a public test (PRE subtest)
 window.openCastPublic=async function(globalKey,name){
-  const parts=globalKey.split('__');
-  const authorUid=parts[0],fbKey=parts.slice(1).join('__');
+  let authorUid,fbKey;
+  if(globalKey.startsWith(PRE_AUTHOR_UID+'__')){authorUid=PRE_AUTHOR_UID;fbKey=globalKey.slice(PRE_AUTHOR_UID.length+2);}
+  else{const idx=globalKey.indexOf('__');authorUid=globalKey.slice(0,idx);fbKey=globalKey.slice(idx+2);}
   try{
     const snap=await get(ref(db,`users/${authorUid}/tests/${fbKey}`));
     if(!snap.exists()){alert('Test topilmadi');return;}
