@@ -738,6 +738,7 @@ async function startMockTest(fanKey){
   }catch(e){alert('Mock testni yuklab bo\'lmadi: '+e.message);}
 }
 window.startMockTest=startMockTest;
+window.startPublicTest=startPublicTest;
 
 // Cast a fan (mock) test — fetch random questions and cast
 window.openCastFan=async function(fanKey,fanName){
