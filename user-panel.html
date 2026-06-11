@@ -176,7 +176,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   padding:5px 12px;color:var(--green);font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:900;cursor:pointer;transition:all .2s;}
 .pre-sub-cast:hover{background:rgba(0,255,170,.2);}
 
-/* QUIZ (individual test playing) */
+/* QUIZ */
 #quiz-wrap{display:none;position:fixed;inset:0;z-index:800;background:var(--bg);overflow-y:auto;}
 #quiz-wrap.on{display:block;}
 .quiz-inner{max-width:700px;margin:0 auto;padding:20px 16px 60px;}
@@ -365,7 +365,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 <!-- MAIN PANEL -->
 <div id="panel">
 
-  <!-- Global search -->
   <div style="margin-bottom:24px;">
     <div style="font-family:'Righteous',cursive;font-size:1.5rem;margin-bottom:4px;">⚡ QuizBlitz Panel</div>
     <p style="color:var(--muted);font-size:.8rem;font-weight:700;margin-bottom:14px;">Testlarni boshqaring, Mock test ishlang yoki jonli o'yin boshlang</p>
@@ -376,7 +375,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     <div id="search-results"></div>
   </div>
 
-  <!-- MY TESTS -->
   <div class="sec-hd">
     <div class="sec-title">📚 Mening Testlarim <span class="cnt-badge" id="cnt">0</span></div>
     <div style="display:flex;gap:7px;">
@@ -385,7 +383,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   </div>
   <div id="tests-list"></div>
 
-  <!-- MOCK TESTS -->
   <div id="mock-section" style="display:none;margin-top:24px;">
     <div class="mock-card">
       <div class="mock-hd">
@@ -399,7 +396,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     </div>
   </div>
 
-  <!-- PRE TESTS -->
   <div id="pre-section" style="display:none;margin-top:20px;">
     <div class="pre-hd">
       <div class="pre-hd-icon">🔷</div>
@@ -417,6 +413,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     <div class="quiz-topbar">
       <div class="q-num" id="q-num">1 / 10</div>
       <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      <!-- FIX: exit tugmasi to'g'ri ishlashi uchun onclick to'g'rilandi -->
       <button type="button" class="exit-btn" onclick="confirmExitQuiz()">✕ Chiqish</button>
     </div>
     <div class="stats-row2">
@@ -483,7 +480,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <div class="type-opt" data-type="bonus" onclick="selType('bonus')"><div class="ti">💎</div><div class="tn">Bonus savollar</div></div>
       </div>
     </div>
-    <!-- Auto mode -->
     <div class="cast-section">
       <div class="cast-lbl">🤖 Avtomatik rejim</div>
       <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);border-radius:12px;padding:12px 14px;border:1px solid var(--border);">
@@ -495,12 +491,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         </label>
         <div style="flex:1;">
           <div style="font-size:.82rem;font-weight:800;color:var(--text);margin-bottom:2px;" id="auto-lbl">Yoqiq — Avto rejim</div>
-          <div style="font-size:.7rem;font-weight:600;color:var(--muted);line-height:1.5;" id="auto-desc">Hammasi javob berganda yoki vaqt tugaganda avto o'tadi. Shoxsupa 5 sek ko'rinib keyin keyingi savolga o'tadi.</div>
+          <div style="font-size:.7rem;font-weight:600;color:var(--muted);line-height:1.5;" id="auto-desc">Hammasi javob berganda yoki vaqt tugaganda avto o'tadi.</div>
         </div>
       </div>
     </div>
-
     <div class="cast-actions">
+      <!-- FIX: Bekor tugmasi to'g'rilandi -->
       <button type="button" class="btn btn-ghost" style="flex:1;" onclick="closeCast()">Bekor</button>
       <button type="button" class="btn btn-green" style="flex:2;" id="cast-start-btn" onclick="startCast()">▶️ O'yinni boshlash</button>
     </div>
@@ -525,6 +521,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       </div>
     </div>
     <div class="start-actions">
+      <!-- FIX: Bekor tugmasi -->
       <button type="button" class="btn btn-ghost" style="flex:1;" onclick="closeStartModal()">Bekor</button>
       <button type="button" class="btn btn-green" style="flex:2;" id="sm-start-btn" onclick="confirmStartQuiz()">▶ Boshlash</button>
     </div>
@@ -537,7 +534,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     <div class="confirm-title" id="conf-title">Tasdiqlaysizmi?</div>
     <p class="confirm-sub" id="conf-sub"></p>
     <div class="confirm-actions">
-      <button type="button" class="btn btn-ghost" style="flex:1;" onclick="closeConfirm()">Bekor</button>
+      <!-- FIX: Bekor tugmasi to'g'rilandi -->
+      <button type="button" class="btn btn-ghost" style="flex:1;" id="conf-cancel-btn">Bekor</button>
       <button type="button" class="btn btn-red" style="flex:1;" id="conf-ok">Ha</button>
     </div>
   </div>
@@ -570,7 +568,6 @@ function loading(show){show?$('loading').classList.remove('hide'):$('loading').c
 
 let curUser=null;
 
-// ── SHOW/HIDE SCREENS ──
 function showAuth(){$('auth').classList.add('on');$('navbar').classList.remove('on');$('panel').classList.remove('on');loading(false);}
 function showPanel(){$('auth').classList.remove('on');$('navbar').classList.add('on');$('panel').classList.add('on');loading(false);loadAll();}
 
@@ -628,7 +625,6 @@ function setNavUser(){
   $('nav-av').textContent=(curUser.username||'?')[0].toUpperCase();
   $('nav-un').textContent=curUser.username;
 }
-
 function showMsg(id,txt,type='err'){const e=$(id);e.textContent=txt;e.className=`msg on ${type}`;}
 
 async function loadAll(){
@@ -654,23 +650,26 @@ function buildTestCard(key,t,i){
   const qc=(t.questions&&t.questions.length)||t.count||0;
   const ts=t.created_at||t.created;
   const date=ts?new Date(ts).toLocaleDateString('uz-UZ',{day:'2-digit',month:'2-digit',year:'numeric'}):'—';
+  // FIX: key ni safe qilamiz onclick uchun — backslash escape
+  const safeKey=key.replace(/'/g,"\\'");
+  const safeName=(t.name||'Test').replace(/'/g,"\\'").replace(/"/g,'&quot;');
   return`<div class="test-card" style="animation-delay:${i*0.04}s">
     <div class="tc-icon">📝</div>
     <div style="flex:1;min-width:0;">
       <div class="tc-name">${esc(t.name||'Nomsiz test')}</div>
       <div class="tc-meta"><span class="q-badge">${qc} savol</span><span>📅 ${date}</span></div>
       <div class="rename-row" id="rr-${key}">
-        <input class="rename-inp" id="ri-${key}" value="${esc(t.name||'')}" maxlength="60" onkeydown="if(event.key==='Enter')saveRename('${key}')">
-        <button type="button" class="act-btn act-edit" onclick="saveRename('${key}')">✓</button>
-        <button type="button" class="act-btn act-del" onclick="cancelRename('${key}')">✕</button>
+        <input class="rename-inp" id="ri-${key}" value="${esc(t.name||'')}" maxlength="60" onkeydown="if(event.key==='Enter')saveRename('${safeKey}')">
+        <button type="button" class="act-btn act-edit" onclick="saveRename('${safeKey}')">✓</button>
+        <button type="button" class="act-btn act-del" onclick="cancelRename('${safeKey}')">✕</button>
       </div>
     </div>
     <div class="tc-actions">
-      <button type="button" class="act-btn act-edit" onclick="loadSavedTest('${key}')">▶ Boshlash</button>
-      <button type="button" class="act-btn act-edit" onclick="editTest('${key}')">✏️</button>
-      <button type="button" class="act-btn act-edit" onclick="openRename('${key}')">📝</button>
-      <button type="button" class="act-btn act-cast" onclick="openCast('${key}','${esc(t.name||'Test').replace(/'/g,"\\'")}','user')">📡 Cast</button>
-      <button type="button" class="act-btn act-del" onclick="confirmDel('${key}','${esc(t.name||'Test').replace(/'/g,"\\'")}')">🗑️</button>
+      <button type="button" class="act-btn act-edit" onclick="loadSavedTest('${safeKey}')">▶ Boshlash</button>
+      <button type="button" class="act-btn act-edit" onclick="editTest('${safeKey}')">✏️</button>
+      <button type="button" class="act-btn act-edit" onclick="openRename('${safeKey}')">📝</button>
+      <button type="button" class="act-btn act-cast" onclick="openCast('${safeKey}','${safeName}','user')">📡 Cast</button>
+      <button type="button" class="act-btn act-del" onclick="confirmDel('${safeKey}','${safeName}')">🗑️</button>
     </div>
   </div>`;
 }
@@ -679,7 +678,6 @@ window.goNewTest=function(){
   if(!curUser){showAuth();return;}
   location.href='create-test.html?user='+curUser.safeKey;
 };
-
 window.editTest=function(key){location.href=`create-test.html?key=${key}&user=${curUser.safeKey}`;};
 window.openRename=function(key){$(`rr-${key}`).classList.add('on');setTimeout(()=>$(`ri-${key}`).focus(),50);};
 window.cancelRename=function(key){$(`rr-${key}`).classList.remove('on');};
@@ -688,15 +686,30 @@ window.saveRename=async function(key){
   try{await set(ref(db,`users/${curUser.safeKey}/tests/${key}/name`),v);loadTests();}catch(_){}
 };
 
-let pendingDelKey=null;
+// FIX: confirmDel — modal bekor tugmasini har safar to'g'ri bind qilamiz
 window.confirmDel=function(key,name){
-  pendingDelKey=key;
   $('conf-title').textContent='Testni o\'chirasizmi?';
   $('conf-sub').textContent=`"${name}" va barcha savollari o'chadi.`;
-  $('conf-ok').onclick=async()=>{closeConfirm();try{await remove(ref(db,`users/${curUser.safeKey}/tests/${pendingDelKey}`));loadTests();}catch(_){}};
+
+  // FIX: onclick ni DOM property sifatida o'rnatamiz (addEventListener emas)
+  $('conf-ok').onclick=async function(){
+    closeConfirm();
+    try{
+      await remove(ref(db,`users/${curUser.safeKey}/tests/${key}`));
+      loadTests();
+    }catch(e){alert('O\'chirishda xato: '+e.message);}
+  };
   $('confirm-modal').classList.add('on');
 };
-window.closeConfirm=function(){$('confirm-modal').classList.remove('on');pendingDelKey=null;};
+
+// FIX: closeConfirm global bo'lishi kerak + bekor tugmasi
+window.closeConfirm=function(){$('confirm-modal').classList.remove('on');};
+$('conf-cancel-btn').addEventListener('click', function(){ window.closeConfirm(); });
+
+// Confirm modal background click bilan yopish
+$('confirm-modal').addEventListener('click', function(e){
+  if(e.target === this) window.closeConfirm();
+});
 
 // ── GLOBAL SEARCH ──
 window.doGlobalSearch=async function(){
@@ -787,42 +800,34 @@ async function startMockTest(fanKey){
     showStartModal(snap.val().name||fanKey,questions.length,'mock',false);
   }catch(e){alert('Mock testni yuklab bo\'lmadi: '+e.message);}
 }
-// ── START TEMPLATE MODAL ──
+
 function showStartModal(name,count,type,isPre){
   const badge=$('sm-badge');
-  if(type==='mock'){
-    badge.textContent='MOCK TEST';badge.className='start-badge mock';
-    $('sm-icon').textContent='🎓';
-    $('sm-type-val').textContent='Mock';
-  } else if(isPre){
-    badge.textContent='PRE TEST';badge.className='start-badge pre';
-    $('sm-icon').textContent='📘';
-    $('sm-type-val').textContent='Pre Test';
-  } else {
-    badge.textContent='PUBLIC TEST';badge.className='start-badge pre';
-    $('sm-icon').textContent='📝';
-    $('sm-type-val').textContent='Umumiy';
-  }
+  if(type==='mock'){badge.textContent='MOCK TEST';badge.className='start-badge mock';$('sm-icon').textContent='🎓';$('sm-type-val').textContent='Mock';}
+  else if(isPre){badge.textContent='PRE TEST';badge.className='start-badge pre';$('sm-icon').textContent='📘';$('sm-type-val').textContent='Pre Test';}
+  else{badge.textContent='PUBLIC TEST';badge.className='start-badge pre';$('sm-icon').textContent='📝';$('sm-type-val').textContent='Umumiy';}
   $('sm-name').textContent=name;
   $('sm-count').textContent=count;
   $('sm-meta').textContent=count+' ta savol bilan test boshlanadi. Tayyor bo\'lsangiz boshlang!';
   $('start-modal').classList.add('on');
 }
-function closeStartModal(){$('start-modal').classList.remove('on');}
-function confirmStartQuiz(){closeStartModal();startQuiz();}
-window.closeStartModal=closeStartModal;
-window.confirmStartQuiz=confirmStartQuiz;
 
+// FIX: closeStartModal va confirmStartQuiz global
+window.closeStartModal=function(){$('start-modal').classList.remove('on');};
+window.confirmStartQuiz=function(){window.closeStartModal();startQuiz();};
 window.startMockTest=startMockTest;
 window.startPublicTest=startPublicTest;
 window.loadSavedTest=loadSavedTest;
 
-// Cast a fan (mock) test — fetch random questions and cast
+// Start modal background click
+$('start-modal').addEventListener('click', function(e){
+  if(e.target === this) window.closeStartModal();
+});
+
 window.openCastFan=async function(fanKey,fanName){
-  // Load fan questions for cast
   try{
     const snap=await get(ref(db,`${FANS_PATH}/${fanKey}`));
-    if(!snap.exists()||!snap.val().questions) {alert('Savollar topilmadi');return;}
+    if(!snap.exists()||!snap.val().questions){alert('Savollar topilmadi');return;}
     const all=snap.val().questions;
     const shuffled=[...all].sort(()=>Math.random()-.5);
     _castOverrideQs=shuffled.slice(0,Math.min(MOCK_COUNT,shuffled.length));
@@ -870,7 +875,6 @@ window.togglePreGroup=function(key){
   const el=$(`preg-${key}`);if(el) el.classList.toggle('open');
 };
 
-// Cast a public test (PRE subtest)
 window.openCastPublic=async function(globalKey,name){
   let authorUid,fbKey;
   if(globalKey.startsWith(PRE_AUTHOR_UID+'__')){authorUid=PRE_AUTHOR_UID;fbKey=globalKey.slice(PRE_AUTHOR_UID.length+2);}
@@ -896,20 +900,15 @@ function startQuiz(){
 
 function updateStats(){
   const tot=shuffledQs.length;
-  $('st-total').textContent=tot;
-  $('st-ans').textContent=answeredCnt;
-  $('st-rem').textContent=tot-answeredCnt;
-  $('st-cor').textContent=correctCnt;
-  $('st-wr').textContent=wrongCnt;
-  const pct=Math.round(answeredCnt/tot*100);
-  $('prog-fill').style.width=pct+'%';
+  $('st-total').textContent=tot;$('st-ans').textContent=answeredCnt;
+  $('st-rem').textContent=tot-answeredCnt;$('st-cor').textContent=correctCnt;$('st-wr').textContent=wrongCnt;
+  $('prog-fill').style.width=Math.round(answeredCnt/tot*100)+'%';
   $('q-num').textContent=(curIdx+1)+' / '+tot;
 }
 
 function showQuestion(){
   const q=shuffledQs[curIdx];answered=false;
   $('q-text').textContent=q.text;
-  // Support both formats: string array (create-test) and object array (PRE/admin)
   const rawOpts=q.options||[];
   const isStrArr=rawOpts.length>0&&typeof rawOpts[0]==='string';
   const opts=[...rawOpts].sort(()=>Math.random()-.5);
@@ -940,7 +939,7 @@ function selectAnswer(btn,opt,q){
     wrongCnt++;btn.classList.add('wrong-ans');
     document.querySelectorAll('.opt-btn').forEach(b=>{if(b.getAttribute('data-correct')==='1')b.classList.add('correct-ans');});
     const co=q.options.find(o=>o.isCorrect);
-    const correctText=co? (typeof co === 'string' ? co : (co.text||'')) : (q.correctText||'');
+    const correctText=co?(typeof co==='string'?co:(co.text||'')):(q.correctText||'');
     $('fb-bar').className='fb-bar show fb-wrong';$('fb-text').textContent=`❌ Xato! To'g'ri: ${correctText}`;
     wrongQs.push({q,yourAnswer:opt.text,correctAnswer:correctText});
   }
@@ -956,7 +955,7 @@ async function showResults(){
   $('result-wrap').classList.add('on');
   const tot=shuffledQs.length,pct=Math.round(correctCnt/tot*100);
   let trophy='🏆',title='Yakunlandi!';
-  if(pct>=90){trophy='🥇';title='Mukammal! Siz ustasiz!';}
+  if(pct>=90){trophy='🥇';title='Mukammal!';}
   else if(pct>=75){trophy='🥈';title="Zo'r natija!";}
   else if(pct>=60){trophy='🥉';title="Yaxshi!";}
   else if(pct>=40){trophy='📚';title='Davom eting!';}
@@ -967,9 +966,9 @@ async function showResults(){
   $('rc-pct').textContent=pct+'%';$('rc-time').textContent=fmtT(totalTime);
   $('review-section').innerHTML='';
   const ws=$('wrong-section');
-  if(!wrongQs.length){ws.innerHTML=`<div style="text-align:center;padding:16px;color:var(--green);font-weight:800;">🎊 Barcha savollarga to'g'ri javob berdingiz!</div>`;}
+  if(!wrongQs.length){ws.innerHTML=`<div style="text-align:center;padding:16px;color:var(--green);font-weight:800;">🎊 Barcha savollarga to'g'ri javob!</div>`;}
   else{ws.innerHTML=`<div style="background:var(--card);border-radius:12px;padding:14px 16px;border:1px solid var(--border);margin-top:14px;">
-    <div style="font-weight:800;margin-bottom:10px;">❌ ${wrongQs.length} ta xato javob</div>
+    <div style="font-weight:800;margin-bottom:10px;">❌ ${wrongQs.length} ta xato</div>
     <div style="display:flex;gap:7px;">
       <button type="button" class="btn btn-ghost" style="flex:1;" onclick="toggleReview()">👁 Ko'rish</button>
       <button type="button" class="btn btn-red" style="flex:1;" onclick="retryWrong()">🔄 Xatolardan test</button>
@@ -992,28 +991,22 @@ window.toggleReview=function(){
       const isYours=!isCorrect&&normStr(optText)===normStr(item.yourAnswer);
       const cls=isCorrect?'cor':isYours?'wr':'neu';
       const icon=isCorrect?'✅':isYours?'❌':'  ';
-      html+=`<div class="r-opt ${cls}">${icon} ${esc(optText)}${isCorrect?" \u2190 To'g'ri":''}${isYours&&!isCorrect?' \u2190 Siz':''}</div>`;
+      html+=`<div class="r-opt ${cls}">${icon} ${esc(optText)}${isCorrect?" ← To'g'ri":''}${isYours&&!isCorrect?' ← Siz':''}</div>`;
     });
     html+=`</div>`;
   });
   r.innerHTML=html;
 };
 
-window.retryWrong=function(){
-  if(!wrongQs.length) return;
-  isRetry=true;questions=wrongQs.map(w=>w.q);startQuiz();
-};
-
+window.retryWrong=function(){if(!wrongQs.length)return;isRetry=true;questions=wrongQs.map(w=>w.q);startQuiz();};
 window.restartQuiz=function(){questions=[...originalQs];isRetry=false;startQuiz();};
-window.backToPanel=function(){
-  $('quiz-wrap').classList.remove('on');$('result-wrap').classList.remove('on');
-  window.scrollTo(0,0);
-};
+window.backToPanel=function(){$('quiz-wrap').classList.remove('on');$('result-wrap').classList.remove('on');window.scrollTo(0,0);};
 
+// FIX: confirmExitQuiz — global + modal to'g'ri bog'langan
 window.confirmExitQuiz=function(){
   $('conf-title').textContent='Testdan chiqmoqchimisiz?';
   $('conf-sub').textContent='Joriy natija saqlanmaydi.';
-  $('conf-ok').onclick=()=>{closeConfirm();$('quiz-wrap').classList.remove('on');};
+  $('conf-ok').onclick=function(){window.closeConfirm();$('quiz-wrap').classList.remove('on');};
   $('confirm-modal').classList.add('on');
 };
 
@@ -1068,9 +1061,7 @@ async function saveAndShowLb(pct,timeSec){
     function buildTabs(){lbTabs.innerHTML=[{id:'personal',label:'👤 Mening natijalarim'},{id:'global',label:'🏆 TOP o\'yinchilar'}].map(t=>`<button type="button" class="lb-tab${activeTab===t.id?' on':''}" onclick="window._switchLbTab('${t.id}')">${t.label}</button>`).join('');}
     buildTabs();await renderMockLb();return;
   }
-  // Normal test
   try{await push(ref(db,`users/${curTestAuthorUid}/tests/${curTestFbKey}/results/${curUser.safeKey}/entries`),data);}catch(_){}
-  // Global natijani saqlash (eng yaxshi score per user)
   if(curTestIsPublic&&curTestGlobalKey&&curTestGlobalKey!=='__mock__'){
     try{
       const exSnap=await get(ref(db,`public_tests/${curTestGlobalKey}/results/${curUser.safeKey}`));
@@ -1118,37 +1109,34 @@ TIMES.forEach(t=>{
 window.selBg=function(n){document.querySelectorAll('.bg-opt').forEach(x=>x.classList.remove('on'));document.querySelector(`.bg-opt[data-bg="${n}"]`).classList.add('on');castSettings.bg=n;};
 window.selType=function(t){document.querySelectorAll('.type-opt').forEach(x=>x.classList.remove('on'));document.querySelector(`.type-opt[data-type="${t}"]`).classList.add('on');castSettings.type=t;};
 
-// Auto toggle
 document.getElementById('auto-check').addEventListener('change',function(){
   castSettings.auto=this.checked;
   const thumb=document.getElementById('auto-thumb');
   const slider=document.getElementById('auto-slider');
   const lbl=document.getElementById('auto-lbl');
-  const desc=document.getElementById('auto-desc');
-  if(this.checked){
-    thumb.style.left='25px';slider.style.background='var(--green)';
-    lbl.textContent='Yoqiq — Avto rejim';
-    desc.textContent='Hammasi javob berganda yoki vaqt tugaganda avto o\'tadi. Shoxsupa 5 sek ko\'rinib keyin keyingi savolga o\'tadi.';
-  } else {
-    thumb.style.left='3px';slider.style.background='rgba(255,255,255,.12)';
-    lbl.textContent='O\'chirilgan — Qo\'lda boshqarish';
-    desc.textContent='Shoxsupada "Davom etish" tugmasini bosmaguningizcha keyingi savolga o\'tmaydi.';
-  }
+  if(this.checked){thumb.style.left='25px';slider.style.background='var(--green)';lbl.textContent='Yoqiq — Avto rejim';}
+  else{thumb.style.left='3px';slider.style.background='rgba(255,255,255,.12)';lbl.textContent='O\'chirilgan — Qo\'lda boshqarish';}
 });
 
-// Open cast for user's own test
 window.openCast=function(key,name,source){
   _castTestKey=key;_castTestSource=source||'user';_castOverrideQs=null;_castOverrideName=null;
   $('cast-test-name').textContent='Test: '+name;
   $('cast-modal').classList.add('on');
 };
-// Open cast with pre-loaded questions (fan/pre)
+
 function openCastDirect(qs,name){
   _castTestKey=null;_castOverrideQs=qs;_castOverrideName=name;
   $('cast-test-name').textContent='Test: '+name;
   $('cast-modal').classList.add('on');
 }
+
+// FIX: closeCast global
 window.closeCast=function(){$('cast-modal').classList.remove('on');_castOverrideQs=null;_castOverrideName=null;};
+
+// Cast modal background click
+$('cast-modal').addEventListener('click', function(e){
+  if(e.target === this) window.closeCast();
+});
 
 window.startCast=async function(){
   if(!curUser) return;
@@ -1160,7 +1148,6 @@ window.startCast=async function(){
       if(!snap.exists()){btn.disabled=false;btn.textContent='▶️ O\'yinni boshlash';return;}
       const td=snap.val();testQs=td.questions||[];testName=td.name||'Test';
     }
-    // unique 5-digit code
     let code='';
     for(let i=0;i<10;i++){
       code=String(Math.floor(10000+Math.random()*90000));
@@ -1174,7 +1161,7 @@ window.startCast=async function(){
       state:{status:'waiting',q_index:-1,q_started_at:0},
       created_at:Date.now()
     });
-    closeCast();
+    window.closeCast();
     location.href=`host-game.html?code=${code}`;
   }catch(e){console.error(e);alert('Xato: '+e.message);}
   btn.disabled=false;btn.textContent='▶️ O\'yinni boshlash';
