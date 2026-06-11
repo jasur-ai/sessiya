@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuizBlitz</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Righteous&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#06060f;--surface:#0f0f20;--card:#14142a;
+  --accent:#ff4466;--gold:#ffd60a;--green:#00ffaa;--blue:#38bdf8;--purple:#c084fc;
+  --text:#f0f0f8;--muted:#636384;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 15% 25%,rgba(255,68,102,.14) 0%,transparent 65%),
+    radial-gradient(ellipse 55% 45% at 85% 70%,rgba(56,189,248,.10) 0%,transparent 65%),
+    radial-gradient(ellipse 40% 35% at 50% 50%,rgba(192,132,252,.07) 0%,transparent 65%);
+}
+
+/* NAV */
+nav{
+  position:fixed;top:0;width:100%;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 24px;
+  background:rgba(6,6,15,.85);backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.nav-logo{
+  font-family:'Righteous',cursive;font-size:1.35rem;
+  background:linear-gradient(135deg,var(--accent),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.nav-toggle{display:flex;gap:4px;background:rgba(255,255,255,.04);border-radius:12px;padding:4px;}
+.nav-btn{
+  padding:7px 15px;border:none;border-radius:9px;
+  font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:800;cursor:pointer;
+  transition:all .2s;background:transparent;color:var(--muted);
+  text-decoration:none;display:flex;align-items:center;gap:5px;white-space:nowrap;
+}
+.nav-btn:hover{color:var(--text);}
+.nav-btn.enter:hover,.nav-btn.enter.active{background:var(--accent);color:#fff;}
+.nav-btn.user:hover,.nav-btn.user.active{background:var(--blue);color:#fff;}
+.nav-btn.admin:hover,.nav-btn.admin.active{background:var(--purple);color:#fff;}
+
+/* HERO */
+.hero{
+  position:relative;z-index:1;min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:100px 20px 60px;text-align:center;
+}
+.hero-logo{
+  font-family:'Righteous',cursive;
+  font-size:clamp(3.5rem,12vw,7rem);line-height:1;
+  background:linear-gradient(135deg,var(--accent) 0%,var(--gold) 45%,var(--green) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  animation:float 4s ease-in-out infinite;margin-bottom:10px;
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.hero-sub{color:var(--muted);font-size:1rem;font-weight:700;margin-bottom:50px;max-width:380px;line-height:1.6;}
+
+/* CARDS */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;width:100%;max-width:880px;}
+.card{
+  background:var(--card);border-radius:22px;padding:28px 22px;
+  border:1px solid rgba(255,255,255,.06);cursor:pointer;
+  text-decoration:none;color:var(--text);transition:all .3s;
+  position:relative;overflow:hidden;display:block;
+}
+.card::after{
+  content:'';position:absolute;inset:0;opacity:0;transition:opacity .3s;
+  border-radius:22px;
+}
+.card.c-enter::after{background:linear-gradient(135deg,rgba(255,68,102,.1),transparent);}
+.card.c-user::after{background:linear-gradient(135deg,rgba(56,189,248,.1),transparent);}
+.card.c-admin::after{background:linear-gradient(135deg,rgba(192,132,252,.1),transparent);}
+.card:hover{transform:translateY(-7px);box-shadow:0 24px 60px rgba(0,0,0,.5);}
+.card:hover::after{opacity:1;}
+.card.c-enter:hover{border-color:rgba(255,68,102,.35);}
+.card.c-user:hover{border-color:rgba(56,189,248,.35);}
+.card.c-admin:hover{border-color:rgba(192,132,252,.35);}
+.card-icon{font-size:2.6rem;margin-bottom:12px;display:block;}
+.card-title{font-family:'Righteous',cursive;font-size:1.35rem;margin-bottom:5px;}
+.card-desc{font-size:.82rem;font-weight:600;color:var(--muted);line-height:1.7;margin-bottom:14px;}
+.card-cta{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:.78rem;font-weight:900;padding:7px 15px;border-radius:50px;
+}
+.c-enter .card-cta{background:rgba(255,68,102,.15);color:var(--accent);}
+.c-user .card-cta{background:rgba(56,189,248,.15);color:var(--blue);}
+.c-admin .card-cta{background:rgba(192,132,252,.15);color:var(--purple);}
+
+/* STATS STRIP */
+.stats{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:40px;}
+.stat{text-align:center;}
+.stat-num{font-family:'Righteous',cursive;font-size:1.6rem;color:var(--text);}
+.stat-lbl{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+
+/* PARTICLES */
+.particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
+.p{position:absolute;border-radius:50%;animation:drift linear infinite;}
+@keyframes drift{
+  0%{transform:translateY(100vh) scale(0);opacity:0;}
+  10%{opacity:.7;}
+  90%{opacity:.7;}
+  100%{transform:translateY(-50px) scale(1);opacity:0;}
+}
+
+@media(max-width:600px){
+  nav{padding:10px 14px;}
+  .nav-btn{padding:6px 10px;font-size:.72rem;}
+  .hero-sub{font-size:.88rem;}
+  .cards{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<div class="particles" id="particles"></div>
+
+<nav>
+  <div class="nav-logo">⚡ QuizBlitz</div>
+  <div class="nav-toggle">
+    <a href="enter-game.html" class="nav-btn enter">🎮 Enter Game</a>
+    <a href="user-panel.html" class="nav-btn user">👤 Panel</a>
+    <a href="admin.html" class="nav-btn admin">⚙️ Admin</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-logo">QuizBlitz</div>
+  <p class="hero-sub">Real-vaqt jonli test platformasi — do'stlar bilan raqobatlashing!</p>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num">⚡</div><div class="stat-lbl">Real-vaqt</div></div>
+    <div class="stat"><div class="stat-num">🏆</div><div class="stat-lbl">Shoxsupa</div></div>
+    <div class="stat"><div class="stat-num">🎭</div><div class="stat-lbl">20 Karakter</div></div>
+    <div class="stat"><div class="stat-num">📊</div><div class="stat-lbl">Excel import</div></div>
+  </div>
+
+  <div class="cards">
+    <a href="enter-game.html" class="card c-enter">
+      <span class="card-icon">🎮</span>
+      <div class="card-title">Enter Game</div>
+      <p class="card-desc">5 xonali unikal kod bilan do'stlar yoki sinfdoshlar o'yiniga real-vaqtda qo'shiling</p>
+      <div class="card-cta">Qo'shilish →</div>
+    </a>
+    <a href="user-panel.html" class="card c-user">
+      <span class="card-icon">📚</span>
+      <div class="card-title">Foydalanuvchi</div>
+      <p class="card-desc">Test yaratish, Excel yuklash, jonli o'yin sifatida cast qilish va natijalarni ko'rish</p>
+      <div class="card-cta">Panel →</div>
+    </a>
+    <a href="admin.html" class="card c-admin">
+      <span class="card-icon">🔐</span>
+      <div class="card-title">Admin Panel</div>
+      <p class="card-desc">Foydalanuvchilarni boshqarish, tizim sozlamalari va Danger Zone</p>
+      <div class="card-cta">Kirish →</div>
+    </a>
+  </div>
+</div>
+
+<script>
+const pc=document.getElementById('particles');
+const cols=['#ff4466','#ffd60a','#00ffaa','#38bdf8','#c084fc'];
+for(let i=0;i<25;i++){
+  const p=document.createElement('div');p.className='p';
+  const sz=2+Math.random()*4;
+  p.style.cssText=`left:${Math.random()*100}%;width:${sz}px;height:${sz}px;background:${cols[i%5]};animation-duration:${10+Math.random()*14}s;animation-delay:${Math.random()*12}s;opacity:.5;`;
+  pc.appendChild(p);
+}
+// Highlight active nav btn
+const path=location.pathname.split('/').pop();
+document.querySelectorAll('.nav-btn').forEach(b=>{
+  if(b.getAttribute('href')===path) b.classList.add('active');
+});
+</script>
+</body>
+</html>
