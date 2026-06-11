@@ -18,13 +18,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   background:radial-gradient(ellipse 55% 40% at 15% 20%,rgba(192,132,252,.09) 0%,transparent 60%),
     radial-gradient(ellipse 45% 35% at 85% 75%,rgba(255,68,102,.06) 0%,transparent 60%);}
 
-/* LOADING */
 #loading{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
 #loading.hide{display:none;}
 .spin{width:38px;height:38px;border:3px solid rgba(255,255,255,.08);border-top-color:var(--purple);border-radius:50%;animation:sp .7s linear infinite;}
 @keyframes sp{to{transform:rotate(360deg)}}
 
-/* AUTH */
 #auth{display:none;min-height:100vh;align-items:center;justify-content:center;padding:20px;position:relative;z-index:1;}
 #auth.on{display:flex;}
 .auth-wrap{width:100%;max-width:380px;text-align:center;}
@@ -46,7 +44,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .msg.on{display:block;}
 .msg.err{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.3);color:var(--accent);}
 
-/* NAVBAR */
 #navbar{display:none;position:sticky;top:0;z-index:100;
   background:rgba(6,6,15,.9);backdrop-filter:blur(18px);
   border-bottom:1px solid var(--border);padding:10px 20px;
@@ -62,7 +59,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .icon-btn:hover{color:var(--text);background:rgba(255,255,255,.1);}
 .icon-btn.danger:hover{color:var(--accent);border-color:rgba(255,68,102,.3);}
 
-/* TABS */
 .tabs-bar{display:flex;gap:6px;padding:16px 16px 0;max-width:960px;margin:0 auto;position:relative;z-index:1;}
 .tab-btn{border:1px solid var(--border);background:rgba(255,255,255,.04);border-radius:10px 10px 0 0;
   padding:9px 16px;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;cursor:pointer;
@@ -72,17 +68,14 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .tab-pane{display:none;}
 .tab-pane.on{display:block;}
 
-/* MAIN */
 #panel{display:none;max-width:960px;margin:0 auto;padding:0 16px 60px;position:relative;z-index:1;}
 #panel.on{display:block;}
 
-/* STATS ROW */
 .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:20px 0;}
 .stat-card{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);text-align:center;}
 .stat-num{font-family:'Righteous',cursive;font-size:1.8rem;}
 .stat-lbl{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
 
-/* SECTION */
 .sec-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;margin-top:20px;flex-wrap:wrap;}
 .sec-title{font-family:'Righteous',cursive;font-size:1.05rem;display:flex;align-items:center;gap:7px;}
 .danger-badge{background:rgba(255,68,102,.15);border:1px solid rgba(255,68,102,.3);color:var(--accent);font-size:.65rem;font-weight:900;border-radius:50px;padding:3px 9px;}
@@ -92,7 +85,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   padding:6px 12px;font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:800;cursor:pointer;color:var(--muted);transition:all .2s;}
 .refresh-btn:hover{color:var(--text);background:rgba(255,255,255,.1);}
 
-/* TABLE */
 .tbl-wrap{overflow-x:auto;border-radius:14px;border:1px solid var(--border);background:var(--card);}
 table{width:100%;border-collapse:collapse;font-size:.82rem;}
 thead th{background:rgba(255,255,255,.04);padding:9px 14px;text-align:left;font-weight:800;color:var(--muted);
@@ -106,7 +98,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
 .del-user{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.2);border-radius:7px;padding:4px 9px;color:var(--accent);font-size:.72rem;font-weight:800;cursor:pointer;transition:all .18s;}
 .del-user:hover{background:rgba(255,68,102,.2);}
 
-/* RESULTS */
 .res-card{background:var(--card);border-radius:14px;padding:14px 16px;border:1px solid var(--border);margin-bottom:8px;animation:fadeUp .25s ease-out both;}
 @keyframes fadeUp{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
 .res-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
@@ -121,7 +112,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
 .top-chip:nth-child(2){border-color:rgba(192,192,192,.3);color:#c0c0c0;}
 .top-chip:nth-child(3){border-color:rgba(205,127,50,.3);color:#cd7f32;}
 
-/* FANS (Mock) section */
 .fans-add-box{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);margin-bottom:14px;}
 .fans-add-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
 .fans-inp{flex:1;min-width:160px;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.08);
@@ -151,7 +141,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
   padding:5px 10px;color:var(--accent);font-size:.72rem;font-weight:800;cursor:pointer;transition:all .18s;}
 .fan-del-btn:hover{background:rgba(255,68,102,.2);}
 
-/* PRE section */
 .pre-add-box{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);margin-bottom:14px;}
 .pre-title-inp{width:100%;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.08);border-radius:9px;
   padding:9px 12px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;
@@ -184,7 +173,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
 .progress-bar{background:rgba(255,255,255,.07);border-radius:50px;height:7px;margin-top:8px;overflow:hidden;}
 .progress-fill{background:linear-gradient(90deg,var(--purple),var(--blue));height:100%;border-radius:50px;transition:width .3s;}
 
-/* STATS */
 .ov-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:16px;}
 .ov-card{background:var(--card);border-radius:12px;padding:14px;border:1px solid var(--border);text-align:center;}
 .ov-val{font-family:'Righteous',cursive;font-size:1.6rem;}
@@ -254,7 +242,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
 <!-- MAIN PANEL -->
 <div id="panel">
 
-  <!-- ── STATS ROW ── -->
   <div class="stats-row" id="stats-row" style="display:none">
     <div class="stat-card"><div class="stat-num" id="s-users" style="color:var(--blue)">—</div><div class="stat-lbl">Foydalanuvchilar</div></div>
     <div class="stat-card"><div class="stat-num" id="s-games" style="color:var(--gold)">—</div><div class="stat-lbl">O'yinlar</div></div>
@@ -262,7 +249,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
     <div class="stat-card"><div class="stat-num" id="s-fans" style="color:var(--purple)">—</div><div class="stat-lbl">Mock Fanlar</div></div>
   </div>
 
-  <!-- ── TAB: DANGER (USERS) ── -->
+  <!-- TAB: DANGER (USERS) -->
   <div class="tab-pane on" id="pane-danger">
     <div class="sec-hd">
       <div class="sec-title">⚠️ Foydalanuvchilar <span class="danger-badge">DANGER ZONE</span></div>
@@ -276,7 +263,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
     </div>
   </div>
 
-  <!-- ── TAB: FANS (MOCK) ── -->
+  <!-- TAB: FANS (MOCK) -->
   <div class="tab-pane" id="pane-fans">
     <div class="sec-hd">
       <div class="sec-title">📚 Mock Fanlar <span class="green-badge">RANDOM 25</span></div>
@@ -298,7 +285,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
     <div id="fans-list"><div class="empty">Yuklanmoqda...</div></div>
   </div>
 
-  <!-- ── TAB: PRE ── -->
+  <!-- TAB: PRE -->
   <div class="tab-pane" id="pane-pre">
     <div class="sec-hd">
       <div class="sec-title">🔷 PRE Testlar <span class="purple-badge">SUBTESTLAR</span></div>
@@ -323,7 +310,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
     <div id="pre-list"><div class="empty">Yuklanmoqda...</div></div>
   </div>
 
-  <!-- ── TAB: RESULTS ── -->
+  <!-- TAB: RESULTS -->
   <div class="tab-pane" id="pane-results">
     <div class="sec-hd">
       <div class="sec-title">🏆 O'yin Natijalari <span class="purple-badge">SHOXSUPA</span></div>
@@ -332,7 +319,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
     <div id="results-wrap"><div class="empty">Yuklanmoqda...</div></div>
   </div>
 
-  <!-- ── TAB: STATS ── -->
+  <!-- TAB: STATS -->
   <div class="tab-pane" id="pane-stats">
     <div class="sec-hd">
       <div class="sec-title">📊 Statistika</div>
@@ -365,15 +352,25 @@ const PRE_AUTHOR_UID='__pre_admin__';
 const PRE_CHUNK=25;
 const MOCK_COUNT=25;
 
-// Global prevent default to avoid browser opening files
+// ── SESSION KEY — har sahifa yuklanganda yangi nonce ──
+// Bu orqali boshqa devicedan kirilsa old session o'chadi
+const SESSION_KEY='qb_admin_session';
+
 window.addEventListener('dragover', e => e.preventDefault());
 window.addEventListener('drop', e => e.preventDefault());
 
 // ── INIT ──
+// FIX: sessionStorage ishlatamiz (tab/window yopilganda o'chadi)
+// localStorage emas — shu tufayli boshqa device yoki yangi tab doim auth so'raydi
 $('loading').classList.add('hide');
-const saved=localStorage.getItem('qb_admin_auth');
-if(saved==='1') showPanel();
-else showAuth();
+const saved = sessionStorage.getItem(SESSION_KEY);
+if(saved === '1') {
+  showPanel();
+} else {
+  // Eski localStorage qoldiqlarini ham tozalaymiz
+  localStorage.removeItem('qb_admin_auth');
+  showAuth();
+}
 
 function showAuth(){
   $('auth').classList.add('on');
@@ -382,7 +379,12 @@ function showAuth(){
   $('panel').style.display='none';
   $('tabs-bar').style.display='none';
   $('stats-row').style.display='none';
+  // Formani tozalaymiz
+  if($('adm-user')) $('adm-user').value='';
+  if($('adm-pass')) $('adm-pass').value='';
+  if($('auth-msg')) $('auth-msg').className='msg';
 }
+
 function showPanel(){
   $('auth').classList.remove('on');
   $('navbar').classList.add('on');
@@ -398,19 +400,28 @@ window.doLogin=function(){
   const u=$('adm-user').value.trim().toLowerCase();
   const p=$('adm-pass').value;
   const msg=$('auth-msg');
-  if(u===ADMIN_USER&&p===ADMIN_PASS){
-    localStorage.setItem('qb_admin_auth','1');
+  if(u===ADMIN_USER && p===ADMIN_PASS){
+    // FIX: sessionStorage — faqat joriy tab/window uchun
+    sessionStorage.setItem(SESSION_KEY,'1');
+    // Eski localStorage ni tozalaymiz
+    localStorage.removeItem('qb_admin_auth');
     msg.className='msg';
     showPanel();
   }else{
     msg.textContent='Login yoki parol noto\'g\'ri';
     msg.className='msg err on';
+    // FIX: parolni tozalaymiz xato kiritilganda
+    $('adm-pass').value='';
+    $('adm-pass').focus();
   }
 };
+
 $('adm-user').addEventListener('keydown',e=>{if(e.key==='Enter')$('adm-pass').focus();});
 $('adm-pass').addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin();});
 
 window.doLogout=function(){
+  // FIX: sessionStorage va localStorage ikkalasini ham tozalaymiz
+  sessionStorage.removeItem(SESSION_KEY);
   localStorage.removeItem('qb_admin_auth');
   showAuth();
 };
@@ -433,7 +444,7 @@ window.loadActiveTab=function(){
   else if(curTab==='stats') loadStats();
 };
 
-// ── GLOBAL STATS (header) ──
+// ── GLOBAL STATS ──
 async function loadGlobalStats(){
   try{
     const [usersSnap,gamesSnap,fansSnap]=await Promise.all([
@@ -449,7 +460,7 @@ async function loadGlobalStats(){
   }catch(_){}
 }
 
-// ─── USERS ───
+// ── USERS ──
 async function loadUsers(){
   $('users-tbody').innerHTML='<tr><td colspan="6"><div class="empty">Yuklanmoqda...</div></td></tr>';
   try{
@@ -486,7 +497,7 @@ window.delUser=async function(key,name){
   catch(e){alert('Xato: '+e.message);}
 };
 
-// ─── FANS (MOCK) ───
+// ── FANS (MOCK) ──
 let fanPendingQs=null;
 let resetFanKey=null;
 
@@ -545,7 +556,7 @@ async function loadFans(){
         </div>
         <div class="fan-btns">
           <button type="button" class="fan-reset-btn" onclick="resetFan('${k}','${esc(f.name||k).replace(/'/g,"\\'")}')" title="Excel bilan yangilash">🔄 Yangilash</button>
-          <button type="button" class="fan-del-btn" onclick="delFan('${k}','${esc(f.name||k).replace(/'/g,"\\'")}')" >🗑️ O'chirish</button>
+          <button type="button" class="fan-del-btn" onclick="delFan('${k}','${esc(f.name||k).replace(/'/g,"\\'")}')">🗑️ O'chirish</button>
         </div>
       </div>`).join('');
   }catch(e){$('fans-list').innerHTML=`<div class="empty" style="color:var(--accent)">Yuklab bo'lmadi</div>`;}
@@ -583,7 +594,7 @@ window.delFan=async function(key,name){
   catch(e){alert('Xato: '+e.message);}
 };
 
-// ─── PRE ───
+// ── PRE ──
 let prePendingQs=null;
 function handlePreExcel(inp){
   const file = inp.files ? inp.files[0] : inp;
@@ -693,7 +704,7 @@ window.delPreGroup=async function(groupKey,groupName,keysRaw){
   }catch(e){alert('O\'chirishda xatolik: '+e.message);}
 };
 
-// ─── RESULTS ───
+// ── RESULTS ──
 async function loadResults(){
   $('results-wrap').innerHTML='<div class="empty">Yuklanmoqda...</div>';
   try{
@@ -719,7 +730,7 @@ async function loadResults(){
 }
 window.loadResults=loadResults;
 
-// ─── STATS ───
+// ── STATS ──
 async function loadStats(){
   $('stats-content').innerHTML='<div class="empty">Yuklanmoqda...</div>';
   try{
@@ -776,7 +787,7 @@ async function loadStats(){
 }
 window.loadStats=loadStats;
 
-// ─── HELPERS ───
+// ── HELPERS ──
 function setMsg(id,txt,type){
   const el=$(id);el.textContent=txt;el.className=`adm-msg on ${type||'ok'}`;
 }
@@ -827,7 +838,7 @@ function parseMockWb(wb){
     return{num:q.num,text:q.text,correctLetter:q.correctLetter,correctText:q.correctText,options:res};
   });
 }
-// ─── TEMPLATE DOWNLOAD ───
+
 window.downloadTemplate=function(){
   const headers=[['#','Savol matni','A variant','B variant','C variant','D variant','To\'g\'ri javob']];
   const sample=[
@@ -838,11 +849,11 @@ window.downloadTemplate=function(){
     [5,'Yorug\'lik tezligi (m/s)?','299 792 458','300 000 000','299 000 000','3 000 000','A'],
   ];
   const ws=XLSX.utils.aoa_to_sheet([...headers,...sample]);
-  // Column widths
   ws['!cols']=[{wch:5},{wch:40},{wch:20},{wch:20},{wch:20},{wch:20},{wch:14}];
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'Savollar');
   XLSX.writeFile(wb,'test_shablon.xlsx');
 };
 </script>
+</body>
 </html>
