@@ -59,10 +59,12 @@ nav{
   font-size:clamp(3.5rem,12vw,7rem);line-height:1;
   background:linear-gradient(135deg,var(--accent) 0%,var(--gold) 45%,var(--green) 100%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  animation:float 4s ease-in-out infinite;margin-bottom:10px;
+  animation:float 4s ease-in-out infinite;margin-bottom:50px;
+  display:inline-block;text-decoration:none;cursor:pointer;
+  transition:filter .25s ease;
 }
+.hero-logo:hover{filter:brightness(1.18);}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
-.hero-logo{margin-bottom:50px;}
 
 /* CARDS */
 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;width:100%;max-width:880px;}
@@ -132,7 +134,7 @@ nav{
 </nav>
 
 <div class="hero">
-  <div class="hero-logo">QuizBlitz</div>
+  <a href="enter-game.html" class="hero-logo">QuizBlitz</a>
 
   <div class="cards">
     <a href="enter-game.html" class="card c-enter">
