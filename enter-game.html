@@ -365,7 +365,7 @@ const RANK_CLS=['r1','r2','r3','','','',''];
 let code='', name='', emoji='', selEmoji='';
 let stateRef=null, playersRef=null;
 let timerIv=null, qTime=20, qStartAt=0, gameEnded=false, lbTimeoutId=null;
-let hasAnswered=false, curQIdx=-1, lastPickedIdx=-1, lastCorrectIdx=-1, lastEarned=0;
+let hasAnswered=false, curQIdx=-1, lastPickedIdx=-1, lastCorrectIdx=-1, lastCorrectText='', lastEarned=0;
 
 // ── HELPERS ──
 const $=id=>document.getElementById(id);
@@ -523,6 +523,7 @@ function showQActive(st){
   goTo('s-qact');
 
   lastCorrectIdx=st.q_correct||0;
+  lastCorrectText=(st.q_options||[])[lastCorrectIdx]||'';
   lastPickedIdx=-1;
   // Start timer display
   qTime=st.q_time||20;
@@ -604,7 +605,7 @@ function showLb(lb){
     $('res-icon').textContent='⏱️';
     $('res-title').textContent="Vaqt tugadi!";
     $('res-pts').textContent='';
-    $('res-correct').textContent='Javob bermadingiz';
+    $('res-correct').textContent=lastCorrectText?`To'g'ri javob: ${lastCorrectText}`:'Javob bermadingiz';
   } else if(isCorrect){
     $('res-icon').textContent='✅';
     $('res-title').textContent="To'g'ri!";
@@ -615,7 +616,7 @@ function showLb(lb){
     $('res-icon').textContent='❌';
     $('res-title').textContent="Xato!";
     $('res-pts').textContent='';
-    $('res-correct').textContent='';
+    $('res-correct').textContent=lastCorrectText?`To'g'ri javob: ${lastCorrectText}`:'';
   }
   goTo('s-result');
   if(lbTimeoutId) clearTimeout(lbTimeoutId);
@@ -648,7 +649,8 @@ async function rejoinSession(){
   try{
     const snap=await get(ref(db,`game_sessions/${code}/state`));
     const st=snap.val();
-    if(!st||st.status==='ended'){sessionStorage.removeItem('qb_player');return;}
+    if(!st){sessionStorage.removeItem('qb_player');return;}
+    if(st.status==='ended'){showEnded(st.leaderboard||[]);return;}
     startLobby();
   }catch(_){sessionStorage.removeItem('qb_player');}
 }

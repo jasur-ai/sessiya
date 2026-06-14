@@ -553,7 +553,7 @@ async function computeScores(idx){
       else if(ratio<.9) pts=20;
       else pts=10;
     }
-    if(type==='bonus'&&q.is_double) pts*=2;
+    if(q.is_double) pts*=2;
 
     const cur=playersSnap[pname]?.score||0;
     const newScore=cur+pts;
@@ -619,7 +619,10 @@ function renderLbFull(lb){
 }
 
 // ── FINISH ──
+let gameFinished=false;
 async function finishGame(){
+  if(gameFinished) return;
+  gameFinished=true;
   const snap=await get(ref(db,`game_sessions/${code}/players`));
   const all=snap.val()||{};
 
@@ -660,7 +663,7 @@ function startHostTimer(startAt,total){
     arc.style.strokeDashoffset=circ*(1-rem/total);
     arc.style.stroke=rem<total*.3?'#ff4466':rem<total*.6?'#f2a827':'var(--green)';
     num.textContent=Math.ceil(rem);
-    if(rem<=0){stopTimer();if(!isProcessing)hostNext();}  // FIX: guard against double-fire
+    if(rem<=0){stopTimer();if(!isProcessing)setTimeout(()=>{if(!isProcessing)hostNext();},500);}  // FIX: small delay so last-moment answers reach DB before scoring
   },100);
 }
 function stopTimer(){if(timerIv){clearInterval(timerIv);timerIv=null;}}
