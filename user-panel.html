@@ -335,24 +335,24 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
         <button type="button" class="tab on" id="tab-login" onclick="switchAuthTab('login')">🔑 Kirish</button>
         <button type="button" class="tab" id="tab-reg" onclick="switchAuthTab('reg')">📝 Ro'yxat</button>
       </div>
-      <div id="form-login">
+      <form id="form-login" autocomplete="on" onsubmit="event.preventDefault();window.doLogin();return false;">
         <div class="msg err" id="login-msg"></div>
         <label class="lbl">Foydalanuvchi nomi</label>
-        <input class="inp" id="login-user" type="text" placeholder="username" autocomplete="off" autocapitalize="off">
+        <input class="inp" id="login-user" name="username" type="text" placeholder="username" autocomplete="username" autocapitalize="off">
         <label class="lbl">Parol</label>
-        <input class="inp" id="login-pass" type="password" placeholder="••••••">
-        <button type="button" class="btn btn-red" id="login-btn" onclick="doLogin()">Kirish →</button>
-      </div>
-      <div id="form-reg" style="display:none;">
+        <input class="inp" id="login-pass" name="password" type="password" placeholder="••••••" autocomplete="current-password">
+        <button type="submit" class="btn btn-red" id="login-btn">Kirish →</button>
+      </form>
+      <form id="form-reg" style="display:none;" autocomplete="on" onsubmit="event.preventDefault();window.doRegister();return false;">
         <div class="msg err" id="reg-msg"></div>
         <label class="lbl">Foydalanuvchi nomi</label>
-        <input class="inp" id="reg-user" type="text" placeholder="username (harf, raqam, _)" autocomplete="off" autocapitalize="off">
+        <input class="inp" id="reg-user" name="username" type="text" placeholder="username (harf, raqam, _)" autocomplete="username" autocapitalize="off">
         <label class="lbl">Parol</label>
-        <input class="inp" id="reg-pass" type="password" placeholder="kamida 4 ta belgi">
+        <input class="inp" id="reg-pass" name="new-password" type="password" placeholder="kamida 4 ta belgi" autocomplete="new-password">
         <label class="lbl">Parolni tasdiqlang</label>
-        <input class="inp" id="reg-pass2" type="password" placeholder="••••••">
-        <button type="button" class="btn btn-blue" id="reg-btn" onclick="doRegister()">Ro'yxatdan o'tish →</button>
-      </div>
+        <input class="inp" id="reg-pass2" name="new-password2" type="password" placeholder="••••••" autocomplete="new-password">
+        <button type="submit" class="btn btn-blue" id="reg-btn">Ro'yxatdan o'tish →</button>
+      </form>
     </div>
     <p style="text-align:center;margin-top:14px;font-size:.74rem;color:var(--muted);">
       <a href="index.html" style="color:var(--muted);text-decoration:none;">← Bosh sahifaga qaytish</a>
@@ -1165,20 +1165,14 @@ window.startCast=async function(){
 };
 
 // ── ENTER KEY BINDINGS ──
-$('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')window.doLogin();});
-$('login-user').addEventListener('keydown',e=>{if(e.key==='Enter')$('login-pass').focus();});
-$('reg-pass2').addEventListener('keydown',e=>{if(e.key==='Enter')window.doRegister();});
+$('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();window.doLogin();}});
+$('login-user').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('login-pass').focus();}});
+$('reg-pass2').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();window.doRegister();}});
 
 // ── INIT ──
-(async function(){
-  const saved=localStorage.getItem('qb_user');
-  if(saved){
-    try{
-      const d=JSON.parse(saved);
-      const snap=await get(ref(db,`users/${d.safeKey}`));
-      if(snap.exists()){curUser=d;setNavUser();showPanel();return;}
-    }catch(_){}
-  }
+// Har safar login/parol ekrani ko'rsatiladi (avto-kirish o'chirilgan).
+// Brauzer/qurilma o'zi saqlagan login-parolni avtomatik to'ldirishi mumkin.
+(function(){
   showAuth();
 })();
 </script>
