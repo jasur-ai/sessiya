@@ -28,9 +28,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 #auth{display:none;min-height:100vh;align-items:center;justify-content:center;padding:30px 20px;position:relative;z-index:1;}
 #auth.on{display:flex;}
 .auth-wrap{width:100%;max-width:420px;}
-.auth-logo{font-family:'Righteous',cursive;font-size:2.2rem;text-align:center;margin-bottom:4px;
+.auth-logo{font-family:'Righteous',cursive;font-size:2.2rem;text-align:center;margin-bottom:24px;
   background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.auth-sub{color:var(--muted);font-size:.82rem;font-weight:700;text-align:center;margin-bottom:24px;}
 .auth-box{background:var(--card);border-radius:20px;padding:26px;border:1px solid var(--border);box-shadow:var(--shadow);}
 .tab-row{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:20px;background:rgba(255,255,255,.04);border-radius:10px;padding:4px;}
 .tab{padding:9px;border-radius:7px;border:none;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted);}
@@ -331,7 +330,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 <div id="auth">
   <div class="auth-wrap">
     <div class="auth-logo">⚡ QuizBlitz</div>
-    <p class="auth-sub">Foydalanuvchi paneli — kirish yoki ro'yxatdan o'tish</p>
     <div class="auth-box">
       <div class="tab-row">
         <button type="button" class="tab on" id="tab-login" onclick="switchAuthTab('login')">🔑 Kirish</button>
@@ -366,8 +364,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 <div id="panel">
 
   <div style="margin-bottom:24px;">
-    <div style="font-family:'Righteous',cursive;font-size:1.5rem;margin-bottom:4px;">⚡ QuizBlitz Panel</div>
-    <p style="color:var(--muted);font-size:.8rem;font-weight:700;margin-bottom:14px;">Testlarni boshqaring, Mock test ishlang yoki jonli o'yin boshlang</p>
+    <div style="font-family:'Righteous',cursive;font-size:1.5rem;margin-bottom:14px;">⚡ QuizBlitz Panel</div>
     <div class="search-row">
       <input class="search-inp" id="search-inp" placeholder="🔍 Umumiy test qidirish (nomi bo'yicha)...">
       <button type="button" class="search-btn" onclick="doGlobalSearch()">Qidirish</button>

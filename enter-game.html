@@ -85,7 +85,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
     radial-gradient(ellipse at 75% 70%,rgba(56,189,248,.1) 0%,transparent 55%),var(--bg);
 }
 .lobby-wrap{text-align:center;max-width:560px;width:100%;}
-.lob-label{color:var(--muted);font-size:.76rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.lob-label{color:var(--muted);font-size:.76rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;margin-top:20px;}
 .lob-code{font-family:'Righteous',cursive;font-size:4.5rem;color:var(--gold);letter-spacing:10px;animation:glow 2.5s ease-in-out infinite;}
 @keyframes glow{0%,100%{text-shadow:0 0 20px rgba(255,214,10,.3)}50%{text-shadow:0 0 50px rgba(255,214,10,.7)}}
 .lob-count{font-family:'Righteous',cursive;font-size:1.3rem;color:var(--green);margin:14px 0 10px;}
@@ -104,7 +104,6 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .qprev-num{color:var(--muted);font-size:.85rem;font-weight:800;margin-bottom:8px;}
 .qprev-text{font-family:'Righteous',cursive;font-size:clamp(1.4rem,5vw,2.4rem);max-width:660px;line-height:1.45;color:var(--text);}
 .badge-double{display:inline-block;padding:5px 14px;border-radius:50px;font-size:.75rem;font-weight:900;background:rgba(255,214,10,.18);border:1px solid rgba(255,214,10,.4);color:var(--gold);margin-bottom:10px;}
-.prep-hint{margin-top:24px;color:var(--muted);font-size:.82rem;}
 
 /* ─── QUESTION ACTIVE ─── */
 #s-qact{
@@ -167,9 +166,8 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   text-align:center;
   background:radial-gradient(ellipse at 50% 20%,rgba(255,214,10,.18) 0%,transparent 55%),var(--bg);
 }
-.lb-title{font-family:'Righteous',cursive;font-size:2rem;color:var(--gold);margin-bottom:2px;animation:gleam 2s ease-in-out infinite;}
+.lb-title{font-family:'Righteous',cursive;font-size:2rem;color:var(--gold);margin-bottom:18px;animation:gleam 2s ease-in-out infinite;}
 @keyframes gleam{0%,100%{text-shadow:0 0 20px rgba(255,214,10,.3)}50%{text-shadow:0 0 50px rgba(255,214,10,.9)}}
-.lb-sub{color:var(--muted);font-size:.8rem;margin-bottom:16px;}
 .lb-list{width:100%;max-width:480px;margin:0 auto;}
 .lbi{
   display:flex;align-items:center;gap:11px;
@@ -196,7 +194,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 #s-end .lb-list::-webkit-scrollbar{width:4px;}
 #s-end .lb-list::-webkit-scrollbar-track{background:rgba(255,255,255,.04);}
 #s-end .lb-list::-webkit-scrollbar-thumb{background:rgba(255,214,10,.35);border-radius:4px;}
-.end-title{font-family:'Righteous',cursive;font-size:2.2rem;color:var(--green);margin-top:10px;}
+.end-title{font-family:'Righteous',cursive;font-size:2.2rem;color:var(--green);margin:10px 0 18px;}
 .confetti{font-size:3.5rem;animation:bounce 1.2s ease-in-out infinite;}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
 
@@ -244,7 +242,6 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   <button type="button" class="toplink" onclick="goTo('s-name')" style="border:none;cursor:pointer;">← Orqaga</button>
   <div class="box" style="max-width:460px;">
     <div class="box-title">🎭 Karakteringizni tanlang</div>
-    <p class="box-sub">O'yinda sizni vakil qiladigan emoji — hammaning o'zicha!</p>
     <div class="emoji-grid" id="emoji-grid"></div>
     <button type="button" class="btn btn-green" id="join-btn" disabled onclick="joinGame()">O'yinga qo'shilish ✓</button>
   </div>
@@ -254,7 +251,6 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 <div class="screen" id="s-lobby">
   <div class="lobby-wrap">
     <div class="logo" style="font-size:1.5rem;margin-bottom:4px;">🏟️ Lobby</div>
-    <p style="color:var(--muted);font-size:.8rem;font-weight:700;margin-bottom:20px;">O'yin boshlashini kuting</p>
     <div class="lob-label">O'YIN KODI</div>
     <div class="lob-code" id="lob-code">—</div>
     <div class="lob-count" id="lob-count">0 o'yinchi</div>
@@ -269,7 +265,6 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   <div id="qp-badge"></div>
   <div class="qprev-num" id="qp-num">Savol 1</div>
   <div class="qprev-text" id="qp-text">Savol yuklanmoqda...</div>
-  <p class="prep-hint">⏳ Javoblar tez orada...</p>
 </div>
 
 <!-- ══ S6: QUESTION ACTIVE ══ -->
@@ -314,7 +309,6 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   <div style="text-align:center;">
     <div id="wlb-icon" style="font-size:3.5rem;margin-bottom:14px;animation:bounce 1.4s ease-in-out infinite;">🏆</div>
     <div style="font-family:'Righteous',cursive;font-size:1.5rem;color:var(--gold);animation:gleam 2s ease-in-out infinite;">Shoxsupa...</div>
-    <p style="color:var(--muted);font-size:.82rem;margin-top:8px;font-weight:700;">Natijalar ko'rsatilmoqda</p>
     <div class="dots" style="justify-content:center;margin-top:16px;"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
   </div>
 </div>
@@ -333,7 +327,6 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 <div class="screen" id="s-lb">
   <div style="width:100%;">
     <div class="lb-title">🏆 Shoxsupa</div>
-    <p class="lb-sub">Eng yaxshi o'yinchilar</p>
     <div class="lb-list" id="lb-list"></div>
   </div>
 </div>
@@ -342,7 +335,6 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 <div class="screen" id="s-end">
   <div class="confetti">🎉</div>
   <div class="end-title">O'yin Tugadi!</div>
-  <p style="color:var(--muted);font-size:.84rem;margin:6px 0 18px;">Yakuniy natijalar</p>
   <div class="lb-list" id="end-lb"></div>
   <a href="index.html" class="btn btn-red" style="display:inline-flex;max-width:280px;margin-top:22px;text-decoration:none;">🏠 Bosh sahifaga</a>
 </div>

@@ -26,9 +26,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 #auth{display:none;min-height:100vh;align-items:center;justify-content:center;padding:20px;position:relative;z-index:1;}
 #auth.on{display:flex;}
 .auth-wrap{width:100%;max-width:380px;text-align:center;}
-.auth-logo{font-family:'Righteous',cursive;font-size:2.2rem;margin-bottom:4px;
+.auth-logo{font-family:'Righteous',cursive;font-size:2.2rem;margin-bottom:24px;
   background:linear-gradient(135deg,var(--purple),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.auth-sub{color:var(--muted);font-size:.8rem;font-weight:700;margin-bottom:20px;}
 .auth-box{background:var(--card);border-radius:20px;padding:26px;border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.5);}
 .lbl{font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;display:block;text-align:left;}
 .inp{width:100%;background:rgba(255,255,255,.05);border:2px solid var(--border);border-radius:10px;
@@ -205,7 +204,6 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
 <div id="auth">
   <div class="auth-wrap">
     <div class="auth-logo">⚙️ Admin</div>
-    <div class="auth-sub">QuizBlitz boshqaruv paneli</div>
     <div class="auth-box">
       <div class="msg err" id="auth-msg"></div>
       <label class="lbl">Admin login</label>
