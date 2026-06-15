@@ -502,6 +502,7 @@ window.hostNext=async function(){
   stopTimer();
   if(ansUnsubscribe){ansUnsubscribe();ansUnsubscribe=null;}
   clearTimeout(autoNextTm);
+  clearTimeout(lateAnswerTm);
 
   const savedIdx=qIdx; // snapshot current index before any async
   try{
@@ -632,6 +633,7 @@ async function finishGame(){
   // FIX: faol savol vaqtida tugatilsa ham, kechiktirilgan auto-advance state'ni qayta yozib yubormasligi uchun
   if(ansUnsubscribe){ansUnsubscribe();ansUnsubscribe=null;}
   clearTimeout(autoNextTm);
+  clearTimeout(lateAnswerTm);
   const snap=await get(ref(db,`game_sessions/${code}/players`));
   const all=snap.val()||{};
 
@@ -662,6 +664,7 @@ window.confirmEnd=function(){
 };
 
 // ── TIMER ──
+let lateAnswerTm=null;
 function startHostTimer(startAt,total){
   const arc=$('t-arc'),num=$('t-num');
   const circ=144.5;
@@ -672,7 +675,16 @@ function startHostTimer(startAt,total){
     arc.style.strokeDashoffset=circ*(1-rem/total);
     arc.style.stroke=rem<total*.3?'#ff4466':rem<total*.6?'#f2a827':'var(--green)';
     num.textContent=Math.ceil(rem);
-    if(rem<=0){stopTimer();if(!isProcessing&&session.settings?.auto!==false)setTimeout(()=>{if(!isProcessing)hostNext();},500);}  // FIX: small delay so last-moment answers reach DB before scoring + respect manual mode
+    if(rem<=0){
+      stopTimer();
+      if(!isProcessing&&session.settings?.auto!==false){
+        // FIX: ushbu timeout endi saqlanadi va hostNext ichida bekor qilinadi —
+        // aks holda ba'zan u "all answered" auto-advance bilan to'qnashib,
+        // bitta savol uchun hostNext() ikki marta chaqirilib, ball ikki marta hisoblanardi.
+        clearTimeout(lateAnswerTm);
+        lateAnswerTm=setTimeout(()=>{if(!isProcessing)hostNext();},500);  // small delay so last-moment answers reach DB before scoring
+      }
+    }
   },100);
 }
 function stopTimer(){if(timerIv){clearInterval(timerIv);timerIv=null;}}
