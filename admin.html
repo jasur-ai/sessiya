@@ -58,20 +58,28 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .icon-btn:hover{color:var(--text);background:rgba(255,255,255,.1);}
 .icon-btn.danger:hover{color:var(--accent);border-color:rgba(255,68,102,.3);}
 
-.tabs-bar{display:flex;gap:6px;padding:16px 16px 0;max-width:960px;margin:0 auto;position:relative;z-index:1;}
-.tab-btn{border:1px solid var(--border);background:rgba(255,255,255,.04);border-radius:10px 10px 0 0;
-  padding:9px 16px;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;cursor:pointer;
-  color:var(--muted);transition:all .2s;}
-.tab-btn.on{background:var(--card);color:var(--text);border-bottom-color:var(--card);}
-.tab-btn:hover:not(.on){background:rgba(255,255,255,.07);color:var(--text);}
+.admin-layout{display:flex;align-items:flex-start;max-width:1200px;margin:0 auto;position:relative;z-index:1;}
+
+.sidebar{display:none;flex-direction:column;gap:3px;width:200px;flex-shrink:0;
+  padding:18px 12px;position:sticky;top:53px;align-self:flex-start;}
+.sidebar.on{display:flex;}
+.side-btn{display:flex;align-items:center;gap:10px;text-align:left;border:1px solid transparent;
+  background:transparent;border-radius:10px;padding:10px 13px;width:100%;
+  font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:800;
+  color:var(--muted);cursor:pointer;transition:all .2s;}
+.side-btn:hover:not(.on){background:rgba(255,255,255,.05);color:var(--text);}
+.side-btn.on{background:rgba(192,132,252,.1);color:var(--purple);border-color:rgba(192,132,252,.25);}
+.side-ico{font-size:1rem;flex-shrink:0;}
+
 .tab-pane{display:none;}
 .tab-pane.on{display:block;}
 
-#panel{display:none;max-width:960px;margin:0 auto;padding:0 16px 60px;position:relative;z-index:1;}
+#panel{display:none;flex:1;min-width:0;padding:0 16px 60px;position:relative;z-index:1;}
 #panel.on{display:block;}
 
 .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:20px 0;}
-.stat-card{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);text-align:center;}
+.stat-card{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);
+  border-left:4px solid var(--border);text-align:center;}
 .stat-num{font-family:'Righteous',cursive;font-size:1.8rem;}
 .stat-lbl{font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px;}
 
@@ -195,6 +203,13 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
 
 .sec-saving{display:none;align-items:center;gap:8px;font-size:.8rem;font-weight:700;color:var(--muted);margin-top:8px;}
 .sec-saving .spin{width:16px;height:16px;border-width:2px;}
+
+@media(max-width:768px){
+  .admin-layout{flex-direction:column;}
+  .sidebar{width:100%;flex-direction:row;overflow-x:auto;position:static;
+    padding:10px 12px;gap:6px;border-bottom:1px solid var(--border);}
+  .side-btn{white-space:nowrap;width:auto;}
+}
 </style>
 </head>
 <body>
@@ -228,23 +243,24 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
   </div>
 </nav>
 
-<!-- TABS BAR -->
-<div class="tabs-bar" id="tabs-bar" style="display:none">
-  <button type="button" class="tab-btn on" onclick="switchTab('danger')" id="tbtn-danger">⚠️ Foydalanuvchilar</button>
-  <button type="button" class="tab-btn" onclick="switchTab('fans')" id="tbtn-fans">📚 Mock Fanlar</button>
-  <button type="button" class="tab-btn" onclick="switchTab('pre')" id="tbtn-pre">🔷 PRE Testlar</button>
-  <button type="button" class="tab-btn" onclick="switchTab('results')" id="tbtn-results">🏆 Natijalar</button>
-  <button type="button" class="tab-btn" onclick="switchTab('stats')" id="tbtn-stats">📊 Statistika</button>
-</div>
+<!-- ADMIN LAYOUT: SIDEBAR + PANEL -->
+<div class="admin-layout">
+  <div class="sidebar" id="sidebar">
+    <button type="button" class="side-btn on" onclick="switchTab('danger')" id="tbtn-danger"><span class="side-ico">⚠️</span> Foydalanuvchilar</button>
+    <button type="button" class="side-btn" onclick="switchTab('fans')" id="tbtn-fans"><span class="side-ico">📚</span> Mock Fanlar</button>
+    <button type="button" class="side-btn" onclick="switchTab('pre')" id="tbtn-pre"><span class="side-ico">🔷</span> PRE Testlar</button>
+    <button type="button" class="side-btn" onclick="switchTab('results')" id="tbtn-results"><span class="side-ico">🏆</span> Natijalar</button>
+    <button type="button" class="side-btn" onclick="switchTab('stats')" id="tbtn-stats"><span class="side-ico">📊</span> Statistika</button>
+  </div>
 
 <!-- MAIN PANEL -->
 <div id="panel">
 
   <div class="stats-row" id="stats-row" style="display:none">
-    <div class="stat-card"><div class="stat-num" id="s-users" style="color:var(--blue)">—</div><div class="stat-lbl">Foydalanuvchilar</div></div>
-    <div class="stat-card"><div class="stat-num" id="s-games" style="color:var(--gold)">—</div><div class="stat-lbl">O'yinlar</div></div>
-    <div class="stat-card"><div class="stat-num" id="s-tests" style="color:var(--green)">—</div><div class="stat-lbl">Testlar</div></div>
-    <div class="stat-card"><div class="stat-num" id="s-fans" style="color:var(--purple)">—</div><div class="stat-lbl">Mock Fanlar</div></div>
+    <div class="stat-card" style="border-left-color:var(--blue)"><div class="stat-num" id="s-users" style="color:var(--blue)">—</div><div class="stat-lbl">Foydalanuvchilar</div></div>
+    <div class="stat-card" style="border-left-color:var(--gold)"><div class="stat-num" id="s-games" style="color:var(--gold)">—</div><div class="stat-lbl">O'yinlar</div></div>
+    <div class="stat-card" style="border-left-color:var(--green)"><div class="stat-num" id="s-tests" style="color:var(--green)">—</div><div class="stat-lbl">Testlar</div></div>
+    <div class="stat-card" style="border-left-color:var(--purple)"><div class="stat-num" id="s-fans" style="color:var(--purple)">—</div><div class="stat-lbl">Mock Fanlar</div></div>
   </div>
 
   <!-- TAB: DANGER (USERS) -->
@@ -327,6 +343,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
   </div>
 
 </div><!-- #panel -->
+</div><!-- .admin-layout -->
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -375,7 +392,7 @@ function showAuth(){
   $('navbar').classList.remove('on');
   $('panel').classList.remove('on');
   $('panel').style.display='none';
-  $('tabs-bar').style.display='none';
+  $('sidebar').classList.remove('on');
   $('stats-row').style.display='none';
   // Formani tozalaymiz
   if($('adm-user')) $('adm-user').value='';
@@ -388,7 +405,7 @@ function showPanel(){
   $('navbar').classList.add('on');
   $('panel').classList.add('on');
   $('panel').style.display='block';
-  $('tabs-bar').style.display='flex';
+  $('sidebar').classList.add('on');
   $('stats-row').style.display='grid';
   loadGlobalStats();
   loadActiveTab();
@@ -428,7 +445,7 @@ window.doLogout=function(){
 let curTab='danger';
 window.switchTab=function(tab){
   curTab=tab;
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.side-btn').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('on'));
   $(`tbtn-${tab}`).classList.add('on');
   $(`pane-${tab}`).classList.add('on');
