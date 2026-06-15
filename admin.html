@@ -255,7 +255,7 @@ tbody tr:hover td{background:rgba(255,255,255,.02);}
     </div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>#</th><th>Login</th><th>Parol</th><th>Ro'yxatdan o'tgan</th><th>Testlar</th><th>O'chirish</th></tr></thead>
+        <thead><tr><th>#</th><th>Login</th><th>Parol (hash)</th><th>Ro'yxatdan o'tgan</th><th>Testlar</th><th>O'chirish</th></tr></thead>
         <tbody id="users-tbody"><tr><td colspan="6"><div class="empty">Yuklanmoqda...</div></td></tr></tbody>
       </table>
     </div>
@@ -474,7 +474,9 @@ async function loadUsers(){
       const tests=u.tests?Object.keys(u.tests).length:0;
       const ts=u.created_at||0;
       const date=ts?new Date(ts).toLocaleString('uz-UZ',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'—';
-      const pass=u.password||u.pass||'—';
+      // FIX: parollar endi SHA-256 hash sifatida saqlanadi — ochiq matn ko'rsatilmaydi.
+      const rawPass=u.password||u.pass||'—';
+      const pass=rawPass.length===64?rawPass.slice(0,12)+'…':rawPass;
       rows+=`<tr>
         <td style="color:var(--muted)">${i+1}</td>
         <td><span class="u-name">${esc(u.username||key)}</span></td>

@@ -556,7 +556,17 @@ function processRows(rows){
   for(let i=0;i<rows.length;i++){
     const r=rows[i];
     const text=String(r[0]||'').trim();
-    if(!text||text.toLowerCase().includes('savol')||text.toLowerCase().includes('question')) continue;
+    if(!text) continue;
+    // FIX: faqat BIRINCHI qatorni, va faqat haqiqatan sarlavhaga o'xshasa, o'tkazib yuboramiz.
+    // Avvalgi versiya har qanday "savol"/"question" so'zi bor matnni tashlab yuborardi —
+    // bu o'zbekcha savol matnlarining ko'pchiligini noto'g'ri filtrlardi.
+    if(i===0){
+      const t=text.toLowerCase();
+      const opt1=String(r[1]||'').trim().toLowerCase();
+      const looksLikeHeader=(t.includes('savol')||t.includes('question'))
+        &&(opt1.includes('variant')||opt1.includes('javob')||opt1.includes('option')||opt1.includes("to'g'ri")||opt1.includes('togri'));
+      if(looksLikeHeader) continue;
+    }
     const opts=[];
     for(let j=1;j<=5;j++){const v=String(r[j]||'').trim();if(v)opts.push(v);}
     if(opts.length<2) continue;

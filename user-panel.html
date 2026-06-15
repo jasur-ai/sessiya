@@ -559,6 +559,11 @@ const COLORS=['#e74c3c','#3498db','#f39c12','#27ae60','#9b59b6'];
 const $=id=>document.getElementById(id);
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function sk(s){return s.toLowerCase().replace(/[^a-z0-9_]/g,'_');}
+// FIX: parollar endi ochiq matnda saqlanmaydi — SHA-256 hash sifatida saqlanadi.
+async function hashPass(p,salt){
+  const buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('qb_'+salt+'_'+p));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
 function fmtT(s){return s<60?s+'s':Math.floor(s/60)+'min '+(s%60)+'s';}
 function normStr(s){return String(s||'').toLowerCase().replace(/\s+/g,' ').trim();}
 function loading(show){show?$('loading').classList.remove('hide'):$('loading').classList.add('hide');}
@@ -584,7 +589,15 @@ window.doLogin=async function(){
     const snap=await get(ref(db,`users/${sk(u)}`));
     if(!snap.exists()){showMsg('login-msg','❌ Foydalanuvchi topilmadi');btn.disabled=false;btn.textContent='Kirish →';return;}
     const d=snap.val();
-    if(d.password!==p){showMsg('login-msg','❌ Parol noto\'g\'ri');btn.disabled=false;btn.textContent='Kirish →';return;}
+    const hashed=await hashPass(p,sk(u));
+    if(d.password===hashed){
+      // OK — hash mos keldi
+    }else if(d.password===p){
+      // Eski (ochiq matnli) parol — kirish ruxsat etiladi va hashga ko'chiriladi
+      try{await set(ref(db,`users/${sk(u)}/password`),hashed);}catch(_){}
+    }else{
+      showMsg('login-msg','❌ Parol noto\'g\'ri');btn.disabled=false;btn.textContent='Kirish →';return;
+    }
     curUser={username:d.username||u,safeKey:sk(u)};
     localStorage.setItem('qb_user',JSON.stringify(curUser));
     setNavUser();showPanel();
@@ -602,7 +615,7 @@ window.doRegister=async function(){
   try{
     const snap=await get(ref(db,`users/${sk(u)}`));
     if(snap.exists()){showMsg('reg-msg','❌ Bu nom band');btn.disabled=false;btn.textContent='Ro\'yxatdan o\'tish →';return;}
-    await set(ref(db,`users/${sk(u)}`),{username:u,password:p,created_at:Date.now(),safeKey:sk(u)});
+    await set(ref(db,`users/${sk(u)}`),{username:u,password:await hashPass(p,sk(u)),created_at:Date.now(),safeKey:sk(u)});
     curUser={username:u,safeKey:sk(u)};
     localStorage.setItem('qb_user',JSON.stringify(curUser));
     setNavUser();showPanel();
@@ -787,7 +800,8 @@ async function startMockTest(fanKey){
     if(!snap.exists()||!snap.val().questions||!snap.val().questions.length){alert('Bu fanda savollar topilmadi!');return;}
     const all=snap.val().questions.map(q=>{
       const opts=q.options.map(o=>({...o,isCorrect:q.correctLetter?(o.letter===q.correctLetter):(normStr(o.text)===normStr(q.correctText))}));
-      if(!opts.some(o=>o.isCorrect)&&opts.length) opts[0].isCorrect=true;
+      // FIX: agar to'g'ri javob hech qaysi variantga mos kelmasa, A-ni majburiy
+      // "to'g'ri" deb belgilamaymiz — aks holda A tanlagan hamma noto'g'ri ball oladi.
       return{...q,options:opts};
     });
     const shuffled=[...all].sort(()=>Math.random()-.5);
@@ -935,8 +949,17 @@ function selectAnswer(btn,opt,q){
   }else{
     wrongCnt++;btn.classList.add('wrong-ans');
     document.querySelectorAll('.opt-btn').forEach(b=>{if(b.getAttribute('data-correct')==='1')b.classList.add('correct-ans');});
-    const co=q.options.find(o=>o.isCorrect);
-    const correctText=co?(typeof co==='string'?co:(co.text||'')):(q.correctText||'');
+    // FIX: foydalanuvchi yaratgan testlarda options — string massiv (o.isCorrect mavjud emas),
+    // shuning uchun find() doim undefined qaytarib, "To'g'ri: " bo'sh chiqib qolardi.
+    const rawOpts=q.options||[];
+    const isStrArr=rawOpts.length>0&&typeof rawOpts[0]==='string';
+    let correctText='';
+    if(isStrArr){
+      correctText=rawOpts[q.correct]||'';
+    }else{
+      const co=rawOpts.find(o=>o.isCorrect);
+      correctText=co?(co.text||''):(q.correctText||'');
+    }
     $('fb-bar').className='fb-bar show fb-wrong';$('fb-text').textContent=`❌ Xato! To'g'ri: ${correctText}`;
     wrongQs.push({q,yourAnswer:opt.text,correctAnswer:correctText});
   }

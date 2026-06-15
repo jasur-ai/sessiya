@@ -341,7 +341,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, get, onValue, off } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, set, get, onValue, off, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const FB={apiKey:"AIzaSyA-2Uf7dZf1kqf7c32txyTFXSd2PCJbJLw",authDomain:"sessiya-11767.firebaseapp.com",databaseURL:"https://sessiya-11767-default-rtdb.firebaseio.com",projectId:"sessiya-11767",storageBucket:"sessiya-11767.firebasestorage.app",messagingSenderId:"883067400258",appId:"1:883067400258:web:941d591d38755c73247ddb"};
 const app=initializeApp(FB);
@@ -422,6 +422,8 @@ window.checkName=async function(){
   const v=$('name-inp').value.trim();
   if(!v){showMsg('name-msg','Ism kiriting');return;}
   if(v.length>20){showMsg('name-msg','Ism 20 harfdan oshmasin');return;}
+  // Firebase kalitlarida taqiqlangan belgilar: . $ # [ ] / va boshqaruv belgilari
+  if(/[.$#\[\]\/\x00-\x1F\x7F]/.test(v)){showMsg('name-msg','Ismda quyidagi belgilar bo\'lmasin: . $ # [ ] /');return;}
   const btn=$('name-btn');btn.disabled=true;btn.textContent='Tekshirilmoqda...';
   try{
     const snap=await get(ref(db,`game_sessions/${code}/players/${v}`));
@@ -438,10 +440,25 @@ window.joinGame=async function(){
   emoji=selEmoji;
   const btn=$('join-btn');btn.disabled=true;btn.textContent='Qo\'shilmoqda...';
   try{
-    await set(ref(db,`game_sessions/${code}/players/${name}`),{emoji,joined_at:Date.now(),score:0});
+    // Atomik yozish — ikki o'yinchi bir vaqtda bir xil ismni "band qilishi"ning oldini olamiz
+    const playerRef=ref(db,`game_sessions/${code}/players/${name}`);
+    const result=await runTransaction(playerRef,cur=>{
+      if(cur!==null) return; // allaqachon band — abort
+      return {emoji,joined_at:Date.now(),score:0};
+    });
+    if(!result.committed){
+      goTo('s-name');
+      showMsg('name-msg','❌ Bu ism band, boshqa ism tanlang');
+      btn.disabled=false;btn.textContent='O\'yinga qo\'shilish ✓';
+      return;
+    }
     sessionStorage.setItem('qb_player',JSON.stringify({code,name,emoji}));
     startLobby();
-  }catch(e){showMsg('name-msg','Xato: '+e.message);btn.disabled=false;btn.textContent='O\'yinga qo\'shilish ✓';}
+  }catch(e){
+    goTo('s-name');
+    showMsg('name-msg','Xato: '+e.message);
+    btn.disabled=false;btn.textContent='O\'yinga qo\'shilish ✓';
+  }
 };
 
 // ── LOBBY ──

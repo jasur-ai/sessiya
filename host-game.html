@@ -334,7 +334,7 @@ let darkMode=true;
     $('lob-code').textContent=code;
     $('theme-lbl').textContent='Test: '+(session.test_name||'');
     // QR kod va havola
-    const joinURL=`${location.origin}/enter-game.html?code=${code}`;
+    const joinURL=`${location.origin}${location.pathname.replace(/[^/]*$/,'')}enter-game.html?code=${code}`;
     if(typeof QRCode!=='undefined'){
       new QRCode($('qr-canvas'),{text:joinURL,width:200,height:200,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.H});
     }
@@ -362,7 +362,10 @@ function normalizeQuestion(q){
     // PRE/Mock format: options are {text, letter, isCorrect}
     const strings=rawOpts.map(o=>o.text||'');
     const correctIdx=rawOpts.findIndex(o=>o.isCorrect);
-    return{text:q.text||'',options:strings,correct:correctIdx>=0?correctIdx:0,is_double:!!q.is_double};
+    // FIX: agar to'g'ri javob topilmasa, A variantni "to'g'ri" deb belgilamaymiz —
+    // aks holda barcha A javob bergan o'yinchilar noto'g'ri ball olib qoladi.
+    // correct:-1 — hech kim bu savol uchun ball olmaydi (savol ma'lumoti noto'g'ri).
+    return{text:q.text||'',options:strings,correct:correctIdx,is_double:!!q.is_double};
   }
   // User-created format: options are strings, correct is index
   return{text:q.text||'',options:rawOpts.map(o=>String(o||'')),correct:typeof q.correct==='number'?q.correct:0,is_double:!!q.is_double};
@@ -477,7 +480,7 @@ function watchAnswers(idx){
     const cnt=Object.keys(answers).length;
     const total=Object.keys(playersSnap).length;
     updateAnsCount(cnt);
-    if(total>0&&cnt>=total&&!isProcessing){
+    if(total>0&&cnt>=total&&!isProcessing&&session.settings?.auto!==false){
       clearTimeout(autoNextTm);
       autoNextTm=setTimeout(()=>{if(!isProcessing)hostNext();},800);
     }
@@ -623,6 +626,12 @@ let gameFinished=false;
 async function finishGame(){
   if(gameFinished) return;
   gameFinished=true;
+  // FIX: agar o'yin preview countdown vaqtida tugatilsa, cntIv keyin otib
+  // tugagan o'yinni qayta "question_active" holatiga qaytarib yuborishi mumkin edi
+  if(cntIv){clearInterval(cntIv);cntIv=null;}
+  // FIX: faol savol vaqtida tugatilsa ham, kechiktirilgan auto-advance state'ni qayta yozib yubormasligi uchun
+  if(ansUnsubscribe){ansUnsubscribe();ansUnsubscribe=null;}
+  clearTimeout(autoNextTm);
   const snap=await get(ref(db,`game_sessions/${code}/players`));
   const all=snap.val()||{};
 
@@ -663,7 +672,7 @@ function startHostTimer(startAt,total){
     arc.style.strokeDashoffset=circ*(1-rem/total);
     arc.style.stroke=rem<total*.3?'#ff4466':rem<total*.6?'#f2a827':'var(--green)';
     num.textContent=Math.ceil(rem);
-    if(rem<=0){stopTimer();if(!isProcessing)setTimeout(()=>{if(!isProcessing)hostNext();},500);}  // FIX: small delay so last-moment answers reach DB before scoring
+    if(rem<=0){stopTimer();if(!isProcessing&&session.settings?.auto!==false)setTimeout(()=>{if(!isProcessing)hostNext();},500);}  // FIX: small delay so last-moment answers reach DB before scoring + respect manual mode
   },100);
 }
 function stopTimer(){if(timerIv){clearInterval(timerIv);timerIv=null;}}
