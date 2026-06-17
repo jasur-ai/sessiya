@@ -8,16 +8,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Righteous&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#06060f;--surf:#0f0f20;--card:#14142a;--card2:#191934;--border:rgba(255,255,255,.07);
-  --accent:#ff4466;--gold:#ffd60a;--green:#00ffaa;--blue:#38bdf8;--purple:#c084fc;
-  --text:#f0f0f8;--muted:#636384;
+  --bg:#0a0f1f;--surf:#0e1428;--card:#111a35;--card2:#191934;--border:rgba(255,255,255,.07);
+  --accent:#2563eb;--gold:#38bdf8;--green:#38bdf8;--blue:#38bdf8;--purple:#64748b;
+  --text:#e8edf7;--muted:#8b96b3;
   --shadow-sm:0 8px 20px rgba(0,0,0,.3);--shadow-lg:0 16px 40px rgba(0,0,0,.45);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background:radial-gradient(ellipse 55% 40% at 15% 20%,rgba(192,132,252,.09) 0%,transparent 60%),
-    radial-gradient(ellipse 45% 35% at 85% 75%,rgba(255,68,102,.06) 0%,transparent 60%),
+  background:radial-gradient(ellipse 55% 40% at 15% 20%,rgba(100,116,139,.09) 0%,transparent 60%),
+    radial-gradient(ellipse 45% 35% at 85% 75%,rgba(37,99,235,.06) 0%,transparent 60%),
     radial-gradient(ellipse 40% 30% at 75% 15%,rgba(56,189,248,.05) 0%,transparent 60%);}
 
 #loading{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
@@ -29,8 +29,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 #auth.on{display:flex;}
 .auth-wrap{width:100%;max-width:380px;text-align:center;}
 .auth-ico{width:64px;height:64px;border-radius:18px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center;
-  font-size:1.8rem;background:linear-gradient(135deg,rgba(192,132,252,.18),rgba(255,68,102,.12));
-  border:1px solid rgba(192,132,252,.25);box-shadow:0 0 40px rgba(192,132,252,.18);}
+  font-size:1.8rem;background:linear-gradient(135deg,rgba(100,116,139,.18),rgba(37,99,235,.12));
+  border:1px solid rgba(100,116,139,.25);box-shadow:0 0 40px rgba(100,116,139,.18);}
 .auth-logo{font-family:'Righteous',cursive;font-size:1.7rem;margin-bottom:22px;
   background:linear-gradient(135deg,var(--purple),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .auth-box{background:var(--card);border-radius:20px;padding:26px;border:1px solid var(--border);box-shadow:var(--shadow-lg);}
@@ -44,29 +44,29 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .inp::placeholder{color:var(--muted);font-weight:600;}
 .login-btn{width:100%;border:none;border-radius:10px;padding:12px;color:#fff;font-family:'Nunito',sans-serif;
   font-size:.93rem;font-weight:900;cursor:pointer;transition:all .2s;
-  background:linear-gradient(135deg,var(--purple),#7c3aed);min-height:46px;box-shadow:0 6px 18px rgba(192,132,252,.25);}
-.login-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 28px rgba(192,132,252,.45);}
+  background:linear-gradient(135deg,var(--purple),#7c3aed);min-height:46px;box-shadow:0 6px 18px rgba(100,116,139,.25);}
+.login-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 10px 28px rgba(100,116,139,.45);}
 .msg{border-radius:9px;padding:9px 12px;font-size:.8rem;font-weight:700;margin-bottom:11px;display:none;}
 .msg.on{display:block;}
-.msg.err{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.3);color:var(--accent);}
+.msg.err{background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.3);color:var(--accent);}
 
 #navbar{display:none;position:sticky;top:0;z-index:100;
   background:rgba(6,6,15,.92);backdrop-filter:blur(18px);
   border-bottom:1px solid var(--border);padding:12px 22px;
   align-items:center;justify-content:space-between;
-  box-shadow:0 1px 0 rgba(192,132,252,.08);}
+  box-shadow:0 1px 0 rgba(100,116,139,.08);}
 #navbar.on{display:flex;}
 .nav-brand{display:flex;align-items:center;gap:9px;text-decoration:none;}
-.nav-brand-ico{font-size:1.15rem;filter:drop-shadow(0 0 8px rgba(255,68,102,.5));}
+.nav-brand-ico{font-size:1.15rem;filter:drop-shadow(0 0 8px rgba(37,99,235,.5));}
 .nav-logo{font-family:'Righteous',cursive;font-size:1.2rem;
   background:linear-gradient(135deg,var(--purple),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-.nav-badge{background:rgba(255,68,102,.15);border:1px solid rgba(255,68,102,.3);color:var(--accent);
+.nav-badge{background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3);color:var(--accent);
   font-size:.65rem;font-weight:900;border-radius:50px;padding:3px 10px;letter-spacing:.5px;}
 .icon-btn{background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:10px;
   padding:7px 14px;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:800;
   cursor:pointer;color:var(--muted);transition:all .2s;}
 .icon-btn:hover{color:var(--text);background:rgba(255,255,255,.1);transform:translateY(-1px);}
-.icon-btn.danger:hover{color:var(--accent);border-color:rgba(255,68,102,.3);background:rgba(255,68,102,.08);}
+.icon-btn.danger:hover{color:var(--accent);border-color:rgba(37,99,235,.3);background:rgba(37,99,235,.08);}
 
 .admin-layout{display:flex;align-items:flex-start;gap:16px;max-width:1200px;margin:0 auto;padding-top:18px;position:relative;z-index:1;}
 
@@ -106,9 +106,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 
 .sec-hd{display:flex;align-items:center;gap:10px;margin-bottom:12px;margin-top:20px;flex-wrap:wrap;}
 .sec-title{font-family:'Righteous',cursive;font-size:1.05rem;display:flex;align-items:center;gap:7px;}
-.danger-badge{background:rgba(255,68,102,.15);border:1px solid rgba(255,68,102,.3);color:var(--accent);font-size:.65rem;font-weight:900;border-radius:50px;padding:3px 9px;}
-.purple-badge{background:rgba(192,132,252,.15);border:1px solid rgba(192,132,252,.3);color:var(--purple);font-size:.65rem;font-weight:900;border-radius:50px;padding:3px 9px;}
-.green-badge{background:rgba(0,255,170,.12);border:1px solid rgba(0,255,170,.25);color:var(--green);font-size:.65rem;font-weight:900;border-radius:50px;padding:3px 9px;}
+.danger-badge{background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3);color:var(--accent);font-size:.65rem;font-weight:900;border-radius:50px;padding:3px 9px;}
+.purple-badge{background:rgba(100,116,139,.15);border:1px solid rgba(100,116,139,.3);color:var(--purple);font-size:.65rem;font-weight:900;border-radius:50px;padding:3px 9px;}
+.green-badge{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);color:var(--green);font-size:.65rem;font-weight:900;border-radius:50px;padding:3px 9px;}
 .refresh-btn{margin-left:auto;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:9px;
   padding:6px 12px;font-family:'Nunito',sans-serif;font-size:.75rem;font-weight:800;cursor:pointer;color:var(--muted);transition:all .2s;}
 .refresh-btn:hover{color:var(--text);background:rgba(255,255,255,.1);transform:translateY(-1px);}
@@ -123,21 +123,21 @@ tbody tr:hover td{background:rgba(255,255,255,.025);}
 .u-name{font-weight:800;}
 .u-date{color:var(--muted);font-size:.76rem;}
 .u-tests{background:rgba(56,189,248,.1);color:var(--blue);border-radius:50px;padding:2px 9px;font-size:.68rem;font-weight:800;}
-.del-user{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.2);border-radius:7px;padding:4px 9px;color:var(--accent);font-size:.72rem;font-weight:800;cursor:pointer;transition:all .18s;}
-.del-user:hover{background:rgba(255,68,102,.2);transform:translateY(-1px);}
+.del-user{background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.2);border-radius:7px;padding:4px 9px;color:var(--accent);font-size:.72rem;font-weight:800;cursor:pointer;transition:all .18s;}
+.del-user:hover{background:rgba(37,99,235,.2);transform:translateY(-1px);}
 
 .res-card{background:var(--card);border-radius:14px;padding:14px 16px;border:1px solid var(--border);margin-bottom:8px;animation:fadeUp .25s ease-out both;transition:border-color .2s,transform .2s;}
-.res-card:hover{border-color:rgba(192,132,252,.25);transform:translateY(-1px);}
+.res-card:hover{border-color:rgba(100,116,139,.25);transform:translateY(-1px);}
 @keyframes fadeUp{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
 .res-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
 .res-title{font-weight:800;font-size:.88rem;}
 .res-meta{font-size:.73rem;font-weight:700;color:var(--muted);margin-top:2px;}
-.res-code{background:rgba(255,214,10,.1);border:1px solid rgba(255,214,10,.25);color:var(--gold);
+.res-code{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);color:var(--gold);
   font-family:'Righteous',cursive;border-radius:8px;padding:4px 10px;font-size:.8rem;flex-shrink:0;}
 .top3{display:flex;gap:6px;flex-wrap:wrap;}
 .top-chip{border-radius:50px;padding:4px 12px;font-size:.74rem;font-weight:800;display:flex;align-items:center;gap:5px;
   border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);}
-.top-chip:nth-child(1){border-color:rgba(255,214,10,.3);color:var(--gold);}
+.top-chip:nth-child(1){border-color:rgba(56,189,248,.3);color:var(--gold);}
 .top-chip:nth-child(2){border-color:rgba(192,192,192,.3);color:#c0c0c0;}
 .top-chip:nth-child(3){border-color:rgba(205,127,50,.3);color:#cd7f32;}
 
@@ -148,59 +148,59 @@ tbody tr:hover td{background:rgba(255,255,255,.025);}
   font-weight:700;outline:none;transition:border-color .2s;}
 .fans-inp:focus{border-color:var(--green);}
 .fans-inp::placeholder{color:var(--muted);}
-.upload-zone-sm{border:2px dashed rgba(0,255,170,.3);border-radius:10px;padding:12px;text-align:center;
-  cursor:pointer;transition:all .2s;background:rgba(0,255,170,.04);}
-.upload-zone-sm:hover{border-color:var(--green);background:rgba(0,255,170,.08);}
+.upload-zone-sm{border:2px dashed rgba(56,189,248,.3);border-radius:10px;padding:12px;text-align:center;
+  cursor:pointer;transition:all .2s;background:rgba(56,189,248,.04);}
+.upload-zone-sm:hover{border-color:var(--green);background:rgba(56,189,248,.08);}
 .upload-zone-sm p{color:var(--muted);font-size:.8rem;font-weight:700;}
-.save-fan-btn{background:linear-gradient(135deg,var(--green),#00a070);border:none;border-radius:9px;
+.save-fan-btn{background:linear-gradient(135deg,var(--green),#1d9bcf);border:none;border-radius:9px;
   padding:9px 18px;color:#000;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:900;
-  cursor:pointer;transition:all .2s;white-space:nowrap;box-shadow:0 4px 14px rgba(0,255,170,.18);}
-.save-fan-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,255,170,.32);}
+  cursor:pointer;transition:all .2s;white-space:nowrap;box-shadow:0 4px 14px rgba(56,189,248,.18);}
+.save-fan-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 22px rgba(56,189,248,.32);}
 .save-fan-btn:disabled{opacity:.45;cursor:not-allowed;}
 .fan-item{display:flex;align-items:center;justify-content:space-between;gap:10px;
   background:rgba(255,255,255,.03);border-radius:10px;padding:10px 14px;margin-bottom:6px;
   border:1px solid rgba(255,255,255,.05);transition:border-color .2s,background .2s;}
-.fan-item:hover{border-color:rgba(0,255,170,.2);background:rgba(255,255,255,.045);}
+.fan-item:hover{border-color:rgba(56,189,248,.2);background:rgba(255,255,255,.045);}
 .fan-item-name{font-weight:800;font-size:.88rem;}
 .fan-item-meta{font-size:.73rem;color:var(--muted);font-weight:700;margin-top:2px;}
 .fan-btns{display:flex;gap:5px;}
 .fan-reset-btn{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);border-radius:7px;
   padding:5px 10px;color:var(--blue);font-size:.72rem;font-weight:800;cursor:pointer;transition:all .18s;}
 .fan-reset-btn:hover{background:rgba(56,189,248,.2);transform:translateY(-1px);}
-.fan-del-btn{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.2);border-radius:7px;
+.fan-del-btn{background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.2);border-radius:7px;
   padding:5px 10px;color:var(--accent);font-size:.72rem;font-weight:800;cursor:pointer;transition:all .18s;}
-.fan-del-btn:hover{background:rgba(255,68,102,.2);transform:translateY(-1px);}
+.fan-del-btn:hover{background:rgba(37,99,235,.2);transform:translateY(-1px);}
 
 .pre-add-box{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);margin-bottom:14px;}
 .pre-title-inp{width:100%;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.08);border-radius:9px;
   padding:9px 12px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;
   outline:none;margin-bottom:9px;transition:border-color .2s;}
 .pre-title-inp:focus{border-color:var(--purple);}
-.pre-upload-zone{border:2px dashed rgba(192,132,252,.3);border-radius:10px;padding:12px;text-align:center;
-  cursor:pointer;background:rgba(192,132,252,.04);transition:all .2s;margin-bottom:9px;}
-.pre-upload-zone:hover{border-color:var(--purple);background:rgba(192,132,252,.08);}
+.pre-upload-zone{border:2px dashed rgba(100,116,139,.3);border-radius:10px;padding:12px;text-align:center;
+  cursor:pointer;background:rgba(100,116,139,.04);transition:all .2s;margin-bottom:9px;}
+.pre-upload-zone:hover{border-color:var(--purple);background:rgba(100,116,139,.08);}
 .pre-upload-zone p{color:var(--muted);font-size:.8rem;font-weight:700;}
 .tmpl-btn{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:9px;
   padding:8px 14px;color:var(--muted);font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:800;
   cursor:pointer;transition:all .2s;text-align:center;margin-bottom:8px;}
 .tmpl-btn:hover{background:rgba(255,255,255,.1);color:var(--text);border-color:rgba(255,255,255,.3);}
 .save-pre-btn{width:100%;background:linear-gradient(135deg,var(--purple),#7c3aed);border:none;border-radius:9px;
-  padding:10px;color:#fff;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(192,132,252,.2);}
-.save-pre-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 22px rgba(192,132,252,.35);}
+  padding:10px;color:#fff;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:900;cursor:pointer;transition:all .2s;box-shadow:0 4px 14px rgba(100,116,139,.2);}
+.save-pre-btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 22px rgba(100,116,139,.35);}
 .save-pre-btn:disabled{opacity:.45;cursor:not-allowed;}
-.pre-preview-box{background:rgba(192,132,252,.07);border:1px solid rgba(192,132,252,.2);border-radius:10px;
+.pre-preview-box{background:rgba(100,116,139,.07);border:1px solid rgba(100,116,139,.2);border-radius:10px;
   padding:11px 13px;margin-bottom:9px;display:none;}
 .pre-chunk-item{display:flex;justify-content:space-between;font-size:.78rem;font-weight:700;
   padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);}
 .pre-chunk-item:last-child{border-bottom:none;}
 .pre-group-item{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);border-radius:10px;
   padding:10px 14px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:border-color .2s,background .2s;}
-.pre-group-item:hover{border-color:rgba(192,132,252,.2);background:rgba(255,255,255,.045);}
+.pre-group-item:hover{border-color:rgba(100,116,139,.2);background:rgba(255,255,255,.045);}
 .pre-group-name{font-weight:800;font-size:.88rem;}
 .pre-group-meta{font-size:.73rem;color:var(--muted);font-weight:700;margin-top:2px;}
-.pre-del-btn{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.2);border-radius:7px;
+.pre-del-btn{background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.2);border-radius:7px;
   padding:5px 10px;color:var(--accent);font-size:.72rem;font-weight:800;cursor:pointer;transition:all .18s;}
-.pre-del-btn:hover{background:rgba(255,68,102,.2);transform:translateY(-1px);}
+.pre-del-btn:hover{background:rgba(37,99,235,.2);transform:translateY(-1px);}
 .progress-bar{background:rgba(255,255,255,.07);border-radius:50px;height:7px;margin-top:8px;overflow:hidden;}
 .progress-fill{background:linear-gradient(90deg,var(--purple),var(--blue));height:100%;border-radius:50px;transition:width .3s;}
 
@@ -221,8 +221,8 @@ tbody tr:hover td{background:rgba(255,255,255,.025);}
 
 .adm-msg{border-radius:9px;padding:9px 12px;font-size:.8rem;font-weight:700;margin-top:9px;display:none;}
 .adm-msg.on{display:block;}
-.adm-msg.err{background:rgba(255,68,102,.1);border:1px solid rgba(255,68,102,.3);color:var(--accent);}
-.adm-msg.ok{background:rgba(0,255,170,.1);border:1px solid rgba(0,255,170,.25);color:var(--green);}
+.adm-msg.err{background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.3);color:var(--accent);}
+.adm-msg.ok{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);color:var(--green);}
 
 .empty{text-align:center;padding:28px;color:var(--muted);font-size:.82rem;font-weight:700;
   background:rgba(255,255,255,.02);border-radius:12px;border:1px dashed rgba(255,255,255,.08);}
@@ -276,10 +276,10 @@ tbody tr:hover td{background:rgba(255,255,255,.025);}
 <div class="admin-layout">
   <div class="sidebar" id="sidebar">
     <div class="side-label">Bo'limlar</div>
-    <button type="button" class="side-btn on" onclick="switchTab('danger')" id="tbtn-danger" style="--c:var(--accent);--cbg:rgba(255,68,102,.14)"><span class="side-ico">⚠️</span> Foydalanuvchilar</button>
-    <button type="button" class="side-btn" onclick="switchTab('fans')" id="tbtn-fans" style="--c:var(--green);--cbg:rgba(0,255,170,.14)"><span class="side-ico">📚</span> Mock Fanlar</button>
-    <button type="button" class="side-btn" onclick="switchTab('pre')" id="tbtn-pre" style="--c:var(--purple);--cbg:rgba(192,132,252,.14)"><span class="side-ico">🔷</span> PRE Testlar</button>
-    <button type="button" class="side-btn" onclick="switchTab('results')" id="tbtn-results" style="--c:var(--gold);--cbg:rgba(255,214,10,.14)"><span class="side-ico">🏆</span> Natijalar</button>
+    <button type="button" class="side-btn on" onclick="switchTab('danger')" id="tbtn-danger" style="--c:var(--accent);--cbg:rgba(37,99,235,.14)"><span class="side-ico">⚠️</span> Foydalanuvchilar</button>
+    <button type="button" class="side-btn" onclick="switchTab('fans')" id="tbtn-fans" style="--c:var(--green);--cbg:rgba(56,189,248,.14)"><span class="side-ico">📚</span> Mock Fanlar</button>
+    <button type="button" class="side-btn" onclick="switchTab('pre')" id="tbtn-pre" style="--c:var(--purple);--cbg:rgba(100,116,139,.14)"><span class="side-ico">🔷</span> PRE Testlar</button>
+    <button type="button" class="side-btn" onclick="switchTab('results')" id="tbtn-results" style="--c:var(--gold);--cbg:rgba(56,189,248,.14)"><span class="side-ico">🏆</span> Natijalar</button>
     <button type="button" class="side-btn" onclick="switchTab('stats')" id="tbtn-stats" style="--c:var(--blue);--cbg:rgba(56,189,248,.14)"><span class="side-ico">📊</span> Statistika</button>
   </div>
 
@@ -288,9 +288,9 @@ tbody tr:hover td{background:rgba(255,255,255,.025);}
 
   <div class="stats-row" id="stats-row" style="display:none">
     <div class="stat-card" style="--c:var(--blue);--cbg:rgba(56,189,248,.12)"><div class="stat-ico">👥</div><div class="stat-info"><div class="stat-num" id="s-users" style="color:var(--blue)">—</div><div class="stat-lbl">Foydalanuvchilar</div></div></div>
-    <div class="stat-card" style="--c:var(--gold);--cbg:rgba(255,214,10,.12)"><div class="stat-ico">🎮</div><div class="stat-info"><div class="stat-num" id="s-games" style="color:var(--gold)">—</div><div class="stat-lbl">O'yinlar</div></div></div>
-    <div class="stat-card" style="--c:var(--green);--cbg:rgba(0,255,170,.12)"><div class="stat-ico">📝</div><div class="stat-info"><div class="stat-num" id="s-tests" style="color:var(--green)">—</div><div class="stat-lbl">Testlar</div></div></div>
-    <div class="stat-card" style="--c:var(--purple);--cbg:rgba(192,132,252,.12)"><div class="stat-ico">📚</div><div class="stat-info"><div class="stat-num" id="s-fans" style="color:var(--purple)">—</div><div class="stat-lbl">Mock Fanlar</div></div></div>
+    <div class="stat-card" style="--c:var(--gold);--cbg:rgba(56,189,248,.12)"><div class="stat-ico">🎮</div><div class="stat-info"><div class="stat-num" id="s-games" style="color:var(--gold)">—</div><div class="stat-lbl">O'yinlar</div></div></div>
+    <div class="stat-card" style="--c:var(--green);--cbg:rgba(56,189,248,.12)"><div class="stat-ico">📝</div><div class="stat-info"><div class="stat-num" id="s-tests" style="color:var(--green)">—</div><div class="stat-lbl">Testlar</div></div></div>
+    <div class="stat-card" style="--c:var(--purple);--cbg:rgba(100,116,139,.12)"><div class="stat-ico">📚</div><div class="stat-info"><div class="stat-num" id="s-fans" style="color:var(--purple)">—</div><div class="stat-lbl">Mock Fanlar</div></div></div>
   </div>
 
   <!-- TAB: DANGER (USERS) -->
