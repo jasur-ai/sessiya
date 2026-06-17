@@ -196,14 +196,42 @@ textarea.inp::placeholder,input.inp::placeholder{color:var(--muted);font-weight:
 .dl-btn:hover{background:rgba(56,189,248,.22);}
 .drop-zone{
   border:2px dashed rgba(56,189,248,.3);border-radius:14px;padding:28px;
-  text-align:center;cursor:pointer;transition:all .2s;margin-bottom:14px;
-  background:rgba(56,189,248,.02);
+  text-align:center;cursor:pointer;transition:all .25s;margin-bottom:14px;
+  background:rgba(56,189,248,.02);position:relative;overflow:hidden;
 }
 .drop-zone:hover,.drop-zone.drag{border-color:var(--blue);background:rgba(56,189,248,.06);}
-.drop-zone .dz-icon{font-size:2rem;margin-bottom:6px;}
-.drop-zone p{font-size:.82rem;font-weight:700;color:var(--muted);}
+.drop-zone.drag{transform:scale(1.01);}
+.drop-zone .dz-icon{font-size:2rem;margin-bottom:6px;transition:all .25s;}
+.drop-zone p{font-size:.82rem;font-weight:700;color:var(--muted);transition:color .25s;}
 .drop-zone strong{color:var(--blue);}
 #file-inp{display:none;}
+
+/* Success feedback after a file is parsed */
+.drop-zone.success{border-color:rgba(0,255,170,.45);background:rgba(0,255,170,.06);}
+.drop-zone.success p{color:var(--green);}
+.drop-zone .dz-tick{
+  display:none;width:46px;height:46px;border-radius:50%;
+  background:rgba(0,255,170,.15);border:2px solid var(--green);
+  align-items:center;justify-content:center;margin:0 auto 8px;
+  font-size:1.4rem;color:var(--green);
+}
+.drop-zone.success .dz-tick{display:flex;animation:tickPop .45s cubic-bezier(.34,1.56,.64,1);}
+.drop-zone.success .dz-icon{display:none;}
+@keyframes tickPop{
+  0%{transform:scale(0);opacity:0;}
+  60%{transform:scale(1.15);opacity:1;}
+  100%{transform:scale(1);opacity:1;}
+}
+.drop-zone .dz-sweep{
+  position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(120deg,transparent 30%,rgba(0,255,170,.18) 50%,transparent 70%);
+  background-size:200% 100%;background-position:150% 0;opacity:0;
+}
+.drop-zone.success .dz-sweep{animation:sweep .6s ease-out;}
+@keyframes sweep{
+  0%{background-position:150% 0;opacity:1;}
+  100%{background-position:-50% 0;opacity:0;}
+}
 
 /* EXCEL PREVIEW */
 .excel-preview{margin-bottom:14px;}
@@ -266,8 +294,10 @@ textarea.inp::placeholder,input.inp::placeholder{color:var(--muted);font-weight:
     </div>
     <button type="button" class="dl-btn" id="dl-template" onclick="downloadTemplate()">⬇️ Namuna shablonni yuklab olish (.csv)</button>
     <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-inp').click()">
+      <div class="dz-sweep"></div>
+      <div class="dz-tick">✓</div>
       <div class="dz-icon">📂</div>
-      <p><strong>Excel / CSV faylni shu yerga tashlang</strong><br>yoki bosib tanlang (.xlsx, .xls, .csv)</p>
+      <p id="dz-text"><strong>Excel / CSV faylni shu yerga tashlang</strong><br>yoki bosib tanlang (.xlsx, .xls, .csv)</p>
     </div>
     <input type="file" id="file-inp" accept=".xlsx,.xls,.csv">
     <div id="excel-preview-wrap" style="display:none">
@@ -511,6 +541,8 @@ fi.addEventListener('change',()=>handleFile(fi.files[0]));
 
 function handleFile(f){
   if(!f)return;
+  dz.classList.remove('success');
+  $('dz-text').innerHTML='<strong>Excel / CSV faylni shu yerga tashlang</strong><br>yoki bosib tanlang (.xlsx, .xls, .csv)';
   const ext=f.name.split('.').pop().toLowerCase();
   if(ext==='csv'){
     const reader=new FileReader();
@@ -579,6 +611,8 @@ function processRows(rows){
 
 function showExcelPreview(){
   if(!excelParsed.length){toast('Hech narsa topilmadi','err');return;}
+  dz.classList.add('success');
+  $('dz-text').innerHTML=`<strong>✅ ${excelParsed.length} ta savol yuklandi!</strong><br>Boshqa fayl tashlash mumkin`;
   $('prev-count').textContent=`${excelParsed.length} ta savol topildi`;
   const thead=`<tr><th>#</th><th>Savol</th><th>To'g'ri</th><th>Variant +</th><th>2x</th></tr>`;
   const tbody=excelParsed.map((q,i)=>`<tr>
@@ -599,6 +633,8 @@ window.addExcelQuestions=function(){
   toast(`✅ ${excelParsed.length} ta savol qo'shildi`);
   excelParsed=[];
   $('excel-preview-wrap').style.display='none';
+  dz.classList.remove('success');
+  $('dz-text').innerHTML='<strong>Excel / CSV faylni shu yerga tashlang</strong><br>yoki bosib tanlang (.xlsx, .xls, .csv)';
 };
 </script>
 </body>
