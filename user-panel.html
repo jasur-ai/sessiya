@@ -411,7 +411,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <div class="q-num" id="q-num">1 / 10</div>
       <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
       <!-- FIX: exit tugmasi to'g'ri ishlashi uchun onclick to'g'rilandi -->
-      <button type="button" class="exit-btn" onclick="confirmExitQuiz()">✕ Chiqish</button>
+      <button type="button" class="exit-btn" onclick="window.confirmExitQuiz()">✕ Chiqish</button>
     </div>
     <div class="stats-row2">
       <div class="stat-c"><div class="stat-n" id="st-total">0</div><div class="stat-l">Jami</div></div>
@@ -1020,13 +1020,24 @@ window.toggleReview=function(){
 
 window.retryWrong=function(){if(!wrongQs.length)return;isRetry=true;questions=wrongQs.map(w=>w.q);startQuiz();};
 window.restartQuiz=function(){questions=[...originalQs];isRetry=false;startQuiz();};
-window.backToPanel=function(){$('quiz-wrap').classList.remove('on');$('result-wrap').classList.remove('on');window.scrollTo(0,0);};
+window.backToPanel=function(){
+  $('quiz-wrap').classList.remove('on');
+  $('result-wrap').classList.remove('on');
+  questions=[];shuffledQs=[];curIdx=0;correctCnt=0;wrongCnt=0;answeredCnt=0;wrongQs=[];answered=false;
+  window.scrollTo(0,0);
+};
 
 // FIX: confirmExitQuiz — global + modal to'g'ri bog'langan
 window.confirmExitQuiz=function(){
   $('conf-title').textContent='Testdan chiqmoqchimisiz?';
   $('conf-sub').textContent='Joriy natija saqlanmaydi.';
-  $('conf-ok').onclick=function(){window.closeConfirm();$('quiz-wrap').classList.remove('on');};
+  $('conf-ok').onclick=function(){
+    window.closeConfirm();
+    $('quiz-wrap').classList.remove('on');
+    $('result-wrap').classList.remove('on');
+    questions=[];shuffledQs=[];curIdx=0;correctCnt=0;wrongCnt=0;answeredCnt=0;wrongQs=[];answered=false;
+    window.scrollTo(0,0);
+  };
   $('confirm-modal').classList.add('on');
 };
 
