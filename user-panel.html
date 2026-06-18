@@ -211,12 +211,35 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   padding:7px 13px;color:var(--accent);font-size:.78rem;font-weight:800;cursor:pointer;}
 .q-text{font-size:1.15rem;font-weight:800;line-height:1.6;margin-bottom:20px;padding:20px;background:var(--card);border-radius:16px;border:1px solid var(--border);}
 .opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:16px;}
-.opt-btn{border:none;border-radius:12px;padding:14px 12px;cursor:pointer;font-family:'Nunito',sans-serif;
-  font-weight:800;font-size:.9rem;text-align:left;transition:all .2s;display:flex;align-items:center;gap:9px;color:#fff;}
-.opt-btn:hover:not(:disabled){transform:translateY(-2px);filter:brightness(1.15);}
-.opt-btn.correct-ans{outline:4px solid var(--green);}
-.opt-btn.wrong-ans{opacity:.5;outline:4px solid var(--accent);}
-.opt-letter{width:26px;height:26px;border-radius:6px;background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:900;flex-shrink:0;}
+.opt-btn{
+  position:relative;overflow:hidden;
+  background:#101a2e;
+  border:2px solid var(--opt-c, rgba(255,255,255,.15));
+  border-radius:13px;padding:15px 14px;cursor:pointer;
+  font-family:'Nunito',sans-serif;font-weight:800;font-size:.9rem;
+  text-align:left;display:flex;align-items:center;gap:10px;color:var(--text);
+  transition:transform .15s,border-color .2s,background .2s;
+  animation:optShimmer 4.5s ease-in-out infinite;
+  animation-delay:var(--opt-delay, 0s);
+}
+.opt-btn::before{
+  content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(115deg,transparent,rgba(255,255,255,.07),transparent);
+  animation:optSweep 5.5s ease-in-out infinite;
+  animation-delay:var(--opt-delay, 0s);
+  pointer-events:none;
+}
+@keyframes optShimmer{0%,100%{box-shadow:inset 0 0 0 0 rgba(255,255,255,0);}50%{box-shadow:inset 0 0 32px 0 rgba(255,255,255,.04);}}
+@keyframes optSweep{0%{left:-60%;}45%{left:120%;}100%{left:120%;}}
+.opt-btn:hover:not(:disabled){transform:translateY(-2px);background:#142036;}
+.opt-btn:disabled{cursor:not-allowed;animation:none;}
+.opt-btn:disabled::before{display:none;}
+.opt-letter{width:26px;height:26px;border-radius:6px;border:1.5px solid var(--opt-c, rgba(255,255,255,.3));
+  color:var(--opt-c, var(--text));display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:900;flex-shrink:0;background:rgba(0,0,0,.2);}
+.opt-btn.correct-ans{border-color:var(--green)!important;background:rgba(0,255,170,.08);box-shadow:0 0 0 1px var(--green);}
+.opt-btn.correct-ans .opt-letter{border-color:var(--green);color:var(--green);}
+.opt-btn.wrong-ans{border-color:var(--accent)!important;background:rgba(255,68,102,.08);opacity:.85;box-shadow:0 0 0 1px var(--accent);}
+.opt-btn.wrong-ans .opt-letter{border-color:var(--accent);color:var(--accent);}
 .fb-bar{border-radius:12px;padding:13px 16px;font-weight:800;font-size:.88rem;margin-bottom:12px;display:none;align-items:center;gap:10px;}
 .fb-bar.show{display:flex;}
 .fb-ok{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.25);color:var(--green);}
@@ -588,7 +611,8 @@ const PRE_GROUPS_PATH='pre_groups';
 const PRE_AUTHOR_UID='__pre_admin__';
 const PRE_CHUNK=25;
 const MOCK_COUNT=25;
-const COLORS=['#e74c3c','#3498db','#f39c12','#27ae60','#9b59b6'];
+/* Variant border/accent colors — surface stays unified, only the border + letter accent change */
+const COLORS=['#ff4466','#38bdf8','#ffd60a','#00ffaa','#c084fc'];
 
 const $=id=>document.getElementById(id);
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -984,9 +1008,11 @@ function showQuestion(){
   opts.forEach((opt,i)=>{
     const optText=isStrArr?opt:(opt.text||'');
     const isCorrect=isStrArr?(rawOpts.indexOf(opt)===q.correct):(opt.isCorrect||false);
+    const c=COLORS[i]||COLORS[i%COLORS.length];
     const btn=document.createElement('button');
     btn.className='opt-btn';
-    btn.style.background=COLORS[i]||'#555';
+    btn.style.setProperty('--opt-c',c);
+    btn.style.setProperty('--opt-delay',(i*0.6)+'s');
     btn.setAttribute('data-correct',isCorrect?'1':'0');
     btn.innerHTML=`<div class="opt-letter">${['A','B','C','D','E'][i]}</div><span>${optText}</span>`;
     btn.onclick=()=>selectAnswer(btn,{text:optText,isCorrect},q);
