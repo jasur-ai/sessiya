@@ -423,7 +423,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     <div class="q-text" id="q-text">Savol matni</div>
     <div class="opts-grid" id="opts-grid"></div>
     <div class="fb-bar" id="fb-bar"><span id="fb-text"></span></div>
-    <button type="button" class="next-q-btn" id="next-q-btn" onclick="nextQ()">Keyingi savol →</button>
+    <button type="button" class="next-q-btn" id="next-q-btn">Keyingi savol →</button>
   </div>
 </div>
 
@@ -440,8 +440,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <div class="r-card"><div class="r-card-lbl">Vaqt</div><div class="r-card-val" id="rc-time">—</div></div>
     </div>
     <div class="r-btns">
-      <button type="button" class="btn btn-red" style="flex:1;" onclick="restartQuiz()">🔁 Qayta</button>
-      <button type="button" class="btn btn-ghost" style="flex:1;" onclick="backToPanel()">🏠 Panel</button>
+      <button type="button" class="btn btn-red" style="flex:1;" id="restart-quiz-btn">🔁 Qayta</button>
+      <button type="button" class="btn btn-ghost" style="flex:1;" id="back-to-panel-btn">🏠 Panel</button>
     </div>
     <div id="wrong-section"></div>
     <div class="lb-section" id="lb-section" style="display:none;">
@@ -519,8 +519,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
     </div>
     <div class="start-actions">
       <!-- FIX: Bekor tugmasi -->
-      <button type="button" class="btn btn-ghost" style="flex:1;" onclick="closeStartModal()">Bekor</button>
-      <button type="button" class="btn btn-green" style="flex:2;" id="sm-start-btn" onclick="confirmStartQuiz()">▶ Boshlash</button>
+      <button type="button" class="btn btn-ghost" style="flex:1;" id="close-start-modal-btn">Bekor</button>
+      <button type="button" class="btn btn-green" style="flex:2;" id="sm-start-btn">▶ Boshlash</button>
     </div>
   </div>
 </div>
@@ -1027,8 +1027,8 @@ window.backToPanel=function(){
   window.scrollTo(0,0);
 };
 
-// FIX: confirmExitQuiz — global + modal to'g'ri bog'langan
-window.confirmExitQuiz=function(){
+// Chiqish tugmasini addEventListener bilan bog'laymiz (onclick atributi module scopeda ishlamaydi)
+$('exit-quiz-btn').addEventListener('click', function(){
   $('conf-title').textContent='Testdan chiqmoqchimisiz?';
   $('conf-sub').textContent='Joriy natija saqlanmaydi.';
   $('conf-ok').onclick=function(){
@@ -1039,9 +1039,12 @@ window.confirmExitQuiz=function(){
     window.scrollTo(0,0);
   };
   $('confirm-modal').classList.add('on');
-};
-// Chiqish tugmasini addEventListener bilan bog'laymiz (onclick atributi module scopeda ishlamaydi)
-$('exit-quiz-btn').addEventListener('click', function(){ window.confirmExitQuiz(); });
+});
+$('next-q-btn').addEventListener('click', function(){ nextQ(); });
+$('restart-quiz-btn').addEventListener('click', function(){ restartQuiz(); });
+$('back-to-panel-btn').addEventListener('click', function(){ backToPanel(); });
+$('close-start-modal-btn').addEventListener('click', function(){ closeStartModal(); });
+$('sm-start-btn').addEventListener('click', function(){ confirmStartQuiz(); });
 
 // ── SAVE RESULTS & LEADERBOARD ──
 const RANK_MEDALS=['🥇','🥈','🥉'];
