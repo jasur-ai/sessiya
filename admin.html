@@ -148,10 +148,22 @@ tbody tr:hover td{background:rgba(255,255,255,.025);}
   font-weight:700;outline:none;transition:border-color .2s;}
 .fans-inp:focus{border-color:var(--green);}
 .fans-inp::placeholder{color:var(--muted);}
-.upload-zone-sm{border:2px dashed rgba(56,189,248,.3);border-radius:10px;padding:12px;text-align:center;
-  cursor:pointer;transition:all .2s;background:rgba(56,189,248,.04);}
+.upload-zone-sm{position:relative;border:2px dashed rgba(56,189,248,.3);border-radius:10px;padding:12px;text-align:center;
+  cursor:pointer;transition:all .2s;background:rgba(56,189,248,.04);overflow:hidden;}
 .upload-zone-sm:hover{border-color:var(--green);background:rgba(56,189,248,.08);}
-.upload-zone-sm p{color:var(--muted);font-size:.8rem;font-weight:700;}
+.upload-zone-sm.drag{border-color:var(--green);background:rgba(56,189,248,.14);transform:scale(1.01);}
+.upload-zone-sm.loaded{border-color:var(--green);border-style:solid;background:rgba(56,189,248,.1);}
+.upload-zone-sm p{color:var(--muted);font-size:.8rem;font-weight:700;transition:color .2s;}
+.upload-zone-sm.loaded p{color:var(--green);}
+.uz-tick{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:50%;
+  background:var(--green);margin-right:6px;vertical-align:middle;flex-shrink:0;transform:scale(0);
+  animation:tickPop .4s cubic-bezier(.34,1.56,.64,1) forwards;}
+.uz-tick svg{width:11px;height:11px;}
+.uz-tick path{stroke:#0a0f1f;stroke-width:3;fill:none;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:16;stroke-dashoffset:16;animation:tickDraw .3s .15s ease-out forwards;}
+@keyframes tickPop{0%{transform:scale(0) rotate(-20deg);}60%{transform:scale(1.25) rotate(5deg);}100%{transform:scale(1) rotate(0);}}
+@keyframes tickDraw{to{stroke-dashoffset:0;}}
+.uz-row{display:flex;align-items:center;justify-content:center;gap:0;}
 .save-fan-btn{background:linear-gradient(135deg,var(--green),#1d9bcf);border:none;border-radius:9px;
   padding:9px 18px;color:#000;font-family:'Nunito',sans-serif;font-size:.85rem;font-weight:900;
   cursor:pointer;transition:all .2s;white-space:nowrap;box-shadow:0 4px 14px rgba(56,189,248,.18);}
@@ -176,10 +188,14 @@ tbody tr:hover td{background:rgba(255,255,255,.025);}
   padding:9px 12px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.9rem;font-weight:700;
   outline:none;margin-bottom:9px;transition:border-color .2s;}
 .pre-title-inp:focus{border-color:var(--purple);}
-.pre-upload-zone{border:2px dashed rgba(100,116,139,.3);border-radius:10px;padding:12px;text-align:center;
-  cursor:pointer;background:rgba(100,116,139,.04);transition:all .2s;margin-bottom:9px;}
+.pre-upload-zone{position:relative;border:2px dashed rgba(100,116,139,.3);border-radius:10px;padding:12px;text-align:center;
+  cursor:pointer;background:rgba(100,116,139,.04);transition:all .2s;margin-bottom:9px;overflow:hidden;}
 .pre-upload-zone:hover{border-color:var(--purple);background:rgba(100,116,139,.08);}
-.pre-upload-zone p{color:var(--muted);font-size:.8rem;font-weight:700;}
+.pre-upload-zone.drag{border-color:var(--purple);background:rgba(100,116,139,.16);transform:scale(1.01);}
+.pre-upload-zone.loaded{border-color:var(--purple);border-style:solid;background:rgba(100,116,139,.12);}
+.pre-upload-zone p{color:var(--muted);font-size:.8rem;font-weight:700;transition:color .2s;}
+.pre-upload-zone.loaded p{color:var(--purple);}
+.pre-upload-zone .uz-tick{background:var(--purple);}
 .tmpl-btn{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:9px;
   padding:8px 14px;color:var(--muted);font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:800;
   cursor:pointer;transition:all .2s;text-align:center;margin-bottom:8px;}
@@ -316,8 +332,8 @@ tbody tr:hover td{background:rgba(255,255,255,.025);}
     <div class="fans-add-box">
       <div class="fans-add-row">
         <input class="fans-inp" id="fan-name" placeholder="Fan nomi (masalan: Matematika)" maxlength="50">
-        <div class="upload-zone-sm" onclick="document.getElementById('fan-excel-inp').click()" style="flex:1;min-width:160px">
-          <p id="fan-excel-lbl">📂 Excel faylni yuklang</p>
+        <div class="upload-zone-sm" id="fan-drop-zone" onclick="document.getElementById('fan-excel-inp').click()" style="flex:1;min-width:160px">
+          <p id="fan-excel-lbl"><span class="uz-row">📂&nbsp;Excel faylni yuklang</span></p>
         </div>
         <button type="button" class="save-fan-btn" id="save-fan-btn" onclick="saveFan()">💾 Saqlash</button>
       </div>
@@ -337,8 +353,8 @@ tbody tr:hover td{background:rgba(255,255,255,.025);}
     </div>
     <div class="pre-add-box">
       <input class="pre-title-inp" id="pre-title" placeholder="Guruh sarlavhasi (masalan: Fizika 2024)" maxlength="60">
-      <div class="pre-upload-zone" onclick="document.getElementById('pre-excel-inp').click()">
-        <p id="pre-excel-lbl">📂 Excel faylni yuklang (25 savol = 1 subtest)</p>
+      <div class="pre-upload-zone" id="pre-drop-zone" onclick="document.getElementById('pre-excel-inp').click()">
+        <p id="pre-excel-lbl"><span class="uz-row">📂&nbsp;Excel faylni yuklang (25 savol = 1 subtest)</span></p>
       </div>
       <button type="button" class="tmpl-btn" onclick="downloadTemplate()" style="margin-top:8px;">⬇️ Excel shablon yuklab olish</button>
       <div class="pre-preview-box" id="pre-preview">
@@ -403,6 +419,18 @@ const SESSION_KEY='qb_admin_session';
 
 window.addEventListener('dragover', e => e.preventDefault());
 window.addEventListener('drop', e => e.preventDefault());
+
+// ── TICK SVG (yashil/binafsha "✓" animatsiyasi uchun) ──
+const TICK_SVG='<span class="uz-tick"><svg viewBox="0 0 24 24"><path d="M4 12.5L9 17.5L20 6.5"/></svg></span>';
+function setZoneLoaded(zoneEl,labelEl,text){
+  zoneEl.classList.remove('drag');
+  zoneEl.classList.add('loaded');
+  labelEl.innerHTML=`<span class="uz-row">${TICK_SVG}${text}</span>`;
+}
+function setZoneIdle(zoneEl,labelEl,text){
+  zoneEl.classList.remove('loaded','drag');
+  labelEl.innerHTML=`<span class="uz-row">📂&nbsp;${text}</span>`;
+}
 
 // ── INIT ──
 // FIX: sessionStorage ishlatamiz (tab/window yopilganda o'chadi)
@@ -551,14 +579,15 @@ let resetFanKey=null;
 function handleFanExcel(inp){
   const file = inp.files ? inp.files[0] : inp;
   if(!file) return;
+  const zone=$('fan-drop-zone'),lbl=$('fan-excel-lbl');
   const r=new FileReader();
   r.onload=e=>{
     try{
       const wb=XLSX.read(e.target.result,{type:'binary'});
       const qs=parseMockWb(wb);
-      if(!qs||!qs.length){setMsg('fan-msg','Savollar topilmadi!','err');fanPendingQs=null;$('fan-excel-lbl').textContent='📂 Excel faylni yuklang';if(inp.value)inp.value='';return;}
+      if(!qs||!qs.length){setMsg('fan-msg','Savollar topilmadi!','err');fanPendingQs=null;setZoneIdle(zone,lbl,'Excel faylni yuklang');if(inp.value)inp.value='';return;}
       fanPendingQs=qs;
-      $('fan-excel-lbl').textContent=`✅ ${qs.length} ta savol yuklandi`;
+      setZoneLoaded(zone,lbl,`${qs.length} ta savol yuklandi`);
       setMsg('fan-msg',`${qs.length} ta savol tayyor — Saqlash tugmasini bosing`,'ok');
     }catch(err){setMsg('fan-msg','Xato: '+err.message,'err');}
     if(inp.value)inp.value='';
@@ -567,8 +596,12 @@ function handleFanExcel(inp){
 }
 window.handleFanExcel=handleFanExcel;
 
-document.querySelector('.upload-zone-sm').addEventListener('drop', e => {
+const fanZone=document.getElementById('fan-drop-zone');
+fanZone.addEventListener('dragover',e=>{e.preventDefault();fanZone.classList.add('drag');});
+fanZone.addEventListener('dragleave',()=>fanZone.classList.remove('drag'));
+fanZone.addEventListener('drop', e => {
   e.preventDefault();
+  fanZone.classList.remove('drag');
   if(e.dataTransfer.files.length) handleFanExcel(e.dataTransfer.files[0]);
 });
 
@@ -582,7 +615,7 @@ async function saveFan(){
     const slim=fanPendingQs.map(q=>({num:q.num,text:q.text,correctLetter:q.correctLetter,correctText:q.correctText,options:q.options.map(o=>({text:o.text,letter:o.letter,isCorrect:o.isCorrect}))}));
     await set(ref(db,`${FANS_PATH}/${fanKey}`),{name,count:slim.length,questions:slim,createdAt:Date.now()});
     setMsg('fan-msg',`✅ "${name}" — ${slim.length} ta savol saqlandi!`,'ok');
-    $('fan-name').value='';$('fan-excel-lbl').textContent='📂 Excel faylni yuklang';fanPendingQs=null;
+    $('fan-name').value='';setZoneIdle($('fan-drop-zone'),$('fan-excel-lbl'),'Excel faylni yuklang');fanPendingQs=null;
     loadFans();loadGlobalStats();
   }catch(e){setMsg('fan-msg','Saqlashda xatolik: '+e.message,'err');}
   btn.disabled=false;btn.textContent='💾 Saqlash';
@@ -646,14 +679,15 @@ let prePendingQs=null;
 function handlePreExcel(inp){
   const file = inp.files ? inp.files[0] : inp;
   if(!file) return;
+  const zone=$('pre-drop-zone'),lbl=$('pre-excel-lbl');
   const r=new FileReader();
   r.onload=e=>{
     try{
       const wb=XLSX.read(e.target.result,{type:'binary'});
       const qs=parseMockWb(wb);
-      if(!qs||!qs.length){setMsg('pre-msg','Savollar topilmadi!','err');prePendingQs=null;$('pre-excel-lbl').textContent='📂 Excel faylni yuklang';if(inp.value)inp.value='';return;}
+      if(!qs||!qs.length){setMsg('pre-msg','Savollar topilmadi!','err');prePendingQs=null;setZoneIdle(zone,lbl,"Excel faylni yuklang (25 savol = 1 subtest)");if(inp.value)inp.value='';return;}
       prePendingQs=qs;
-      $('pre-excel-lbl').textContent=`✅ ${qs.length} ta savol yuklandi`;
+      setZoneLoaded(zone,lbl,`${qs.length} ta savol yuklandi`);
       const cnt=Math.ceil(qs.length/PRE_CHUNK);
       setMsg('pre-msg',`${qs.length} ta savol — ${cnt} ta subtest yaratiladi`,'ok');
       updatePrePreview();
@@ -664,8 +698,12 @@ function handlePreExcel(inp){
 }
 window.handlePreExcel=handlePreExcel;
 
-document.querySelector('.pre-upload-zone').addEventListener('drop', e => {
+const preZone=document.getElementById('pre-drop-zone');
+preZone.addEventListener('dragover',e=>{e.preventDefault();preZone.classList.add('drag');});
+preZone.addEventListener('dragleave',()=>preZone.classList.remove('drag'));
+preZone.addEventListener('drop', e => {
   e.preventDefault();
+  preZone.classList.remove('drag');
   if(e.dataTransfer.files.length) handlePreExcel(e.dataTransfer.files[0]);
 });
 
@@ -710,7 +748,7 @@ async function savePre(){
     $('pre-prog-fill').style.width='100%';
     $('pre-save-text').textContent=`✅ ${chunks.length} ta subtest muvaffaqiyatli saqlandi!`;
     setMsg('pre-msg',`✅ "${baseTitle}" — ${chunks.length} ta subtest yaratildi!`,'ok');
-    $('pre-title').value='';$('pre-excel-lbl').textContent='📂 Excel faylni yuklang';$('pre-preview').style.display='none';prePendingQs=null;
+    $('pre-title').value='';setZoneIdle($('pre-drop-zone'),$('pre-excel-lbl'),"Excel faylni yuklang (25 savol = 1 subtest)");$('pre-preview').style.display='none';prePendingQs=null;
     setTimeout(()=>{$('pre-saving').style.display='none';$('pre-prog-bar').style.display='none';},2500);
     loadPre();
   }catch(e){setMsg('pre-msg','Saqlashda xatolik: '+e.message,'err');$('pre-saving').style.display='none';$('pre-prog-bar').style.display='none';}
