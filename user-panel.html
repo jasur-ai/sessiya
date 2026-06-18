@@ -292,7 +292,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .start-actions{display:flex;gap:8px;}
 
 /* CONFIRM MODAL */
-#confirm-modal{position:fixed;inset:0;z-index:600;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.6);}
+#confirm-modal{position:fixed;inset:0;z-index:950;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.6);}
 #confirm-modal.on{display:flex;}
 .confirm-box{background:var(--surf);border-radius:18px;padding:24px;width:100%;max-width:340px;border:1px solid var(--border);text-align:center;}
 .confirm-title{font-family:'Righteous',cursive;font-size:1.1rem;margin-bottom:6px;}
@@ -1024,7 +1024,7 @@ window.backToPanel=function(){
   $('quiz-wrap').classList.remove('on');
   $('result-wrap').classList.remove('on');
   questions=[];shuffledQs=[];curIdx=0;correctCnt=0;wrongCnt=0;answeredCnt=0;wrongQs=[];answered=false;
-  window.scrollTo(0,0);
+  location.href='user-panel.html';
 };
 
 // Chiqish tugmasini addEventListener bilan bog'laymiz (onclick atributi module scopeda ishlamaydi)
@@ -1033,10 +1033,7 @@ $('exit-quiz-btn').addEventListener('click', function(){
   $('conf-sub').textContent='Joriy natija saqlanmaydi.';
   $('conf-ok').onclick=function(){
     window.closeConfirm();
-    $('quiz-wrap').classList.remove('on');
-    $('result-wrap').classList.remove('on');
-    questions=[];shuffledQs=[];curIdx=0;correctCnt=0;wrongCnt=0;answeredCnt=0;wrongQs=[];answered=false;
-    window.scrollTo(0,0);
+    location.href='user-panel.html';
   };
   $('confirm-modal').classList.add('on');
 });
