@@ -1024,7 +1024,10 @@ window.backToPanel=function(){
   $('quiz-wrap').classList.remove('on');
   $('result-wrap').classList.remove('on');
   questions=[];shuffledQs=[];curIdx=0;correctCnt=0;wrongCnt=0;answeredCnt=0;wrongQs=[];answered=false;
-  window.scrollTo(0,0);
+  // Mock yoki PRE testdan chiqqanda shu bo'limga scroll
+  const target=$('mock-section')&&$('mock-section').style.display!=='none'?$('mock-section'):($('pre-section')&&$('pre-section').style.display!=='none'?$('pre-section'):null);
+  if(target) setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),50);
+  else window.scrollTo(0,0);
 };
 
 // Chiqish tugmasini addEventListener bilan bog'laymiz (onclick atributi module scopeda ishlamaydi)
@@ -1036,7 +1039,9 @@ $('exit-quiz-btn').addEventListener('click', function(){
     $('quiz-wrap').classList.remove('on');
     $('result-wrap').classList.remove('on');
     questions=[];shuffledQs=[];curIdx=0;correctCnt=0;wrongCnt=0;answeredCnt=0;wrongQs=[];answered=false;
-    window.scrollTo(0,0);
+    const target=$('mock-section')&&$('mock-section').style.display!=='none'?$('mock-section'):($('pre-section')&&$('pre-section').style.display!=='none'?$('pre-section'):null);
+    if(target) setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),50);
+    else window.scrollTo(0,0);
   };
   $('confirm-modal').classList.add('on');
 });
