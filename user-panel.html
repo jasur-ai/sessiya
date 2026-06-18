@@ -1024,7 +1024,7 @@ window.backToPanel=function(){
   $('quiz-wrap').classList.remove('on');
   $('result-wrap').classList.remove('on');
   questions=[];shuffledQs=[];curIdx=0;correctCnt=0;wrongCnt=0;answeredCnt=0;wrongQs=[];answered=false;
-  location.href='user-panel.html';
+  window.scrollTo(0,0);
 };
 
 // Chiqish tugmasini addEventListener bilan bog'laymiz (onclick atributi module scopeda ishlamaydi)
@@ -1033,7 +1033,10 @@ $('exit-quiz-btn').addEventListener('click', function(){
   $('conf-sub').textContent='Joriy natija saqlanmaydi.';
   $('conf-ok').onclick=function(){
     window.closeConfirm();
-    location.href='user-panel.html';
+    $('quiz-wrap').classList.remove('on');
+    $('result-wrap').classList.remove('on');
+    questions=[];shuffledQs=[];curIdx=0;correctCnt=0;wrongCnt=0;answeredCnt=0;wrongQs=[];answered=false;
+    window.scrollTo(0,0);
   };
   $('confirm-modal').classList.add('on');
 });
