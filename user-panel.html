@@ -139,12 +139,36 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .fan-btn-cnt{font-size:.72rem;color:var(--muted);font-weight:700;}
 .fan-btn-actions{display:flex;gap:6px;}
 .fan-start{background:rgba(155,89,182,.2);border:1px solid rgba(155,89,182,.35);border-radius:8px;
-  padding:6px 13px;color:#ce9fff;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:900;cursor:pointer;transition:all .2s;}
+  padding:8px 13px;color:#ce9fff;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:900;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px;}
 .fan-start:hover{background:rgba(155,89,182,.35);}
-.fan-cast{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);border-radius:8px;
-  padding:6px 13px;color:var(--green);font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:900;cursor:pointer;transition:all .2s;}
-.fan-cast:hover{background:rgba(56,189,248,.2);}
+.fan-cast{background:rgba(0,255,170,.1);border:1px solid rgba(0,255,170,.2);border-radius:8px;
+  padding:8px 13px;color:var(--green);font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:900;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.fan-cast:hover{background:rgba(0,255,170,.2);}
 .no-fans{color:var(--muted);font-size:.82rem;font-weight:700;padding:12px 0;}
+
+/* ACCORDION SECTIONS */
+.acc-section{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:2px;}
+.acc-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;transition:background .2s;user-select:none;}
+.acc-header:hover{background:rgba(255,255,255,.04);}
+.acc-icon{font-size:1.25rem;}
+.acc-title{font-family:'Righteous',cursive;font-size:1rem;color:var(--text);}
+.acc-arrow{color:var(--muted);font-size:.7rem;transition:transform .25s;flex-shrink:0;}
+.acc-arrow.open{transform:rotate(90deg);}
+.acc-body{display:none;padding:0 14px 14px;}
+.acc-body.open{display:block;}
+
+/* Fan item ichida accordion (har bir fan yig'ilgan) */
+.fan-acc{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:11px;margin-bottom:6px;overflow:hidden;}
+.fan-acc-hd{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;transition:background .2s;}
+.fan-acc-hd:hover{background:rgba(155,89,182,.07);}
+.fan-acc-left{display:flex;flex-direction:column;gap:2px;}
+.fan-acc-name{font-weight:800;font-size:.88rem;}
+.fan-acc-cnt{font-size:.72rem;color:var(--muted);font-weight:700;}
+.fan-acc-right{display:flex;align-items:center;gap:8px;}
+.fan-acc-arrow{color:var(--muted);font-size:.65rem;transition:transform .2s;}
+.fan-acc-arrow.open{transform:rotate(90deg);}
+.fan-acc-body{display:none;padding:0 14px 12px;gap:7px;flex-direction:column;}
+.fan-acc-body.open{display:flex;}
 
 /* PRE SECTION */
 .pre-section-wrap{margin-bottom:20px;}
@@ -380,26 +404,36 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   </div>
   <div id="tests-list"></div>
 
-  <div id="mock-section" style="display:none;margin-top:24px;">
-    <div class="mock-card">
-      <div class="mock-hd">
-        <div class="mock-icon">🎓</div>
-        <div>
-          <div class="mock-title">Mock Test <span class="mock-badge">RANDOM 25</span></div>
+  <div id="mock-section" style="display:none;margin-top:16px;">
+    <div class="acc-section">
+      <div class="acc-header" onclick="toggleAcc('mock-body','mock-arrow')">
+        <div style="display:flex;align-items:center;gap:9px;">
+          <span class="acc-icon">🎓</span>
+          <span class="acc-title">Mock Testlar</span>
+          <span class="mock-badge">RANDOM 25</span>
         </div>
+        <span class="acc-arrow" id="mock-arrow">▶</span>
       </div>
-      <div class="mock-desc">Fanlardan birini tanlang — bazadan 25 ta tasodifiy savol beriladi. Natijalar saqlanadi.</div>
-      <div class="fans-grid" id="fans-grid"></div>
+      <div class="acc-body" id="mock-body">
+        <div class="fans-grid" id="fans-grid"></div>
+      </div>
     </div>
   </div>
 
-  <div id="pre-section" style="display:none;margin-top:20px;">
-    <div class="pre-hd">
-      <div class="pre-hd-icon">🔷</div>
-      <div class="pre-hd-title">PRE Testlar</div>
-      <div class="pre-badge">SUBTESTLAR</div>
+  <div id="pre-section" style="display:none;margin-top:10px;">
+    <div class="acc-section">
+      <div class="acc-header" onclick="toggleAcc('pre-body','pre-arrow')">
+        <div style="display:flex;align-items:center;gap:9px;">
+          <span class="acc-icon">🔷</span>
+          <span class="acc-title">PRE Testlar</span>
+          <span class="pre-badge">SUBTESTLAR</span>
+        </div>
+        <span class="acc-arrow" id="pre-arrow">▶</span>
+      </div>
+      <div class="acc-body" id="pre-body">
+        <div id="pre-groups-list"></div>
+      </div>
     </div>
-    <div id="pre-groups-list"></div>
   </div>
 
 </div><!-- #panel -->
@@ -771,25 +805,48 @@ async function startPublicTest(globalKey){
   }catch(e){alert('Yuklab bo\'lmadi: '+e.message);}
 }
 
+// ── ACCORDION toggle ──
+window.toggleAcc=function(bodyId,arrowId){
+  const body=document.getElementById(bodyId),arrow=document.getElementById(arrowId);
+  if(!body||!arrow) return;
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  arrow.classList.toggle('open',!isOpen);
+};
+window.toggleFanAcc=function(safeK){
+  const body=document.getElementById('fan-body-'+safeK),arrow=document.getElementById('fan-arrow-'+safeK);
+  if(!body||!arrow) return;
+  const isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  arrow.classList.toggle('open',!isOpen);
+};
+
 // ── MOCK ──
 async function loadMock(){
-  const sec=$('mock-section'),grid=$('fans-grid');
+  const sec=document.getElementById('mock-section'),grid=document.getElementById('fans-grid');
   try{
     const snap=await get(ref(db,FANS_PATH));
     if(!snap.exists()){sec.style.display='none';return;}
     const fans=Object.entries(snap.val()).sort((a,b)=>(a[1].name||'').localeCompare(b[1].name||''));
     if(!fans.length){sec.style.display='none';return;}
     sec.style.display='block';
-    grid.innerHTML=fans.map(([k,f])=>`<div class="fan-btn">
-      <div class="fan-btn-left">
-        <div class="fan-btn-name">📘 ${esc(f.name||k)}</div>
-        <div class="fan-btn-cnt">${f.count||0} ta savol bazasi • random ${MOCK_COUNT} ta beriladi</div>
-      </div>
-      <div class="fan-btn-actions">
-        <button type="button" class="fan-start" onclick="startMockTest('${k}')">▶ Boshlash</button>
-        <button type="button" class="fan-cast" onclick="openCastFan('${k}','${esc(f.name||k).replace(/'/g,"\\'")}')">📡 Cast</button>
-      </div>
-    </div>`).join('');
+    grid.innerHTML=fans.map(([k,f])=>{
+      const safeK=k.replace(/[^a-zA-Z0-9]/g,'_');
+      const safeName=esc(f.name||k).replace(/'/g,"\'");
+      return '<div class="fan-acc">'
+        +'<div class="fan-acc-hd" onclick="toggleFanAcc(\'' +safeK+ '\')">'
+          +'<div class="fan-acc-left">'
+            +'<div class="fan-acc-name">📘 '+esc(f.name||k)+'</div>'
+            +'<div class="fan-acc-cnt">'+(f.count||0)+' ta savol • random '+MOCK_COUNT+' ta</div>'
+          +'</div>'
+          +'<span class="fan-acc-arrow" id="fan-arrow-'+safeK+'">▶</span>'
+        +'</div>'
+        +'<div class="fan-acc-body" id="fan-body-'+safeK+'">'
+          +'<button type="button" class="fan-start" style="width:100%;margin-bottom:6px;" onclick="startMockTest(\'' +k+ '\')">▶ Boshlash</button>'
+          +'<button type="button" class="fan-cast" style="width:100%;" onclick="openCastFan(\'' +k+ "','" +safeName+ '\')">📡 Cast</button>'
+        +'</div>'
+      +'</div>';
+    }).join('');
   }catch(_){sec.style.display='none';}
 }
 
