@@ -411,7 +411,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <div class="q-num" id="q-num">1 / 10</div>
       <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
       <!-- FIX: exit tugmasi to'g'ri ishlashi uchun onclick to'g'rilandi -->
-      <button type="button" class="exit-btn" onclick="window.confirmExitQuiz()">✕ Chiqish</button>
+      <button type="button" class="exit-btn" id="exit-quiz-btn">✕ Chiqish</button>
     </div>
     <div class="stats-row2">
       <div class="stat-c"><div class="stat-n" id="st-total">0</div><div class="stat-l">Jami</div></div>
@@ -1040,6 +1040,8 @@ window.confirmExitQuiz=function(){
   };
   $('confirm-modal').classList.add('on');
 };
+// Chiqish tugmasini addEventListener bilan bog'laymiz (onclick atributi module scopeda ishlamaydi)
+$('exit-quiz-btn').addEventListener('click', function(){ window.confirmExitQuiz(); });
 
 // ── SAVE RESULTS & LEADERBOARD ──
 const RANK_MEDALS=['🥇','🥈','🥉'];
