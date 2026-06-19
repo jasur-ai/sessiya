@@ -115,22 +115,32 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:920px;margin-top:12px;}
 .opts.single{grid-template-columns:1fr;}
 .opt{
-  border:none;border-radius:14px;padding:18px 14px;
+  position:relative;overflow:hidden;
+  background:#101a2e;
+  border:2px solid var(--opt-c, rgba(255,255,255,.15));
+  border-radius:14px;padding:18px 14px;
   font-family:'Nunito',sans-serif;font-size:.97rem;font-weight:800;
-  cursor:pointer;transition:all .2s;color:#fff;
+  cursor:pointer;transition:transform .15s,border-color .2s,background .2s;color:#fff;
   text-align:left;display:flex;align-items:center;gap:10px;
   min-height:76px;word-break:break-word;
+  animation:optShimmer 4.5s ease-in-out infinite;
+  animation-delay:var(--opt-delay, 0s);
 }
-.opt:hover:not(:disabled){transform:scale(1.025);box-shadow:0 10px 30px rgba(0,0,0,.4);}
-.opt:disabled{cursor:not-allowed;}
+.opt::before{
+  content:'';position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(115deg,transparent,rgba(255,255,255,.07),transparent);
+  animation:optSweep 5.5s ease-in-out infinite;
+  animation-delay:var(--opt-delay, 0s);
+  pointer-events:none;
+}
+@keyframes optShimmer{0%,100%{box-shadow:inset 0 0 0 0 rgba(255,255,255,0);}50%{box-shadow:inset 0 0 32px 0 rgba(255,255,255,.04);}}
+@keyframes optSweep{0%{left:-60%;}45%{left:120%;}100%{left:120%;}}
+.opt:hover:not(:disabled){transform:translateY(-2px);background:#142036;}
+.opt:disabled{cursor:not-allowed;animation:none;}
+.opt:disabled::before{display:none;}
 .opt.dim{opacity:.45;transform:scale(.97)!important;}
-.opt.pick{box-shadow:0 0 0 5px rgba(255,255,255,.5)!important;transform:scale(1.04)!important;}
-[data-c="0"]{background:linear-gradient(135deg,#e84040,#1d4ed8);}
-[data-c="1"]{background:linear-gradient(135deg,#2d9cdb,#1a6599);}
-[data-c="2"]{background:linear-gradient(135deg,#f2a827,#b87b10);}
-[data-c="3"]{background:linear-gradient(135deg,#27ae60,#1a7a42);}
-[data-c="4"]{background:linear-gradient(135deg,#9b59b6,#6c3483);}
-.opt-sym{font-size:1.3rem;flex-shrink:0;}
+.opt.pick{border-color:var(--gold)!important;box-shadow:0 0 0 1px var(--gold)!important;transform:scale(1.02)!important;}
+.opt-sym{font-size:1.3rem;flex-shrink:0;color:var(--opt-c, #fff);}
 
 /* Player badge bottom-left (always visible in game) */
 .pbadge{
@@ -350,6 +360,7 @@ const db=getDatabase(app);
 // ── CONSTANTS ──
 const EMOJIS=['🦊','🐺','🦁','🐯','🦝','🐲','🦄','🦅','🐸','🦑','🤖','👾','🦸','🧙','🥷','🦈','🐙','🦉','🦩','🎭'];
 const SHAPES=['▲','●','■','♦','★'];
+const OPT_COLORS=['#ff4466','#38bdf8','#ffd60a','#00ffaa','#c084fc'];
 const RANK_EMOJI=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣'];
 const RANK_CLS=['r1','r2','r3','','','',''];
 
@@ -523,10 +534,13 @@ function showQActive(st){
   const opts=seededShuffle(rawOpts,name);
   const grid=$('opts-grid');
   grid.className='opts'+(opts.length<=2?' single':'');
-  grid.innerHTML=opts.map((o,pos)=>`
-    <button type="button" class="opt" data-c="${pos}" data-idx="${o.idx}" onclick="pickAns(${o.idx},this)">
+  grid.innerHTML=opts.map((o,pos)=>{
+    const c=OPT_COLORS[pos]||OPT_COLORS[pos%OPT_COLORS.length];
+    return `
+    <button type="button" class="opt" data-idx="${o.idx}" style="--opt-c:${c};--opt-delay:${pos*0.6}s" onclick="pickAns(${o.idx},this)">
       <span class="opt-sym">${SHAPES[pos]||'•'}</span>${esc(o.text)}
-    </button>`).join('');
+    </button>`;
+  }).join('');
 
   updatePBadge();
   goTo('s-qact');
