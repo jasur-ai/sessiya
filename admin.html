@@ -141,6 +141,19 @@ tbody tr:hover td{background:rgba(255,255,255,.025);}
 .top-chip:nth-child(2){border-color:rgba(192,192,192,.3);color:#c0c0c0;}
 .top-chip:nth-child(3){border-color:rgba(205,127,50,.3);color:#cd7f32;}
 
+.res-toggle-hint{margin-top:9px;font-size:.7rem;font-weight:800;color:var(--muted);cursor:pointer;text-align:center;
+  border-top:1px dashed rgba(255,255,255,.08);padding-top:8px;transition:color .2s;}
+.res-toggle-hint:hover{color:var(--purple);}
+.res-full{margin-top:10px;border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:6px;}
+.res-full-hd{font-size:.72rem;font-weight:900;color:var(--purple);text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px;}
+.full-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);
+  border-radius:9px;padding:7px 12px;font-size:.8rem;font-weight:700;}
+.fr-rank{width:24px;text-align:center;font-weight:900;color:var(--gold);}
+.fr-em{font-size:1.1rem;flex-shrink:0;}
+.fr-nm{flex:1;}
+.fr-sc{color:var(--gold);font-weight:800;}
+.fr-tm{color:var(--muted);font-size:.72rem;min-width:50px;text-align:right;}
+
 .fans-add-box{background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);margin-bottom:14px;}
 .fans-add-row{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
 .fans-inp{flex:1;min-width:160px;background:rgba(255,255,255,.05);border:2px solid rgba(255,255,255,.08);
@@ -797,23 +810,48 @@ async function loadResults(){
     if(!snap.exists()){$('results-wrap').innerHTML='<div class="empty">Hali saqlangan natija yo\'q</div>';return;}
     const entries=Object.entries(snap.val()).sort((a,b)=>(b[1].date||0)-(a[1].date||0));
     $('results-wrap').innerHTML=entries.map(([code,r])=>{
-      const lb=r.leaderboard||[];
+      const lb=r.leaderboard||[]; // faqat TOP 7 (shoxsupa) doimiy saqlanadi
       const date=r.date?new Date(r.date).toLocaleString('uz-UZ',{dateStyle:'short',timeStyle:'short'}):'—';
+      const totalPlayers=r.totalPlayers!=null?r.totalPlayers:lb.length;
       const top3=lb.slice(0,3).map((p,i)=>`<div class="top-chip">${['🥇','🥈','🥉'][i]} ${p.emoji||''} ${esc(p.name)} — <strong>${p.score}</strong></div>`).join('');
+      const fullRows=lb.map((p,i)=>`<div class="full-row">
+          <span class="fr-rank">${['🥇','🥈','🥉'][i]||(i+1)}</span>
+          <span class="fr-em">${p.emoji||'❓'}</span>
+          <span class="fr-nm">${esc(p.name)}</span>
+          <span class="fr-sc">${p.score||0} ball</span>
+          <span class="fr-tm">${fmtMs(p.time)}</span>
+        </div>`).join('');
       return`<div class="res-card">
-        <div class="res-head">
+        <div class="res-head" onclick="toggleResCard(this)" style="cursor:pointer">
           <div>
             <div class="res-title">📝 ${esc(r.test_name||'Test')} <span style="color:var(--muted);font-size:.76rem">Host: ${esc(r.host||'—')}</span></div>
-            <div class="res-meta">📅 ${date} &bull; ${lb.length} ta o'yinchi</div>
+            <div class="res-meta">📅 ${date} &bull; ${totalPlayers} ta o'yinchi &bull; <span style="color:var(--purple)">🏆 ${lb.length} ta shoxsupada</span></div>
           </div>
           <div class="res-code"># ${code}</div>
         </div>
         <div class="top3">${top3||'<span style="color:var(--muted);font-size:.76rem">Natija yo\'q</span>'}</div>
+        <div class="res-full" style="display:none">
+          <div class="res-full-hd">🏆 To'liq qaydnoma — TOP ${lb.length}</div>
+          ${fullRows||'<div style="color:var(--muted);font-size:.78rem">Natija yo\'q</div>'}
+        </div>
+        <div class="res-toggle-hint" onclick="toggleResCard(this.parentElement.querySelector('.res-head'))">👁 To'liq qaydnomani ko'rish / yashirish</div>
       </div>`;
     }).join('');
   }catch(e){$('results-wrap').innerHTML=`<div class="empty" style="color:var(--accent)">Xato: ${e.message}</div>`;}
 }
 window.loadResults=loadResults;
+
+window.toggleResCard=function(headEl){
+  const card=headEl.closest('.res-card');
+  const full=card.querySelector('.res-full');
+  full.style.display=(full.style.display!=='none')?'none':'block';
+};
+
+function fmtMs(ms){
+  const s=Math.round((ms||0)/1000);
+  return s<60?s+'s':Math.floor(s/60)+'m '+(s%60)+'s';
+}
+
 
 // ── STATS ──
 async function loadStats(){

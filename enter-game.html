@@ -198,6 +198,13 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .lb-nm{font-weight:800;flex:1;text-align:left;}
 .lb-sc{font-family:'Righteous',cursive;font-size:.95rem;color:var(--gold);}
 
+/* TOP 7 dan tashqari o'yinchilar — shunchaki, ajratilmagan ko'rinishda */
+.lbi-plain{background:transparent!important;border:none!important;box-shadow:none;padding:7px 15px;animation:none!important;}
+.lbi-plain .lb-rank{color:var(--muted);font-family:'Nunito',sans-serif;font-weight:800;font-size:.8rem;}
+.lbi-plain .lb-em{font-size:1.25rem;opacity:.75;}
+.lbi-plain .lb-nm{font-weight:700;font-size:.84rem;color:var(--muted);}
+.lbi-plain .lb-sc{color:var(--muted);font-size:.85rem;}
+
 /* ENDED */
 #s-end{background:radial-gradient(ellipse at 50% 30%,rgba(56,189,248,.14) 0%,transparent 55%),var(--bg);}
 #s-end .lb-list{max-height:55vh;overflow-y:auto;padding-right:4px;}
@@ -608,15 +615,27 @@ function renderLb(lb){
     </div>`).join('');
 }
 
-// Yakuniy ekran uchun — hamma o'yinchi ko'rinadi (slice yo'q)
+// Yakuniy ekran uchun — hamma o'yinchi ko'rinadi (slice yo'q), TOP 7 shoxsupa, qolganlari oddiy
 function renderLbAll(lb){
-  return lb.map((p,i)=>`
-    <div class="lbi${p.name===name?' me':''}">
-      <div class="lb-rank ${RANK_CLS[i]||''}">${RANK_EMOJI[i]||i+1}</div>
+  return lb.map((p,i)=>{
+    const plain=i>=7;
+    const rankLabel=plain?(i+1):(RANK_EMOJI[i]||i+1);
+    return`
+    <div class="lbi${p.name===name?' me':''}${plain?' lbi-plain':''}">
+      <div class="lb-rank ${plain?'':(RANK_CLS[i]||'')}">${rankLabel}</div>
       <div class="lb-em">${p.emoji||'❓'}</div>
       <div class="lb-nm">${esc(p.name)}${p.name===name?' 👈':''}</div>
-      <div class="lb-sc">${p.score||0} ball</div>
-    </div>`).join('');
+      <div style="text-align:right">
+        <div class="lb-sc">${p.score||0} ball</div>
+        <div style="font-size:.65rem;color:var(--muted);font-weight:700">${fmtMs(p.time)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function fmtMs(ms){
+  const s=Math.round((ms||0)/1000);
+  return s<60?s+'s':Math.floor(s/60)+'min '+(s%60)+'s';
 }
 
 function showLb(lb){

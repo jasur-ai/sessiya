@@ -211,6 +211,13 @@ body.light .ans-bar{background:rgba(240,240,248,.92);}
 .lb-sc{font-family:'Righteous',cursive;font-size:1rem;color:var(--gold);}
 .lb-auto{color:var(--muted);font-size:.78rem;margin-top:4px;}
 
+/* TOP 7 dan tashqari o'yinchilar — shunchaki, ajratilmagan ko'rinishda */
+.lbi-plain{background:transparent!important;border:none!important;box-shadow:none;padding:7px 16px;animation:none!important;}
+.lbi-plain .lb-rank{background:transparent;color:var(--muted);font-family:'Nunito',sans-serif;font-weight:800;font-size:.8rem;width:auto;}
+.lbi-plain .lb-em{font-size:1.05rem;opacity:.75;}
+.lbi-plain .lb-nm{font-weight:700;font-size:.84rem;color:var(--muted);}
+.lbi-plain .lb-sc{color:var(--muted);font-size:.85rem;}
+
 .cont-btn{
   background:linear-gradient(135deg,var(--blue),#1a6599);color:#fff;border:none;
   border-radius:12px;padding:12px 32px;font-family:'Righteous',cursive;
@@ -572,15 +579,25 @@ async function computeScores(idx){
   if(!Object.keys(answers).length) return;
 
   const type=session.settings?.type||'score';
-  const scorePromises=[];
+  const writePromises=[];
 
   for(const [pname,ans] of Object.entries(answers)){
     const isCorrect=(ans.option===q.correct);
+    const elapsed=ans.time_ms||0;
+
+    // Sarflagan vaqtni har doim (to'g'ri/xato bo'lishidan qat'iy nazar) yig'amiz — yakuniy tartiblash uchun
+    const curTime=playersSnap[pname]?.totalTime||0;
+    const newTime=curTime+elapsed;
+    if(playersSnap[pname]) playersSnap[pname].totalTime=newTime;
+    writePromises.push(
+      set(ref(db,`game_sessions/${code}/players/${pname}/totalTime`),newTime)
+        .catch(e=>console.warn(`Time write failed for ${pname}:`,e))
+    );
+
     if(!isCorrect) continue;
 
     let pts=100;
     if(type==='score'){
-      const elapsed=ans.time_ms||0;
       const total=qTime*1000;
       const ratio=Math.min(1,elapsed/total);
       if(ratio<.1) pts=100;
@@ -601,18 +618,23 @@ async function computeScores(idx){
     // Update local snapshot immediately
     if(playersSnap[pname]) playersSnap[pname].score=newScore;
     // Fire individual set — no root multi-path needed
-    scorePromises.push(
+    writePromises.push(
       set(ref(db,`game_sessions/${code}/players/${pname}/score`),newScore)
         .catch(e=>console.warn(`Score write failed for ${pname}:`,e))
     );
   }
-  await Promise.all(scorePromises);
+  await Promise.all(writePromises);
 }
 
 function buildLb(players){
   return Object.entries(players)
-    .map(([n,p])=>({name:n,emoji:p.emoji||'❓',score:p.score||0}))
+    .map(([n,p])=>({name:n,emoji:p.emoji||'❓',score:p.score||0,time:p.totalTime||0}))
     .sort((a,b)=>b.score-a.score);
+}
+
+function fmtMs(ms){
+  const s=Math.round((ms||0)/1000);
+  return s<60?s+'s':Math.floor(s/60)+'m '+(s%60)+'s';
 }
 
 // ── LEADERBOARD HOST ──
@@ -649,14 +671,31 @@ function renderLb(lb){
   </div>`).join('');
 }
 
-// Hammani ko'rsatadigan full render (yakuniy ekran uchun)
+// Hammani ko'rsatadigan full render — TOP 7 shoxsupa stilida, qolganlari oddiy
 function renderLbFull(lb){
-  return lb.map((p,i)=>`<div class="lbi">
-    <div class="lb-rank ${RANK_CLS[i]||'rank-n'}">${['🥇','🥈','🥉'][i]||i+1}</div>
-    <div class="lb-em">${p.emoji||'❓'}</div>
-    <div class="lb-nm">${esc(p.name)}</div>
-    <div class="lb-sc">${p.score||0} ball</div>
-  </div>`).join('');
+  return lb.map((p,i)=>{
+    const plain=i>=7;
+    if(plain){
+      return`<div class="lbi lbi-plain">
+        <div class="lb-rank rank-n">${i+1}</div>
+        <div class="lb-em">${p.emoji||'❓'}</div>
+        <div class="lb-nm">${esc(p.name)}</div>
+        <div style="text-align:right">
+          <div class="lb-sc">${p.score||0} ball</div>
+          <div style="font-size:.65rem;color:var(--muted);font-weight:700">${fmtMs(p.time)}</div>
+        </div>
+      </div>`;
+    }
+    return`<div class="lbi">
+      <div class="lb-rank ${RANK_CLS[i]||'rank-n'}">${['🥇','🥈','🥉'][i]||i+1}</div>
+      <div class="lb-em">${p.emoji||'❓'}</div>
+      <div class="lb-nm">${esc(p.name)}</div>
+      <div style="text-align:right">
+        <div class="lb-sc">${p.score||0} ball</div>
+        <div style="font-size:.65rem;color:var(--muted);font-weight:700">${fmtMs(p.time)}</div>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 // ── FINISH ──
@@ -682,23 +721,25 @@ async function finishGame(){
   const snap=await get(ref(db,`game_sessions/${code}/players`));
   const all=snap.val()||{};
 
-  // Barcha o'yinchilarni tartiblash
+  // Barcha o'yinchilarni ball (yuqori) va sarflagan vaqt (kam) bo'yicha tartiblash
   const allSorted=Object.entries(all)
-    .map(([n,p])=>({name:n,emoji:p.emoji||'❓',score:p.score||0}))
-    .sort((a,b)=>b.score-a.score);
+    .map(([n,p])=>({name:n,emoji:p.emoji||'❓',score:p.score||0,time:p.totalTime||0}))
+    .sort((a,b)=>b.score-a.score||a.time-b.time);
 
-  // Firebase-ga barcha o'yinchilar saqlansin
+  // Doimiy bazaga FAQAT TOP 7 (shoxsupa) saqlanadi
+  const top7=allSorted.slice(0,7);
   await set(ref(db,`results/${code}`),{
     test_name:session.test_name||'Test',
     host:session.host||'',
     date:Date.now(),
-    leaderboard:allSorted
+    totalPlayers:allSorted.length,
+    leaderboard:top7
   });
 
-  // O'yinchilar ekraniga HAMMA natijasi yuborilsin (yakuniy ko'rsatish uchun)
+  // O'yinchilar ekraniga HAMMA natijasi yuborilsin (vaqtinchalik — bir marta ko'rsatish uchun, bazaga yozilmaydi)
   await update(ref(db,`game_sessions/${code}/state`),{status:'ended',leaderboard:allSorted});
 
-  // Host yakuniy ekranida ham hamma ko'rinsin
+  // Host yakuniy ekranida ham hamma ko'rinsin (vaqtinchalik)
   $('end-list').innerHTML=renderLbFull(allSorted);
   goTo('s-end');
 }
