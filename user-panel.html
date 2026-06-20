@@ -1296,9 +1296,21 @@ $('login-user').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefa
 $('reg-pass2').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();window.doRegister();}});
 
 // ── INIT ──
-// Har safar login/parol ekrani ko'rsatiladi (avto-kirish o'chirilgan).
-// Brauzer/qurilma o'zi saqlagan login-parolni avtomatik to'ldirishi mumkin.
+// FIX: agar localStorage'da saqlangan sessiya bo'lsa (masalan, host-game.html
+// dagi "Panelga qaytish" havolasi sahifani refresh qilganda), foydalanuvchini
+// avtomatik tiklaymiz va to'g'ridan-to'g'ri panelga kiritamiz — login ekraniga
+// emas. Avval bu yerda har doim showAuth() chaqirilib, login qilingan host ham
+// qayta login ekraniga tashlanardi.
 (function(){
+  try{
+    const saved = JSON.parse(localStorage.getItem('qb_user') || 'null');
+    if(saved && saved.username && saved.safeKey){
+      curUser = saved;
+      setNavUser();
+      showPanel();
+      return;
+    }
+  }catch(_){}
   showAuth();
 })();
 </script>
