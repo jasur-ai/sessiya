@@ -134,6 +134,9 @@ tbody tr:hover td{background:rgba(255,255,255,.025);}
 .res-meta{font-size:.73rem;font-weight:700;color:var(--muted);margin-top:2px;}
 .res-code{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);color:var(--gold);
   font-family:'Righteous',cursive;border-radius:8px;padding:4px 10px;font-size:.8rem;flex-shrink:0;}
+.res-del-btn{background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.2);border-radius:7px;
+  padding:5px 9px;color:var(--accent);font-size:.78rem;cursor:pointer;transition:all .18s;}
+.res-del-btn:hover{background:rgba(37,99,235,.22);transform:translateY(-1px);}
 .top3{display:flex;gap:6px;flex-wrap:wrap;}
 .top-chip{border-radius:50px;padding:4px 12px;font-size:.74rem;font-weight:800;display:flex;align-items:center;gap:5px;
   border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.05);}
@@ -821,13 +824,16 @@ async function loadResults(){
           <span class="fr-sc">${p.score||0} ball</span>
           <span class="fr-tm">${fmtMs(p.time)}</span>
         </div>`).join('');
-      return`<div class="res-card">
+      return`<div class="res-card" id="res-${code}">
         <div class="res-head" onclick="toggleResCard(this)" style="cursor:pointer">
           <div>
             <div class="res-title">📝 ${esc(r.test_name||'Test')} <span style="color:var(--muted);font-size:.76rem">Host: ${esc(r.host||'—')}</span></div>
             <div class="res-meta">📅 ${date} &bull; ${totalPlayers} ta o'yinchi &bull; <span style="color:var(--purple)">🏆 ${lb.length} ta shoxsupada</span></div>
           </div>
-          <div class="res-code"># ${code}</div>
+          <div style="display:flex;align-items:center;gap:7px;flex-shrink:0;">
+            <div class="res-code"># ${code}</div>
+            <button type="button" class="res-del-btn" onclick="event.stopPropagation();delResult('${code}','${esc(r.test_name||'Test').replace(/'/g,"\\'")}')">🗑️</button>
+          </div>
         </div>
         <div class="top3">${top3||'<span style="color:var(--muted);font-size:.76rem">Natija yo\'q</span>'}</div>
         <div class="res-full" style="display:none">
@@ -845,6 +851,16 @@ window.toggleResCard=function(headEl){
   const card=headEl.closest('.res-card');
   const full=card.querySelector('.res-full');
   full.style.display=(full.style.display!=='none')?'none':'block';
+};
+
+window.delResult=async function(code,name){
+  if(!confirm(`"${name}" (# ${code}) natijasini o'chirishni tasdiqlaysizmi?\nBu amalni qaytarib bo'lmaydi.`)) return;
+  try{
+    await remove(ref(db,`results/${code}`));
+    const el=$(`res-${code}`);
+    if(el) el.remove();
+    loadGlobalStats();
+  }catch(e){alert('O\'chirishda xatolik: '+e.message);}
 };
 
 function fmtMs(ms){
