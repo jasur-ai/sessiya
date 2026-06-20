@@ -56,6 +56,17 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 }
 .end-btn:hover{background:rgba(37,99,235,.22);}
 
+/* Floating end button — o'yin jarayonidagi ekranlarda (preview/active/leaderboard) ko'rinadi */
+.float-end-btn{
+  position:fixed;top:14px;right:14px;z-index:200;
+  background:rgba(37,99,235,.16);border:1px solid rgba(37,99,235,.35);border-radius:10px;
+  padding:8px 14px;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:900;
+  cursor:pointer;color:#fff;transition:all .2s;display:none;
+  backdrop-filter:blur(10px);box-shadow:0 4px 16px rgba(0,0,0,.3);
+}
+.float-end-btn.show{display:flex;align-items:center;gap:5px;}
+.float-end-btn:hover{background:rgba(37,99,235,.3);transform:translateY(-1px);}
+
 .lob-main{margin-top:80px;}
 .lob-sub{font-size:.78rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
 .lob-code{
@@ -231,6 +242,9 @@ body.light .ans-bar{background:rgba(240,240,248,.92);}
 <body>
 <div id="loading"><div class="spin"></div><div style="color:var(--muted);font-size:.82rem;font-weight:700">O'yin yuklanmoqda...</div></div>
 
+<!-- FLOATING END BUTTON — game screens uchun (preview/active/leaderboard) -->
+<button type="button" class="float-end-btn" id="float-end-btn" onclick="confirmEnd()">✕ Tugatish</button>
+
 <!-- LOBBY -->
 <div class="screen" id="s-lobby">
   <div class="lob-head">
@@ -325,7 +339,16 @@ if(!code){location.href='user-panel.html';}
 
 function $(id){return document.getElementById(id);}
 let _activeBg=0;
-function goTo(id){document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('on');if(_activeBg>0)s.style.background='';});$(id).classList.add('on');$('ans-bar').style.display=id==='s-qact'?'flex':'none';if(_activeBg>0)applyBgTo($(id));}
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('on');if(_activeBg>0)s.style.background='';});
+  $(id).classList.add('on');
+  $('ans-bar').style.display=id==='s-qact'?'flex':'none';
+  if(_activeBg>0)applyBgTo($(id));
+  // FIX: "Tugatish" tugmasi o'yin jarayonidagi barcha ekranlarda (preview/active/leaderboard) ko'rinadi —
+  // shu paytgacha faqat lobby'da edi, host o'yin boshlangach uni tugata olmas edi.
+  const showFloatEnd=(id==='s-qprev'||id==='s-qact'||id==='s-lb');
+  $('float-end-btn').classList.toggle('show',showFloatEnd);
+}
 
 let session=null,questions=[],qIdx=0,qStartAt=0,qTime=20,timerIv=null,cntIv=null;
 const OPT_COLORS=['#ff4466','#38bdf8','#ffd60a','#00ffaa','#c084fc'];
@@ -648,6 +671,14 @@ async function finishGame(){
   if(ansUnsubscribe){ansUnsubscribe();ansUnsubscribe=null;}
   clearTimeout(autoNextTm);
   clearTimeout(lateAnswerTm);
+  stopTimer();
+
+  // FIX: agar host "Tugatish" tugmasini joriy savol hali baholanmagan paytda bossa
+  // (masalan question_active yoki leaderboard hali chiqmagan holatda), shu savol uchun
+  // ham ballarni hisoblab, keyin natijalarni saqlaymiz — aks holda oxirgi savol
+  // natijalarsiz qolib ketardi. Mantiq oddiy tugash bilan bir xil.
+  try{await computeScores(qIdx);}catch(e){console.warn('finishGame computeScores xato (ignored):',e);}
+
   const snap=await get(ref(db,`game_sessions/${code}/players`));
   const all=snap.val()||{};
 
@@ -669,7 +700,6 @@ async function finishGame(){
 
   // Host yakuniy ekranida ham hamma ko'rinsin
   $('end-list').innerHTML=renderLbFull(allSorted);
-  stopTimer();
   goTo('s-end');
 }
 
