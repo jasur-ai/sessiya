@@ -121,62 +121,43 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
   border-radius:9px;padding:7px 13px;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:900;cursor:pointer;transition:all .2s;flex-shrink:0;}
 .sr-start:hover{background:rgba(56,189,248,.22);}
 
-/* MOCK SECTION */
-.mock-card{background:linear-gradient(135deg,rgba(155,89,182,.18),rgba(74,144,217,.14));
-  border:2px solid rgba(155,89,182,.35);border-radius:18px;padding:18px 20px;margin-bottom:20px;position:relative;overflow:hidden;}
-.mock-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(155,89,182,.05),rgba(74,144,217,.05));pointer-events:none;}
-.mock-hd{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
-.mock-icon{font-size:1.8rem;}
-.mock-title{font-family:'Righteous',cursive;font-size:1.2rem;color:#fff;}
-.mock-badge{font-size:.62rem;font-weight:800;background:rgba(155,89,182,.3);border:1px solid rgba(155,89,182,.5);color:#ce9fff;border-radius:50px;padding:3px 8px;margin-left:4px;}
-.mock-desc{color:var(--muted);font-size:.8rem;font-weight:600;margin-bottom:14px;line-height:1.5;}
-.fans-grid{display:flex;flex-direction:column;gap:7px;}
+/* PANEL TABS — segmented control for Mening testlarim / Mock / PRE */
+.panel-tabs{display:flex;gap:5px;background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:14px;padding:5px;margin-bottom:18px;overflow-x:auto;}
+.ptab{flex:1;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:10px 14px;border-radius:10px;border:none;background:transparent;color:var(--muted);
+  font-family:'Nunito',sans-serif;font-size:.83rem;font-weight:800;cursor:pointer;transition:all .2s;}
+.ptab:hover{color:var(--text);background:rgba(255,255,255,.05);}
+.ptab.on{background:var(--accent);color:#fff;box-shadow:0 4px 16px rgba(37,99,235,.35);}
+.ptab-badge{background:rgba(255,255,255,.14);font-size:.66rem;padding:1px 7px;border-radius:50px;font-weight:900;}
+.ptab.on .ptab-badge{background:rgba(255,255,255,.25);}
+.ptab-pane{display:none;}
+.ptab-pane.on{display:block;animation:fadeUp .25s ease-out both;}
+.tab-desc{color:var(--muted);font-size:.8rem;font-weight:600;margin-bottom:14px;line-height:1.5;}
+
+/* MOCK / FAN LIST */
+.fans-grid{display:flex;flex-direction:column;gap:8px;}
 .fan-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;
-  background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:11px 14px;transition:all .2s;}
-.fan-btn:hover{background:rgba(255,255,255,.09);border-color:rgba(155,89,182,.4);}
-.fan-btn-left{display:flex;flex-direction:column;gap:2px;}
+  background:var(--card);border:1px solid var(--border);border-radius:13px;padding:13px 16px;transition:all .2s;animation:fadeUp .25s ease-out both;}
+.fan-btn:hover{border-color:rgba(155,89,182,.4);}
+.fan-btn-left{display:flex;align-items:center;gap:12px;}
+.fan-btn-icon{width:38px;height:38px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,rgba(155,89,182,.25),rgba(56,189,248,.15));
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem;}
+.fan-btn-info{display:flex;flex-direction:column;gap:2px;}
 .fan-btn-name{font-weight:800;font-size:.88rem;}
 .fan-btn-cnt{font-size:.72rem;color:var(--muted);font-weight:700;}
-.fan-btn-actions{display:flex;gap:6px;}
-.fan-start{background:rgba(155,89,182,.2);border:1px solid rgba(155,89,182,.35);border-radius:8px;
-  padding:8px 13px;color:#ce9fff;font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:900;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px;}
-.fan-start:hover{background:rgba(155,89,182,.35);}
-.fan-cast{background:rgba(0,255,170,.1);border:1px solid rgba(0,255,170,.2);border-radius:8px;
-  padding:8px 13px;color:var(--green);font-family:'Nunito',sans-serif;font-size:.82rem;font-weight:900;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px;}
-.fan-cast:hover{background:rgba(0,255,170,.2);}
+.fan-btn-actions{display:flex;gap:6px;flex-shrink:0;}
+.fan-start{background:rgba(155,89,182,.16);border:1px solid rgba(155,89,182,.3);border-radius:9px;
+  padding:8px 13px;color:#ce9fff;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:900;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.fan-start:hover{background:rgba(155,89,182,.3);}
+.fan-cast{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);border-radius:9px;
+  padding:8px 13px;color:var(--green);font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:900;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.fan-cast:hover{background:rgba(56,189,248,.2);}
 .no-fans{color:var(--muted);font-size:.82rem;font-weight:700;padding:12px 0;}
 
-/* ACCORDION SECTIONS */
-.acc-section{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:2px;}
-.acc-header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;transition:background .2s;user-select:none;}
-.acc-header:hover{background:rgba(255,255,255,.04);}
-.acc-icon{font-size:1.25rem;}
-.acc-title{font-family:'Righteous',cursive;font-size:1rem;color:var(--text);}
-.acc-arrow{color:var(--muted);font-size:.7rem;transition:transform .25s;flex-shrink:0;}
-.acc-arrow.open{transform:rotate(90deg);}
-.acc-body{display:none;padding:0 14px 14px;}
-.acc-body.open{display:block;}
-
-/* Fan item ichida accordion (har bir fan yig'ilgan) */
-.fan-acc{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:11px;margin-bottom:6px;overflow:hidden;}
-.fan-acc-hd{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;cursor:pointer;transition:background .2s;}
-.fan-acc-hd:hover{background:rgba(155,89,182,.07);}
-.fan-acc-left{display:flex;flex-direction:column;gap:2px;}
-.fan-acc-name{font-weight:800;font-size:.88rem;}
-.fan-acc-cnt{font-size:.72rem;color:var(--muted);font-weight:700;}
-.fan-acc-right{display:flex;align-items:center;gap:8px;}
-.fan-acc-arrow{color:var(--muted);font-size:.65rem;transition:transform .2s;}
-.fan-acc-arrow.open{transform:rotate(90deg);}
-.fan-acc-body{display:none;padding:0 14px 12px;gap:7px;flex-direction:column;}
-.fan-acc-body.open{display:flex;}
-
-/* PRE SECTION */
-.pre-section-wrap{margin-bottom:20px;}
-.pre-hd{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
-.pre-hd-icon{font-size:1.4rem;}
-.pre-hd-title{font-family:'Righteous',cursive;font-size:1.05rem;}
-.pre-badge{font-size:.62rem;font-weight:800;background:rgba(100,116,139,.2);border:1px solid rgba(100,116,139,.4);color:var(--purple);border-radius:50px;padding:3px 8px;}
-.pre-group{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;overflow:hidden;}
+/* PRE GROUPS */
+.pre-group{background:var(--card);border:1px solid var(--border);border-radius:14px;margin-bottom:8px;overflow:hidden;animation:fadeUp .25s ease-out both;}
 .pre-group-toggle{display:flex;align-items:center;gap:12px;padding:13px 16px;cursor:pointer;transition:background .2s;}
 .pre-group-toggle:hover{background:rgba(255,255,255,.03);}
 .pre-group-icon{font-size:1.3rem;}
@@ -410,53 +391,39 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 <!-- MAIN PANEL -->
 <div id="panel">
 
-  <div style="margin-bottom:24px;">
-    <div style="font-family:'Righteous',cursive;font-size:1.5rem;margin-bottom:14px;">⚡ QuizBlitz Panel</div>
-    <div class="search-row">
-      <input class="search-inp" id="search-inp" placeholder="🔍 Umumiy test qidirish (nomi bo'yicha)...">
-      <button type="button" class="search-btn" onclick="doGlobalSearch()">Qidirish</button>
-    </div>
-    <div id="search-results"></div>
+  <div style="font-family:'Righteous',cursive;font-size:1.5rem;margin-bottom:16px;">⚡ QuizBlitz Panel</div>
+
+  <div class="search-row">
+    <input class="search-inp" id="search-inp" placeholder="🔍 Umumiy test qidirish (nomi bo'yicha)...">
+    <button type="button" class="search-btn" onclick="doGlobalSearch()">Qidirish</button>
+  </div>
+  <div id="search-results"></div>
+
+  <div class="panel-tabs" id="panel-tabs">
+    <button type="button" class="ptab on" id="ptab-mine" onclick="switchPanelTab('mine')">📚 Testlarim <span class="ptab-badge" id="tab-cnt-mine">0</span></button>
+    <button type="button" class="ptab" id="ptab-mock" style="display:none" onclick="switchPanelTab('mock')">🎓 Mock <span class="ptab-badge" id="tab-cnt-mock">0</span></button>
+    <button type="button" class="ptab" id="ptab-pre" style="display:none" onclick="switchPanelTab('pre')">🔷 PRE <span class="ptab-badge" id="tab-cnt-pre">0</span></button>
   </div>
 
-  <div class="sec-hd">
-    <div class="sec-title">📚 Mening Testlarim <span class="cnt-badge" id="cnt">0</span></div>
-    <div style="display:flex;gap:7px;">
+  <!-- TAB: Mening testlarim -->
+  <div class="ptab-pane on" id="pane-mine">
+    <div class="sec-hd">
+      <div class="sec-title">📚 Mening Testlarim <span class="cnt-badge" id="cnt">0</span></div>
       <button type="button" class="new-btn" onclick="goNewTest()">✏️ Yangi test</button>
     </div>
-  </div>
-  <div id="tests-list"></div>
-
-  <div id="mock-section" style="display:none;margin-top:16px;">
-    <div class="acc-section">
-      <div class="acc-header" onclick="toggleAcc('mock-body','mock-arrow')">
-        <div style="display:flex;align-items:center;gap:9px;">
-          <span class="acc-icon">🎓</span>
-          <span class="acc-title">Mock Testlar</span>
-          <span class="mock-badge">Exam style</span>
-        </div>
-        <span class="acc-arrow" id="mock-arrow">▶</span>
-      </div>
-      <div class="acc-body" id="mock-body">
-        <div class="fans-grid" id="fans-grid"></div>
-      </div>
-    </div>
+    <div id="tests-list"></div>
   </div>
 
-  <div id="pre-section" style="display:none;margin-top:10px;">
-    <div class="acc-section">
-      <div class="acc-header" onclick="toggleAcc('pre-body','pre-arrow')">
-        <div style="display:flex;align-items:center;gap:9px;">
-          <span class="acc-icon">🔷</span>
-          <span class="acc-title">PRE Testlar</span>
-          <span class="pre-badge">Subtestlar</span>
-        </div>
-        <span class="acc-arrow" id="pre-arrow">▶</span>
-      </div>
-      <div class="acc-body" id="pre-body">
-        <div id="pre-groups-list"></div>
-      </div>
-    </div>
+  <!-- TAB: Mock testlar -->
+  <div class="ptab-pane" id="pane-mock">
+    <div class="tab-desc">🎓 Fanlardan birini tanlang — bazadan random 25 ta savol beriladi. Natijalar saqlanadi va reytingda ko'rinadi.</div>
+    <div class="fans-grid" id="fans-grid"></div>
+  </div>
+
+  <!-- TAB: PRE testlar -->
+  <div class="ptab-pane" id="pane-pre">
+    <div class="tab-desc">🔷 Har bir PRE test 25 talik subtestlarga bo'lingan. Kerakli guruhni oching va subtestni tanlang.</div>
+    <div id="pre-groups-list"></div>
   </div>
 
 </div><!-- #panel -->
@@ -683,7 +650,8 @@ window.doRegister=async function(){
 window.logout=function(){
   curUser=null;localStorage.removeItem('qb_user');
   $('tests-list').innerHTML='';$('search-results').innerHTML='';
-  $('mock-section').style.display='none';$('pre-section').style.display='none';
+  $('ptab-mock').style.display='none';$('ptab-pre').style.display='none';
+  switchPanelTab('mine');
   showAuth();
 };
 
@@ -698,6 +666,19 @@ async function loadAll(){
   await Promise.all([loadTests(),loadMock(),loadPre()]);
 }
 
+// ── PANEL TABS ──
+let activePanelTab='mine';
+window.switchPanelTab=function(tab){
+  const btn=$(`ptab-${tab}`);
+  if(btn&&btn.style.display==='none') return; // hidden tab (no data) — ignore
+  activePanelTab=tab;
+  ['mine','mock','pre'].forEach(t=>{
+    const b=$(`ptab-${t}`),p=$(`pane-${t}`);
+    if(b) b.classList.toggle('on',t===tab);
+    if(p) p.classList.toggle('on',t===tab);
+  });
+};
+
 // ── MY TESTS ──
 async function loadTests(){
   if(!curUser) return;
@@ -706,9 +687,10 @@ async function loadTests(){
   try{
     const snap=await get(ref(db,`users/${curUser.safeKey}/tests`));
     const data=snap.val();
-    if(!data){list.innerHTML=`<div class="empty-state"><div class="ei">📭</div>Hali testlar yo'q. Birinchi testingizni yarating!</div>`;$('cnt').textContent='0';return;}
+    if(!data){list.innerHTML=`<div class="empty-state"><div class="ei">📭</div>Hali testlar yo'q. Birinchi testingizni yarating!</div>`;$('cnt').textContent='0';if($('tab-cnt-mine'))$('tab-cnt-mine').textContent='0';return;}
     const tests=Object.entries(data).sort((a,b)=>(b[1].created_at||b[1].created||0)-(a[1].created_at||a[1].created||0));
     $('cnt').textContent=tests.length;
+    if($('tab-cnt-mine'))$('tab-cnt-mine').textContent=tests.length;
     list.innerHTML=tests.map(([k,t],i)=>buildTestCard(k,t,i)).join('');
   }catch(e){list.innerHTML=`<div class="empty-state">⚠️ Yuklab bo'lmadi</div>`;}
 }
@@ -828,49 +810,33 @@ async function startPublicTest(globalKey){
   }catch(e){alert('Yuklab bo\'lmadi: '+e.message);}
 }
 
-// ── ACCORDION toggle ──
-window.toggleAcc=function(bodyId,arrowId){
-  const body=document.getElementById(bodyId),arrow=document.getElementById(arrowId);
-  if(!body||!arrow) return;
-  const isOpen=body.classList.contains('open');
-  body.classList.toggle('open',!isOpen);
-  arrow.classList.toggle('open',!isOpen);
-};
-window.toggleFanAcc=function(safeK){
-  const body=document.getElementById('fan-body-'+safeK),arrow=document.getElementById('fan-arrow-'+safeK);
-  if(!body||!arrow) return;
-  const isOpen=body.classList.contains('open');
-  body.classList.toggle('open',!isOpen);
-  arrow.classList.toggle('open',!isOpen);
-};
-
 // ── MOCK ──
 async function loadMock(){
-  const sec=document.getElementById('mock-section'),grid=document.getElementById('fans-grid');
+  const grid=document.getElementById('fans-grid'),tabBtn=$('ptab-mock');
   try{
     const snap=await get(ref(db,FANS_PATH));
-    if(!snap.exists()){sec.style.display='none';return;}
+    if(!snap.exists()){tabBtn.style.display='none';return;}
     const fans=Object.entries(snap.val()).sort((a,b)=>(a[1].name||'').localeCompare(b[1].name||''));
-    if(!fans.length){sec.style.display='none';return;}
-    sec.style.display='block';
-    grid.innerHTML=fans.map(([k,f])=>{
-      const safeK=k.replace(/[^a-zA-Z0-9]/g,'_');
+    if(!fans.length){tabBtn.style.display='none';return;}
+    tabBtn.style.display='';
+    $('tab-cnt-mock').textContent=fans.length;
+    grid.innerHTML=fans.map(([k,f],i)=>{
       const safeName=esc(f.name||k).replace(/'/g,"\'");
-      return '<div class="fan-acc">'
-        +'<div class="fan-acc-hd" onclick="toggleFanAcc(\'' +safeK+ '\')">'
-          +'<div class="fan-acc-left">'
-            +'<div class="fan-acc-name">📘 '+esc(f.name||k)+'</div>'
-            +'<div class="fan-acc-cnt">'+(f.count||0)+' ta savol • random '+MOCK_COUNT+' ta</div>'
-          +'</div>'
-          +'<span class="fan-acc-arrow" id="fan-arrow-'+safeK+'">▶</span>'
-        +'</div>'
-        +'<div class="fan-acc-body" id="fan-body-'+safeK+'">'
-          +'<button type="button" class="fan-start" style="width:100%;margin-bottom:6px;" onclick="startMockTest(\'' +k+ '\')">▶ Boshlash</button>'
-          +'<button type="button" class="fan-cast" style="width:100%;" onclick="openCastFan(\'' +k+ "','" +safeName+ '\')">📡 Cast</button>'
-        +'</div>'
-      +'</div>';
+      return`<div class="fan-btn" style="animation-delay:${i*0.04}s">
+        <div class="fan-btn-left">
+          <div class="fan-btn-icon">📘</div>
+          <div class="fan-btn-info">
+            <div class="fan-btn-name">${esc(f.name||k)}</div>
+            <div class="fan-btn-cnt">${f.count||0} ta savol bazasi • random ${MOCK_COUNT} ta</div>
+          </div>
+        </div>
+        <div class="fan-btn-actions">
+          <button type="button" class="fan-start" onclick="startMockTest('${k}')">▶ Boshlash</button>
+          <button type="button" class="fan-cast" onclick="openCastFan('${k}','${safeName}')">📡 Cast</button>
+        </div>
+      </div>`;
     }).join('');
-  }catch(_){sec.style.display='none';}
+  }catch(_){tabBtn.style.display='none';}
 }
 
 async function startMockTest(fanKey){
@@ -929,14 +895,15 @@ window.openCastFan=async function(fanKey,fanName){
 
 // ── PRE ──
 async function loadPre(){
-  const sec=$('pre-section');
+  const tabBtn=$('ptab-pre');
   try{
     const snap=await get(ref(db,PRE_GROUPS_PATH));
-    if(!snap.exists()){sec.style.display='none';return;}
+    if(!snap.exists()){tabBtn.style.display='none';return;}
     const groups=Object.entries(snap.val()).map(([k,v])=>({key:k,...v}));
     groups.sort((a,b)=>(a.baseTitle||'').localeCompare(b.baseTitle||''));
-    if(!groups.length){sec.style.display='none';return;}
-    sec.style.display='block';
+    if(!groups.length){tabBtn.style.display='none';return;}
+    tabBtn.style.display='';
+    $('tab-cnt-pre').textContent=groups.length;
     $('pre-groups-list').innerHTML=groups.map(g=>{
       const subtests=Array.from({length:g.chunksCount||0},(_,i)=>{
         const fbKey=(g.keys||[])[i];if(!fbKey) return'';
@@ -959,7 +926,7 @@ async function loadPre(){
         <div class="pre-subtests">${subtests}</div>
       </div>`;
     }).join('');
-  }catch(_){sec.style.display='none';}
+  }catch(_){tabBtn.style.display='none';}
 }
 
 window.togglePreGroup=function(key){
@@ -1106,10 +1073,10 @@ window.backToPanel=function(){
   $('quiz-wrap').classList.remove('on');
   $('result-wrap').classList.remove('on');
   questions=[];shuffledQs=[];curIdx=0;correctCnt=0;wrongCnt=0;answeredCnt=0;wrongQs=[];answered=false;
-  // Mock yoki PRE testdan chiqqanda shu bo'limga scroll
-  const target=$('mock-section')&&$('mock-section').style.display!=='none'?$('mock-section'):($('pre-section')&&$('pre-section').style.display!=='none'?$('pre-section'):null);
-  if(target) setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),50);
-  else window.scrollTo(0,0);
+  // Mock yoki PRE testdan chiqqanda tegishli bo'limga qaytamiz
+  if(curMockFanKey&&$('ptab-mock').style.display!=='none') switchPanelTab('mock');
+  else if(curTestGlobalKey&&curTestGlobalKey.startsWith(PRE_AUTHOR_UID+'__')&&$('ptab-pre').style.display!=='none') switchPanelTab('pre');
+  window.scrollTo(0,0);
 };
 
 // Chiqish tugmasini addEventListener bilan bog'laymiz (onclick atributi module scopeda ishlamaydi)
@@ -1121,9 +1088,9 @@ $('exit-quiz-btn').addEventListener('click', function(){
     $('quiz-wrap').classList.remove('on');
     $('result-wrap').classList.remove('on');
     questions=[];shuffledQs=[];curIdx=0;correctCnt=0;wrongCnt=0;answeredCnt=0;wrongQs=[];answered=false;
-    const target=$('mock-section')&&$('mock-section').style.display!=='none'?$('mock-section'):($('pre-section')&&$('pre-section').style.display!=='none'?$('pre-section'):null);
-    if(target) setTimeout(()=>target.scrollIntoView({behavior:'smooth',block:'start'}),50);
-    else window.scrollTo(0,0);
+    if(curMockFanKey&&$('ptab-mock').style.display!=='none') switchPanelTab('mock');
+    else if(curTestGlobalKey&&curTestGlobalKey.startsWith(PRE_AUTHOR_UID+'__')&&$('ptab-pre').style.display!=='none') switchPanelTab('pre');
+    window.scrollTo(0,0);
   };
   $('confirm-modal').classList.add('on');
 });
