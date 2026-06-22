@@ -551,8 +551,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       </div>
     </div>
     <div class="cast-actions">
-      <!-- FIX: Bekor tugmasi to'g'rilandi -->
-      <button type="button" class="btn btn-ghost" style="flex:1;" onclick="closeCast()">Bekor</button>
+      <!-- Qaytish tugmasi: kelib chiqqan sahifaga qaytadi -->
+      <button type="button" class="btn btn-ghost" style="flex:1;" id="cast-back-btn" onclick="closeCast()">← Qaytish</button>
       <button type="button" class="btn btn-green" style="flex:2;" id="cast-start-btn" onclick="startCast()">▶️ O'yinni boshlash</button>
     </div>
   </div>
@@ -926,7 +926,7 @@ window.openCastFan=async function(fanKey,fanName){
     const shuffled=[...all].sort(()=>Math.random()-.5);
     _castOverrideQs=shuffled.slice(0,Math.min(MOCK_COUNT,shuffled.length));
     _castOverrideName='Mock: '+fanName;
-    openCastDirect(_castOverrideQs,'Mock: '+fanName);
+    openCastDirect(_castOverrideQs,'Mock: '+fanName,'user');
   }catch(e){alert('Xato: '+e.message);}
 };
 
@@ -976,7 +976,7 @@ window.openCastPublic=async function(globalKey,name){
   try{
     const snap=await get(ref(db,`users/${authorUid}/tests/${fbKey}`));
     if(!snap.exists()){alert('Test topilmadi');return;}
-    openCastDirect(snap.val().questions||[],name);
+    openCastDirect(snap.val().questions||[],name,'user');
   }catch(e){alert('Xato: '+e.message);}
 };
 
@@ -1221,7 +1221,7 @@ async function saveAndShowLb(pct,timeSec){
 // ── CAST MODAL ──
 const TIMES=[5,10,15,20,25,30,35,40];
 let castSettings={time:20,bg:0,type:'score',auto:true};
-let _castTestKey=null,_castTestSource='user';
+let _castTestKey=null,_castTestSource='user',_castFrom='user';
 let _castOverrideQs=null,_castOverrideName=null;
 
 const tg=$('time-grid');
@@ -1246,12 +1246,14 @@ document.getElementById('auto-check').addEventListener('change',function(){
 
 window.openCast=function(key,name,source){
   _castTestKey=key;_castTestSource=source||'user';_castOverrideQs=null;_castOverrideName=null;
+  _castFrom=source||'user'; // 'user' yoki 'admin'
   $('cast-test-name').textContent='Test: '+name;
   $('cast-modal').classList.add('on');
 };
 
-function openCastDirect(qs,name){
+function openCastDirect(qs,name,from){
   _castTestKey=null;_castOverrideQs=qs;_castOverrideName=name;
+  _castFrom=from||'user';
   $('cast-test-name').textContent='Test: '+name;
   $('cast-modal').classList.add('on');
 }
@@ -1288,7 +1290,7 @@ window.startCast=async function(){
       created_at:Date.now()
     });
     window.closeCast();
-    location.href=`host-game.html?code=${code}`;
+    location.href=`host-game.html?code=${code}&from=${_castFrom}`;
   }catch(e){console.error(e);alert('Xato: '+e.message);}
   btn.disabled=false;btn.textContent='▶️ O\'yinni boshlash';
 };

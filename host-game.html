@@ -326,7 +326,7 @@ body.light .ans-bar{background:rgba(240,240,248,.92);}
   <div class="lb-title">🏆 Shoxsupa</div>
   <div class="end-title">O'yin tugadi!</div>
   <div class="lb-list" id="end-list"></div>
-  <a href="user-panel.html" class="home-btn">Panelga qaytish →</a>
+  <a id="home-btn-link" href="user-panel.html" class="home-btn">Panelga qaytish →</a>
 </div>
 
 <script type="module">
@@ -342,7 +342,8 @@ const db=getDatabase(app);
 
 const params=new URLSearchParams(location.search);
 const code=params.get('code');
-if(!code){location.href='user-panel.html';}
+const _backUrl=params.get('from')==='admin'?'admin.html':'user-panel.html';
+if(!code){location.href=_backUrl;}
 
 function $(id){return document.getElementById(id);}
 let _activeBg=0;
@@ -364,9 +365,11 @@ let darkMode=true;
 
 // ── Load session ──
 (async function init(){
+  // Qaytish havolasini from parametriga qarab belgilaymiz
+  document.getElementById('home-btn-link').href=_backUrl;
   try{
     const snap=await get(ref(db,`game_sessions/${code}`));
-    if(!snap.exists()){alert('O\'yin topilmadi');location.href='user-panel.html';return;}
+    if(!snap.exists()){alert('O\'yin topilmadi');location.href=_backUrl;return;}
     session=snap.val();
     questions=Array.isArray(session.questions)?session.questions:Object.values(session.questions||[]);
     qTime=session.settings?.time_per_q||20;
@@ -391,7 +394,7 @@ let darkMode=true;
     applyBg(session.settings?.bg||0);
     $('loading').classList.add('hide');
     goTo('s-lobby');
-  }catch(e){alert('Xato: '+e.message);location.href='user-panel.html';}
+  }catch(e){alert('Xato: '+e.message);location.href=_backUrl;}
 })();
 
 // Normalize any question format into {text, options:string[], correct:number, is_double}

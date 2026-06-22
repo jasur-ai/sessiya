@@ -342,9 +342,13 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 
 <!-- ══ S8: LEADERBOARD (SHOXSUPA) ══ -->
 <div class="screen" id="s-lb">
-  <div style="width:100%;">
+  <div style="width:100%;max-width:480px;">
     <div class="lb-title">🏆 Shoxsupa</div>
     <div class="lb-list" id="lb-list"></div>
+    <div id="lb-my-pos" style="display:none;margin-top:12px;padding:12px 16px;
+      background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);
+      border-radius:13px;text-align:center;font-weight:800;font-size:.88rem;color:var(--text);">
+    </div>
   </div>
 </div>
 
@@ -604,9 +608,9 @@ function startTimer(startAt,totalSec){
 }
 function stopTimer(){if(timerIv){clearInterval(timerIv);timerIv=null;}}
 
-// Leaderboard rendering
+// Leaderboard rendering — faqat TOP 7 (oraliq shoxsupa uchun)
 function renderLb(lb){
-  return lb.map((p,i)=>`
+  return lb.slice(0,7).map((p,i)=>`
     <div class="lbi${p.name===name?' me':''}">
       <div class="lb-rank ${RANK_CLS[i]||''}">${RANK_EMOJI[i]||i+1}</div>
       <div class="lb-em">${p.emoji||'❓'}</div>
@@ -665,6 +669,20 @@ function showLb(lb){
   lbTimeoutId=setTimeout(()=>{
     if(gameEnded) return; // O'yin tugagan bo'lsa s-lb ga o'tmaymiz
     $('lb-list').innerHTML=renderLb(lb);
+    // Joriy o'yinchining pozitsiyasini topib ko'rsatamiz
+    const myPos=lb.findIndex(p=>p.name===name);
+    const myPosEl=$('lb-my-pos');
+    if(myPos>=0){
+      const myEntry=lb[myPos];
+      if(myPos<7){
+        myPosEl.style.display='none'; // TOP 7 da ko'rinib turibdi
+      } else {
+        myPosEl.style.display='block';
+        myPosEl.textContent=`Sizning o'rningiz: ${myPos+1}-o'rin • ${myEntry.score||0} ball`;
+      }
+    } else {
+      myPosEl.style.display='none';
+    }
     goTo('s-lb');
   }, 2500);
 }
