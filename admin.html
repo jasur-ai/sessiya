@@ -854,6 +854,7 @@ async function loadPre(){
           <div class="pre-group-meta">${g.chunksCount} ta subtest &bull; ${g.totalQuestions} ta savol &bull; ${g.date||''}</div>
         </div>
         <div style="display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;">
+          <button type="button" onclick="startMockupPre('${g.key}','${esc(g.baseTitle).replace(/'/g,"\\'")}',${JSON.stringify(g.keys||[]).replace(/"/g,"'")})" style="background:rgba(100,116,139,.14);border:1px solid rgba(100,116,139,.28);border-radius:7px;padding:5px 10px;color:var(--purple);font-size:.72rem;font-weight:800;cursor:pointer;">🤖 Mock-up</button>
           <button type="button" onclick="openAdmCastPre('${g.key}','${esc(g.baseTitle).replace(/'/g,"\\'")}',${JSON.stringify(g.keys||[]).replace(/"/g,"'")})" style="background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);border-radius:7px;padding:5px 10px;color:var(--green);font-size:.72rem;font-weight:800;cursor:pointer;">📡 Cast</button>
           <button type="button" class="pre-del-btn" onclick="delPreGroup('${g.key}','${esc(g.baseTitle).replace(/'/g,"\\'")}',${JSON.stringify(g.keys||[]).replace(/"/g,"'")})">🗑️ O'chirish</button>
         </div>
@@ -1123,7 +1124,6 @@ window.openAdmCastPre=async function(groupKey,groupName,keysRaw){
   let keys=[];
   try{keys=typeof keysRaw==='string'?JSON.parse(keysRaw.replace(/'/g,'"')):keysRaw;}catch(_){}
   if(!keys.length){alert('Subtestlar topilmadi');return;}
-  // Birinchi subtestni olamiz (yoki barcha savollarni yig'amiz)
   try{
     const allQs=[];
     for(const k of keys){
@@ -1137,6 +1137,28 @@ window.openAdmCastPre=async function(groupKey,groupName,keysRaw){
     $('adm-cast-name').textContent='Test: '+groupName+' ('+_admCastQs.length+' ta savol)';
     $('adm-cast-modal-title').textContent='📡 Jonli O\'yin';
     $('adm-cast-start-btn').textContent='▶️ O\'yinni boshlash';
+    $('adm-cast-modal').style.display='flex';
+  }catch(e){alert('Xato: '+e.message);}
+};
+
+window.startMockupPre=async function(groupKey,groupName,keysRaw){
+  let keys=[];
+  try{keys=typeof keysRaw==='string'?JSON.parse(keysRaw.replace(/'/g,'"')):keysRaw;}catch(_){}
+  if(!keys.length){alert('Subtestlar topilmadi');return;}
+  try{
+    const allQs=[];
+    for(const k of keys){
+      const snap=await get(ref(db,`users/${PRE_AUTHOR_UID}/tests/${k}`));
+      if(snap.exists()){const qs=snap.val().questions||[];allQs.push(...qs);}
+    }
+    if(!allQs.length){alert('Savollar topilmadi');return;}
+    const shuffled=[...allQs].sort(()=>Math.random()-.5);
+    _admCastQs=shuffled.slice(0,Math.min(MOCK_COUNT,shuffled.length));
+    _admCastName=groupName;
+    _admCastMode='mockup';
+    $('adm-cast-name').textContent='Test: '+groupName+' ('+_admCastQs.length+' ta savol)';
+    $('adm-cast-modal-title').textContent='🤖 Mock-up Sinov';
+    $('adm-cast-start-btn').textContent='🤖 Demoni boshlash';
     $('adm-cast-modal').style.display='flex';
   }catch(e){alert('Xato: '+e.message);}
 };
