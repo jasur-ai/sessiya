@@ -578,6 +578,9 @@ window.pickAns=async function(idx,btn){
   catch(e){}
 
   stopTimer();
+  $('wait-icon').textContent='✅';
+  document.querySelector('#s-wait .wait-title').textContent='Javob berildi!';
+  document.querySelector('#s-wait .wait-sub').textContent='Boshqalar javob berishi va natijalarni kuting...';
   updatePBadge2();
   goTo('s-wait');
 };
@@ -596,10 +599,13 @@ function startTimer(startAt,totalSec){
     arc.style.stroke=rem<totalSec*.3?'#2563eb':rem<totalSec*.6?'#f2a827':'var(--green)';
     if(rem<=0){
       stopTimer();
-      // Agar o'yinchi javob bermagan bo'lsa, kutish ekraniga o'tamiz
+      // Agar o'yinchi javob bermagan bo'lsa, vaqt tugadi ekrani
       if(!hasAnswered){
         hasAnswered=true;
         lastPickedIdx=-1; // vaqt tugadi — javob yo'q
+        $('wait-icon').textContent='⏱️';
+        document.querySelector('#s-wait .wait-title').textContent='Vaqt tugadi!';
+        document.querySelector('#s-wait .wait-sub').textContent='Keyingi savol kutilmoqda...';
         updatePBadge2();
         goTo('s-wait');
       }

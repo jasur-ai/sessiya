@@ -649,14 +649,19 @@ function showLbHost(lb,isLast,savedIdx){
   afterLbFn=isLast?()=>finishGame():()=>pushQPreview(savedIdx+1);
   goTo('s-lb');
   if(lbAutoTm) clearTimeout(lbAutoTm);
-  let sec=5;
-  $('lb-auto').textContent=`${sec}s da davom etadi...`;
-  const iv=setInterval(()=>{
-    sec--;
-    if(sec>0) $('lb-auto').textContent=`${sec}s da davom etadi...`;
-    else{clearInterval(iv);$('lb-auto').textContent='';}
-  },1000);
-  lbAutoTm=setTimeout(()=>afterLbFn&&afterLbFn(),5000);
+  const isAuto=session.settings?.auto!==false;
+  if(isAuto){
+    let sec=5;
+    $('lb-auto').textContent=`${sec}s da davom etadi...`;
+    const iv=setInterval(()=>{
+      sec--;
+      if(sec>0) $('lb-auto').textContent=`${sec}s da davom etadi...`;
+      else{clearInterval(iv);$('lb-auto').textContent='';}
+    },1000);
+    lbAutoTm=setTimeout(()=>afterLbFn&&afterLbFn(),5000);
+  }else{
+    $('lb-auto').textContent='Qo\'lda boshqarish rejimi';
+  }
 }
 
 window.afterLbNext=function(){
