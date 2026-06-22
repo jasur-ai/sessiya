@@ -410,6 +410,52 @@ tbody tr:hover td{background:rgba(255,255,255,.025);}
 </div><!-- #panel -->
 </div><!-- .admin-layout -->
 
+<!-- CAST MODAL (admin) -->
+<div id="adm-cast-modal" style="position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);">
+  <div style="background:var(--surf);border-radius:22px;padding:28px;width:100%;max-width:500px;border:1px solid var(--border);box-shadow:0 16px 40px rgba(0,0,0,.5);max-height:90vh;overflow-y:auto;">
+    <div style="font-family:'Righteous',cursive;font-size:1.3rem;margin-bottom:4px;display:flex;align-items:center;gap:8px;">📡 Jonli O'yin</div>
+    <p id="adm-cast-name" style="color:var(--muted);font-size:.78rem;margin-bottom:20px;">Test: —</p>
+
+    <div style="margin-bottom:18px;">
+      <div style="font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">⏱️ Savol vaqti (soniya)</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;" id="adm-time-grid"></div>
+    </div>
+
+    <div style="margin-bottom:18px;">
+      <div style="font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">🎯 O'yin turi</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+        <div class="adm-type-opt on" data-type="score" onclick="admSelType('score')" style="border:2px solid rgba(100,116,139,.3);background:rgba(100,116,139,.12);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .18s;">
+          <div style="font-size:1.3rem;margin-bottom:3px;">⚡</div><div style="font-size:.7rem;font-weight:800;color:var(--purple);">Tezlik + Ball</div>
+        </div>
+        <div class="adm-type-opt" data-type="correct" onclick="admSelType('correct')" style="border:2px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer;transition:all .18s;">
+          <div style="font-size:1.3rem;margin-bottom:3px;">✅</div><div style="font-size:.7rem;font-weight:800;color:var(--muted);">To'g'ri javob</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <div style="font-size:.72rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">🤖 Avtomatik rejim</div>
+      <div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.04);border-radius:12px;padding:12px 14px;border:1px solid var(--border);">
+        <label style="position:relative;width:48px;height:26px;flex-shrink:0;cursor:pointer;">
+          <input type="checkbox" id="adm-auto-check" checked style="opacity:0;width:0;height:0;position:absolute;">
+          <span id="adm-auto-slider" style="position:absolute;inset:0;background:var(--green);border-radius:50px;cursor:pointer;transition:background .25s;">
+            <span id="adm-auto-thumb" style="position:absolute;height:20px;width:20px;left:25px;bottom:3px;background:#fff;border-radius:50%;transition:left .25s;box-shadow:0 1px 4px rgba(0,0,0,.4);"></span>
+          </span>
+        </label>
+        <div style="flex:1;">
+          <div style="font-size:.82rem;font-weight:800;color:var(--text);margin-bottom:2px;" id="adm-auto-lbl">Yoqiq — Avto rejim</div>
+          <div style="font-size:.7rem;font-weight:600;color:var(--muted);">Hammasi javob berganda yoki vaqt tugaganda avto o'tadi.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:4px;">
+      <button type="button" onclick="closeAdmCast()" style="flex:1;border:none;border-radius:10px;padding:12px;background:rgba(255,255,255,.06);color:var(--muted);font-family:'Nunito',sans-serif;font-size:.93rem;font-weight:900;cursor:pointer;">← Qaytish</button>
+      <button type="button" id="adm-cast-start-btn" onclick="startAdmCast()" style="flex:2;border:none;border-radius:10px;padding:12px;background:linear-gradient(135deg,var(--green),#1d9bcf);color:#000;font-family:'Nunito',sans-serif;font-size:.93rem;font-weight:900;cursor:pointer;">▶️ O'yinni boshlash</button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getDatabase,ref,get,set,push,remove}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -655,6 +701,7 @@ async function loadFans(){
         </div>
         <div class="fan-btns">
           <button type="button" class="fan-mock-btn" onclick="startMockupFan('${k}','${esc(f.name||k).replace(/'/g,"\\'")}')" title="Bot-sinov maydonida boshlash">🤖 Mock-up</button>
+          <button type="button" class="fan-cast-btn" onclick="openAdmCastFan('${k}','${esc(f.name||k).replace(/'/g,"\\'")}')" title="Jonli o'yin boshlash" style="background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);border-radius:7px;padding:5px 10px;color:var(--green);font-size:.72rem;font-weight:800;cursor:pointer;transition:all .18s;">📡 Cast</button>
           <button type="button" class="fan-reset-btn" onclick="resetFan('${k}','${esc(f.name||k).replace(/'/g,"\\'")}')" title="Excel bilan yangilash">🔄 Yangilash</button>
           <button type="button" class="fan-del-btn" onclick="delFan('${k}','${esc(f.name||k).replace(/'/g,"\\'")}')">🗑️ O'chirish</button>
         </div>
@@ -814,7 +861,10 @@ async function loadPre(){
           <div class="pre-group-name">🔷 ${esc(g.baseTitle)}</div>
           <div class="pre-group-meta">${g.chunksCount} ta subtest &bull; ${g.totalQuestions} ta savol &bull; ${g.date||''}</div>
         </div>
-        <button type="button" class="pre-del-btn" onclick="delPreGroup('${g.key}','${esc(g.baseTitle).replace(/'/g,"\\'")}',${JSON.stringify(g.keys||[]).replace(/"/g,"'")})">🗑️ O'chirish</button>
+        <div style="display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap;">
+          <button type="button" onclick="openAdmCastPre('${g.key}','${esc(g.baseTitle).replace(/'/g,"\\'")}',${JSON.stringify(g.keys||[]).replace(/"/g,"'")})" style="background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);border-radius:7px;padding:5px 10px;color:var(--green);font-size:.72rem;font-weight:800;cursor:pointer;">📡 Cast</button>
+          <button type="button" class="pre-del-btn" onclick="delPreGroup('${g.key}','${esc(g.baseTitle).replace(/'/g,"\\'")}',${JSON.stringify(g.keys||[]).replace(/"/g,"'")})">🗑️ O'chirish</button>
+        </div>
       </div>`).join('');
   }catch(e){$('pre-list').innerHTML=`<div class="empty" style="color:var(--accent)">Yuklab bo'lmadi</div>`;}
 }
@@ -1021,6 +1071,105 @@ window.downloadTemplate=function(){
   const wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,'Savollar');
   XLSX.writeFile(wb,'test_shablon.xlsx');
+};
+
+// ── ADM CAST MODAL ──
+const ADM_TIMES=[5,10,15,20,25,30,35,40];
+let admCastSettings={time:20,type:'score',auto:true};
+let _admCastQs=null,_admCastName=null;
+
+// Time grid yaratish
+(function buildAdmTimeGrid(){
+  const tg=$('adm-time-grid');
+  ADM_TIMES.forEach(t=>{
+    const d=document.createElement('div');
+    d.style.cssText='border:2px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);border-radius:9px;padding:8px 5px;text-align:center;font-family:\'Righteous\',cursive;font-size:.95rem;cursor:pointer;transition:all .18s;color:var(--muted);';
+    if(t===20){d.style.borderColor='var(--green)';d.style.background='rgba(56,189,248,.12)';d.style.color='var(--green)';}
+    d.textContent=t+'s';d.dataset.t=t;
+    d.onclick=()=>{
+      document.querySelectorAll('#adm-time-grid > div').forEach(x=>{x.style.borderColor='rgba(255,255,255,.08)';x.style.background='rgba(255,255,255,.04)';x.style.color='var(--muted)';});
+      d.style.borderColor='var(--green)';d.style.background='rgba(56,189,248,.12)';d.style.color='var(--green)';
+      admCastSettings.time=t;
+    };
+    tg.appendChild(d);
+  });
+})();
+
+window.admSelType=function(t){
+  document.querySelectorAll('.adm-type-opt').forEach(x=>{
+    x.style.borderColor='rgba(255,255,255,.08)';x.style.background='rgba(255,255,255,.04)';
+    x.querySelector('div:last-child').style.color='var(--muted)';
+  });
+  const el=document.querySelector(`.adm-type-opt[data-type="${t}"]`);
+  if(el){el.style.borderColor='rgba(100,116,139,.3)';el.style.background='rgba(100,116,139,.12)';el.querySelector('div:last-child').style.color='var(--purple)';}
+  admCastSettings.type=t;
+};
+
+$('adm-auto-check').addEventListener('change',function(){
+  admCastSettings.auto=this.checked;
+  const thumb=$('adm-auto-thumb'),slider=$('adm-auto-slider'),lbl=$('adm-auto-lbl');
+  if(this.checked){thumb.style.left='25px';slider.style.background='var(--green)';lbl.textContent='Yoqiq — Avto rejim';}
+  else{thumb.style.left='3px';slider.style.background='rgba(255,255,255,.12)';lbl.textContent='O\'chirilgan — Qo\'lda boshqarish';}
+});
+
+window.openAdmCastFan=async function(fanKey,fanName){
+  try{
+    const snap=await get(ref(db,`${FANS_PATH}/${fanKey}`));
+    if(!snap.exists()||!snap.val().questions){alert('Savollar topilmadi');return;}
+    const all=snap.val().questions;
+    const shuffled=[...all].sort(()=>Math.random()-.5);
+    _admCastQs=shuffled.slice(0,Math.min(MOCK_COUNT,shuffled.length));
+    _admCastName='Mock: '+fanName;
+    $('adm-cast-name').textContent='Test: Mock: '+fanName;
+    $('adm-cast-modal').style.display='flex';
+  }catch(e){alert('Xato: '+e.message);}
+};
+
+window.openAdmCastPre=async function(groupKey,groupName,keysRaw){
+  let keys=[];
+  try{keys=typeof keysRaw==='string'?JSON.parse(keysRaw.replace(/'/g,'"')):keysRaw;}catch(_){}
+  if(!keys.length){alert('Subtestlar topilmadi');return;}
+  // Birinchi subtestni olamiz (yoki barcha savollarni yig'amiz)
+  try{
+    const allQs=[];
+    for(const k of keys){
+      const snap=await get(ref(db,`users/${PRE_AUTHOR_UID}/tests/${k}`));
+      if(snap.exists()){const qs=snap.val().questions||[];allQs.push(...qs);}
+    }
+    if(!allQs.length){alert('Savollar topilmadi');return;}
+    const shuffled=[...allQs].sort(()=>Math.random()-.5);
+    _admCastQs=shuffled.slice(0,Math.min(MOCK_COUNT,shuffled.length));
+    _admCastName=groupName;
+    $('adm-cast-name').textContent='Test: '+groupName+' ('+_admCastQs.length+' ta savol)';
+    $('adm-cast-modal').style.display='flex';
+  }catch(e){alert('Xato: '+e.message);}
+};
+
+window.closeAdmCast=function(){$('adm-cast-modal').style.display='none';_admCastQs=null;_admCastName=null;};
+
+$('adm-cast-modal').addEventListener('click',function(e){if(e.target===this)window.closeAdmCast();});
+
+window.startAdmCast=async function(){
+  if(!_admCastQs||!_admCastQs.length){alert('Savollar yo\'q');return;}
+  const btn=$('adm-cast-start-btn');btn.disabled=true;btn.textContent='Yaratilmoqda...';
+  try{
+    let code='';
+    for(let i=0;i<10;i++){
+      code=String(Math.floor(10000+Math.random()*90000));
+      const ex=await get(ref(db,`game_sessions/${code}/state`));
+      if(!ex.exists()) break;
+    }
+    await set(ref(db,`game_sessions/${code}`),{
+      host:'Admin',host_key:'__admin__',
+      test_name:_admCastName||'Test',questions:_admCastQs,
+      settings:{time_per_q:admCastSettings.time,bg:0,type:admCastSettings.type,auto:admCastSettings.auto},
+      state:{status:'waiting',q_index:-1,q_started_at:0},
+      created_at:Date.now()
+    });
+    window.closeAdmCast();
+    location.href=`host-game.html?code=${code}&from=admin`;
+  }catch(e){alert('Xato: '+e.message);}
+  btn.disabled=false;btn.textContent='▶️ O\'yinni boshlash';
 };
 </script>
 </body>
