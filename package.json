@@ -1,0 +1,13 @@
+{
+  "name": "quizblitz-mock-up",
+  "version": "1.0.0",
+  "description": "QuizBlitz cast funksiyasini real odamlarsiz sinash uchun bot skripti",
+  "type": "module",
+  "main": "mock-up.js",
+  "scripts": {
+    "start": "node mock-up.js"
+  },
+  "dependencies": {
+    "firebase": "^10.12.2"
+  }
+}

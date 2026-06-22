@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QuizBlitz — Test Arena (Cast Sinov)</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Righteous&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0f1f;--surf:#0e1428;--card:#111a35;--border:rgba(255,255,255,.07);
+  --accent:#2563eb;--gold:#38bdf8;--green:#38bdf8;--blue:#38bdf8;--purple:#64748b;
+  --text:#e8edf7;--muted:#8b96b3;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;overflow:hidden;}
+
+/* ── TOPBAR ── */
+#topbar{
+  background:rgba(6,6,15,.95);border-bottom:1px solid var(--border);
+  padding:10px 16px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+  font-size:.8rem;
+}
+#topbar .logo{font-family:'Righteous',cursive;font-size:1.05rem;
+  background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-right:6px;white-space:nowrap;}
+#topbar input{
+  background:rgba(255,255,255,.06);border:2px solid var(--border);border-radius:8px;
+  padding:7px 10px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;
+  outline:none;transition:border-color .2s;
+}
+#topbar input:focus{border-color:var(--accent);}
+#topbar input::placeholder{color:var(--muted);}
+#topbar input#code-inp{width:100px;font-family:'Righteous',cursive;letter-spacing:2px;text-align:center;}
+#topbar input#path-inp{width:70px;}
+#topbar input#bot-count{width:54px;}
+#topbar input#correct-rate,#topbar input#answer-rate{width:54px;}
+.tb-lbl{color:var(--muted);font-weight:800;font-size:.7rem;text-transform:uppercase;letter-spacing:.4px;}
+.tb-btn{
+  border:none;border-radius:8px;padding:7px 13px;font-family:'Nunito',sans-serif;
+  font-size:.78rem;font-weight:900;cursor:pointer;transition:all .2s;white-space:nowrap;
+}
+.tb-btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn-load{background:linear-gradient(135deg,var(--blue),#1a6599);color:#000;}
+.btn-bots{background:linear-gradient(135deg,var(--green),#1d9bcf);color:#000;}
+.btn-clean{background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3)!important;color:var(--accent);}
+.btn-load:hover,.btn-bots:hover{transform:translateY(-1px);}
+.tb-sep{width:1px;height:22px;background:var(--border);margin:0 2px;}
+#status-pill{
+  margin-left:auto;font-size:.72rem;font-weight:800;padding:4px 11px;border-radius:50px;
+  background:rgba(255,255,255,.06);color:var(--muted);
+}
+#status-pill.live{background:rgba(56,189,248,.12);color:var(--green);}
+
+/* ── LOG PANEL (toggleable) ── */
+#log-wrap{display:none;background:var(--surf);border-bottom:1px solid var(--border);}
+#log-wrap.on{display:block;}
+#log-panel{
+  height:130px;overflow-y:auto;padding:8px 14px;font-family:monospace;font-size:.72rem;
+  line-height:1.6;color:var(--muted);
+}
+#log-panel .ok{color:var(--green);}
+#log-panel .err{color:var(--accent);}
+#log-panel .info{color:var(--blue);}
+
+/* ── MAIN SPLIT ── */
+#main{flex:1;display:flex;overflow:hidden;min-height:0;}
+.pane{display:flex;flex-direction:column;min-width:0;}
+#left-pane{flex:0 0 36%;max-width:520px;min-width:280px;border-right:2px solid var(--border);background:#000;}
+#right-pane{flex:1;background:#000;}
+.pane-hd{
+  display:flex;align-items:center;gap:7px;padding:7px 12px;
+  background:rgba(255,255,255,.04);border-bottom:1px solid var(--border);
+  font-size:.74rem;font-weight:800;color:var(--muted);flex-shrink:0;
+}
+.pane-hd .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+#left-pane .pane-hd .dot{background:var(--purple);}
+#right-pane .pane-hd .dot{background:var(--green);}
+.pane-hd b{color:var(--text);}
+.pane-frame-wrap{flex:1;position:relative;min-height:0;}
+.pane-frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+.placeholder{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:8px;color:var(--muted);font-size:.82rem;font-weight:700;text-align:center;padding:20px;
+}
+.placeholder .pi{font-size:2.2rem;}
+
+@media(max-width:760px){
+  #main{flex-direction:column;}
+  #left-pane{flex:0 0 38vh;max-width:none;border-right:none;border-bottom:2px solid var(--border);}
+  #right-pane{flex:1;}
+  #topbar input,#topbar .tb-btn{font-size:.74rem;}
+}
+</style>
+</head>
+<body>
+
+<div id="topbar">
+  <div class="logo">⚡ Test Arena</div>
+
+  <span class="tb-lbl">Kod</span>
+  <input type="text" id="code-inp" placeholder="48213" maxlength="5" inputmode="numeric">
+
+  <span class="tb-lbl">Yo'l</span>
+  <input type="text" id="path-inp" placeholder="(joriy papka)" value="" title="host-game.html / enter-game.html joylashgan papkaga nisbatan yo'l — repo flat bo'lgani uchun odatda bo'sh qoldiring">
+
+  <button type="button" class="tb-btn btn-load" onclick="loadArena()">▶ Yuklash</button>
+
+  <div class="tb-sep"></div>
+
+  <span class="tb-lbl">Bot soni</span>
+  <input type="number" id="bot-count" value="20" min="1" max="50">
+  <span class="tb-lbl">To'g'ri %</span>
+  <input type="number" id="correct-rate" value="70" min="0" max="100">
+  <span class="tb-lbl">Javob %</span>
+  <input type="number" id="answer-rate" value="95" min="0" max="100">
+
+  <button type="button" class="tb-btn btn-bots" id="add-bots-btn" onclick="addBots()" disabled>🤖 Botlarni qo'shish</button>
+  <button type="button" class="tb-btn btn-clean" id="clean-btn" onclick="cleanupBots()" disabled>🗑️ Tozalash</button>
+  <button type="button" class="tb-btn" style="background:rgba(255,255,255,.07);color:var(--muted)" onclick="toggleLog()">📋 Log</button>
+
+  <div id="status-pill">Kod kiritilmagan</div>
+</div>
+
+<div id="log-wrap"><div id="log-panel"></div></div>
+
+<div id="main">
+  <div class="pane" id="left-pane">
+    <div class="pane-hd"><div class="dot"></div><b>🖥️ Caster (Host)</b> — kichik ekran</div>
+    <div class="pane-frame-wrap" id="left-frame-wrap">
+      <div class="placeholder"><div class="pi">🖥️</div>Kodni kiritib "Yuklash"ni bosing</div>
+    </div>
+  </div>
+  <div class="pane" id="right-pane">
+    <div class="pane-hd"><div class="dot"></div><b>🎮 Siz — 21-haqiqiy ishtirokchi</b> (real qo'shilish)</div>
+    <div class="pane-frame-wrap" id="right-frame-wrap">
+      <div class="placeholder"><div class="pi">🎮</div>Kodni kiritib "Yuklash"ni bosing — bu yerda o'zingiz oddiy o'yinchidek ismingizni kiritib qo'shilasiz</div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, get, remove, onValue, off } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const FB={apiKey:"AIzaSyA-2Uf7dZf1kqf7c32txyTFXSd2PCJbJLw",authDomain:"sessiya-11767.firebaseapp.com",databaseURL:"https://sessiya-11767-default-rtdb.firebaseio.com",projectId:"sessiya-11767",storageBucket:"sessiya-11767.firebasestorage.app",messagingSenderId:"883067400258",appId:"1:883067400258:web:941d591d38755c73247ddb"};
+const app=initializeApp(FB);
+const db=getDatabase(app);
+
+const $=id=>document.getElementById(id);
+const EMOJIS=['🦊','🐺','🦁','🐯','🦝','🐲','🦄','🦅','🐸','🦑','🤖','👾','🦸','🧙','🥷','🦈','🐙','🦉','🦩','🎭','🦔','🦦','🦥','🐢','🦡'];
+const BOT_PREFIX='Bot';
+
+let curCode=null,curBotCount=20,stateUnsub=null,processedQIdx=-1;
+
+function log(msg,type='info'){
+  const p=$('log-panel');
+  const line=document.createElement('div');
+  line.className=type;
+  const t=new Date().toLocaleTimeString('uz-UZ');
+  line.textContent=`[${t}] ${msg}`;
+  p.appendChild(line);
+  p.scrollTop=p.scrollHeight;
+}
+window.toggleLog=()=>{$('log-wrap').classList.toggle('on');};
+
+function setStatus(txt,live){
+  const el=$('status-pill');el.textContent=txt;el.className='live'?'':''; // reset then set
+  el.className=live?'live':'';
+  el.textContent=txt;
+}
+
+// ── ARENA YUKLASH (ikkala iframe) ──
+window.loadArena=function(){
+  const code=$('code-inp').value.trim();
+  if(!/^\d{4,6}$/.test(code)){alert("To'g'ri o'yin kodini kiriting (host-game.html dan olingan)");return;}
+  const base=$('path-inp').value.trim();
+  curCode=code;
+
+  $('left-frame-wrap').innerHTML=`<iframe src="${base}host-game.html?code=${code}"></iframe>`;
+  $('right-frame-wrap').innerHTML=`<iframe src="${base}enter-game.html?code=${code}"></iframe>`;
+
+  $('add-bots-btn').disabled=false;
+  $('clean-btn').disabled=false;
+  setStatus('Yuklandi: '+code,true);
+  log(`Arena yuklandi — kod: ${code}, yo'l: "${base}"`,'ok');
+
+  watchGame(code);
+};
+
+// ── BOTLARNI QO'SHISH ──
+window.addBots=async function(){
+  if(!curCode) return;
+  const count=Math.max(1,Math.min(50,parseInt($('bot-count').value||'20',10)));
+  curBotCount=count;
+  const btn=$('add-bots-btn');btn.disabled=true;btn.textContent='Qo\'shilmoqda...';
+  try{
+    const stSnap=await get(ref(db,`game_sessions/${curCode}/state`));
+    if(!stSnap.exists()){log('❌ Bunday kod bilan sessiya topilmadi','err');alert('Sessiya topilmadi — avval host-game.html da cast yarating');btn.disabled=false;btn.textContent="🤖 Botlarni qo'shish";return;}
+    for(let i=1;i<=count;i++){
+      const name=`${BOT_PREFIX}${i}`;
+      const emoji=EMOJIS[(i-1)%EMOJIS.length];
+      await set(ref(db,`game_sessions/${curCode}/players/${name}`),{emoji,joined_at:Date.now(),score:0});
+    }
+    log(`✅ ${count} ta bot lobby'ga qo'shildi (siz bilan birga jami ${count+1} o'yinchi bo'lishi kerak)`,'ok');
+  }catch(e){log('Xato: '+e.message,'err');}
+  btn.disabled=false;btn.textContent="🤖 Botlarni qo'shish";
+};
+
+// ── BOTLARNI TOZALASH ──
+window.cleanupBots=async function(){
+  if(!curCode) return;
+  if(!confirm('Barcha Bot1..BotN o\'yinchilarini lobbydan o\'chirasizmi?')) return;
+  const btn=$('clean-btn');btn.disabled=true;
+  try{
+    for(let i=1;i<=50;i++){
+      await remove(ref(db,`game_sessions/${curCode}/players/${BOT_PREFIX}${i}`));
+    }
+    log('🧹 Botlar tozalandi','ok');
+  }catch(e){log('Xato: '+e.message,'err');}
+  btn.disabled=false;
+};
+
+// ── O'YIN HOLATINI KUZATISH + AVTOMATIK JAVOB ──
+function watchGame(code){
+  if(stateUnsub){off(ref(db,`game_sessions/${curCode}/state`));stateUnsub=null;}
+  processedQIdx=-1;
+  const stateRef=ref(db,`game_sessions/${code}/state`);
+  onValue(stateRef,snap=>{
+    const st=snap.val();
+    if(!st) return;
+    if(st.status==='question_active' && st.q_index!==processedQIdx){
+      processedQIdx=st.q_index;
+      scheduleAnswers(code,st);
+    }else if(st.status==='leaderboard'){
+      log(`🏆 Shoxsupa (savol ${(st.q_index??0)+1} dan keyin)`,'info');
+    }else if(st.status==='ended'){
+      const lb=st.leaderboard||[];
+      log('🎉 O\'YIN TUGADI! Yakuniy natijalar:','ok');
+      lb.forEach((p,i)=>log(`   ${i+1}. ${p.emoji||''} ${p.name} — ${p.score} ball`,'ok'));
+    }
+  });
+  stateUnsub=true;
+}
+
+function pickOption(correctIdx,numOptions,correctRate){
+  const willBeCorrect=Math.random()<correctRate;
+  if(willBeCorrect) return correctIdx;
+  if(numOptions<=1) return correctIdx;
+  let idx;do{idx=Math.floor(Math.random()*numOptions);}while(idx===correctIdx);
+  return idx;
+}
+
+function scheduleAnswers(code,st){
+  const qIndex=st.q_index;
+  const qTimeMs=(st.q_time||20)*1000;
+  const correctIdx=typeof st.q_correct==='number'?st.q_correct:0;
+  const numOptions=(st.q_options||[]).length||4;
+  const startedAt=st.q_started_at||Date.now();
+  const elapsed=Date.now()-startedAt;
+  const maxDelay=Math.max(400,qTimeMs-600-elapsed);
+  const correctRate=Math.max(0,Math.min(1,(parseFloat($('correct-rate').value)||70)/100));
+  const answerRate=Math.max(0,Math.min(1,(parseFloat($('answer-rate').value)||95)/100));
+
+  log(`📝 Savol ${qIndex+1} faollashdi — botlar javob tayyorlamoqda (${Math.round(qTimeMs/1000)}s)`,'info');
+
+  for(let i=1;i<=curBotCount;i++){
+    const name=`${BOT_PREFIX}${i}`;
+    if(Math.random()>answerRate) continue; // vaqt tugashini kutadi
+    const optionIdx=pickOption(correctIdx,numOptions,correctRate);
+    const delay=400+Math.random()*Math.max(0,maxDelay-400);
+    setTimeout(async()=>{
+      try{
+        await set(ref(db,`game_sessions/${code}/answers/${qIndex}/${name}`),{option:optionIdx,time_ms:Math.round(delay)});
+      }catch(e){log(`⚠️ ${name} xato: ${e.message}`,'err');}
+    },delay);
+  }
+}
+
+// Enter bosilganda yuklash
+$('code-inp').addEventListener('keydown',e=>{if(e.key==='Enter')window.loadArena();});
+
+// ── URL orqali avtomatik yuklash (user-panel.html dagi "🤖 Mock-up" tugmasi shu yerga ?code=XXXXX&auto=1 bilan yo'naltiradi) ──
+(function(){
+  const p=new URLSearchParams(location.search);
+  const urlCode=p.get('code');
+  if(urlCode&&/^\d{4,6}$/.test(urlCode)){
+    $('code-inp').value=urlCode;
+    if(p.get('auto')==='1') setTimeout(()=>window.loadArena(),200);
+  }
+})();
+</script>
+</body>
+</html>

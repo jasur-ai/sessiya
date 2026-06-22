@@ -97,6 +97,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 .act-edit{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.2);color:var(--blue);}
 .act-edit:hover{background:rgba(56,189,248,.22);}
 .act-cast{background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.2);color:var(--green);}
+.act-mock{background:rgba(100,116,139,.14);border:1px solid rgba(100,116,139,.28);color:var(--purple);}
+.act-mock:hover{background:rgba(100,116,139,.26);}
 .act-cast:hover{background:rgba(56,189,248,.22);}
 .act-del{background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.2);color:var(--accent);}
 .act-del:hover{background:rgba(37,99,235,.2);}
@@ -736,6 +738,7 @@ function buildTestCard(key,t,i){
       <button type="button" class="act-btn act-edit" onclick="editTest('${safeKey}')">✏️</button>
       <button type="button" class="act-btn act-edit" onclick="openRename('${safeKey}')">📝</button>
       <button type="button" class="act-btn act-cast" onclick="openCast('${safeKey}','${safeName}','user')">📡 Cast</button>
+      <button type="button" class="act-btn act-mock" onclick="startMockup('${safeKey}')">🤖 Mock-up</button>
       <button type="button" class="act-btn act-del" onclick="confirmDel('${safeKey}','${safeName}')">🗑️</button>
     </div>
   </div>`;
@@ -1288,6 +1291,33 @@ window.startCast=async function(){
     location.href=`host-game.html?code=${code}`;
   }catch(e){console.error(e);alert('Xato: '+e.message);}
   btn.disabled=false;btn.textContent='▶️ O\'yinni boshlash';
+};
+
+// ── MOCK-UP (test-arena.html) — testni bitta bosishda bot-sinov maydoniga yuboradi ──
+window.startMockup=async function(key){
+  if(!curUser) return;
+  try{
+    const snap=await get(ref(db,`users/${curUser.safeKey}/tests/${key}`));
+    if(!snap.exists()){alert('Test topilmadi');return;}
+    const td=snap.val();
+    const testQs=td.questions||[];
+    const testName=td.name||'Test';
+    if(!testQs.length){alert('Bu testda savollar yo\'q');return;}
+    let code='';
+    for(let i=0;i<10;i++){
+      code=String(Math.floor(10000+Math.random()*90000));
+      const ex=await get(ref(db,`game_sessions/${code}/state`));
+      if(!ex.exists()) break;
+    }
+    await set(ref(db,`game_sessions/${code}`),{
+      host:curUser.username,host_key:curUser.safeKey,
+      test_name:testName,questions:testQs,
+      settings:{time_per_q:20,bg:0,type:'score',auto:true},
+      state:{status:'waiting',q_index:-1,q_started_at:0},
+      created_at:Date.now()
+    });
+    location.href=`test-arena.html?code=${code}&auto=1`;
+  }catch(e){console.error(e);alert('Xato: '+e.message);}
 };
 
 // ── ENTER KEY BINDINGS ──
