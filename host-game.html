@@ -666,7 +666,7 @@ window.afterLbNext=function(){
 
 const RANK_CLS=['rank-1','rank-2','rank-3','rank-n','rank-n','rank-n','rank-n'];
 function renderLb(lb){
-  return lb.map((p,i)=>`<div class="lbi">
+  return lb.slice(0,7).map((p,i)=>`<div class="lbi">
     <div class="lb-rank ${RANK_CLS[i]||'rank-n'}">${['🥇','🥈','🥉'][i]||i+1}</div>
     <div class="lb-em">${p.emoji||'❓'}</div>
     <div class="lb-nm">${esc(p.name)}</div>
