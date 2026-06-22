@@ -413,7 +413,7 @@ tbody tr:hover td{background:rgba(255,255,255,.025);}
 <!-- CAST MODAL (admin) -->
 <div id="adm-cast-modal" style="position:fixed;inset:0;z-index:500;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);">
   <div style="background:var(--surf);border-radius:22px;padding:28px;width:100%;max-width:500px;border:1px solid var(--border);box-shadow:0 16px 40px rgba(0,0,0,.5);max-height:90vh;overflow-y:auto;">
-    <div style="font-family:'Righteous',cursive;font-size:1.3rem;margin-bottom:4px;display:flex;align-items:center;gap:8px;">📡 Jonli O'yin</div>
+    <div id="adm-cast-modal-title" style="font-family:'Righteous',cursive;font-size:1.3rem;margin-bottom:4px;display:flex;align-items:center;gap:8px;">📡 Jonli O'yin</div>
     <p id="adm-cast-name" style="color:var(--muted);font-size:.78rem;margin-bottom:20px;">Test: —</p>
 
     <div style="margin-bottom:18px;">
@@ -720,7 +720,9 @@ window.startMockupFan=async function(fanKey,fanName){
     _admCastQs=shuffled.slice(0,Math.min(MOCK_COUNT,shuffled.length));
     _admCastName='Mock: '+fanName;
     _admCastMode='mockup';
-    $('adm-cast-name').textContent='Mock-up: '+fanName;
+    $('adm-cast-name').textContent='Test: '+fanName;
+    $('adm-cast-modal-title').textContent='🤖 Mock-up Sinov';
+    $('adm-cast-start-btn').textContent='🤖 Demoni boshlash';
     $('adm-cast-modal').style.display='flex';
   }catch(e){alert('Xato: '+e.message);}
 };
@@ -1111,6 +1113,8 @@ window.openAdmCastFan=async function(fanKey,fanName){
     _admCastQs=shuffled.slice(0,Math.min(MOCK_COUNT,shuffled.length));
     _admCastName='Mock: '+fanName;
     $('adm-cast-name').textContent='Test: Mock: '+fanName;
+    $('adm-cast-modal-title').textContent='📡 Jonli O\'yin';
+    $('adm-cast-start-btn').textContent='▶️ O\'yinni boshlash';
     $('adm-cast-modal').style.display='flex';
   }catch(e){alert('Xato: '+e.message);}
 };
@@ -1131,6 +1135,8 @@ window.openAdmCastPre=async function(groupKey,groupName,keysRaw){
     _admCastQs=shuffled.slice(0,Math.min(MOCK_COUNT,shuffled.length));
     _admCastName=groupName;
     $('adm-cast-name').textContent='Test: '+groupName+' ('+_admCastQs.length+' ta savol)';
+    $('adm-cast-modal-title').textContent='📡 Jonli O\'yin';
+    $('adm-cast-start-btn').textContent='▶️ O\'yinni boshlash';
     $('adm-cast-modal').style.display='flex';
   }catch(e){alert('Xato: '+e.message);}
 };
@@ -1163,7 +1169,7 @@ window.startAdmCast=async function(){
       location.href=`host-game.html?code=${code}&from=admin`;
     }
   }catch(e){alert('Xato: '+e.message);}
-  btn.disabled=false;btn.textContent='▶️ O\'yinni boshlash';
+  btn.disabled=false;btn.textContent=_admCastMode==='mockup'?'🤖 Demoni boshlash':'▶️ O\'yinni boshlash';
 };
 </script>
 </body>

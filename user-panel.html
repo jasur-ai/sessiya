@@ -514,7 +514,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 <!-- CAST MODAL -->
 <div id="cast-modal">
   <div class="cast-box">
-    <div class="cast-title">📡 Jonli O'yin</div>
+    <div class="cast-title" id="cast-modal-title">📡 Jonli O'yin</div>
     <p class="cast-sub" id="cast-test-name">Test: —</p>
     <div class="cast-section">
       <div class="cast-lbl">⏱️ Savol vaqti (soniya)</div>
@@ -1246,8 +1246,10 @@ document.getElementById('auto-check').addEventListener('change',function(){
 
 window.openCast=function(key,name,source){
   _castTestKey=key;_castTestSource=source||'user';_castOverrideQs=null;_castOverrideName=null;
-  _castFrom=source||'user'; // 'user' yoki 'admin'
+  _castFrom=source||'user';
   $('cast-test-name').textContent='Test: '+name;
+  $('cast-modal-title').textContent='📡 Jonli O\'yin';
+  $('cast-start-btn').textContent='▶️ O\'yinni boshlash';
   $('cast-modal').classList.add('on');
 };
 
@@ -1255,6 +1257,8 @@ function openCastDirect(qs,name,from){
   _castTestKey=null;_castOverrideQs=qs;_castOverrideName=name;
   _castFrom=from||'user';
   $('cast-test-name').textContent='Test: '+name;
+  $('cast-modal-title').textContent='📡 Jonli O\'yin';
+  $('cast-start-btn').textContent='▶️ O\'yinni boshlash';
   $('cast-modal').classList.add('on');
 }
 
@@ -1296,7 +1300,7 @@ window.startCast=async function(){
       location.href=`host-game.html?code=${code}&from=${_castFrom}`;
     }
   }catch(e){console.error(e);alert('Xato: '+e.message);}
-  btn.disabled=false;btn.textContent='▶️ O\'yinni boshlash';
+  btn.disabled=false;btn.textContent=_castFrom==='mockup'?'🤖 Demoni boshlash':'▶️ O\'yinni boshlash';
 };
 
 // ── MOCK-UP — avval cast sozlamalari so'raladi, keyin test-arena.html ga yo'naltiriladi ──
@@ -1313,7 +1317,9 @@ window.startMockup=async function(key){
     _castOverrideQs=testQs;
     _castOverrideName=testName;
     _castFrom='mockup';
-    $('cast-test-name').textContent='Mock-up: '+testName;
+    $('cast-test-name').textContent='Test: '+testName;
+    $('cast-modal-title').textContent='🤖 Mock-up Sinov';
+    $('cast-start-btn').textContent='🤖 Demoni boshlash';
     $('cast-modal').classList.add('on');
   }catch(e){console.error(e);alert('Xato: '+e.message);}
 };
