@@ -710,28 +710,18 @@ async function loadFans(){
 }
 window.loadFans=loadFans;
 
-// ── MOCK-UP (test-arena.html) — fan savollaridan tasodifiy MOCK_COUNT tasini olib, bot-sinov uchun cast yaratadi ──
+// ── MOCK-UP — avval cast sozlamalari so'raladi, keyin test-arena.html ga yo'naltiriladi ──
 window.startMockupFan=async function(fanKey,fanName){
   try{
     const snap=await get(ref(db,`${FANS_PATH}/${fanKey}`));
     if(!snap.exists()||!snap.val().questions||!snap.val().questions.length){alert('Bu fanda savollar topilmadi!');return;}
     const all=snap.val().questions;
     const shuffled=[...all].sort(()=>Math.random()-.5);
-    const qs=shuffled.slice(0,Math.min(MOCK_COUNT,shuffled.length));
-    let code='';
-    for(let i=0;i<10;i++){
-      code=String(Math.floor(10000+Math.random()*90000));
-      const ex=await get(ref(db,`game_sessions/${code}/state`));
-      if(!ex.exists()) break;
-    }
-    await set(ref(db,`game_sessions/${code}`),{
-      host:'Admin',host_key:'__admin__',
-      test_name:'Mock: '+fanName,questions:qs,
-      settings:{time_per_q:20,bg:0,type:'score',auto:true},
-      state:{status:'waiting',q_index:-1,q_started_at:0},
-      created_at:Date.now()
-    });
-    location.href=`test-arena.html?code=${code}&auto=1`;
+    _admCastQs=shuffled.slice(0,Math.min(MOCK_COUNT,shuffled.length));
+    _admCastName='Mock: '+fanName;
+    _admCastMode='mockup';
+    $('adm-cast-name').textContent='Mock-up: '+fanName;
+    $('adm-cast-modal').style.display='flex';
   }catch(e){alert('Xato: '+e.message);}
 };
 
@@ -1076,7 +1066,7 @@ window.downloadTemplate=function(){
 // ── ADM CAST MODAL ──
 const ADM_TIMES=[5,10,15,20,25,30,35,40];
 let admCastSettings={time:20,type:'score',auto:true};
-let _admCastQs=null,_admCastName=null;
+let _admCastQs=null,_admCastName=null,_admCastMode='cast';
 
 // Time grid yaratish
 (function buildAdmTimeGrid(){
@@ -1145,7 +1135,7 @@ window.openAdmCastPre=async function(groupKey,groupName,keysRaw){
   }catch(e){alert('Xato: '+e.message);}
 };
 
-window.closeAdmCast=function(){$('adm-cast-modal').style.display='none';_admCastQs=null;_admCastName=null;};
+window.closeAdmCast=function(){$('adm-cast-modal').style.display='none';_admCastQs=null;_admCastName=null;_admCastMode='cast';};
 
 $('adm-cast-modal').addEventListener('click',function(e){if(e.target===this)window.closeAdmCast();});
 
@@ -1167,7 +1157,11 @@ window.startAdmCast=async function(){
       created_at:Date.now()
     });
     window.closeAdmCast();
-    location.href=`host-game.html?code=${code}&from=admin`;
+    if(_admCastMode==='mockup'){
+      location.href=`test-arena.html?code=${code}&auto=1`;
+    }else{
+      location.href=`host-game.html?code=${code}&from=admin`;
+    }
   }catch(e){alert('Xato: '+e.message);}
   btn.disabled=false;btn.textContent='▶️ O\'yinni boshlash';
 };

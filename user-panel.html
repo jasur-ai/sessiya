@@ -1290,12 +1290,16 @@ window.startCast=async function(){
       created_at:Date.now()
     });
     window.closeCast();
-    location.href=`host-game.html?code=${code}&from=${_castFrom}`;
+    if(_castFrom==='mockup'){
+      location.href=`test-arena.html?code=${code}&auto=1`;
+    }else{
+      location.href=`host-game.html?code=${code}&from=${_castFrom}`;
+    }
   }catch(e){console.error(e);alert('Xato: '+e.message);}
   btn.disabled=false;btn.textContent='▶️ O\'yinni boshlash';
 };
 
-// ── MOCK-UP (test-arena.html) — testni bitta bosishda bot-sinov maydoniga yuboradi ──
+// ── MOCK-UP — avval cast sozlamalari so'raladi, keyin test-arena.html ga yo'naltiriladi ──
 window.startMockup=async function(key){
   if(!curUser) return;
   try{
@@ -1305,20 +1309,12 @@ window.startMockup=async function(key){
     const testQs=td.questions||[];
     const testName=td.name||'Test';
     if(!testQs.length){alert('Bu testda savollar yo\'q');return;}
-    let code='';
-    for(let i=0;i<10;i++){
-      code=String(Math.floor(10000+Math.random()*90000));
-      const ex=await get(ref(db,`game_sessions/${code}/state`));
-      if(!ex.exists()) break;
-    }
-    await set(ref(db,`game_sessions/${code}`),{
-      host:curUser.username,host_key:curUser.safeKey,
-      test_name:testName,questions:testQs,
-      settings:{time_per_q:20,bg:0,type:'score',auto:true},
-      state:{status:'waiting',q_index:-1,q_started_at:0},
-      created_at:Date.now()
-    });
-    location.href=`test-arena.html?code=${code}&auto=1`;
+    // Cast modal ochiladi — sozlamalar so'ralib, keyin test-arena.html ga yo'naltiriladi
+    _castOverrideQs=testQs;
+    _castOverrideName=testName;
+    _castFrom='mockup';
+    $('cast-test-name').textContent='Mock-up: '+testName;
+    $('cast-modal').classList.add('on');
   }catch(e){console.error(e);alert('Xato: '+e.message);}
 };
 
