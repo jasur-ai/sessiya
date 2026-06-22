@@ -1293,8 +1293,9 @@ window.startCast=async function(){
       state:{status:'waiting',q_index:-1,q_started_at:0},
       created_at:Date.now()
     });
+    const isMockup=(_castFrom==='mockup');
     window.closeCast();
-    if(_castFrom==='mockup'){
+    if(isMockup){
       location.href=`test-arena.html?code=${code}&auto=1`;
     }else{
       location.href=`host-game.html?code=${code}&from=${_castFrom}`;
