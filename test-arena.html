@@ -192,7 +192,6 @@ function updatePhoneScale(){
   const availH=content.clientHeight||580;
   const IFRAME_W=390;
   const IFRAME_H=844;
-  // cover: kattaroq scale — ichni to'liq to'ldiradi, bo'sh joy qolmaydi
   const scale=Math.max(availW/IFRAME_W, availH/IFRAME_H);
   const iframe=content.querySelector('iframe');
   if(iframe){
@@ -201,9 +200,8 @@ function updatePhoneScale(){
     iframe.style.transform=`scale(${scale})`;
     iframe.style.transformOrigin='top left';
     const scaledW=IFRAME_W*scale;
-    const scaledH=IFRAME_H*scale;
     iframe.style.left=Math.round((availW-scaledW)/2)+'px';
-    iframe.style.top=Math.round((availH-scaledH)/2)+'px';
+    iframe.style.top='0';
   }
 }
 window.addEventListener('resize',updatePhoneScale);
