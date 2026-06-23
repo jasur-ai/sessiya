@@ -7,8 +7,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&family=Righteous&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#0a0f1f;--surf:#0e1428;--card:#111a35;--border:rgba(255,255,255,.07);
-  --accent:#2563eb;--gold:#38bdf8;--green:#00e5a0;--blue:#38bdf8;
+  --bg:#06080f;--surf:#0b0e1a;--card:#0f1525;--border:rgba(255,255,255,.07);
+  --accent:#2563eb;--gold:#38bdf8;--green:#00e5a0;--red:#f87171;
   --text:#e8edf7;--muted:#8b96b3;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -18,226 +18,291 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);disp
 /* ── TOPBAR ── */
 #topbar{
   background:rgba(4,6,18,.98);border-bottom:1px solid var(--border);
-  padding:8px 14px;display:flex;align-items:center;gap:7px;
-  font-size:.78rem;flex-shrink:0;white-space:nowrap;overflow-x:auto;
+  padding:7px 12px;display:flex;align-items:center;gap:6px;
+  flex-shrink:0;overflow-x:auto;white-space:nowrap;
 }
-#topbar .logo{
-  font-family:'Righteous',cursive;font-size:1rem;
+.logo{font-family:'Righteous',cursive;font-size:.95rem;
   background:linear-gradient(135deg,var(--accent),var(--gold));
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  margin-right:4px;flex-shrink:0;
-}
+  flex-shrink:0;margin-right:2px;}
 #topbar input{
   background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.1);border-radius:7px;
-  padding:5px 9px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;
-  outline:none;transition:border-color .2s;flex-shrink:0;
+  padding:5px 8px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:700;
+  outline:none;transition:border-color .2s;
 }
 #topbar input:focus{border-color:var(--accent);}
 #topbar input::placeholder{color:var(--muted);}
-#code-inp{width:90px;font-family:'Righteous',cursive;letter-spacing:3px;text-align:center;}
-#bot-count,#correct-rate,#answer-rate{width:50px;text-align:center;}
-.tb-lbl{color:var(--muted);font-weight:800;font-size:.68rem;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;}
+#code-inp{width:82px;font-family:'Righteous',cursive;letter-spacing:3px;text-align:center;}
+#bot-count,#correct-rate,#answer-rate{width:46px;text-align:center;}
+.tb-lbl{color:var(--muted);font-weight:800;font-size:.65rem;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;}
 .tb-btn{
-  border:none;border-radius:7px;padding:6px 12px;
-  font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:900;
-  cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0;
+  border:none;border-radius:7px;padding:5px 11px;
+  font-family:'Nunito',sans-serif;font-size:.74rem;font-weight:900;
+  cursor:pointer;transition:all .18s;flex-shrink:0;
 }
 .tb-btn:disabled{opacity:.35;cursor:not-allowed;}
 .btn-load{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;}
 .btn-bots{background:linear-gradient(135deg,#00e5a0,#059669);color:#000;}
 .btn-clean{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;}
-.btn-load:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 14px rgba(37,99,235,.4);}
-.btn-bots:hover:not(:disabled){transform:translateY(-1px);}
-.tb-sep{width:1px;height:20px;background:rgba(255,255,255,.08);flex-shrink:0;}
+.tb-sep{width:1px;height:18px;background:rgba(255,255,255,.08);flex-shrink:0;}
 #status-pill{
-  margin-left:auto;font-size:.7rem;font-weight:800;padding:3px 10px;border-radius:50px;
+  margin-left:auto;font-size:.68rem;font-weight:800;padding:3px 10px;border-radius:50px;
   background:rgba(255,255,255,.06);color:var(--muted);flex-shrink:0;
 }
 #status-pill.live{background:rgba(0,229,160,.12);color:var(--green);border:1px solid rgba(0,229,160,.25);}
 
-/* ── MAIN SPLIT ── */
+/* ── MAIN: 3 kolonka ── */
 #main{flex:1;display:flex;min-height:0;overflow:hidden;}
 
-/* CHAP — host iframe, katta */
+/* CHAP — host iframe */
 #left-pane{
-  flex:1;
+  flex:1;min-width:0;
   display:flex;flex-direction:column;
-  border-right:2px solid rgba(255,255,255,.06);
-  min-width:0;background:#000;
+  border-right:2px solid rgba(255,255,255,.05);
+  background:#000;
 }
 
-/* O'NG — telefon wrapper */
+/* O'RTA — diagnostika panel */
+#mid-pane{
+  width:280px;flex-shrink:0;
+  display:flex;flex-direction:column;
+  background:var(--surf);
+  border-right:2px solid rgba(255,255,255,.05);
+  overflow:hidden;
+}
+
+/* O'NG — telefon */
 #right-pane{
-  flex:0 0 400px;
-  width:400px;
-  display:flex;
-  flex-direction:column;
-  background:#060810;
+  width:370px;flex-shrink:0;
+  display:flex;flex-direction:column;
+  background:#07090f;
 }
 
-/* Panel header */
+/* Pane header */
 .pane-hd{
-  padding:6px 12px;
-  background:rgba(255,255,255,.035);
+  padding:5px 10px;
+  background:rgba(255,255,255,.03);
   border-bottom:1px solid var(--border);
-  font-size:.72rem;font-weight:800;color:var(--muted);
-  display:flex;align-items:center;gap:6px;
-  flex-shrink:0;
+  font-size:.68rem;font-weight:800;color:var(--muted);
+  display:flex;align-items:center;gap:5px;flex-shrink:0;
 }
-.dot{width:6px;height:6px;border-radius:50%;}
+.pane-hd b{color:var(--text);font-size:.72rem;}
+.phd-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
 .dot-purple{background:#a78bfa;}
+.dot-blue{background:var(--accent);}
 .dot-green{background:var(--green);}
-.pane-hd b{color:var(--text);}
 
-/* Host iframe — to'liq */
+/* Host iframe */
 #left-frame-wrap{flex:1;position:relative;}
 #left-frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
 
-/* Telefon area */
-#phone-area{
-  flex:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  padding:10px 8px;
-  background:radial-gradient(ellipse at 50% 30%,rgba(37,99,235,.07) 0%,transparent 60%),#060810;
-  min-height:0;
+/* ── DIAGNOSTIKA PANEL ── */
+#diag-body{
+  flex:1;overflow-y:auto;padding:10px;
+  display:flex;flex-direction:column;gap:8px;
 }
+#diag-body::-webkit-scrollbar{width:4px;}
+#diag-body::-webkit-scrollbar-track{background:transparent;}
+#diag-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:4px;}
 
-/* Telefon qobi'gi */
-#phone-device{
-  width:340px;
-  height:100%;
-  max-height:680px;
-  min-height:400px;
-  border-radius:42px;
-  background:#0a0a12;
-  border:3px solid rgba(255,255,255,.15);
-  box-shadow:
-    0 0 0 1px rgba(0,0,0,.8),
-    0 0 60px rgba(37,99,235,.12),
-    0 20px 60px rgba(0,0,0,.7),
-    inset 0 0 0 1px rgba(255,255,255,.04);
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  position:relative;
+.diag-section{background:var(--card);border-radius:10px;border:1px solid var(--border);overflow:hidden;}
+.diag-sec-hd{
+  padding:7px 10px;font-size:.65rem;font-weight:900;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--muted);border-bottom:1px solid var(--border);background:rgba(255,255,255,.02);
+  display:flex;align-items:center;gap:5px;
 }
+.diag-sec-body{padding:8px 10px;}
 
-/* Dynamic island / notch */
-.phone-notch{
-  flex-shrink:0;
-  height:30px;
-  background:#0a0a12;
+/* Stats grid */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.stat-item{background:rgba(255,255,255,.04);border-radius:7px;padding:7px 8px;text-align:center;}
+.stat-val{font-family:'Righteous',cursive;font-size:1.2rem;line-height:1;}
+.stat-lbl{font-size:.58rem;font-weight:700;color:var(--muted);margin-top:2px;text-transform:uppercase;}
+.stat-val.blue{color:var(--gold);}
+.stat-val.green{color:var(--green);}
+.stat-val.red{color:var(--red);}
+.stat-val.purple{color:#a78bfa;}
+
+/* Q info */
+.q-info-box{font-size:.72rem;font-weight:700;line-height:1.6;color:var(--muted);}
+.q-info-box .q-text-preview{
+  color:var(--text);font-weight:800;font-size:.76rem;
+  background:rgba(255,255,255,.04);border-radius:7px;padding:7px 9px;margin-bottom:7px;
+  line-height:1.5;border-left:3px solid var(--accent);
+}
+.opt-row{display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.03);}
+.opt-row:last-child{border-bottom:none;}
+.opt-letter{
+  width:18px;height:18px;border-radius:4px;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;
-  position:relative;z-index:2;
+  font-size:.6rem;font-weight:900;background:rgba(255,255,255,.08);color:var(--muted);
+}
+.opt-letter.correct{background:rgba(0,229,160,.2);color:var(--green);}
+.opt-text{flex:1;font-size:.7rem;font-weight:700;color:var(--muted);}
+.opt-text.correct{color:var(--green);}
+.opt-bar-wrap{width:50px;background:rgba(255,255,255,.06);border-radius:3px;height:5px;overflow:hidden;}
+.opt-bar{height:100%;border-radius:3px;background:rgba(255,255,255,.2);transition:width .4s;}
+.opt-bar.correct{background:var(--green);}
+.opt-cnt{font-size:.62rem;font-weight:800;color:var(--muted);width:20px;text-align:right;}
+
+/* Issues */
+.issue-item{
+  display:flex;align-items:flex-start;gap:6px;padding:5px 0;
+  border-bottom:1px solid rgba(255,255,255,.04);font-size:.68rem;font-weight:700;
+}
+.issue-item:last-child{border-bottom:none;}
+.issue-icon{flex-shrink:0;font-size:.85rem;}
+.issue-text{color:var(--muted);line-height:1.5;}
+.issue-text b{color:var(--text);}
+.issue-text .warn{color:#fbbf24;}
+.issue-text .err{color:var(--red);}
+.issue-text .ok{color:var(--green);}
+
+/* Answer live feed */
+.ans-feed{display:flex;flex-direction:column;gap:3px;max-height:160px;overflow-y:auto;}
+.ans-feed::-webkit-scrollbar{width:3px;}
+.ans-feed::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px;}
+.ans-chip{
+  display:flex;align-items:center;gap:5px;padding:3px 6px;border-radius:5px;
+  font-size:.64rem;font-weight:800;background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.05);
+  animation:fadein .2s ease-out;
+}
+@keyframes fadein{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+.ans-chip.cor{border-color:rgba(0,229,160,.2);background:rgba(0,229,160,.06);}
+.ans-chip.wr{border-color:rgba(248,113,113,.2);background:rgba(248,113,113,.05);}
+.ans-chip .chip-em{font-size:.9rem;}
+.ans-chip .chip-nm{color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ans-chip .chip-opt{color:var(--muted);}
+.ans-chip.cor .chip-opt{color:var(--green);}
+.ans-chip.wr .chip-opt{color:var(--red);}
+.ans-chip .chip-time{color:var(--muted);font-size:.58rem;}
+
+/* Empty state */
+.diag-empty{color:var(--muted);font-size:.7rem;font-weight:700;text-align:center;padding:12px 0;}
+
+/* ── TELEFON ── */
+#phone-area{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:10px 8px;min-height:0;
+  background:radial-gradient(ellipse at 50% 30%,rgba(37,99,235,.07) 0%,transparent 60%),#07090f;
+}
+#phone-device{
+  width:320px;height:100%;max-height:660px;min-height:380px;
+  border-radius:40px;background:#08080f;
+  border:3px solid rgba(255,255,255,.14);
+  box-shadow:0 0 0 1px rgba(0,0,0,.9),0 0 50px rgba(37,99,235,.1),0 20px 60px rgba(0,0,0,.8),inset 0 0 0 1px rgba(255,255,255,.04);
+  display:flex;flex-direction:column;overflow:hidden;position:relative;
+}
+.phone-notch{
+  flex-shrink:0;height:28px;background:#08080f;
+  display:flex;align-items:center;justify-content:center;position:relative;z-index:2;
 }
 .phone-notch::after{
-  content:'';
-  width:110px;height:22px;
-  background:#000;
-  border-radius:0 0 16px 16px;
-  display:block;
+  content:'';width:100px;height:20px;background:#000;
+  border-radius:0 0 14px 14px;display:block;
 }
-
-/* iframe ichida */
-#phone-content{
-  flex:1;
-  position:relative;
-  overflow:hidden;
-  background:#06060f;
-}
+#phone-content{flex:1;position:relative;overflow:hidden;background:#06060f;}
 #phone-content iframe{
-  position:absolute;
-  top:0;left:0;
-  width:390px; /* iPhone standart kenglik */
-  /* height ni scale bilan kompensatsiya qilamiz: 100% / 0.872 */
-  height:calc(100% / 0.8718);
-  border:none;
-  transform-origin:top left;
-  /* scale: 340px / 390px = 0.8718 */
-  transform:scale(0.8718);
+  position:absolute;top:0;left:0;width:390px;
+  height:calc(100% / 0.8205);
+  border:none;transform-origin:top left;transform:scale(0.8205);
 }
-
-/* Home bar */
 .phone-home{
-  flex-shrink:0;
-  height:22px;
-  background:#0a0a12;
+  flex-shrink:0;height:20px;background:#08080f;
   display:flex;align-items:center;justify-content:center;
 }
-.phone-home::after{
-  content:'';
-  width:100px;height:4px;
-  background:rgba(255,255,255,.25);
-  border-radius:4px;
-  display:block;
-}
+.phone-home::after{content:'';width:90px;height:4px;background:rgba(255,255,255,.2);border-radius:4px;display:block;}
 
-/* Placeholder */
 .placeholder{
-  position:absolute;inset:0;
-  display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:10px;
-  color:var(--muted);font-size:.82rem;font-weight:700;text-align:center;padding:20px;
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:8px;color:var(--muted);font-size:.75rem;font-weight:700;text-align:center;padding:16px;
 }
-.placeholder .pi{font-size:2.4rem;}
+.placeholder .pi{font-size:2rem;}
 </style>
 </head>
 <body>
 
 <div id="topbar">
   <div class="logo">⚡ Test Arena</div>
-
   <span class="tb-lbl">Kod</span>
   <input type="text" id="code-inp" placeholder="12345" maxlength="5" inputmode="numeric">
   <button type="button" class="tb-btn btn-load" onclick="loadArena()">▶ Yuklash</button>
-
   <div class="tb-sep"></div>
-
-  <span class="tb-lbl">Bot soni</span>
-  <input type="number" id="bot-count" value="20" min="1" max="50">
-  <span class="tb-lbl">To'g'ri %</span>
+  <span class="tb-lbl">Botlar</span>
+  <input type="number" id="bot-count" value="15" min="1" max="50">
+  <span class="tb-lbl">To'g'ri%</span>
   <input type="number" id="correct-rate" value="70" min="0" max="100">
-  <span class="tb-lbl">Javob %</span>
-  <input type="number" id="answer-rate" value="95" min="0" max="100">
-
-  <button type="button" class="tb-btn btn-bots" id="add-bots-btn" onclick="addBots()" disabled>🤖 Botlarni qo'shish</button>
+  <span class="tb-lbl">Javob%</span>
+  <input type="number" id="answer-rate" value="90" min="0" max="100">
+  <button type="button" class="tb-btn btn-bots" id="add-bots-btn" onclick="addBots()" disabled>🤖 Botlar</button>
   <button type="button" class="tb-btn btn-clean" id="clean-btn" onclick="cleanupBots()" disabled>🗑️ Tozalash</button>
-
   <div id="status-pill">Tayyor</div>
 </div>
 
 <div id="main">
 
-  <!-- CHAP: Host — katta ekran -->
+  <!-- CHAP: Host -->
   <div id="left-pane">
-    <div class="pane-hd">
-      <div class="dot dot-purple"></div>
-      <b>🖥️ Caster (Host)</b>
-    </div>
+    <div class="pane-hd"><span class="phd-dot dot-purple"></span><b>🖥️ Cast (Host)</b></div>
     <div id="left-frame-wrap">
-      <div class="placeholder">
-        <div class="pi">🖥️</div>
-        Kodni kiritib "Yuklash"ni bosing
-      </div>
+      <div class="placeholder"><div class="pi">🖥️</div>Kodni kiritib Yuklash</div>
     </div>
   </div>
 
-  <!-- O'NG: Player — telefon formatida -->
-  <div id="right-pane">
-    <div class="pane-hd">
-      <div class="dot dot-green"></div>
-      <b>📱 Siz</b> &nbsp;(real qo'shilish)
+  <!-- O'RTA: Diagnostika -->
+  <div id="mid-pane">
+    <div class="pane-hd"><span class="phd-dot dot-blue"></span><b>🔬 Diagnostika</b></div>
+    <div id="diag-body">
+
+      <!-- Umumiy stats -->
+      <div class="diag-section" id="diag-stats">
+        <div class="diag-sec-hd">📊 O'yin statistikasi</div>
+        <div class="diag-sec-body">
+          <div class="stat-grid">
+            <div class="stat-item"><div class="stat-val blue" id="d-players">—</div><div class="stat-lbl">O'yinchi</div></div>
+            <div class="stat-item"><div class="stat-val purple" id="d-qidx">—</div><div class="stat-lbl">Savol</div></div>
+            <div class="stat-item"><div class="stat-val green" id="d-answers">—</div><div class="stat-lbl">Javob</div></div>
+            <div class="stat-item"><div class="stat-val" id="d-state" style="font-size:.7rem;color:var(--muted)">kutilmoqda</div><div class="stat-lbl">Holat</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Joriy savol + variantlar -->
+      <div class="diag-section" id="diag-q">
+        <div class="diag-sec-hd">❓ Joriy savol</div>
+        <div class="diag-sec-body" id="diag-q-body">
+          <div class="diag-empty">O'yin boshlanmagan</div>
+        </div>
+      </div>
+
+      <!-- Muammolar -->
+      <div class="diag-section" id="diag-issues">
+        <div class="diag-sec-hd">⚠️ Muammolar <span id="issues-cnt" style="margin-left:auto;background:rgba(251,191,36,.15);color:#fbbf24;border-radius:50px;padding:1px 7px;font-size:.6rem;">0</span></div>
+        <div class="diag-sec-body" id="diag-issues-body">
+          <div class="diag-empty">—</div>
+        </div>
+      </div>
+
+      <!-- Javob feed -->
+      <div class="diag-section">
+        <div class="diag-sec-hd">⚡ Javoblar (live)</div>
+        <div class="diag-sec-body" style="padding:6px 8px;">
+          <div class="ans-feed" id="ans-feed"><div class="diag-empty">—</div></div>
+        </div>
+      </div>
+
     </div>
+  </div>
+
+  <!-- O'NG: Telefon -->
+  <div id="right-pane">
+    <div class="pane-hd"><span class="phd-dot dot-green"></span><b>📱 O'yinchi (siz)</b></div>
     <div id="phone-area">
       <div id="phone-device">
         <div class="phone-notch"></div>
         <div id="phone-content">
-          <div class="placeholder" id="phone-placeholder">
-            <div class="pi">📱</div>
-            Kodni kiritib "Yuklash"ni bosing
-          </div>
+          <div class="placeholder" id="phone-placeholder"><div class="pi">📱</div>Kodni kiritib Yuklash</div>
         </div>
         <div class="phone-home"></div>
       </div>
@@ -253,79 +318,67 @@ import { getDatabase, ref, set, get, remove, onValue, off } from "https://www.gs
 const FB={apiKey:"AIzaSyA-2Uf7dZf1kqf7c32txyTFXSd2PCJbJLw",authDomain:"sessiya-11767.firebaseapp.com",databaseURL:"https://sessiya-11767-default-rtdb.firebaseio.com",projectId:"sessiya-11767",storageBucket:"sessiya-11767.firebasestorage.app",messagingSenderId:"883067400258",appId:"1:883067400258:web:941d591d38755c73247ddb"};
 const app=initializeApp(FB);
 const db=getDatabase(app);
-
 const $=id=>document.getElementById(id);
-const EMOJIS=['🦊','🐺','🦁','🐯','🦝','🐲','🦄','🦅','🐸','🦑','🤖','👾','🦸','🧙','🥷','🦈','🐙','🦉','🦩','🎭','🦔','🦦','🦥','🐢','🦡'];
+const EMOJIS=['🦊','🐺','🦁','🐯','🦝','🐲','🦄','🦅','🐸','🦑','🤖','👾','🦸','🧙','🥷','🦈','🐙','🦉','🦩','🎭','🦔','🦦','🦥','🐢','🦡','🦋','🐬','🦓','🦒','🐘'];
 const BOT_PREFIX='Bot';
 
-let curCode=null,curBotCount=20,stateUnsub=null,processedQIdx=-1;
+let curCode=null, curBotCount=15, stateUnsub=null, playersUnsub=null, answersUnsub=null;
+let processedQIdx=-1, curSt=null, curPlayers={}, curAnswers={};
 
 function setStatus(txt,live=false){
-  const el=$('status-pill');
-  el.className=live?'live':'';
-  el.textContent=txt;
+  const el=$('status-pill');el.className=live?'live':'';el.textContent=txt;
 }
 
-// iframe scale ni dinamik hisoblash
+// ── IFRAME SCALE ──
 function updatePhoneScale(){
-  const content=$('phone-content');
-  if(!content) return;
+  const content=$('phone-content');if(!content) return;
   const availH=content.clientHeight;
-  // iPhone viewport: 390x844
-  const scaleW=320/390; // device kenglik / iframe kenglik
-  const scaleH=availH/844;
-  const scale=Math.min(scaleW,scaleH,1);
+  const scale=320/390; // phone-device width 320, iframe 390
   const iframe=content.querySelector('iframe');
   if(iframe){
-    iframe.style.transform=`scale(${scale})`;
     iframe.style.width='390px';
-    iframe.style.height=`${availH/scale}px`;
+    iframe.style.height=(availH/scale)+'px';
+    iframe.style.transform=`scale(${scale})`;
     iframe.style.transformOrigin='top left';
   }
 }
+window.addEventListener('resize',updatePhoneScale);
 
+// ── LOAD ──
 window.loadArena=function(){
   const code=$('code-inp').value.trim();
-  if(!/^\d{4,6}$/.test(code)){alert("5 xonali o'yin kodini kiriting");return;}
+  if(!/^\d{4,6}$/.test(code)){alert("5 xonali kod kiriting");return;}
   curCode=code;
 
-  // Chap: host
   $('left-frame-wrap').innerHTML=`<iframe src="host-game.html?code=${code}" allow="clipboard-write"></iframe>`;
 
-  // O'ng: telefon iframe
   const pc=$('phone-content');
   pc.innerHTML=`<iframe src="enter-game.html?code=${code}" id="phone-iframe"></iframe>`;
-  setTimeout(updatePhoneScale, 100);
+  setTimeout(updatePhoneScale,120);
 
   $('add-bots-btn').disabled=false;
   $('clean-btn').disabled=false;
-  setStatus('Yuklandi: '+code, true);
+  setStatus('Yuklandi: '+code,true);
   watchGame(code);
 };
 
-window.addEventListener('resize', updatePhoneScale);
-
+// ── BOTLAR ──
 window.addBots=async function(){
   if(!curCode) return;
-  const count=Math.max(1,Math.min(50,parseInt($('bot-count').value||'20',10)));
+  const count=Math.max(1,Math.min(50,parseInt($('bot-count').value||'15',10)));
   curBotCount=count;
-  const btn=$('add-bots-btn');
-  btn.disabled=true;btn.textContent="Qo'shilmoqda...";
+  const btn=$('add-bots-btn');btn.disabled=true;btn.textContent="Qo'shilmoqda...";
   try{
     const stSnap=await get(ref(db,`game_sessions/${curCode}/state`));
-    if(!stSnap.exists()){
-      alert('Sessiya topilmadi — avval host ekranida o\'yin yarating');
-      btn.disabled=false;btn.textContent="🤖 Botlarni qo'shish";
-      return;
-    }
+    if(!stSnap.exists()){alert('Sessiya topilmadi');btn.disabled=false;btn.textContent="🤖 Botlar";return;}
     for(let i=1;i<=count;i++){
       await set(ref(db,`game_sessions/${curCode}/players/${BOT_PREFIX}${i}`),{
         emoji:EMOJIS[(i-1)%EMOJIS.length],joined_at:Date.now(),score:0
       });
     }
-    setStatus(`${count} bot qo'shildi`, true);
+    setStatus(`${count} bot qo'shildi`,true);
   }catch(e){alert('Xato: '+e.message);}
-  btn.disabled=false;btn.textContent="🤖 Botlarni qo'shish";
+  btn.disabled=false;btn.textContent="🤖 Botlar";
 };
 
 window.cleanupBots=async function(){
@@ -333,26 +386,153 @@ window.cleanupBots=async function(){
   if(!confirm("Barcha botlarni o'chirasizmi?")) return;
   const btn=$('clean-btn');btn.disabled=true;
   try{
-    for(let i=1;i<=50;i++)
-      await remove(ref(db,`game_sessions/${curCode}/players/${BOT_PREFIX}${i}`));
-    setStatus('Botlar tozalandi', false);
+    for(let i=1;i<=50;i++) await remove(ref(db,`game_sessions/${curCode}/players/${BOT_PREFIX}${i}`));
+    setStatus('Botlar tozalandi',false);
   }catch(_){}
   btn.disabled=false;
 };
 
+// ── WATCHERS ──
 function watchGame(code){
-  if(stateUnsub){try{off(ref(db,`game_sessions/${curCode}/state`));}catch(_){} stateUnsub=null;}
+  // State
+  if(stateUnsub){off(ref(db,`game_sessions/${curCode||code}/state`));stateUnsub=null;}
   processedQIdx=-1;
   onValue(ref(db,`game_sessions/${code}/state`),snap=>{
     const st=snap.val();if(!st) return;
+    curSt=st;
+    updateDiagState(st);
     if(st.status==='question_active'&&st.q_index!==processedQIdx){
       processedQIdx=st.q_index;
+      clearAnsFeed();
       scheduleAnswers(code,st);
+      watchAnswers(code,st.q_index);
     }
   });
   stateUnsub=true;
+
+  // Players
+  if(playersUnsub){off(ref(db,`game_sessions/${curCode||code}/players`));playersUnsub=null;}
+  onValue(ref(db,`game_sessions/${code}/players`),snap=>{
+    curPlayers=snap.val()||{};
+    $('d-players').textContent=Object.keys(curPlayers).length;
+  });
+  playersUnsub=true;
 }
 
+function watchAnswers(code,qIdx){
+  if(answersUnsub){off(ref(db,`game_sessions/${code}/answers/${qIdx-1}`));answersUnsub=null;}
+  onValue(ref(db,`game_sessions/${code}/answers/${qIdx}`),snap=>{
+    curAnswers=snap.val()||{};
+    const cnt=Object.keys(curAnswers).length;
+    const total=Object.keys(curPlayers).length;
+    $('d-answers').textContent=`${cnt}/${total}`;
+    updateAnsFeed(curAnswers,qIdx);
+  });
+  answersUnsub=true;
+}
+
+// ── DIAGNOSTIKA UPDATE ──
+function updateDiagState(st){
+  const statusMap={
+    waiting:'⏳ lobby',question_preview:'👁 preview',question_active:'🎯 aktiv',
+    leaderboard:'🏆 shoxsupa',ended:'✅ tugadi'
+  };
+  $('d-state').textContent=statusMap[st.status]||st.status;
+  $('d-qidx').textContent=st.q_index>=0?(st.q_index+1):'—';
+
+  // Savol info
+  if(st.status==='question_active'||st.status==='question_preview'||st.status==='leaderboard'){
+    renderQDiag(st);
+  } else if(st.status==='waiting'){
+    $('diag-q-body').innerHTML='<div class="diag-empty">O\'yin boshlanmagan</div>';
+    $('diag-issues-body').innerHTML='<div class="diag-empty">—</div>';
+    $('issues-cnt').textContent='0';
+  }
+}
+
+function renderQDiag(st){
+  const opts=st.q_options||[];
+  const correctIdx=typeof st.q_correct==='number'?st.q_correct:0;
+  const qText=st.q_text||'';
+
+  // Muammolarni aniqlash
+  const issues=[];
+  if(!qText.trim()) issues.push({icon:'🔴',text:'<span class="err">Savol matni bo\'sh!</span>'});
+  if(qText.length<10) issues.push({icon:'🟡',text:`<span class="warn">Savol juda qisqa (${qText.length} belgi)</span>`});
+  if(qText.length>200) issues.push({icon:'🟡',text:`<span class="warn">Savol juda uzun (${qText.length} belgi)</span>`});
+  if(opts.length<2) issues.push({icon:'🔴',text:'<span class="err">Variantlar yetarli emas!</span>'});
+  if(opts.length>5) issues.push({icon:'🟡',text:'<span class="warn">Variantlar soni juda ko\'p (>5)</span>'});
+  if(correctIdx<0||correctIdx>=opts.length) issues.push({icon:'🔴',text:'<span class="err">To\'g\'ri javob indeksi noto\'g\'ri!</span>'});
+  opts.forEach((o,i)=>{
+    if(!String(o||'').trim()) issues.push({icon:'🔴',text:`<span class="err">${i+1}-variant bo'sh!</span>`});
+    else if(String(o).length<2) issues.push({icon:'🟡',text:`<span class="warn">${i+1}-variant juda qisqa</span>`});
+  });
+  // Duplicate variants
+  const uniq=new Set(opts.map(o=>String(o||'').trim().toLowerCase()));
+  if(uniq.size<opts.length) issues.push({icon:'🟡',text:'<span class="warn">Bir xil variantlar mavjud</span>'});
+  // To'g'ri javob
+  const correctText=opts[correctIdx];
+  if(issues.length===0) issues.push({icon:'✅',text:'<span class="ok">Savol sog\'lom ko\'rinadi</span>'});
+
+  // Q info render
+  const answerCounts={};
+  Object.values(curAnswers).forEach(a=>{
+    if(typeof a.option==='number') answerCounts[a.option]=(answerCounts[a.option]||0)+1;
+  });
+  const totalAns=Object.keys(curAnswers).length;
+
+  let qHtml=`<div class="q-info-box">
+    <div class="q-text-preview">${esc(qText.length>120?qText.slice(0,120)+'…':qText)}</div>`;
+  opts.forEach((o,i)=>{
+    const isCorrect=i===correctIdx;
+    const cnt=answerCounts[i]||0;
+    const pct=totalAns>0?Math.round(cnt/totalAns*100):0;
+    qHtml+=`<div class="opt-row">
+      <div class="opt-letter${isCorrect?' correct':''}">${['A','B','C','D','E'][i]}</div>
+      <div class="opt-text${isCorrect?' correct':`${''}`}">${esc(String(o||'').slice(0,30))}${isCorrect?' ✓':''}</div>
+      <div class="opt-bar-wrap"><div class="opt-bar${isCorrect?' correct':''}" style="width:${pct}%"></div></div>
+      <div class="opt-cnt">${cnt}</div>
+    </div>`;
+  });
+  qHtml+=`<div style="font-size:.62rem;color:var(--muted);margin-top:6px;padding-top:5px;border-top:1px solid rgba(255,255,255,.04);">
+    Vaqt: <b style="color:var(--text)">${st.q_time||20}s</b>
+    ${st.q_is_double?'&nbsp; <span style="color:var(--gold)">⚡ 2x ball</span>':''}
+  </div></div>`;
+  $('diag-q-body').innerHTML=qHtml;
+
+  // Issues render
+  $('issues-cnt').textContent=issues.filter(i=>!i.icon.includes('✅')).length||'0';
+  $('diag-issues-body').innerHTML=issues.map(i=>`
+    <div class="issue-item"><span class="issue-icon">${i.icon}</span><div class="issue-text">${i.text}</div></div>
+  `).join('');
+}
+
+// ── ANS FEED ──
+function clearAnsFeed(){
+  $('ans-feed').innerHTML='';
+}
+
+function updateAnsFeed(answers,qIdx){
+  const opts=(curSt&&curSt.q_options)||[];
+  const correctIdx=(curSt&&typeof curSt.q_correct==='number')?curSt.q_correct:0;
+  const feed=$('ans-feed');
+  feed.innerHTML='';
+  const entries=Object.entries(answers).sort((a,b)=>(a[1].time_ms||0)-(b[1].time_ms||0));
+  if(!entries.length){feed.innerHTML='<div class="diag-empty">Hali javob yo\'q</div>';return;}
+  entries.forEach(([pname,ans])=>{
+    const isCorrect=ans.option===correctIdx;
+    const player=curPlayers[pname]||{};
+    const em=player.emoji||'❓';
+    const optText=opts[ans.option]!==undefined?String(opts[ans.option]).slice(0,18):'?';
+    const timeS=ans.time_ms?((ans.time_ms/1000).toFixed(1)+'s'):'?';
+    const chip=document.createElement('div');
+    chip.className='ans-chip '+(isCorrect?'cor':'wr');
+    chip.innerHTML=`<span class="chip-em">${em}</span><span class="chip-nm">${esc(pname)}</span><span class="chip-opt">${optText}</span><span class="chip-time">${timeS}</span>`;
+    feed.appendChild(chip);
+  });
+}
+
+// ── BOT ANSWERS ──
 function scheduleAnswers(code,st){
   const qIndex=st.q_index;
   const qTimeMs=(st.q_time||20)*1000;
@@ -362,7 +542,7 @@ function scheduleAnswers(code,st){
   const elapsed=Date.now()-startedAt;
   const maxDelay=Math.max(400,qTimeMs-600-elapsed);
   const correctRate=Math.max(0,Math.min(1,(parseFloat($('correct-rate').value)||70)/100));
-  const answerRate=Math.max(0,Math.min(1,(parseFloat($('answer-rate').value)||95)/100));
+  const answerRate=Math.max(0,Math.min(1,(parseFloat($('answer-rate').value)||90)/100));
 
   for(let i=1;i<=curBotCount;i++){
     if(Math.random()>answerRate) continue;
@@ -373,16 +553,17 @@ function scheduleAnswers(code,st){
     else{do{opt=Math.floor(Math.random()*numOptions);}while(opt===correctIdx&&numOptions>1);}
     const delay=400+Math.random()*Math.max(0,maxDelay-400);
     setTimeout(async()=>{
-      try{
-        await set(ref(db,`game_sessions/${code}/answers/${qIndex}/${name}`),
-          {option:opt,time_ms:Math.round(delay)});
-      }catch(_){}
+      try{await set(ref(db,`game_sessions/${code}/answers/${qIndex}/${name}`),{option:opt,time_ms:Math.round(delay)});}
+      catch(_){}
     },delay);
   }
 }
 
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
 $('code-inp').addEventListener('keydown',e=>{if(e.key==='Enter')window.loadArena();});
 
+// URL dan auto-load
 (function(){
   const p=new URLSearchParams(location.search);
   const c=p.get('code');
