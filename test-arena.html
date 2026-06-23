@@ -8,133 +8,179 @@
 <style>
 :root{
   --bg:#0a0f1f;--surf:#0e1428;--card:#111a35;--border:rgba(255,255,255,.07);
-  --accent:#2563eb;--gold:#38bdf8;--green:#38bdf8;--blue:#38bdf8;--purple:#64748b;
+  --accent:#2563eb;--gold:#38bdf8;--green:#00e5a0;--blue:#38bdf8;
   --text:#e8edf7;--muted:#8b96b3;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;}
-body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;overflow:hidden;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);display:flex;flex-direction:column;}
 
 /* ── TOPBAR ── */
 #topbar{
-  background:rgba(6,6,15,.95);border-bottom:1px solid var(--border);
-  padding:9px 16px;display:flex;flex-wrap:nowrap;align-items:center;gap:8px;
-  font-size:.8rem;flex-shrink:0;
+  background:rgba(4,6,18,.98);border-bottom:1px solid var(--border);
+  padding:8px 14px;display:flex;align-items:center;gap:7px;
+  font-size:.78rem;flex-shrink:0;white-space:nowrap;overflow-x:auto;
 }
-#topbar .logo{font-family:'Righteous',cursive;font-size:1.05rem;
-  background:linear-gradient(135deg,var(--accent),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  margin-right:4px;white-space:nowrap;}
+#topbar .logo{
+  font-family:'Righteous',cursive;font-size:1rem;
+  background:linear-gradient(135deg,var(--accent),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-right:4px;flex-shrink:0;
+}
 #topbar input{
-  background:rgba(255,255,255,.06);border:2px solid var(--border);border-radius:8px;
-  padding:6px 9px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.8rem;font-weight:700;
-  outline:none;transition:border-color .2s;
+  background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.1);border-radius:7px;
+  padding:5px 9px;color:var(--text);font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:700;
+  outline:none;transition:border-color .2s;flex-shrink:0;
 }
 #topbar input:focus{border-color:var(--accent);}
 #topbar input::placeholder{color:var(--muted);}
-#topbar input#code-inp{width:95px;font-family:'Righteous',cursive;letter-spacing:2px;text-align:center;}
-#topbar input#bot-count{width:52px;}
-#topbar input#correct-rate,#topbar input#answer-rate{width:52px;}
-.tb-lbl{color:var(--muted);font-weight:800;font-size:.7rem;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;}
+#code-inp{width:90px;font-family:'Righteous',cursive;letter-spacing:3px;text-align:center;}
+#bot-count,#correct-rate,#answer-rate{width:50px;text-align:center;}
+.tb-lbl{color:var(--muted);font-weight:800;font-size:.68rem;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;}
 .tb-btn{
-  border:none;border-radius:8px;padding:7px 13px;font-family:'Nunito',sans-serif;
-  font-size:.78rem;font-weight:900;cursor:pointer;transition:all .2s;white-space:nowrap;
+  border:none;border-radius:7px;padding:6px 12px;
+  font-family:'Nunito',sans-serif;font-size:.76rem;font-weight:900;
+  cursor:pointer;transition:all .18s;white-space:nowrap;flex-shrink:0;
 }
-.tb-btn:disabled{opacity:.4;cursor:not-allowed;}
-.btn-load{background:linear-gradient(135deg,var(--blue),#1a6599);color:#000;}
-.btn-bots{background:linear-gradient(135deg,var(--green),#1d9bcf);color:#000;}
-.btn-clean{background:rgba(37,99,235,.15);border:1px solid rgba(37,99,235,.3)!important;color:var(--accent);}
-.btn-load:hover,.btn-bots:hover{transform:translateY(-1px);}
-.tb-sep{width:1px;height:22px;background:var(--border);margin:0 2px;flex-shrink:0;}
+.tb-btn:disabled{opacity:.35;cursor:not-allowed;}
+.btn-load{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;}
+.btn-bots{background:linear-gradient(135deg,#00e5a0,#059669);color:#000;}
+.btn-clean{background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.3);color:#f87171;}
+.btn-load:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 14px rgba(37,99,235,.4);}
+.btn-bots:hover:not(:disabled){transform:translateY(-1px);}
+.tb-sep{width:1px;height:20px;background:rgba(255,255,255,.08);flex-shrink:0;}
 #status-pill{
-  font-size:.72rem;font-weight:800;padding:4px 11px;border-radius:50px;
-  background:rgba(255,255,255,.06);color:var(--muted);white-space:nowrap;
+  margin-left:auto;font-size:.7rem;font-weight:800;padding:3px 10px;border-radius:50px;
+  background:rgba(255,255,255,.06);color:var(--muted);flex-shrink:0;
 }
-#status-pill.live{background:rgba(56,189,248,.12);color:var(--green);}
+#status-pill.live{background:rgba(0,229,160,.12);color:var(--green);border:1px solid rgba(0,229,160,.25);}
 
 /* ── MAIN SPLIT ── */
-#main{flex:1;display:flex;overflow:hidden;min-height:0;}
-.pane{display:flex;flex-direction:column;min-width:0;}
+#main{flex:1;display:flex;min-height:0;overflow:hidden;}
 
-/* CHAP: host — katta, butun ekranning ~65% i */
-#left-pane{flex:1;border-right:2px solid var(--border);background:#000;}
-
-/* O'NG: player — telefon formatida, qat'iy kenglik */
-#right-pane{
-  flex:0 0 390px;width:390px;min-width:320px;max-width:420px;
-  background:#050510;
+/* CHAP — host iframe, katta */
+#left-pane{
+  flex:1;
   display:flex;flex-direction:column;
-  box-shadow:-4px 0 24px rgba(0,0,0,.6);
+  border-right:2px solid rgba(255,255,255,.06);
+  min-width:0;background:#000;
 }
 
-.pane-hd{
-  display:flex;align-items:center;gap:7px;padding:7px 12px;
-  background:rgba(255,255,255,.04);border-bottom:1px solid var(--border);
-  font-size:.74rem;font-weight:800;color:var(--muted);flex-shrink:0;
+/* O'NG — telefon wrapper */
+#right-pane{
+  flex:0 0 400px;
+  width:400px;
+  display:flex;
+  flex-direction:column;
+  background:#060810;
 }
-.pane-hd .dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
-#left-pane .pane-hd .dot{background:var(--purple);}
-#right-pane .pane-hd .dot{background:var(--green);}
+
+/* Panel header */
+.pane-hd{
+  padding:6px 12px;
+  background:rgba(255,255,255,.035);
+  border-bottom:1px solid var(--border);
+  font-size:.72rem;font-weight:800;color:var(--muted);
+  display:flex;align-items:center;gap:6px;
+  flex-shrink:0;
+}
+.dot{width:6px;height:6px;border-radius:50%;}
+.dot-purple{background:#a78bfa;}
+.dot-green{background:var(--green);}
 .pane-hd b{color:var(--text);}
 
-/* Telefon qobig'i simulyatsiya */
-#phone-shell{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
-  padding:12px 8px;background:#050510;overflow:hidden;
-}
-#phone-outer{
-  width:375px;max-width:100%;
+/* Host iframe — to'liq */
+#left-frame-wrap{flex:1;position:relative;}
+#left-frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+
+/* Telefon area */
+#phone-area{
   flex:1;
-  border-radius:40px;
-  border:3px solid rgba(255,255,255,.12);
-  background:#000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 8px;
+  background:radial-gradient(ellipse at 50% 30%,rgba(37,99,235,.07) 0%,transparent 60%),#060810;
+  min-height:0;
+}
+
+/* Telefon qobi'gi */
+#phone-device{
+  width:340px;
+  height:100%;
+  max-height:680px;
+  min-height:400px;
+  border-radius:42px;
+  background:#0a0a12;
+  border:3px solid rgba(255,255,255,.15);
   box-shadow:
-    0 0 0 1px rgba(255,255,255,.05),
-    0 8px 32px rgba(0,0,0,.8),
-    inset 0 0 0 2px rgba(255,255,255,.04);
+    0 0 0 1px rgba(0,0,0,.8),
+    0 0 60px rgba(37,99,235,.12),
+    0 20px 60px rgba(0,0,0,.7),
+    inset 0 0 0 1px rgba(255,255,255,.04);
+  display:flex;
+  flex-direction:column;
   overflow:hidden;
-  display:flex;flex-direction:column;
   position:relative;
 }
-/* Notch */
-#phone-outer::before{
-  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);
-  width:130px;height:28px;background:#000;border-radius:0 0 18px 18px;z-index:10;
+
+/* Dynamic island / notch */
+.phone-notch{
+  flex-shrink:0;
+  height:30px;
+  background:#0a0a12;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:2;
 }
-#phone-iframe-wrap{
-  flex:1;overflow:hidden;position:relative;margin-top:28px;
+.phone-notch::after{
+  content:'';
+  width:110px;height:22px;
+  background:#000;
+  border-radius:0 0 16px 16px;
+  display:block;
 }
-#phone-iframe-wrap iframe{
-  position:absolute;inset:0;width:100%;height:100%;border:none;
-  /* scale down to fit phone width */
+
+/* iframe ichida */
+#phone-content{
+  flex:1;
+  position:relative;
+  overflow:hidden;
+  background:#06060f;
+}
+#phone-content iframe{
+  position:absolute;
+  top:0;left:0;
+  width:390px; /* iPhone standart kenglik */
+  height:100%;
+  border:none;
+  transform-origin:top left;
+  /* scale qilamiz: 340px / 390px ≈ 0.872 */
+  transform:scale(0.872);
 }
 
 /* Home bar */
-#phone-outer::after{
-  content:'';display:block;height:20px;background:#000;
-  border-top:1px solid rgba(255,255,255,.06);
+.phone-home{
+  flex-shrink:0;
+  height:22px;
+  background:#0a0a12;
   display:flex;align-items:center;justify-content:center;
 }
+.phone-home::after{
+  content:'';
+  width:100px;height:4px;
+  background:rgba(255,255,255,.25);
+  border-radius:4px;
+  display:block;
+}
 
-.pane-frame-wrap{flex:1;position:relative;min-height:0;}
-.pane-frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+/* Placeholder */
 .placeholder{
-  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
-  flex-direction:column;gap:8px;color:var(--muted);font-size:.82rem;font-weight:700;text-align:center;padding:20px;
+  position:absolute;inset:0;
+  display:flex;align-items:center;justify-content:center;
+  flex-direction:column;gap:10px;
+  color:var(--muted);font-size:.82rem;font-weight:700;text-align:center;padding:20px;
 }
-.placeholder .pi{font-size:2.2rem;}
-
-/* Responsive */
-@media(max-width:900px){
-  #right-pane{flex:0 0 320px;width:320px;}
-  #phone-outer{width:290px;}
-}
-@media(max-width:680px){
-  #main{flex-direction:column;}
-  #left-pane{flex:1;border-right:none;border-bottom:2px solid var(--border);}
-  #right-pane{flex:0 0 380px;width:100%;max-width:none;}
-  #phone-shell{padding:8px 16px;}
-  #phone-outer{width:360px;max-width:100%;}
-}
+.placeholder .pi{font-size:2.4rem;}
 </style>
 </head>
 <body>
@@ -143,8 +189,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);disp
   <div class="logo">⚡ Test Arena</div>
 
   <span class="tb-lbl">Kod</span>
-  <input type="text" id="code-inp" placeholder="48213" maxlength="5" inputmode="numeric">
-
+  <input type="text" id="code-inp" placeholder="12345" maxlength="5" inputmode="numeric">
   <button type="button" class="tb-btn btn-load" onclick="loadArena()">▶ Yuklash</button>
 
   <div class="tb-sep"></div>
@@ -159,29 +204,45 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);disp
   <button type="button" class="tb-btn btn-bots" id="add-bots-btn" onclick="addBots()" disabled>🤖 Botlarni qo'shish</button>
   <button type="button" class="tb-btn btn-clean" id="clean-btn" onclick="cleanupBots()" disabled>🗑️ Tozalash</button>
 
-  <div id="status-pill">Kod kiritilmagan</div>
+  <div id="status-pill">Tayyor</div>
 </div>
 
 <div id="main">
-  <!-- CHAP: Host — katta ekran -->
-  <div class="pane" id="left-pane">
-    <div class="pane-hd"><div class="dot"></div><b>🖥️ Caster (Host)</b></div>
-    <div class="pane-frame-wrap" id="left-frame-wrap">
-      <div class="placeholder"><div class="pi">🖥️</div>Kodni kiritib "Yuklash"ni bosing</div>
-    </div>
-  </div>
 
-  <!-- O'NG: Player — telefon formati -->
-  <div class="pane" id="right-pane">
-    <div class="pane-hd"><div class="dot"></div><b>📱 Siz</b> (real qo'shilish)</div>
-    <div id="phone-shell">
-      <div id="phone-outer">
-        <div id="phone-iframe-wrap">
-          <div class="placeholder" id="phone-placeholder"><div class="pi">📱</div>Kodni kiritib "Yuklash"ni bosing</div>
-        </div>
+  <!-- CHAP: Host — katta ekran -->
+  <div id="left-pane">
+    <div class="pane-hd">
+      <div class="dot dot-purple"></div>
+      <b>🖥️ Caster (Host)</b>
+    </div>
+    <div id="left-frame-wrap">
+      <div class="placeholder">
+        <div class="pi">🖥️</div>
+        Kodni kiritib "Yuklash"ni bosing
       </div>
     </div>
   </div>
+
+  <!-- O'NG: Player — telefon formatida -->
+  <div id="right-pane">
+    <div class="pane-hd">
+      <div class="dot dot-green"></div>
+      <b>📱 Siz</b> &nbsp;(real qo'shilish)
+    </div>
+    <div id="phone-area">
+      <div id="phone-device">
+        <div class="phone-notch"></div>
+        <div id="phone-content">
+          <div class="placeholder" id="phone-placeholder">
+            <div class="pi">📱</div>
+            Kodni kiritib "Yuklash"ni bosing
+          </div>
+        </div>
+        <div class="phone-home"></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <script type="module">
@@ -198,85 +259,97 @@ const BOT_PREFIX='Bot';
 
 let curCode=null,curBotCount=20,stateUnsub=null,processedQIdx=-1;
 
-function setStatus(txt,live){
+function setStatus(txt,live=false){
   const el=$('status-pill');
   el.className=live?'live':'';
   el.textContent=txt;
 }
 
-// ── ARENA YUKLASH ──
+// iframe scale ni dinamik hisoblash
+function updatePhoneScale(){
+  const content=$('phone-content');
+  if(!content) return;
+  const availH=content.clientHeight;
+  // iPhone viewport: 390x844
+  const scaleW=320/390; // device kenglik / iframe kenglik
+  const scaleH=availH/844;
+  const scale=Math.min(scaleW,scaleH,1);
+  const iframe=content.querySelector('iframe');
+  if(iframe){
+    iframe.style.transform=`scale(${scale})`;
+    iframe.style.width='390px';
+    iframe.style.height=`${availH/scale}px`;
+    iframe.style.transformOrigin='top left';
+  }
+}
+
 window.loadArena=function(){
   const code=$('code-inp').value.trim();
-  if(!/^\d{4,6}$/.test(code)){alert("To'g'ri o'yin kodini kiriting");return;}
-  const base='';
+  if(!/^\d{4,6}$/.test(code)){alert("5 xonali o'yin kodini kiriting");return;}
   curCode=code;
 
-  // Chap: host — to'liq ekran
-  $('left-frame-wrap').innerHTML=`<iframe src="${base}host-game.html?code=${code}" allow="clipboard-write"></iframe>`;
+  // Chap: host
+  $('left-frame-wrap').innerHTML=`<iframe src="host-game.html?code=${code}" allow="clipboard-write"></iframe>`;
 
-  // O'ng: player — telefon iframe
-  $('phone-placeholder') && ($('phone-placeholder').style.display='none');
-  $('phone-iframe-wrap').innerHTML=`<iframe src="${base}enter-game.html?code=${code}"></iframe>`;
+  // O'ng: telefon iframe
+  const pc=$('phone-content');
+  pc.innerHTML=`<iframe src="enter-game.html?code=${code}" id="phone-iframe"></iframe>`;
+  setTimeout(updatePhoneScale, 100);
 
   $('add-bots-btn').disabled=false;
   $('clean-btn').disabled=false;
-  setStatus('Yuklandi: '+code,true);
+  setStatus('Yuklandi: '+code, true);
   watchGame(code);
 };
 
-// ── BOTLARNI QO'SHISH ──
+window.addEventListener('resize', updatePhoneScale);
+
 window.addBots=async function(){
   if(!curCode) return;
   const count=Math.max(1,Math.min(50,parseInt($('bot-count').value||'20',10)));
   curBotCount=count;
-  const btn=$('add-bots-btn');btn.disabled=true;btn.textContent="Qo'shilmoqda...";
+  const btn=$('add-bots-btn');
+  btn.disabled=true;btn.textContent="Qo'shilmoqda...";
   try{
     const stSnap=await get(ref(db,`game_sessions/${curCode}/state`));
     if(!stSnap.exists()){
-      alert('Sessiya topilmadi — avval host-game.html da cast yarating');
-      btn.disabled=false;btn.textContent="🤖 Botlarni qo'shish";return;
+      alert('Sessiya topilmadi — avval host ekranida o\'yin yarating');
+      btn.disabled=false;btn.textContent="🤖 Botlarni qo'shish";
+      return;
     }
     for(let i=1;i<=count;i++){
-      const name=`${BOT_PREFIX}${i}`;
-      const emoji=EMOJIS[(i-1)%EMOJIS.length];
-      await set(ref(db,`game_sessions/${curCode}/players/${name}`),{emoji,joined_at:Date.now(),score:0});
+      await set(ref(db,`game_sessions/${curCode}/players/${BOT_PREFIX}${i}`),{
+        emoji:EMOJIS[(i-1)%EMOJIS.length],joined_at:Date.now(),score:0
+      });
     }
+    setStatus(`${count} bot qo'shildi`, true);
   }catch(e){alert('Xato: '+e.message);}
   btn.disabled=false;btn.textContent="🤖 Botlarni qo'shish";
 };
 
-// ── BOTLARNI TOZALASH ──
 window.cleanupBots=async function(){
   if(!curCode) return;
   if(!confirm("Barcha botlarni o'chirasizmi?")) return;
   const btn=$('clean-btn');btn.disabled=true;
   try{
-    for(let i=1;i<=50;i++) await remove(ref(db,`game_sessions/${curCode}/players/${BOT_PREFIX}${i}`));
-  }catch(e){}
+    for(let i=1;i<=50;i++)
+      await remove(ref(db,`game_sessions/${curCode}/players/${BOT_PREFIX}${i}`));
+    setStatus('Botlar tozalandi', false);
+  }catch(_){}
   btn.disabled=false;
 };
 
-// ── O'YIN KUZATISH + AVTOMATIK JAVOB ──
 function watchGame(code){
-  if(stateUnsub){try{off(ref(db,`game_sessions/${curCode}/state`));}catch(_){}stateUnsub=null;}
+  if(stateUnsub){try{off(ref(db,`game_sessions/${curCode}/state`));}catch(_){} stateUnsub=null;}
   processedQIdx=-1;
-  const stateRef=ref(db,`game_sessions/${code}/state`);
-  onValue(stateRef,snap=>{
-    const st=snap.val();
-    if(!st) return;
-    if(st.status==='question_active' && st.q_index!==processedQIdx){
+  onValue(ref(db,`game_sessions/${code}/state`),snap=>{
+    const st=snap.val();if(!st) return;
+    if(st.status==='question_active'&&st.q_index!==processedQIdx){
       processedQIdx=st.q_index;
       scheduleAnswers(code,st);
     }
   });
   stateUnsub=true;
-}
-
-function pickOption(correctIdx,numOptions,correctRate){
-  if(Math.random()<correctRate) return correctIdx;
-  if(numOptions<=1) return correctIdx;
-  let idx;do{idx=Math.floor(Math.random()*numOptions);}while(idx===correctIdx);
-  return idx;
 }
 
 function scheduleAnswers(code,st){
@@ -291,13 +364,17 @@ function scheduleAnswers(code,st){
   const answerRate=Math.max(0,Math.min(1,(parseFloat($('answer-rate').value)||95)/100));
 
   for(let i=1;i<=curBotCount;i++){
-    const name=`${BOT_PREFIX}${i}`;
     if(Math.random()>answerRate) continue;
-    const optionIdx=pickOption(correctIdx,numOptions,correctRate);
+    const name=`${BOT_PREFIX}${i}`;
+    const isCorrect=Math.random()<correctRate;
+    let opt;
+    if(isCorrect){opt=correctIdx;}
+    else{do{opt=Math.floor(Math.random()*numOptions);}while(opt===correctIdx&&numOptions>1);}
     const delay=400+Math.random()*Math.max(0,maxDelay-400);
     setTimeout(async()=>{
       try{
-        await set(ref(db,`game_sessions/${code}/answers/${qIndex}/${name}`),{option:optionIdx,time_ms:Math.round(delay)});
+        await set(ref(db,`game_sessions/${code}/answers/${qIndex}/${name}`),
+          {option:opt,time_ms:Math.round(delay)});
       }catch(_){}
     },delay);
   }
@@ -305,12 +382,11 @@ function scheduleAnswers(code,st){
 
 $('code-inp').addEventListener('keydown',e=>{if(e.key==='Enter')window.loadArena();});
 
-// URL orqali avtomatik yuklash
 (function(){
   const p=new URLSearchParams(location.search);
-  const urlCode=p.get('code');
-  if(urlCode&&/^\d{4,6}$/.test(urlCode)){
-    $('code-inp').value=urlCode;
+  const c=p.get('code');
+  if(c&&/^\d{4,6}$/.test(c)){
+    $('code-inp').value=c;
     if(p.get('auto')==='1') setTimeout(()=>window.loadArena(),200);
   }
 })();
