@@ -222,7 +222,23 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 @media(max-width:600px){
   .opts{grid-template-columns:1fr;}
   .emoji-grid{grid-template-columns:repeat(4,1fr);}
-  .code-input{font-size:2rem;letter-spacing:8px;}
+  .code-input{font-size:2.2rem;letter-spacing:8px;padding:14px 10px;}
+  .screen{padding:14px;}
+  .box{padding:20px 16px;border-radius:18px;}
+  .opt{min-height:60px;font-size:.9rem;padding:14px 11px;}
+  .lob-code{font-size:clamp(3rem,18vw,5rem);letter-spacing:6px;}
+  .lb-list{padding:0 4px;}
+  .pbadge{padding:5px 10px;font-size:.75rem;}
+  .timer-wrap .t-ring{width:48px;height:48px;}
+  .timer-wrap svg{width:48px;height:48px;}
+  .t-num{font-size:.95rem;}
+  .q-text{font-size:clamp(1rem,4.5vw,1.5rem);}
+}
+@media(max-width:400px){
+  .emoji-grid{grid-template-columns:repeat(4,1fr);gap:6px;}
+  .e-btn{font-size:1.4rem;border-radius:10px;}
+  .logo{font-size:1.5rem;}
+  .wait-title{font-size:1.2rem;}
 }
 </style>
 </head>
@@ -357,7 +373,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   <div class="confetti">🎉</div>
   <div class="end-title">O'yin Tugadi!</div>
   <div class="lb-list" id="end-lb"></div>
-  <a href="index.html" class="btn btn-red" style="display:inline-flex;max-width:280px;margin-top:22px;text-decoration:none;">🏠 Bosh sahifaga</a>
+  <a id="end-back-btn" href="index.html" class="btn btn-red" style="display:inline-flex;max-width:280px;margin-top:22px;text-decoration:none;">← Orqaga qaytish</a>
 </div>
 
 <script type="module">
@@ -377,6 +393,9 @@ const RANK_CLS=['r1','r2','r3','','','',''];
 
 // ── STATE ──
 let code='', name='', emoji='', selEmoji='';
+const _backUrl=(new URLSearchParams(location.search).get('from')==='admin')?'admin.html':'index.html';
+// Set back button href
+document.addEventListener('DOMContentLoaded',()=>{const b=document.getElementById('end-back-btn');if(b)b.href=_backUrl;});
 let stateRef=null, playersRef=null;
 let timerIv=null, qTime=20, qStartAt=0, gameEnded=false, lbTimeoutId=null;
 let hasAnswered=false, curQIdx=-1, lastPickedIdx=-1, lastCorrectIdx=-1, lastCorrectText='', lastEarned=0;

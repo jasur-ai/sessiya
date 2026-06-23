@@ -176,10 +176,29 @@ body.light .ans-bar{background:rgba(240,240,248,.92);}
 .t-ring circle.bg-c{stroke:rgba(255,255,255,.08);}
 .t-ring circle.fg-c{stroke:var(--accent);stroke-linecap:round;transition:stroke .4s;}
 
+/* Corner back button — always visible */
+.corner-back{
+  position:fixed;top:14px;left:14px;z-index:300;
+  background:rgba(6,6,15,.82);backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,.12);border-radius:50px;
+  padding:8px 16px;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:900;
+  cursor:pointer;color:var(--muted);transition:all .2s;text-decoration:none;
+  display:none;align-items:center;gap:6px;
+}
+.corner-back.show{display:flex;}
+.corner-back:hover{color:var(--text);background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.22);}
+
 /* ── LEADERBOARD ── */
-#s-lb,#s-end{
+#s-lb{
   text-align:center;
   background:radial-gradient(ellipse at 50% 20%,rgba(56,189,248,.2) 0%,transparent 55%),var(--bg);
+}
+/* END screen — birlashtirilgan: leaderboard + tugadi xabari */
+#s-end{
+  text-align:center;
+  background:radial-gradient(ellipse at 50% 20%,rgba(56,189,248,.18) 0%,transparent 55%),
+    radial-gradient(ellipse at 80% 80%,rgba(0,255,170,.08) 0%,transparent 50%),var(--bg);
+  padding-top:70px;padding-bottom:80px;
 }
 .lb-title{font-family:'Righteous',cursive;font-size:2.2rem;color:var(--gold);
   animation:gleam 2s ease-in-out infinite;margin-bottom:4px;}
@@ -211,7 +230,7 @@ body.light .ans-bar{background:rgba(240,240,248,.92);}
 .lb-sc{font-family:'Righteous',cursive;font-size:1rem;color:var(--gold);}
 .lb-auto{color:var(--muted);font-size:.78rem;margin-top:4px;}
 
-/* TOP 7 dan tashqari o'yinchilar — shunchaki, ajratilmagan ko'rinishda */
+/* TOP 7 dan tashqari o'yinchilar */
 .lbi-plain{background:transparent!important;border:none!important;box-shadow:none;padding:7px 16px;animation:none!important;}
 .lbi-plain .lb-rank{background:transparent;color:var(--muted);font-family:'Nunito',sans-serif;font-weight:800;font-size:.8rem;width:auto;}
 .lbi-plain .lb-em{font-size:1.05rem;opacity:.75;}
@@ -226,19 +245,14 @@ body.light .ans-bar{background:rgba(240,240,248,.92);}
 .cont-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(56,189,248,.3);}
 
 /* END SCREEN */
-.end-badge{font-size:3.5rem;margin-bottom:12px;animation:pop .4s ease-out;}
-#s-end .lb-list{max-height:52vh;overflow-y:auto;padding-right:4px;}
+.end-badge{font-size:3.5rem;margin-bottom:8px;animation:pop .4s ease-out;}
+#s-end .lb-list{max-height:55vh;overflow-y:auto;padding-right:4px;}
 #s-end .lb-list::-webkit-scrollbar{width:4px;}
 #s-end .lb-list::-webkit-scrollbar-track{background:rgba(255,255,255,.04);}
 #s-end .lb-list::-webkit-scrollbar-thumb{background:rgba(56,189,248,.35);border-radius:4px;}
 @keyframes pop{0%{transform:scale(0)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
-.end-title{font-family:'Righteous',cursive;font-size:1.7rem;margin-bottom:6px;}
-.home-btn{
-  background:linear-gradient(135deg,var(--accent),#1d4ed8);color:#fff;border:none;
-  border-radius:12px;padding:12px 30px;font-family:'Righteous',cursive;
-  font-size:.95rem;cursor:pointer;transition:all .2s;margin-top:16px;text-decoration:none;display:inline-block;
-}
-.home-btn:hover{transform:translateY(-2px);}
+.end-title{font-family:'Righteous',cursive;font-size:1.7rem;margin-bottom:6px;color:var(--green);}
+.end-sub{color:var(--muted);font-size:.8rem;margin-bottom:20px;}
 
 #loading{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;}
 #loading.hide{display:none;}
@@ -251,6 +265,9 @@ body.light .ans-bar{background:rgba(240,240,248,.92);}
 
 <!-- FLOATING END BUTTON — game screens uchun (preview/active/leaderboard) -->
 <button type="button" class="float-end-btn" id="float-end-btn" onclick="confirmEnd()">✕ Tugatish</button>
+
+<!-- CORNER BACK BUTTON — faqat s-end ekranida ko'rinadi -->
+<a id="corner-back" class="corner-back" href="user-panel.html">← Panelga qaytish</a>
 
 <!-- LOBBY -->
 <div class="screen" id="s-lobby">
@@ -320,13 +337,13 @@ body.light .ans-bar{background:rgba(240,240,248,.92);}
   <button type="button" class="cont-btn" onclick="afterLbNext()">Davom etish →</button>
 </div>
 
-<!-- END -->
+<!-- END — birlashtirilgan yakuniy ekran -->
 <div class="screen" id="s-end">
   <div class="end-badge">🎉</div>
-  <div class="lb-title">🏆 Shoxsupa</div>
+  <div class="lb-title">🏆 Final Shoxsupa</div>
   <div class="end-title">O'yin tugadi!</div>
+  <div class="end-sub" id="end-sub">Barcha o'yinchilar natijalari</div>
   <div class="lb-list" id="end-list"></div>
-  <a id="home-btn-link" href="user-panel.html" class="home-btn">Panelga qaytish →</a>
 </div>
 
 <script type="module">
@@ -352,10 +369,12 @@ function goTo(id){
   $(id).classList.add('on');
   $('ans-bar').style.display=id==='s-qact'?'flex':'none';
   if(_activeBg>0)applyBgTo($(id));
-  // FIX: "Tugatish" tugmasi o'yin jarayonidagi barcha ekranlarda (preview/active/leaderboard) ko'rinadi —
-  // shu paytgacha faqat lobby'da edi, host o'yin boshlangach uni tugata olmas edi.
+  // FIX: "Tugatish" tugmasi o'yin jarayonidagi barcha ekranlarda ko'rinadi
   const showFloatEnd=(id==='s-qprev'||id==='s-qact'||id==='s-lb');
   $('float-end-btn').classList.toggle('show',showFloatEnd);
+  // Corner back — faqat s-end ekranida
+  const cb=$('corner-back');
+  if(cb) cb.classList.toggle('show', id==='s-end');
 }
 
 let session=null,questions=[],qIdx=0,qStartAt=0,qTime=20,timerIv=null,cntIv=null;
@@ -366,7 +385,8 @@ let darkMode=true;
 // ── Load session ──
 (async function init(){
   // Qaytish havolasini from parametriga qarab belgilaymiz
-  document.getElementById('home-btn-link').href=_backUrl;
+  const cb=document.getElementById('corner-back');
+  if(cb) cb.href=_backUrl;
   try{
     const snap=await get(ref(db,`game_sessions/${code}`));
     if(!snap.exists()){alert('O\'yin topilmadi');location.href=_backUrl;return;}
