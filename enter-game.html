@@ -535,10 +535,6 @@ function handleState(st){
   if(s==='question_preview') showQPreview(st);
   else if(s==='question_active') showQActive(st);
   else if(s==='leaderboard'){
-    // Agar allaqachon s-result yoki s-lb da bo'lsak qayta chaqirmaymiz
-    const _cur=document.querySelector('.screen.on');
-    const _curId=_cur?_cur.id:'';
-    if(_curId==='s-result'||_curId==='s-lb') return;
     stopTimer();
     showLb(st.leaderboard||[]);
   }
@@ -672,70 +668,57 @@ function fmtMs(ms){
 
 function showLb(lb){
   stopTimer();
-  // Show result first
-  const isCorrect = lastPickedIdx !== -1 && lastPickedIdx === lastCorrectIdx;
-  const noAnswer = lastPickedIdx === -1;
-  if(noAnswer){
-    $('res-icon').textContent='⏱️';
-    $('res-title').textContent="Vaqt tugadi!";
-    $('res-pts').textContent='';
-    $('res-correct').textContent=lastCorrectText?`To'g'ri javob: ${lastCorrectText}`:'Javob bermadingiz';
-  } else if(isCorrect){
-    $('res-icon').textContent='✅';
-    $('res-title').textContent="To'g'ri!";
-    const me=lb.find(p=>p.name===name);
-    $('res-pts').textContent=me?me.score+' ball':'';
-    $('res-correct').textContent='';
-  } else {
-    $('res-icon').textContent='❌';
-    $('res-title').textContent="Xato!";
-    $('res-pts').textContent='';
-    $('res-correct').textContent=lastCorrectText?`To'g'ri javob: ${lastCorrectText}`:'';
-  }
-  goTo('s-result');
   if(lbTimeoutId) clearTimeout(lbTimeoutId);
+  const curId=(document.querySelector('.screen.on')||{}).id||'';
+  const alreadyShown=(curId==='s-result'||curId==='s-lb');
+  if(!alreadyShown){
+    const isCorrect=lastPickedIdx!==-1&&lastPickedIdx===lastCorrectIdx;
+    const noAnswer=lastPickedIdx===-1;
+    if(noAnswer){
+      $('res-icon').textContent='⏱️';
+      $('res-title').textContent="Vaqt tugadi!";
+      $('res-pts').textContent='';
+      $('res-correct').textContent=lastCorrectText?`To'g'ri javob: ${lastCorrectText}`:'Javob bermadingiz';
+    }else if(isCorrect){
+      $('res-icon').textContent='✅';
+      $('res-title').textContent="To'g'ri!";
+      const me=lb.find(p=>p.name===name);
+      $('res-pts').textContent=me?me.score+' ball':'';
+      $('res-correct').textContent='';
+    }else{
+      $('res-icon').textContent='❌';
+      $('res-title').textContent="Xato!";
+      $('res-pts').textContent='';
+      $('res-correct').textContent=lastCorrectText?`To'g'ri javob: ${lastCorrectText}`:'';
+    }
+    goTo('s-result');
+  }
   lbTimeoutId=setTimeout(()=>{
-    if(gameEnded) return; // O'yin tugagan bo'lsa s-lb ga o'tmaymiz
+    if(gameEnded) return;
     $('lb-list').innerHTML=renderLb(lb);
-    // Joriy o'yinchining pozitsiyasini topib ko'rsatamiz
     const myPos=lb.findIndex(p=>p.name===name);
     const myPosEl=$('lb-my-pos');
-    if(myPos>=0){
-      const myEntry=lb[myPos];
-      if(myPos<7){
-        myPosEl.style.display='none'; // TOP 7 da ko'rinib turibdi
-      } else {
-        myPosEl.style.display='block';
-        myPosEl.textContent=`Sizning o'rningiz: ${myPos+1}-o'rin • ${myEntry.score||0} ball`;
-      }
-    } else {
+    if(myPos>=7){
+      const me=lb[myPos];
+      myPosEl.style.display='block';
+      myPosEl.textContent=`Sizning o'rningiz: ${myPos+1}-o'rin • ${me.score||0} ball`;
+    }else{
       myPosEl.style.display='none';
     }
     goTo('s-lb');
-  }, 2500);
+  }, alreadyShown?400:2500);
 }
 
 function showEnded(lb){
   gameEnded=true;
   if(lbTimeoutId){clearTimeout(lbTimeoutId);lbTimeoutId=null;}
   stopTimer();
-  // Faqat TOP 7 shoxsupa + o'zining o'rni
-  const myPos=lb.findIndex(p=>p.name===name);
-  let html=renderLb(lb); // TOP 7
-  // Agar o'zim TOP 7 dan tashqarida bo'lsam — pastda alohida ko'rsat
-  if(myPos>=7){
-    const me=lb[myPos];
-    html+=`<div style="margin-top:8px;padding:10px 14px;background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);border-radius:12px;display:flex;align-items:center;gap:10px;">
-      <div class="lb-rank rank-n" style="background:rgba(37,99,235,.2);color:var(--blue)">${myPos+1}</div>
-      <div class="lb-em">${me.emoji||'❓'}</div>
-      <div class="lb-nm" style="color:var(--blue)">${esc(me.name)} 👈</div>
-      <div class="lb-sc">${me.score||0} ball</div>
-    </div>`;
-  }
-  $('end-lb').innerHTML=html;
+  // Hamma o'yinchi ko'rinadi — renderLbAll ishlatamiz
+  $('end-lb').innerHTML=renderLbAll(lb);
   goTo('s-end');
   sessionStorage.removeItem('qb_player');
 }
+
 
 function updatePBadge(){
   $('pb-em1').textContent=emoji||'❓';$('pb-nm1').textContent=name||'—';
