@@ -532,13 +532,14 @@ function startLobby(){
 function handleState(st){
   const s=st.status;
   if(s==='waiting') return;
+  if(s==='ended'){showEnded(st.leaderboard||[]);return;}
+  if(gameEnded) return; // o'yin tugagan — boshqa holatlarga e'tibor bermaymiz
   if(s==='question_preview') showQPreview(st);
   else if(s==='question_active') showQActive(st);
   else if(s==='leaderboard'){
     stopTimer();
     showLb(st.leaderboard||[]);
   }
-  else if(s==='ended') showEnded(st.leaderboard||[]);
 }
 
 function showQPreview(st){
