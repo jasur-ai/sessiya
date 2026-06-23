@@ -773,7 +773,11 @@ async function finishGame(){
 }
 
 window.confirmEnd=function(){
-  if(confirm('O\'yinni tugatishni xohlaysizmi?')) finishGame();
+  if(confirm('O\'yinni tugatishni xohlaysizmi?')){
+    if(lbAutoTm){clearTimeout(lbAutoTm);lbAutoTm=null;}
+    afterLbFn=null;
+    finishGame();
+  }
 };
 
 // ── TIMER ──
