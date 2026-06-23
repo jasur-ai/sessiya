@@ -194,7 +194,8 @@ function updatePhoneScale(){
   const availH=content.clientHeight||580;
   const IFRAME_W=390;
   const IFRAME_H=844;
-  const scale=Math.min(availW/IFRAME_W, availH/IFRAME_H);
+  // cover: kattaroq scale — ichni to'liq to'ldiradi, bo'sh joy qolmaydi
+  const scale=Math.max(availW/IFRAME_W, availH/IFRAME_H);
   const iframe=content.querySelector('iframe');
   if(iframe){
     iframe.style.width=IFRAME_W+'px';
@@ -203,8 +204,8 @@ function updatePhoneScale(){
     iframe.style.transformOrigin='top left';
     const scaledW=IFRAME_W*scale;
     const scaledH=IFRAME_H*scale;
-    iframe.style.left=scaledW<availW?Math.round((availW-scaledW)/2)+'px':'0';
-    iframe.style.top=scaledH<availH?Math.round((availH-scaledH)/2)+'px':'0';
+    iframe.style.left=Math.round((availW-scaledW)/2)+'px';
+    iframe.style.top=Math.round((availH-scaledH)/2)+'px';
   }
 }
 window.addEventListener('resize',updatePhoneScale);
