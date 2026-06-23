@@ -249,7 +249,10 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);disp
     </div>
   </div>
 
-  
+  <!-- O'RTA: Diagnostika -->
+  <div id="mid-pane">
+    <div class="pane-hd"><span class="phd-dot dot-blue"></span><b>🔬 Diagnostika</b></div>
+    <div id="diag-body">
 
       <!-- Umumiy stats -->
       <div class="diag-section" id="diag-stats">
@@ -272,7 +275,13 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);disp
         </div>
       </div>
 
-    
+      <!-- Muammolar -->
+      <div class="diag-section" id="diag-issues">
+        <div class="diag-sec-hd">⚠️ Muammolar <span id="issues-cnt" style="margin-left:auto;background:rgba(251,191,36,.15);color:#fbbf24;border-radius:50px;padding:1px 7px;font-size:.6rem;">0</span></div>
+        <div class="diag-sec-body" id="diag-issues-body">
+          <div class="diag-empty">—</div>
+        </div>
+      </div>
 
       <!-- Javob feed -->
       <div class="diag-section">
@@ -456,8 +465,21 @@ function renderQDiag(st){
   const correctIdx=typeof st.q_correct==='number'?st.q_correct:0;
   const qText=st.q_text||'';
 
-
-
+  // Muammolarni aniqlash
+  const issues=[];
+  if(!qText.trim()) issues.push({icon:'🔴',text:'<span class="err">Savol matni bo\'sh!</span>'});
+  if(qText.length<10) issues.push({icon:'🟡',text:`<span class="warn">Savol juda qisqa (${qText.length} belgi)</span>`});
+  if(qText.length>200) issues.push({icon:'🟡',text:`<span class="warn">Savol juda uzun (${qText.length} belgi)</span>`});
+  if(opts.length<2) issues.push({icon:'🔴',text:'<span class="err">Variantlar yetarli emas!</span>'});
+  if(opts.length>5) issues.push({icon:'🟡',text:'<span class="warn">Variantlar soni juda ko\'p (>5)</span>'});
+  if(correctIdx<0||correctIdx>=opts.length) issues.push({icon:'🔴',text:'<span class="err">To\'g\'ri javob indeksi noto\'g\'ri!</span>'});
+  opts.forEach((o,i)=>{
+    if(!String(o||'').trim()) issues.push({icon:'🔴',text:`<span class="err">${i+1}-variant bo'sh!</span>`});
+    else if(String(o).length<2) issues.push({icon:'🟡',text:`<span class="warn">${i+1}-variant juda qisqa</span>`});
+  });
+  // Duplicate variants
+  const uniq=new Set(opts.map(o=>String(o||'').trim().toLowerCase()));
+  if(uniq.size<opts.length) issues.push({icon:'🟡',text:'<span class="warn">Bir xil variantlar mavjud</span>'});
   // To'g'ri javob
   const correctText=opts[correctIdx];
   if(issues.length===0) issues.push({icon:'✅',text:'<span class="ok">Savol sog\'lom ko\'rinadi</span>'});
@@ -488,6 +510,12 @@ function renderQDiag(st){
   </div></div>`;
   $('diag-q-body').innerHTML=qHtml;
 
+  // Issues render
+  $('issues-cnt').textContent=issues.filter(i=>!i.icon.includes('✅')).length||'0';
+  $('diag-issues-body').innerHTML=issues.map(i=>`
+    <div class="issue-item"><span class="issue-icon">${i.icon}</span><div class="issue-text">${i.text}</div></div>
+  `).join('');
+}
 
 // ── ANS FEED ──
 function clearAnsFeed(){
