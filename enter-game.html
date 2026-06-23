@@ -716,8 +716,20 @@ function showEnded(lb){
   gameEnded=true;
   if(lbTimeoutId){clearTimeout(lbTimeoutId);lbTimeoutId=null;}
   stopTimer();
-  // lb endi barcha o'yinchilarni o'z ichiga oladi (host tomonidan yuborilgan)
-  $('end-lb').innerHTML=renderLbAll(lb);
+  // Faqat TOP 7 shoxsupa + o'zining o'rni
+  const myPos=lb.findIndex(p=>p.name===name);
+  let html=renderLb(lb); // TOP 7
+  // Agar o'zim TOP 7 dan tashqarida bo'lsam — pastda alohida ko'rsat
+  if(myPos>=7){
+    const me=lb[myPos];
+    html+=`<div style="margin-top:8px;padding:10px 14px;background:rgba(37,99,235,.12);border:1px solid rgba(37,99,235,.3);border-radius:12px;display:flex;align-items:center;gap:10px;">
+      <div class="lb-rank rank-n" style="background:rgba(37,99,235,.2);color:var(--blue)">${myPos+1}</div>
+      <div class="lb-em">${me.emoji||'❓'}</div>
+      <div class="lb-nm" style="color:var(--blue)">${esc(me.name)} 👈</div>
+      <div class="lb-sc">${me.score||0} ball</div>
+    </div>`;
+  }
+  $('end-lb').innerHTML=html;
   goTo('s-end');
   sessionStorage.removeItem('qb_player');
 }
