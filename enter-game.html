@@ -535,7 +535,10 @@ function handleState(st){
   if(s==='question_preview') showQPreview(st);
   else if(s==='question_active') showQActive(st);
   else if(s==='leaderboard'){
-    // HOST shows shoxsupa — players see their result then the leaderboard
+    // Agar allaqachon s-result yoki s-lb da bo'lsak qayta chaqirmaymiz
+    const _cur=document.querySelector('.screen.on');
+    const _curId=_cur?_cur.id:'';
+    if(_curId==='s-result'||_curId==='s-lb') return;
     stopTimer();
     showLb(st.leaderboard||[]);
   }
