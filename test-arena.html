@@ -151,11 +151,12 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);disp
   position:absolute;
   top:0;left:0;
   width:390px; /* iPhone standart kenglik */
-  height:100%;
+  /* height ni scale bilan kompensatsiya qilamiz: 100% / 0.872 */
+  height:calc(100% / 0.8718);
   border:none;
   transform-origin:top left;
-  /* scale qilamiz: 340px / 390px ≈ 0.872 */
-  transform:scale(0.872);
+  /* scale: 340px / 390px = 0.8718 */
+  transform:scale(0.8718);
 }
 
 /* Home bar */
