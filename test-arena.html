@@ -64,9 +64,9 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);disp
 
 /* O'NG — telefon */
 #right-pane{
-  width:390px;flex-shrink:0;
+  width:370px;flex-shrink:0;
   display:flex;flex-direction:column;
-  background:#000;
+  background:#07090f;
 }
 
 /* Pane header */
@@ -86,14 +86,37 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);disp
 #left-frame-wrap{flex:1;position:relative;}
 #left-frame-wrap iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
 
-/* ── TELEFON — to'liq ekran ── */
+/* ── TELEFON ── */
 #phone-area{
-  flex:1;position:relative;overflow:hidden;
-  background:#000;
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:10px 8px;min-height:0;
+  background:radial-gradient(ellipse at 50% 30%,rgba(37,99,235,.07) 0%,transparent 60%),#07090f;
 }
-#phone-area iframe{
-  position:absolute;inset:0;width:100%;height:100%;border:none;
+#phone-device{
+  width:320px;height:100%;max-height:660px;min-height:380px;
+  border-radius:40px;background:#08080f;
+  border:3px solid rgba(255,255,255,.14);
+  box-shadow:0 0 0 1px rgba(0,0,0,.9),0 0 50px rgba(37,99,235,.1),0 20px 60px rgba(0,0,0,.8),inset 0 0 0 1px rgba(255,255,255,.04);
+  display:flex;flex-direction:column;overflow:hidden;position:relative;
 }
+.phone-notch{
+  flex-shrink:0;height:28px;background:#08080f;
+  display:flex;align-items:center;justify-content:center;position:relative;z-index:2;
+}
+.phone-notch::after{
+  content:'';width:100px;height:20px;background:#000;
+  border-radius:0 0 14px 14px;display:block;
+}
+#phone-content{flex:1;position:relative;overflow:hidden;background:#06060f;}
+#phone-content iframe{
+  position:absolute;top:0;left:0;
+  border:none;transform-origin:top left;
+}
+.phone-home{
+  flex-shrink:0;height:20px;background:#08080f;
+  display:flex;align-items:center;justify-content:center;
+}
+.phone-home::after{content:'';width:90px;height:4px;background:rgba(255,255,255,.2);border-radius:4px;display:block;}
 
 .placeholder{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
@@ -135,7 +158,13 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);disp
   <div id="right-pane">
     <div class="pane-hd"><span class="phd-dot dot-green"></span><b>📱 O'yinchi (siz)</b></div>
     <div id="phone-area">
-      <div class="placeholder" id="phone-placeholder"><div class="pi">📱</div>Kodni kiritib Yuklash</div>
+      <div id="phone-device">
+        <div class="phone-notch"></div>
+        <div id="phone-content">
+          <div class="placeholder" id="phone-placeholder"><div class="pi">📱</div>Kodni kiritib Yuklash</div>
+        </div>
+        <div class="phone-home"></div>
+      </div>
     </div>
   </div>
 
@@ -158,6 +187,28 @@ function setStatus(txt,live=false){
   const el=$('status-pill');el.className=live?'live':'';el.textContent=txt;
 }
 
+// ── IFRAME SCALE — ichni to'liq to'ldiradi ──
+function updatePhoneScale(){
+  const content=$('phone-content');if(!content) return;
+  const availW=content.clientWidth||294;
+  const availH=content.clientHeight||580;
+  const IFRAME_W=390;
+  const IFRAME_H=844;
+  const scale=Math.min(availW/IFRAME_W, availH/IFRAME_H);
+  const iframe=content.querySelector('iframe');
+  if(iframe){
+    iframe.style.width=IFRAME_W+'px';
+    iframe.style.height=IFRAME_H+'px';
+    iframe.style.transform=`scale(${scale})`;
+    iframe.style.transformOrigin='top left';
+    const scaledW=IFRAME_W*scale;
+    const scaledH=IFRAME_H*scale;
+    iframe.style.left=scaledW<availW?Math.round((availW-scaledW)/2)+'px':'0';
+    iframe.style.top=scaledH<availH?Math.round((availH-scaledH)/2)+'px':'0';
+  }
+}
+window.addEventListener('resize',updatePhoneScale);
+
 // ── LOAD ──
 window.loadArena=function(){
   const code=$('code-inp').value.trim();
@@ -166,8 +217,12 @@ window.loadArena=function(){
 
   $('left-frame-wrap').innerHTML=`<iframe src="host-game.html?code=${code}" allow="clipboard-write"></iframe>`;
 
-  const pa=$('phone-area');
-  pa.innerHTML=`<iframe src="enter-game.html?code=${code}" id="phone-iframe"></iframe>`;
+  const pc=$('phone-content');
+  pc.innerHTML=`<iframe src="enter-game.html?code=${code}" id="phone-iframe"></iframe>`;
+  const pif=pc.querySelector('iframe');
+  pif.addEventListener('load',updatePhoneScale);
+  setTimeout(updatePhoneScale,80);
+  setTimeout(updatePhoneScale,400);
 
   $('add-bots-btn').disabled=false;
   $('clean-btn').disabled=false;
