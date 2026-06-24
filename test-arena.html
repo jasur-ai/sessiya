@@ -163,6 +163,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);disp
         <div id="phone-content">
           <div class="placeholder" id="phone-placeholder"><div class="pi">📱</div>Kodni kiritib Yuklash</div>
         </div>
+        <div class="phone-home"></div>
       </div>
     </div>
   </div>
@@ -171,7 +172,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);disp
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, get, remove, onValue, off } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { getDatabase, ref, set, get, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const FB={apiKey:"AIzaSyA-2Uf7dZf1kqf7c32txyTFXSd2PCJbJLw",authDomain:"sessiya-11767.firebaseapp.com",databaseURL:"https://sessiya-11767-default-rtdb.firebaseio.com",projectId:"sessiya-11767",storageBucket:"sessiya-11767.firebasestorage.app",messagingSenderId:"883067400258",appId:"1:883067400258:web:941d591d38755c73247ddb"};
 const app=initializeApp(FB);
@@ -210,7 +211,7 @@ window.addEventListener('resize',updatePhoneScale);
 // ── LOAD ──
 window.loadArena=function(){
   const code=$('code-inp').value.trim();
-  if(!/^\d{4,6}$/.test(code)){alert("5 xonali kod kiriting");return;}
+  if(!/^\d{5}$/.test(code)){alert("5 xonali kod kiriting");return;}
   curCode=code;
 
   $('left-frame-wrap').innerHTML=`<iframe src="host-game.html?code=${code}" allow="clipboard-write"></iframe>`;
@@ -260,16 +261,17 @@ window.cleanupBots=async function(){
 
 // ── WATCHERS + BOT ANSWERS ──
 function watchGame(code){
-  if(stateUnsub){off(ref(db,`game_sessions/${curCode||code}/state`));stateUnsub=null;}
+  // Oldingi listenerlarni to'g'ri o'chirish — unsubscribe fn ni saqlaymiz
+  if(stateUnsub && typeof stateUnsub==='function'){stateUnsub();stateUnsub=null;}
   processedQIdx=-1;
-  onValue(ref(db,`game_sessions/${code}/state`),snap=>{
+  // onValue qaytargan unsubscribe fn ni saqlaymiz
+  stateUnsub=onValue(ref(db,`game_sessions/${code}/state`),snap=>{
     const st=snap.val();if(!st) return;
     if(st.status==='question_active'&&st.q_index!==processedQIdx){
       processedQIdx=st.q_index;
       scheduleAnswers(code,st);
     }
   });
-  stateUnsub=true;
 }
 
 // ── BOT ANSWERS ──
