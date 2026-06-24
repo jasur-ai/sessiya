@@ -1,0 +1,143 @@
+<svg width="100%" viewBox="0 0 680 520" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>Baby Boss</title>
+<desc>Baby Boss — kostyumda, ko'zoynak taqib, qo'llari qovushtirib turgan multfilm personaji</desc>
+
+<style>
+  @keyframes sway {
+    0%,100%{ transform: rotate(-2deg) translateY(0px); }
+    50%{ transform: rotate(2deg) translateY(-4px); }
+  }
+  @keyframes armL {
+    0%,100%{ transform: rotate(0deg); }
+    50%{ transform: rotate(4deg); }
+  }
+  @keyframes armR {
+    0%,100%{ transform: rotate(0deg); }
+    50%{ transform: rotate(-4deg); }
+  }
+  @keyframes legL {
+    0%,100%{ transform: translateY(0px); }
+    50%{ transform: translateY(3px); }
+  }
+  @keyframes legR {
+    0%,100%{ transform: translateY(3px); }
+    50%{ transform: translateY(0px); }
+  }
+  .char-root {
+    transform-origin: 340px 300px;
+    animation: sway 3s ease-in-out infinite;
+  }
+  .arm-l {
+    transform-origin: 295px 295px;
+    animation: armL 3s ease-in-out infinite;
+  }
+  .arm-r {
+    transform-origin: 385px 295px;
+    animation: armR 3s ease-in-out infinite;
+  }
+  .leg-l {
+    transform-origin: 320px 430px;
+    animation: legL 2.8s ease-in-out infinite;
+  }
+  .leg-r {
+    transform-origin: 360px 430px;
+    animation: legR 2.8s ease-in-out infinite;
+  }
+</style>
+
+<g class="char-root">
+
+  <!-- OYOQLAR -->
+  <g class="leg-l">
+    <rect x="308" y="428" width="28" height="38" rx="6" fill="#1a1a2e"/>
+    <ellipse cx="318" cy="468" rx="18" ry="10" fill="#0d0d1a"/>
+    <ellipse cx="326" cy="466" rx="8" ry="6" fill="#1a1a2e"/>
+  </g>
+  <g class="leg-r">
+    <rect x="344" y="428" width="28" height="38" rx="6" fill="#1a1a2e"/>
+    <ellipse cx="362" cy="468" rx="18" ry="10" fill="#0d0d1a"/>
+    <ellipse cx="354" cy="466" rx="8" ry="6" fill="#1a1a2e"/>
+  </g>
+
+  <!-- TANA (KOSTYUM) -->
+  <rect x="294" y="300" width="92" height="132" rx="16" fill="#1a1a2e"/>
+  <rect x="294" y="300" width="4" height="132" rx="2" fill="#141428"/>
+  <rect x="382" y="300" width="4" height="132" rx="2" fill="#141428"/>
+  <polygon points="325,300 355,300 348,330 332,330" fill="#ffffff"/>
+  <polygon points="337,305 343,305 345,342 340,348 335,342" fill="#0a0a0a"/>
+  <ellipse cx="340" cy="312" rx="3" ry="3" fill="#e8e8e8"/>
+  <ellipse cx="340" cy="345" rx="2.5" ry="2.5" fill="#2a2a3e"/>
+  <ellipse cx="340" cy="358" rx="2.5" ry="2.5" fill="#2a2a3e"/>
+
+  <!-- QO'LLAR -->
+  <g class="arm-l">
+    <path d="M294 310 Q268 320 260 355 Q256 370 266 378 Q276 386 282 375 Q290 360 298 340 Z" fill="#1a1a2e"/>
+    <path d="M263 360 Q255 375 260 388 Q265 400 276 398 Q285 396 286 382 Q284 368 278 356 Z" fill="#e8c9a0"/>
+    <ellipse cx="262" cy="392" rx="8" ry="6" fill="#e8c9a0"/>
+    <ellipse cx="255" cy="388" rx="6" ry="5" fill="#dbb88a"/>
+    <ellipse cx="270" cy="395" rx="6" ry="5" fill="#dbb88a"/>
+  </g>
+  <g class="arm-r">
+    <path d="M386 310 Q412 320 420 355 Q424 370 414 378 Q404 386 398 375 Q390 360 382 340 Z" fill="#1a1a2e"/>
+    <path d="M417 360 Q425 375 420 388 Q415 400 404 398 Q395 396 394 382 Q396 368 402 356 Z" fill="#e8c9a0"/>
+    <ellipse cx="418" cy="392" rx="8" ry="6" fill="#e8c9a0"/>
+    <ellipse cx="425" cy="388" rx="6" ry="5" fill="#dbb88a"/>
+    <ellipse cx="410" cy="395" rx="6" ry="5" fill="#dbb88a"/>
+  </g>
+
+  <path d="M294 330 Q280 340 278 365 Q278 380 290 385 Q308 388 320 375 Q326 360 310 348 Z" fill="#1a1a2e"/>
+  <path d="M386 330 Q400 340 402 365 Q402 380 390 385 Q372 388 360 375 Q354 360 370 348 Z" fill="#1a1a2e"/>
+  <rect x="302" y="360" width="76" height="32" rx="12" fill="#1a1a2e"/>
+  <ellipse cx="310" cy="378" rx="12" ry="9" fill="#e8c9a0"/>
+  <ellipse cx="370" cy="378" rx="12" ry="9" fill="#e8c9a0"/>
+  <rect x="300" y="370" width="9" height="14" rx="4" fill="#dbb88a"/>
+  <rect x="301" y="368" width="9" height="14" rx="4" fill="#e8c9a0"/>
+  <rect x="302" y="369" width="9" height="14" rx="4" fill="#e8c9a0"/>
+  <rect x="371" y="370" width="9" height="14" rx="4" fill="#dbb88a"/>
+  <rect x="369" y="368" width="9" height="14" rx="4" fill="#e8c9a0"/>
+  <rect x="368" y="369" width="9" height="14" rx="4" fill="#e8c9a0"/>
+
+  <!-- BO'YIN -->
+  <rect x="325" y="274" width="30" height="30" rx="6" fill="#e8c9a0"/>
+
+  <!-- BOSH -->
+  <ellipse cx="340" cy="230" rx="68" ry="72" fill="#f0d4a8"/>
+  <ellipse cx="295" cy="252" rx="16" ry="10" fill="#f4a0a0" opacity="0.5"/>
+  <ellipse cx="385" cy="252" rx="16" ry="10" fill="#f4a0a0" opacity="0.5"/>
+  <ellipse cx="275" cy="228" rx="14" ry="18" fill="#e8c9a0"/>
+  <ellipse cx="275" cy="228" rx="8" ry="12" fill="#dba888"/>
+  <ellipse cx="405" cy="228" rx="14" ry="18" fill="#e8c9a0"/>
+  <ellipse cx="405" cy="228" rx="8" ry="12" fill="#dba888"/>
+
+  <!-- SOCH -->
+  <path d="M310 165 Q316 152 325 160 Q330 148 340 155 Q350 148 355 160 Q364 152 370 165" 
+        stroke="#f5c842" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="340" cy="162" rx="30" ry="8" fill="#f5c842" opacity="0.4"/>
+
+  <!-- KO'ZOYNAK -->
+  <rect x="298" y="218" width="46" height="30" rx="8" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+  <rect x="336" y="218" width="46" height="30" rx="8" fill="#1a1a1a" stroke="#333" stroke-width="1.5"/>
+  <rect x="343" y="228" width="14" height="5" rx="2" fill="#333"/>
+  <rect x="275" y="230" width="24" height="4" rx="2" fill="#333"/>
+  <rect x="381" y="230" width="24" height="4" rx="2" fill="#333"/>
+  <rect x="300" y="220" width="42" height="26" rx="6" fill="#0a0a14" opacity="0.88"/>
+  <rect x="338" y="220" width="42" height="26" rx="6" fill="#0a0a14" opacity="0.88"/>
+  <ellipse cx="316" cy="228" rx="8" ry="5" fill="#ffffff" opacity="0.08"/>
+  <ellipse cx="354" cy="228" rx="8" ry="5" fill="#ffffff" opacity="0.08"/>
+
+  <!-- BURUN -->
+  <ellipse cx="340" cy="256" rx="9" ry="7" fill="#dba888"/>
+  <ellipse cx="336" cy="257" rx="3" ry="2.5" fill="#c8956e" opacity="0.7"/>
+  <ellipse cx="344" cy="257" rx="3" ry="2.5" fill="#c8956e" opacity="0.7"/>
+
+  <!-- OG'IZ -->
+  <path d="M320 272 Q340 286 360 272" stroke="#c8956e" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <rect x="332" y="272" width="8" height="7" rx="2" fill="#ffffff"/>
+  <rect x="340" y="272" width="8" height="7" rx="2" fill="#f0f0f0"/>
+
+  <!-- QOSH -->
+  <path d="M300 212 Q316 206 330 210" stroke="#8B6914" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M350 210 Q364 206 380 212" stroke="#8B6914" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+</g>
+</svg>
