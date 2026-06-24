@@ -18,6 +18,13 @@ export const CARTOON_CHARS = [
     image: 'characters/baby-boss.png',
     from: 'The Boss Baby (2017)'
   }
+  ,
+  {
+    id: 'puss-in-boots-nailles',
+    name: 'Puss in Boots Nailles',
+    image: 'characters/puss-in-boots-nailles.svg',
+    from: 'Shrek / DreamWorks'
+  }
   // Keyingi personajlar shu yerga qo'shiladi:
   // { id: 'shrek', name: 'Shrek', image: 'characters/shrek.png', from: 'Shrek (2001)' },
 ];
