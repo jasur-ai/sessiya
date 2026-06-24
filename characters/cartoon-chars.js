@@ -20,6 +20,13 @@ export const CARTOON_CHARS = [
   }
   ,
   {
+    id: 'baby-boss-girl',
+    name: 'Baby Boss Girl',
+    image: 'characters/baby-boss-girl.svg',
+    from: 'The Boss Baby: Family Business (2021)'
+  }
+  ,
+  {
     id: 'puss-in-boots-nailles',
     name: 'Puss in Boots Nailles',
     image: 'characters/puss-in-boots-nailles.svg',
