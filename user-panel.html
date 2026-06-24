@@ -1165,7 +1165,7 @@ async function saveAndShowLb(pct,timeSec){
   const fKey=curMockFanKey;
   if(isMock){
     try{await push(ref(db,`${FANS_PATH}/${fKey}/results/${curUser.safeKey}/entries`),data);}catch(_){}
-    try{const ex=await get(ref(db,`${FANS_PATH}/${fKey}/globalResults/${curUser.safeKey}`));if(!ex.exists()||pct>ex.val().pct||(pct===ex.val().pct&&timeSec<ex.val().timeSec))await set(ref(db,`${FANS_PATH}/${fKey}/globalResults/${curUser.safeKey}`),data);}catch(_){}
+    try{const ex=await get(ref(db,`${FANS_PATH}/${fKey}/globalResults/${curUser.safeKey}`));if(!ex.exists())await set(ref(db,`${FANS_PATH}/${fKey}/globalResults/${curUser.safeKey}`),data);}catch(_){}
     async function renderMockLb(){
       lbContent.innerHTML='<div class="lb-empty">⏳ Yuklanmoqda...</div>';
       try{
@@ -1190,7 +1190,7 @@ async function saveAndShowLb(pct,timeSec){
   if(curTestIsPublic&&curTestGlobalKey&&curTestGlobalKey!=='__mock__'){
     try{
       const exSnap=await get(ref(db,`public_tests/${curTestGlobalKey}/results/${curUser.safeKey}`));
-      if(!exSnap.exists()||pct>exSnap.val().pct||(pct===exSnap.val().pct&&timeSec<exSnap.val().timeSec)){
+      if(!exSnap.exists()){
         await set(ref(db,`public_tests/${curTestGlobalKey}/results/${curUser.safeKey}`),data);
       }
     }catch(_){}
