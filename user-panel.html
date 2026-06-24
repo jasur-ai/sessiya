@@ -1157,6 +1157,8 @@ function renderLbRow(e,i,mine){
 
 async function saveAndShowLb(pct,timeSec){
   const lb=$('lb-section'),lbTabs=$('lb-tabs'),lbContent=$('lb-content');
+  // Xatolardan qilingan qayta test — hech qayerga record saqlanmaydi, lb ham ko'rsatilmaydi
+  if(isRetry){lb.style.display='none';return;}
   if(!curUser||!curTestFbKey||!curTestAuthorUid){lb.style.display='none';return;}
   const data={username:curUser.username,uid:curUser.safeKey,pct,correct:correctCnt,wrong:wrongCnt,total:shuffledQs.length,timeSec,date:new Date().toLocaleDateString('uz'),created:Date.now()};
   const isMock=(curTestFbKey==='mock_fan'&&curTestAuthorUid==='__mock__'&&curMockFanKey);
