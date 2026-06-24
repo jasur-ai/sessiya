@@ -370,10 +370,47 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <div class="nav-av" id="nav-av">U</div>
       <div><div class="nav-username" id="nav-un">—</div><div class="nav-role">Foydalanuvchi</div></div>
     </div>
+    <button type="button" class="icon-btn" id="chars-toggle-btn" onclick="toggleCharsPanel()" style="border-color:rgba(56,189,248,.3);color:var(--gold);">🎬 Chars</button>
     <a href="index.html" class="icon-btn">🏠</a>
     <button type="button" class="icon-btn danger" onclick="logout()">🚪 Chiqish</button>
   </div>
 </nav>
+
+<!-- CHARS PANEL -->
+<div id="chars-panel" style="display:none;position:fixed;top:56px;left:0;right:0;z-index:200;
+  background:rgba(6,6,15,.97);backdrop-filter:blur(20px);
+  border-bottom:2px solid rgba(56,189,248,.25);
+  padding:18px 20px 22px;animation:slideDown .25s ease-out;">
+  <div style="max-width:820px;margin:0 auto;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div style="font-family:'Righteous',cursive;font-size:1rem;color:var(--gold);">🎬 Cartoon Characters</div>
+      <div style="font-size:.72rem;color:var(--muted);font-weight:700;">Keyingi versiyalarda qo'shiladi...</div>
+    </div>
+    <div style="display:flex;gap:14px;flex-wrap:wrap;">
+      <!-- Baby Boss -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
+        background:rgba(255,255,255,.04);border:2px solid rgba(56,189,248,.25);
+        border-radius:16px;padding:12px 16px;transition:all .2s;min-width:110px;"
+        onmouseover="this.style.borderColor='var(--gold)';this.style.background='rgba(56,189,248,.08)'"
+        onmouseout="this.style.borderColor='rgba(56,189,248,.25)';this.style.background='rgba(255,255,255,.04)'">
+        <img src="characters/baby-boss.svg" width="80" height="80" style="object-fit:contain;" alt="Baby Boss">
+        <div style="font-size:.75rem;font-weight:800;color:var(--text);">Baby Boss</div>
+        <div style="font-size:.62rem;color:var(--muted);">The Boss Baby</div>
+      </div>
+      <!-- Ko'proq keladi -->
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+        background:rgba(255,255,255,.02);border:2px dashed rgba(255,255,255,.08);
+        border-radius:16px;padding:12px 16px;min-width:110px;min-height:120px;">
+        <div style="font-size:1.6rem;opacity:.3;">＋</div>
+        <div style="font-size:.7rem;color:var(--muted);text-align:center;">Keyingi<br>personaj</div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+
 
 <!-- AUTH -->
 <div id="auth">
@@ -1350,6 +1387,28 @@ $('reg-pass2').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefau
   }catch(_){}
   showAuth();
 })();
+
+// ── CHARS PANEL TOGGLE ──
+let charsPanelOpen = false;
+window.toggleCharsPanel = function(){
+  const panel = document.getElementById('chars-panel');
+  const btn = document.getElementById('chars-toggle-btn');
+  charsPanelOpen = !charsPanelOpen;
+  panel.style.display = charsPanelOpen ? 'block' : 'none';
+  btn.style.background = charsPanelOpen ? 'rgba(56,189,248,.15)' : '';
+  btn.style.borderColor = charsPanelOpen ? 'var(--gold)' : 'rgba(56,189,248,.3)';
+};
+// Panel tashqarisiga bosganda yopilsin
+document.addEventListener('click', function(e){
+  if(!charsPanelOpen) return;
+  const panel = document.getElementById('chars-panel');
+  const btn = document.getElementById('chars-toggle-btn');
+  if(panel && !panel.contains(e.target) && btn && !btn.contains(e.target)){
+    charsPanelOpen = false;
+    panel.style.display = 'none';
+    btn.style.background = '';
+    btn.style.borderColor = 'rgba(56,189,248,.3)';
+  }
+});
+
 </script>
-</body>
-</html>
