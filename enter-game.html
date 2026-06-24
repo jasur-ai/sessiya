@@ -559,6 +559,8 @@ function handleState(st){
 
 function showQPreview(st){
   stopTimer();
+  // Oldingi leaderboard timeout ni bekor qilamiz — yangi savol boshlanganda s-lb qayta ko'rinmasin
+  if(lbTimeoutId){clearTimeout(lbTimeoutId);lbTimeoutId=null;}
   $('qp-num').textContent=`Savol ${(st.q_index||0)+1}`;
   $('qp-text').textContent=st.q_text||'...';
   $('qp-badge').innerHTML=st.q_is_double?'<div class="badge-double">⚡ IKKI BAROBAR BALL</div>':'';
