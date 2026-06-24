@@ -534,6 +534,19 @@ function showPanel(){
   loadActiveTab();
 }
 
+// ── BFCACHE FIX: back button dan qaytganda ma'lumotlarni qayta yuklaymiz ──
+window.addEventListener('pageshow', function(e){
+  if(e.persisted){
+    // Sahifa bfcache dan tiklandi (back/forward button) — skriptlar qayta ishlamaydi,
+    // shuning uchun ma'lumotlarni qo'lda yangilaymiz
+    const isLoggedIn = sessionStorage.getItem('qb_admin_session') === '1';
+    if(isLoggedIn) {
+      loadGlobalStats();
+      loadActiveTab();
+    }
+  }
+});
+
 window.doLogin=function(){
   const u=$('adm-user').value.trim().toLowerCase();
   const p=$('adm-pass').value;

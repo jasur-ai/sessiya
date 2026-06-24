@@ -276,6 +276,7 @@ body.light .ans-bar{background:rgba(240,240,248,.92);}
     <div class="hd-right">
       <div id="theme-lbl" style="font-size:.72rem;font-weight:700;color:var(--muted)">Test:</div>
       <button type="button" class="mode-btn" id="dark-toggle" onclick="toggleDark()">☀️ Light</button>
+      <a id="lob-back-btn" href="user-panel.html" class="mode-btn" style="text-decoration:none;display:flex;align-items:center;gap:5px;">← Qaytish</a>
       <button type="button" class="end-btn" onclick="confirmEnd()">✕ Tugatish</button>
     </div>
   </div>
@@ -387,6 +388,8 @@ let darkMode=true;
   // Qaytish havolasini from parametriga qarab belgilaymiz
   const cb=document.getElementById('corner-back');
   if(cb) cb.href=_backUrl;
+  const lbb=document.getElementById('lob-back-btn');
+  if(lbb) lbb.href=_backUrl;
   try{
     const snap=await get(ref(db,`game_sessions/${code}`));
     if(!snap.exists()){alert('O\'yin topilmadi');location.href=_backUrl;return;}

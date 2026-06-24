@@ -1374,6 +1374,13 @@ window.startMockup=async function(key){
   }catch(e){console.error(e);alert('Xato: '+e.message);}
 };
 
+// ── BFCACHE FIX: back button dan qaytganda ma'lumotlarni qayta yuklaymiz ──
+window.addEventListener('pageshow', function(e){
+  if(e.persisted && curUser){
+    loadAll();
+  }
+});
+
 // ── ENTER KEY BINDINGS ──
 $('login-pass').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();window.doLogin();}});
 $('login-user').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('login-pass').focus();}});

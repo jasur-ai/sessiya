@@ -426,11 +426,22 @@ EMOJIS.forEach(em=>{
 // Pre-fill name from user panel session
 try{const ud=JSON.parse(localStorage.getItem('qb_user')||'{}');if(ud.username) $('name-inp').value=ud.username;}catch(_){}
 
-// Restore session on reload
-try{
-  const ss=JSON.parse(sessionStorage.getItem('qb_player')||'null');
-  if(ss){code=ss.code;name=ss.name;emoji=ss.emoji;rejoinSession();}
-}catch(_){}
+// Restore session on reload — faqat URL kodi sessiya kodi bilan MOS kelsa qayta ulanadi.
+// Aks holda (masalan, index.html dan yangi kirishda) eski sessiya o'chiriladi va kod so'raladi.
+(function(){
+  try{
+    const ss=JSON.parse(sessionStorage.getItem('qb_player')||'null');
+    const urlCode=new URLSearchParams(location.search).get('code');
+    // Rejoin faqat: URL kodi bor VA u saqlangan kod bilan mos kelsa
+    if(ss && ss.code && urlCode && urlCode===ss.code){
+      code=ss.code;name=ss.name;emoji=ss.emoji;
+      rejoinSession();
+      return;
+    }
+    // Boshqa holatda eski sessiyani tozalab, kod ekranini ko'rsatamiz
+    sessionStorage.removeItem('qb_player');
+  }catch(_){sessionStorage.removeItem('qb_player');}
+})();
 
 // ── STEP 1: Code ──
 window.checkCode=async function(){
@@ -450,9 +461,13 @@ window.checkCode=async function(){
 $('code-inp').addEventListener('keydown',e=>{if(e.key==='Enter')checkCode();});
 
 // Auto-fill code from URL ?code=XXXXX — after checkCode is defined
+// Faqat kod kiritish ekranida bo'lganda ishlaydi (rejoin bo'lmagan holat)
 (function(){
   const urlCode=new URLSearchParams(location.search).get('code');
   if(urlCode&&/^\d{5}$/.test(urlCode)){
+    // Agar rejoin allaqachon boshlangan bo'lsa (s-code ko'rinmasa), o'tkazib yuboramiz
+    const codeScreen=document.getElementById('s-code');
+    if(codeScreen&&!codeScreen.classList.contains('on')) return;
     $('code-inp').value=urlCode;
     setTimeout(()=>checkCode(),300);
   }
