@@ -738,6 +738,7 @@ function buildTestCard(key,t,i){
       <button type="button" class="act-btn act-edit" onclick="editTest('${safeKey}')">✏️</button>
       <button type="button" class="act-btn act-edit" onclick="openRename('${safeKey}')">📝</button>
       <button type="button" class="act-btn act-cast" onclick="openCast('${safeKey}','${safeName}','user')">📡 Cast</button>
+      <button type="button" class="act-btn act-mock" onclick="startMockup('${safeKey}')">🤖</button>
       <button type="button" class="act-btn act-del" onclick="confirmDel('${safeKey}','${safeName}')">🗑️</button>
     </div>
   </div>`;
@@ -1264,7 +1265,7 @@ function openCastDirect(qs,name,from){
 }
 
 // FIX: closeCast global
-window.closeCast=function(){$('cast-modal').classList.remove('on');_castOverrideQs=null;_castOverrideName=null;};
+window.closeCast=function(){$('cast-modal').classList.remove('on');_castOverrideQs=null;_castOverrideName=null;_castFrom='user';};
 
 // Cast modal background click
 $('cast-modal').addEventListener('click', function(e){

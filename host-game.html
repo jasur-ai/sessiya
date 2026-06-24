@@ -474,7 +474,7 @@ async function pushQPreview(idx){
     q_index:idx,
     q_text:q.text||'',
     q_options:q.options||[],
-    q_correct:q.correct||0,
+    q_correct:typeof q.correct==='number'?q.correct:0,
     q_is_double:!!q.is_double,
     q_time:qTime,
     q_started_at:0

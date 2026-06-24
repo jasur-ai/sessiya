@@ -575,7 +575,7 @@ function showQActive(st){
   updatePBadge();
   goTo('s-qact');
 
-  lastCorrectIdx=st.q_correct||0;
+  lastCorrectIdx=typeof st.q_correct==='number'?st.q_correct:-1;
   lastCorrectText=(st.q_options||[])[lastCorrectIdx]||'';
   lastPickedIdx=-1;
   // Start timer display
