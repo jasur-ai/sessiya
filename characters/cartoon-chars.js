@@ -55,5 +55,13 @@ export const CARTOON_CHARS = [
     animation: 'hover',
     animationStyle: 'sway 2.8s ease-in-out infinite'
   },
+  {
+    id: 'judy-hopps',
+    name: 'Judy Hopps',
+    image: 'characters/judy-hopps.png',
+    from: 'Zootopia',
+    animation: 'hover',
+    animationStyle: 'sway 2.5s ease-in-out infinite'
+  },
   
 ];
