@@ -42,4 +42,11 @@ export const CARTOON_CHARS = [
     from: 'Dragon Warrior',
     animation: null
   },
+  {
+    id: 'tigress',
+    name: 'Tigress',
+    image: 'characters/tigress.png',
+    from: 'Kung Fu Panda',
+    animation: 'sway 2.8s ease-in-out infinite'
+  },
 ];
