@@ -89,5 +89,22 @@ export const CARTOON_CHARS = [
     animation: 'hover',
     animationStyle: 'float 2.6s ease-in-out infinite'
   },
+  {
+    id: 'white-fury',
+    name: 'Night Fury',
+    image: 'characters/white-fury.png',
+    from: 'Fantasy ',
+    animation: 'hover',
+    animationStyle: 'float 2.6s ease-in-out infinite'
+  },
+   {
+    id: 'black-fury',
+    name: 'Night Fury fury',
+    image: 'characters/black-fury.png',
+    from: 'Fantasy ',
+    animation: 'hover',
+    animationStyle: 'float 2.6s ease-in-out infinite'
+  },
+  
   
 ];
