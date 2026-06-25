@@ -386,55 +386,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
       <div style="font-family:'Righteous',cursive;font-size:1rem;color:var(--gold);">🎬 Cartoon Characters</div>
       <div style="font-size:.72rem;color:var(--muted);font-weight:700;">Keyingi versiyalarda qo'shiladi...</div>
     </div>
-    <div style="display:flex;gap:14px;flex-wrap:wrap;">
-      <!-- Baby Boss -->
-      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
-        background:rgba(255,255,255,.04);border:2px solid rgba(56,189,248,.25);
-        border-radius:16px;padding:12px 16px;transition:all .2s;min-width:110px;"
-        onmouseover="this.style.borderColor='var(--gold)';this.style.background='rgba(56,189,248,.08)'"
-        onmouseout="this.style.borderColor='rgba(56,189,248,.25)';this.style.background='rgba(255,255,255,.04)'">
-        <img src="characters/baby-boss.svg" width="80" height="80" style="object-fit:contain;" alt="Baby Boss">
-        <div style="font-size:.75rem;font-weight:800;color:var(--text);">Baby Boss</div>
-        <div style="font-size:.62rem;color:var(--muted);">The Boss Baby</div>
-      </div>
-      <!-- Puss in Boots -->
-      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
-        background:rgba(255,255,255,.04);border:2px solid rgba(255,140,0,.25);
-        border-radius:16px;padding:12px 16px;transition:all .2s;min-width:110px;"
-        onmouseover="this.style.borderColor='#f5c430';this.style.background='rgba(245,196,48,.08)'"
-        onmouseout="this.style.borderColor='rgba(255,140,0,.25)';this.style.background='rgba(255,255,255,.04)'">
-        <img src="characters/puss-in-boots.svg" width="80" height="112" style="object-fit:contain;" alt="Puss in Boots">
-        <div style="font-size:.75rem;font-weight:800;color:var(--text);">Puss in Boots</div>
-        <div style="font-size:.62rem;color:var(--muted);">Shrek / DreamWorks</div>
-      </div>
-      <!-- Baby Boss Girl -->
-      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
-        background:rgba(255,255,255,.04);border:2px solid rgba(255,182,193,.25);
-        border-radius:16px;padding:12px 16px;transition:all .2s;min-width:110px;"
-        onmouseover="this.style.borderColor='#ffb6c1';this.style.background='rgba(255,182,193,.08)'"
-        onmouseout="this.style.borderColor='rgba(255,182,193,.25)';this.style.background='rgba(255,255,255,.04)'">
-        <img src="characters/baby-boss-girl.svg" width="80" height="112" style="object-fit:contain;" alt="Baby Boss Girl">
-        <div style="font-size:.75rem;font-weight:800;color:var(--text);">Baby Boss Girl</div>
-        <div style="font-size:.62rem;color:var(--muted);">Family Business (2021)</div>
-      </div>
-      <!-- Puss in Boots Nailles -->
-      <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
-        background:rgba(255,255,255,.04);border:2px solid rgba(100,116,139,.25);
-        border-radius:16px;padding:12px 16px;transition:all .2s;min-width:110px;"
-        onmouseover="this.style.borderColor='var(--text)';this.style.background='rgba(100,116,139,.08)'"
-        onmouseout="this.style.borderColor='rgba(100,116,139,.25)';this.style.background='rgba(255,255,255,.04)'">
-        <img src="characters/puss-in-boots-nailles.svg" width="80" height="112" style="object-fit:contain;" alt="Puss in Boots Nailles">
-        <div style="font-size:.75rem;font-weight:800;color:var(--text);">Puss in Boots Nailles</div>
-        <div style="font-size:.62rem;color:var(--muted);">Shrek / DreamWorks</div>
-      </div>
-      <!-- Ko'proq keladi -->
-      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-        background:rgba(255,255,255,.02);border:2px dashed rgba(255,255,255,.08);
-        border-radius:16px;padding:12px 16px;min-width:110px;min-height:120px;">
-        <div style="font-size:1.6rem;opacity:.3;">＋</div>
-        <div style="font-size:.7rem;color:var(--muted);text-align:center;">Keyingi<br>personaj</div>
-      </div>
-    </div>
+    <div id="chars-grid" style="display:flex;gap:14px;flex-wrap:wrap;"></div>
   </div>
 </div>
 <style>
@@ -1425,7 +1377,29 @@ $('reg-pass2').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefau
   showAuth();
 })();
 
-// ── CHARS PANEL TOGGLE ──
+// ── CHARS PANEL — cartoon-chars.js dan dinamik render ──
+import { CARTOON_CHARS } from './characters/cartoon-chars.js';
+(function renderChars(){
+  const grid = document.getElementById('chars-grid');
+  if(!grid) return;
+  grid.innerHTML = CARTOON_CHARS.map(c=>`
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;
+      background:rgba(255,255,255,.04);border:2px solid ${c.border};
+      border-radius:16px;padding:12px 16px;transition:all .2s;min-width:110px;"
+      onmouseover="this.style.borderColor='${c.borderHover}';this.style.background='${c.bgHover}'"
+      onmouseout="this.style.borderColor='${c.border}';this.style.background='rgba(255,255,255,.04)'">
+      <img src="${c.image}" width="${c.w||80}" height="${c.h||80}" style="object-fit:contain;" alt="${c.name}">
+      <div style="font-size:.75rem;font-weight:800;color:var(--text);">${c.name}</div>
+      <div style="font-size:.62rem;color:var(--muted);">${c.from}</div>
+    </div>`).join('')
+  + `<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+      background:rgba(255,255,255,.02);border:2px dashed rgba(255,255,255,.08);
+      border-radius:16px;padding:12px 16px;min-width:110px;min-height:120px;">
+      <div style="font-size:1.6rem;opacity:.3;">＋</div>
+      <div style="font-size:.7rem;color:var(--muted);text-align:center;">Keyingi<br>personaj</div>
+    </div>`;
+})();
+
 let charsPanelOpen = false;
 window.toggleCharsPanel = function(){
   const panel = document.getElementById('chars-panel');
