@@ -73,5 +73,13 @@ export const CARTOON_CHARS = [
     animation: 'hover',
     animationStyle: 'sway 3s ease-in-out infinite'
   },
+  {
+    id: 'dark-wolf',
+    name: 'Dark Wolf',
+    image: 'characters/dark-wolf.png',
+    from: 'Fantasy / Original',
+    animation: 'hover',
+    animationStyle: 'sway 2.4s ease-in-out infinite'
+  },
   
 ];
