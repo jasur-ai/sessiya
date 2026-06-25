@@ -81,5 +81,13 @@ export const CARTOON_CHARS = [
     animation: 'hover',
     animationStyle: 'sway 2.4s ease-in-out infinite'
   },
+  {
+    id: 'dark-blade',
+    name: 'Dark Blade',
+    image: 'characters/dark-blade.png',
+    from: 'Fantasy / Original',
+    animation: 'hover',
+    animationStyle: 'float 2.6s ease-in-out infinite'
+  },
   
 ];
