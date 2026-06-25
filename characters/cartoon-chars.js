@@ -20,7 +20,7 @@ export const CARTOON_CHARS = [
     name: 'Puss in Boots',
     image: 'characters/puss-in-boots.svg',
     from: 'Shrek / DreamWorks',
-    animation: null,
+    animation: 'hover',
     animationStyle: 'float 2.8s ease-in-out infinite'
   },
   {
@@ -28,7 +28,7 @@ export const CARTOON_CHARS = [
     name: 'Baby Boss Girl',
     image: 'characters/baby-boss-girl.svg',
     from: 'Family Business (2021)',
-    animation: null,
+    animation: 'hover',
     animationStyle: 'sway 3.4s ease-in-out infinite'
   },
   {
@@ -36,7 +36,7 @@ export const CARTOON_CHARS = [
     name: 'Puss in Boots Nailles',
     image: 'characters/puss-in-boots-nailles.svg',
     from: 'Shrek / DreamWorks',
-    animation: null,
+    animation: 'hover',
     animationStyle: 'float 3.1s ease-in-out infinite'
   },
   {
