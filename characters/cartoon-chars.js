@@ -16,14 +16,6 @@ export const CARTOON_CHARS = [
     animationStyle: 'sway 3s ease-in-out infinite'
   },
   {
-    id: 'puss-in-boots',
-    name: 'Puss in Boots',
-    image: 'characters/puss-in-boots.svg',
-    from: 'Shrek / DreamWorks',
-    animation: 'hover',
-    animationStyle: 'float 2.8s ease-in-out infinite'
-  },
-  {
     id: 'baby-boss-girl',
     name: 'Baby Boss Girl',
     image: 'characters/baby-boss-girl.svg',
@@ -31,6 +23,16 @@ export const CARTOON_CHARS = [
     animation: 'hover',
     animationStyle: 'sway 3.4s ease-in-out infinite'
   },
+
+  {
+    id: 'puss-in-boots',
+    name: 'Puss in Boots',
+    image: 'characters/puss-in-boots.svg',
+    from: 'Shrek / DreamWorks',
+    animation: 'hover',
+    animationStyle: 'float 2.8s ease-in-out infinite'
+  },
+  
   {
     id: 'puss-in-boots-nailles',
     name: 'Puss in Boots Nailles',
