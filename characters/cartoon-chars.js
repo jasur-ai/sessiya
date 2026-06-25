@@ -44,7 +44,7 @@ export const CARTOON_CHARS = [
     name: 'Kitty Softpaws',
     image: 'characters/kitty-softpaws.png',
     from: 'Puss in Boots (2011)',
-    animation: 'hover',
+    animation: null,
     animationStyle: 'sway 2.6s ease-in-out infinite'
   },
   {
@@ -55,12 +55,5 @@ export const CARTOON_CHARS = [
     animation: 'hover',
     animationStyle: 'sway 2.8s ease-in-out infinite'
   },
-  {
-    id: 'tai-lung',
-    name: 'Tai Lung',
-    image: 'characters/tai-lung.png',
-    from: 'Kung Fu Panda',
-    animation: null,
-    animationStyle: null
-  },
+  
 ];
