@@ -38,7 +38,7 @@ export const CARTOON_CHARS = [
   {
     id: 'kitty-softpaws',
     name: 'Kitty Softpaws',
-    image: 'characters/kitty-softpaws.svg',
+    image: 'characters/kitty-softpaws.png',
     from: 'Puss in Boots (2011)',
     animation: null
   },
