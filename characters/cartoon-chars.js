@@ -7,6 +7,30 @@
  */
 
 export const CARTOON_CHARS = [
+   {
+    id: 'dark-wolf',
+    name: 'Dark Wolf',
+    image: 'characters/dark-wolf.png',
+    from: 'Fantasy / Original',
+    animation: 'hover',
+    animationStyle: 'sway 2.4s ease-in-out infinite'
+  },
+   {
+    id: 'genral',
+    name: 'General Kai',
+    image: 'characters/general.png',
+    from: 'Fantasy',
+    animation: 'hover',
+    animationStyle: 'sway 2.4s ease-in-out infinite'
+  },
+   {
+    id: 'dark-blade',
+    name: 'Dark Blade',
+    image: 'characters/dark-blade.png',
+    from: 'Fantasy / Original',
+    animation: 'hover',
+    animationStyle: 'float 2.6s ease-in-out infinite'
+  },
   {
     id: 'baby-boss',
     name: 'Baby Boss',
@@ -72,23 +96,8 @@ export const CARTOON_CHARS = [
     from: 'Zootopia',
     animation: 'hover',
     animationStyle: 'sway 3s ease-in-out infinite'
-  },
-  {
-    id: 'dark-wolf',
-    name: 'Dark Wolf',
-    image: 'characters/dark-wolf.png',
-    from: 'Fantasy / Original',
-    animation: 'hover',
-    animationStyle: 'sway 2.4s ease-in-out infinite'
-  },
-  {
-    id: 'dark-blade',
-    name: 'Dark Blade',
-    image: 'characters/dark-blade.png',
-    from: 'Fantasy / Original',
-    animation: 'hover',
-    animationStyle: 'float 2.6s ease-in-out infinite'
-  },
+  }, 
+ 
   {
     id: 'white-fury',
     name: 'Night Fury',
