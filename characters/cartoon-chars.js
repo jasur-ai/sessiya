@@ -63,5 +63,13 @@ export const CARTOON_CHARS = [
     animation: 'hover',
     animationStyle: 'sway 2.5s ease-in-out infinite'
   },
+  {
+    id: 'nick-wilde',
+    name: 'Nick Wilde',
+    image: 'characters/nick-wilde.png',
+    from: 'Zootopia',
+    animation: 'hover',
+    animationStyle: 'sway 3s ease-in-out infinite'
+  },
   
 ];
