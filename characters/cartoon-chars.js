@@ -40,6 +40,6 @@ export const CARTOON_CHARS = [
     name: 'Kitty Softpaws',
     image: 'characters/kitty-softpaws.svg',
     from: 'Puss in Boots (2011)',
-    animation: 'sway 2.6s ease-in-out infinite'
+    animation: null
   },
 ];
