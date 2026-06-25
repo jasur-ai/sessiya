@@ -32,6 +32,13 @@ export const CARTOON_CHARS = [
     image: 'characters/puss-in-boots-nailles.svg',
     from: 'Shrek / DreamWorks'
   }
+  ,
+  {
+    id: 'kitty-softpaws',
+    name: 'Kitty Softpaws',
+    image: 'characters/kitty-softpaws.svg',
+    from: 'Puss in Boots (2011)'
+  }
   // Keyingi personajlar shu yerga qo'shiladi:
   // { id: 'shrek', name: 'Shrek', image: 'characters/shrek.png', from: 'Shrek (2001)' },
 ];
