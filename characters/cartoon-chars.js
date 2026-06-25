@@ -31,6 +31,14 @@ export const CARTOON_CHARS = [
     animation: 'hover',
     animationStyle: 'float 2.6s ease-in-out infinite'
   },
+   {
+    id: 'lord-shen',
+    name: 'Lorn Shen',
+    image: 'characters/lord-shen.png',
+    from: 'Fantasy',
+    animation: 'hover',
+    animationStyle: 'sway 2.4s ease-in-out infinite'
+  },
   {
     id: 'baby-boss',
     name: 'Baby Boss',
