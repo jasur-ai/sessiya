@@ -73,6 +73,14 @@ export const CARTOON_CHARS = [
     animation: 'hover',
     animationStyle: 'float 3.1s ease-in-out infinite'
   },
+    {
+    id: 'snitch',
+    name: 'Snitch',
+    image: 'characters/snitch.png',
+    from: 'Snitch',
+    animation: 'hover',
+    animationStyle: 'float 2.8s ease-in-out infinite'
+  },
   {
     id: 'kitty-softpaws',
     name: 'Kitty Softpaws',
