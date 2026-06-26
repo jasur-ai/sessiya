@@ -456,7 +456,7 @@ function setupLobby(){
     playersSnap=snap.val()||{};
     const list=Object.entries(playersSnap);
     $('lob-cnt').textContent=`${list.length} o'yinchi`;
-    $('lob-players').innerHTML=list.map(([n,p])=>`<div class="p-chip">${p.emoji||'👤'} ${esc(n)}</div>`).join('');
+    $('lob-players').innerHTML=list.map(([n,p])=>`<div class="p-chip">${charImg(p.emoji||'👤',22)} ${esc(n)}</div>`).join('');
   });
 }
 
@@ -693,10 +693,18 @@ window.afterLbNext=function(){
 };
 
 const RANK_CLS=['rank-1','rank-2','rank-3','rank-n','rank-n','rank-n','rank-n'];
+function charImg(imgPath,size=30){
+  if(!imgPath) return '❓';
+  if(imgPath.startsWith('characters/')||imgPath.startsWith('http')){
+    return `<img src="${imgPath}" style="width:${size}px;height:${size}px;object-fit:contain;vertical-align:middle;border-radius:4px;" alt="">`;
+  }
+  return imgPath;
+}
+
 function renderLb(lb){
   return lb.slice(0,7).map((p,i)=>`<div class="lbi">
     <div class="lb-rank ${RANK_CLS[i]||'rank-n'}">${['🥇','🥈','🥉'][i]||i+1}</div>
-    <div class="lb-em">${p.emoji||'❓'}</div>
+    <div class="lb-em">${charImg(p.emoji,32)}</div>
     <div class="lb-nm">${esc(p.name)}</div>
     <div class="lb-sc">${p.score||0} ball</div>
   </div>`).join('');
@@ -709,7 +717,7 @@ function renderLbFull(lb){
     if(plain){
       return`<div class="lbi lbi-plain">
         <div class="lb-rank rank-n">${i+1}</div>
-        <div class="lb-em">${p.emoji||'❓'}</div>
+        <div class="lb-em">${charImg(p.emoji,24)}</div>
         <div class="lb-nm">${esc(p.name)}</div>
         <div style="text-align:right">
           <div class="lb-sc">${p.score||0} ball</div>
@@ -719,7 +727,7 @@ function renderLbFull(lb){
     }
     return`<div class="lbi">
       <div class="lb-rank ${RANK_CLS[i]||'rank-n'}">${['🥇','🥈','🥉'][i]||i+1}</div>
-      <div class="lb-em">${p.emoji||'❓'}</div>
+      <div class="lb-em">${charImg(p.emoji,32)}</div>
       <div class="lb-nm">${esc(p.name)}</div>
       <div style="text-align:right">
         <div class="lb-sc">${p.score||0} ball</div>

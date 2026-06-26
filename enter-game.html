@@ -68,15 +68,23 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 .err{background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.3);color:var(--accent);}
 .ok{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);color:var(--green);}
 
-/* ─── EMOJI GRID ─── */
-.emoji-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin:14px 0 18px;}
+/* ─── CHARACTER GRID ─── */
+.emoji-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 18px;}
 .e-btn{
-  aspect-ratio:1;border-radius:12px;border:2px solid rgba(255,255,255,.07);
-  background:rgba(255,255,255,.04);font-size:1.7rem;cursor:pointer;
-  transition:all .18s;display:flex;align-items:center;justify-content:center;
+  border-radius:14px;border:2px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.04);cursor:pointer;
+  transition:all .18s;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding:8px 6px 7px;gap:4px;min-height:100px;position:relative;overflow:hidden;
 }
-.e-btn:hover{border-color:var(--accent);transform:scale(1.08);background:rgba(37,99,235,.1);}
-.e-btn.sel{border-color:var(--gold);background:rgba(56,189,248,.12);transform:scale(1.1);}
+.e-btn img{width:64px;height:64px;object-fit:contain;transition:transform .2s;}
+.e-btn .e-name{font-size:.6rem;font-weight:800;color:var(--muted);text-align:center;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;}
+.e-btn:hover{border-color:var(--accent);background:rgba(37,99,235,.08);}
+.e-btn:hover img{transform:scale(1.12) translateY(-3px);}
+.e-btn.sel{border-color:var(--gold);background:rgba(56,189,248,.1);}
+.e-btn.sel img{transform:scale(1.1) translateY(-4px);}
+.e-btn.sel .e-name{color:var(--gold);}
+@keyframes sway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
 /* ─── LOBBY ─── */
 #s-lobby{
@@ -221,8 +229,9 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 
 @media(max-width:600px){
   .opts{grid-template-columns:1fr;}
-  .emoji-grid{grid-template-columns:repeat(4,1fr);}
-  .code-input{font-size:2.2rem;letter-spacing:8px;padding:14px 10px;}
+  .emoji-grid{grid-template-columns:repeat(3,1fr);}
+  .e-btn{min-height:88px;}
+  .e-btn img{width:52px;height:52px;}
   .screen{padding:14px;}
   .box{padding:20px 16px;border-radius:18px;}
   .opt{min-height:60px;font-size:.9rem;padding:14px 11px;}
@@ -235,8 +244,10 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   .q-text{font-size:clamp(1rem,4.5vw,1.5rem);}
 }
 @media(max-width:400px){
-  .emoji-grid{grid-template-columns:repeat(4,1fr);gap:6px;}
-  .e-btn{font-size:1.4rem;border-radius:10px;}
+  .emoji-grid{grid-template-columns:repeat(3,1fr);gap:7px;}
+  .e-btn{min-height:80px;}
+  .e-btn img{width:46px;height:46px;}
+  .e-btn .e-name{font-size:.55rem;}
   .logo{font-size:1.5rem;}
   .wait-title{font-size:1.2rem;}
 }
@@ -273,7 +284,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 <!-- ══ S3: CHOOSE EMOJI ══ -->
 <div class="screen" id="s-emoji">
   <button type="button" class="toplink" onclick="goTo('s-name')" style="border:none;cursor:pointer;">← Orqaga</button>
-  <div class="box" style="max-width:460px;">
+  <div class="box" style="max-width:540px;">
     <div class="box-title">🎭 Karakteringizni tanlang</div>
     <div class="emoji-grid" id="emoji-grid"></div>
     <button type="button" class="btn btn-green" id="join-btn" disabled onclick="joinGame()">O'yinga qo'shilish ✓</button>
@@ -322,7 +333,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 
   <!-- Player badge -->
   <div class="pbadge on" id="pb-act">
-    <span class="pb-em" id="pb-em1">🦊</span><span id="pb-nm1">—</span>
+    <span class="pb-em" id="pb-em1" style="display:flex;align-items:center;"></span><span id="pb-nm1">—</span>
   </div>
 </div>
 
@@ -333,7 +344,7 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
   <div class="wait-sub">Boshqalar javob berishi va natijalarni kuting...</div>
   <div class="dots" style="margin-top:20px;justify-content:center;"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
   <div class="pbadge on" id="pb-wait" style="position:fixed;">
-    <span class="pb-em" id="pb-em2">🦊</span><span id="pb-nm2">—</span>
+    <span class="pb-em" id="pb-em2" style="display:flex;align-items:center;"></span><span id="pb-nm2">—</span>
   </div>
 </div>
 
@@ -385,11 +396,35 @@ const app=initializeApp(FB);
 const db=getDatabase(app);
 
 // ── CONSTANTS ──
-const EMOJIS=['🦊','🐺','🦁','🐯','🦝','🐲','🦄','🦅','🐸','🦑','🤖','👾','🦸','🧙','🥷','🦈','🐙','🦉','🦩','🎭'];
+const CARTOON_CHARS=[
+  {id:'dark-wolf',name:'Dark Wolf',image:'characters/dark-wolf.png',animationStyle:'sway 2.4s ease-in-out infinite'},
+  {id:'general',name:'General Kai',image:'characters/general.png',animationStyle:'sway 2.4s ease-in-out infinite'},
+  {id:'dark-blade',name:'Dark Blade',image:'characters/dark-blade.png',animationStyle:'float 2.6s ease-in-out infinite'},
+  {id:'lord-shen',name:'Lord Shen',image:'characters/lord-shen.png',animationStyle:'sway 2.4s ease-in-out infinite'},
+  {id:'baby-boss',name:'Baby Boss',image:'characters/baby-boss.svg',animationStyle:'sway 3s ease-in-out infinite'},
+  {id:'baby-boss-girl',name:'Baby Boss Girl',image:'characters/baby-boss-girl.svg',animationStyle:'sway 3.4s ease-in-out infinite'},
+  {id:'puss-in-boots',name:'Puss in Boots',image:'characters/puss-in-boots.svg',animationStyle:'float 2.8s ease-in-out infinite'},
+  {id:'puss-in-boots-nailles',name:'Puss Nailles',image:'characters/puss-in-boots-nailles.svg',animationStyle:'float 3.1s ease-in-out infinite'},
+  {id:'kitty-softpaws',name:'Kitty Softpaws',image:'characters/kitty-softpaws.png',animationStyle:'sway 2.6s ease-in-out infinite'},
+  {id:'tigress',name:'Tigress',image:'characters/tigress.png',animationStyle:'sway 2.8s ease-in-out infinite'},
+  {id:'judy-hopps',name:'Judy Hopps',image:'characters/judy-hopps.png',animationStyle:'sway 2.5s ease-in-out infinite'},
+  {id:'nick-wilde',name:'Nick Wilde',image:'characters/nick-wilde.png',animationStyle:'sway 3s ease-in-out infinite'},
+  {id:'white-fury',name:'Night Fury W',image:'characters/white-fury.png',animationStyle:'float 2.6s ease-in-out infinite'},
+  {id:'black-fury',name:'Night Fury B',image:'characters/black-fury.png',animationStyle:'float 2.6s ease-in-out infinite'},
+];
 const SHAPES=['▲','●','■','♦','★'];
 const OPT_COLORS=['#ff4466','#38bdf8','#ffd60a','#00ffaa','#c084fc'];
 const RANK_EMOJI=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣'];
 const RANK_CLS=['r1','r2','r3','','','',''];
+
+// Helper: emoji (image path) dan <img> HTML yasash
+function charImg(imgPath,size=28){
+  if(!imgPath) return '❓';
+  if(imgPath.startsWith('characters/')||imgPath.startsWith('http')){
+    return `<img src="${imgPath}" style="width:${size}px;height:${size}px;object-fit:contain;vertical-align:middle;border-radius:4px;" alt="">`;
+  }
+  return imgPath; // fallback: emoji text
+}
 
 // ── STATE ──
 let code='', name='', emoji='', selEmoji='';
@@ -415,11 +450,21 @@ function seededShuffle(arr,seed){
   return a;
 }
 
-// Build emoji grid
+// Build character grid
 const grid=$('emoji-grid');
-EMOJIS.forEach(em=>{
-  const b=document.createElement('button');b.className='e-btn';b.textContent=em;
-  b.onclick=()=>{document.querySelectorAll('.e-btn').forEach(x=>x.classList.remove('sel'));b.classList.add('sel');selEmoji=em;$('join-btn').disabled=false;};
+CARTOON_CHARS.forEach(ch=>{
+  const b=document.createElement('button');b.className='e-btn';
+  b.innerHTML=`<img src="${ch.image}" alt="${ch.name}" style="animation:none"><div class="e-name">${ch.name}</div>`;
+  const img=b.querySelector('img');
+  b.onmouseenter=()=>{img.style.animation=ch.animationStyle||'';};
+  b.onmouseleave=()=>{if(!b.classList.contains('sel'))img.style.animation='';};
+  b.onclick=()=>{
+    document.querySelectorAll('.e-btn').forEach(x=>{x.classList.remove('sel');const xi=x.querySelector('img');if(xi)xi.style.animation='';});
+    b.classList.add('sel');
+    img.style.animation=ch.animationStyle||'';
+    selEmoji=ch.image;
+    $('join-btn').disabled=false;
+  };
   grid.appendChild(b);
 });
 
@@ -530,7 +575,7 @@ function startLobby(){
     const data=snap.val()||{};
     const list=Object.entries(data);
     $('lob-count').textContent=`${list.length} o'yinchi`;
-    $('lob-players').innerHTML=list.map(([n,p])=>`<div class="p-chip">${p.emoji} ${esc(n)}</div>`).join('');
+    $('lob-players').innerHTML=list.map(([n,p])=>`<div class="p-chip">${charImg(p.emoji,22)} ${esc(n)}</div>`).join('');
   });
 
   // Listen game state
@@ -655,7 +700,7 @@ function renderLb(lb){
   return lb.slice(0,7).map((p,i)=>`
     <div class="lbi${p.name===name?' me':''}">
       <div class="lb-rank ${RANK_CLS[i]||''}">${RANK_EMOJI[i]||i+1}</div>
-      <div class="lb-em">${p.emoji||'❓'}</div>
+      <div class="lb-em">${charImg(p.emoji,32)}</div>
       <div class="lb-nm">${esc(p.name)}${p.name===name?' 👈':''}</div>
       <div class="lb-sc">${p.score||0} ball</div>
     </div>`).join('');
@@ -669,7 +714,7 @@ function renderLbAll(lb){
     return`
     <div class="lbi${p.name===name?' me':''}${plain?' lbi-plain':''}">
       <div class="lb-rank ${plain?'':(RANK_CLS[i]||'')}">${rankLabel}</div>
-      <div class="lb-em">${p.emoji||'❓'}</div>
+      <div class="lb-em">${charImg(p.emoji,plain?26:32)}</div>
       <div class="lb-nm">${esc(p.name)}${p.name===name?' 👈':''}</div>
       <div style="text-align:right">
         <div class="lb-sc">${p.score||0} ball</div>
@@ -739,10 +784,10 @@ function showEnded(lb){
 
 
 function updatePBadge(){
-  $('pb-em1').textContent=emoji||'❓';$('pb-nm1').textContent=name||'—';
+  $('pb-em1').innerHTML=charImg(emoji||'characters/baby-boss.svg',24);$('pb-nm1').textContent=name||'—';
 }
 function updatePBadge2(){
-  $('pb-em2').textContent=emoji||'❓';$('pb-nm2').textContent=name||'—';
+  $('pb-em2').innerHTML=charImg(emoji||'characters/baby-boss.svg',24);$('pb-nm2').textContent=name||'—';
 }
 
 // Rejoin on reload
