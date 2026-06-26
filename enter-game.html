@@ -390,28 +390,13 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, set, get, onValue, off, runTransaction } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { CARTOON_CHARS } from "./characters/cartoon-chars.js";
 
 const FB={apiKey:"AIzaSyA-2Uf7dZf1kqf7c32txyTFXSd2PCJbJLw",authDomain:"sessiya-11767.firebaseapp.com",databaseURL:"https://sessiya-11767-default-rtdb.firebaseio.com",projectId:"sessiya-11767",storageBucket:"sessiya-11767.firebasestorage.app",messagingSenderId:"883067400258",appId:"1:883067400258:web:941d591d38755c73247ddb"};
 const app=initializeApp(FB);
 const db=getDatabase(app);
 
 // ── CONSTANTS ──
-const CARTOON_CHARS=[
-  {id:'dark-wolf',name:'Dark Wolf',image:'characters/dark-wolf.png',animationStyle:'sway 2.4s ease-in-out infinite'},
-  {id:'general',name:'General Kai',image:'characters/general.png',animationStyle:'sway 2.4s ease-in-out infinite'},
-  {id:'dark-blade',name:'Dark Blade',image:'characters/dark-blade.png',animationStyle:'float 2.6s ease-in-out infinite'},
-  {id:'lord-shen',name:'Lord Shen',image:'characters/lord-shen.png',animationStyle:'sway 2.4s ease-in-out infinite'},
-  {id:'baby-boss',name:'Baby Boss',image:'characters/baby-boss.svg',animationStyle:'sway 3s ease-in-out infinite'},
-  {id:'baby-boss-girl',name:'Baby Boss Girl',image:'characters/baby-boss-girl.svg',animationStyle:'sway 3.4s ease-in-out infinite'},
-  {id:'puss-in-boots',name:'Puss in Boots',image:'characters/puss-in-boots.svg',animationStyle:'float 2.8s ease-in-out infinite'},
-  {id:'puss-in-boots-nailles',name:'Puss Nailles',image:'characters/puss-in-boots-nailles.svg',animationStyle:'float 3.1s ease-in-out infinite'},
-  {id:'kitty-softpaws',name:'Kitty Softpaws',image:'characters/kitty-softpaws.png',animationStyle:'sway 2.6s ease-in-out infinite'},
-  {id:'tigress',name:'Tigress',image:'characters/tigress.png',animationStyle:'sway 2.8s ease-in-out infinite'},
-  {id:'judy-hopps',name:'Judy Hopps',image:'characters/judy-hopps.png',animationStyle:'sway 2.5s ease-in-out infinite'},
-  {id:'nick-wilde',name:'Nick Wilde',image:'characters/nick-wilde.png',animationStyle:'sway 3s ease-in-out infinite'},
-  {id:'white-fury',name:'Night Fury W',image:'characters/white-fury.png',animationStyle:'float 2.6s ease-in-out infinite'},
-  {id:'black-fury',name:'Night Fury B',image:'characters/black-fury.png',animationStyle:'float 2.6s ease-in-out infinite'},
-];
 const SHAPES=['▲','●','■','♦','★'];
 const OPT_COLORS=['#ff4466','#38bdf8','#ffd60a','#00ffaa','#c084fc'];
 const RANK_EMOJI=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣'];

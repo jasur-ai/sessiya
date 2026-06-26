@@ -620,6 +620,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import{getDatabase,ref,set,get,remove,push}from"https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { CARTOON_CHARS } from './characters/cartoon-chars.js';
 
 const FB={apiKey:"AIzaSyA-2Uf7dZf1kqf7c32txyTFXSd2PCJbJLw",authDomain:"sessiya-11767.firebaseapp.com",
   databaseURL:"https://sessiya-11767-default-rtdb.firebaseio.com",projectId:"sessiya-11767",
@@ -1380,7 +1381,6 @@ $('reg-pass2').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefau
 })();
 
 // ── CHARS PANEL — cartoon-chars.js dan dinamik render ──
-import { CARTOON_CHARS } from './characters/cartoon-chars.js';
 (function renderChars(){
   const grid = document.getElementById('chars-grid');
   if(!grid) return;

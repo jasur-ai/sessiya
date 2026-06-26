@@ -173,12 +173,12 @@ body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);disp
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, set, get, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { CARTOON_CHARS } from "./characters/cartoon-chars.js";
 
 const FB={apiKey:"AIzaSyA-2Uf7dZf1kqf7c32txyTFXSd2PCJbJLw",authDomain:"sessiya-11767.firebaseapp.com",databaseURL:"https://sessiya-11767-default-rtdb.firebaseio.com",projectId:"sessiya-11767",storageBucket:"sessiya-11767.firebasestorage.app",messagingSenderId:"883067400258",appId:"1:883067400258:web:941d591d38755c73247ddb"};
 const app=initializeApp(FB);
 const db=getDatabase(app);
 const $=id=>document.getElementById(id);
-const EMOJIS=['characters/dark-wolf.png','characters/general.png','characters/dark-blade.png','characters/lord-shen.png','characters/baby-boss.svg','characters/baby-boss-girl.svg','characters/puss-in-boots.svg','characters/puss-in-boots-nailles.svg','characters/kitty-softpaws.png','characters/tigress.png','characters/judy-hopps.png','characters/nick-wilde.png','characters/white-fury.png','characters/black-fury.png'];
 const BOT_PREFIX='Bot';
 
 let curCode=null, curBotCount=15, stateUnsub=null, processedQIdx=-1;
@@ -240,7 +240,7 @@ window.addBots=async function(){
     if(!stSnap.exists()){alert('Sessiya topilmadi');btn.disabled=false;btn.textContent="🤖 Botlar";return;}
     for(let i=1;i<=count;i++){
       await set(ref(db,`game_sessions/${curCode}/players/${BOT_PREFIX}${i}`),{
-        emoji:EMOJIS[(i-1)%EMOJIS.length],joined_at:Date.now(),score:0
+        emoji:CARTOON_CHARS[(i-1)%CARTOON_CHARS.length].image,joined_at:Date.now(),score:0
       });
     }
     setStatus(`${count} bot qo'shildi`,true);
