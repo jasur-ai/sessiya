@@ -77,17 +77,17 @@ export const CARTOON_CHARS = [
     id: 'snitch',
     name: 'Snitch',
     image: 'characters/snitch.png',
-    from: 'Snitch',
+    from: 'Disney',
     animation: 'hover',
     animationStyle: 'float 2.8s ease-in-out infinite'
   },
   {
-    id: 'kitty-softpaws',
-    name: 'Kitty Softpaws',
+    id: 'Tai-Lung',
+    name: 'Tai Lung',
     image: 'characters/kitty-softpaws.png',
     from: 'Puss in Boots (2011)',
     animation: null,
-    animationStyle: 'sway 2.6s ease-in-out infinite'
+    animationStyle: null
   },
   {
     id: 'tigress',
@@ -96,6 +96,14 @@ export const CARTOON_CHARS = [
     from: 'Kung Fu Panda',
     animation: 'hover',
     animationStyle: 'sway 2.8s ease-in-out infinite'
+  },
+   {
+    id: 'prince',
+    name: 'Prince',
+    image: 'characters/prince.webp',
+    from: 'Ralph break the net',
+    animation: 'hover',
+    animationStyle: 'sway 2.5s ease-in-out infinite'
   },
   {
     id: 'judy-hopps',
