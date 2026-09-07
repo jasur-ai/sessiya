@@ -725,10 +725,12 @@
     bars.forEach(function(b){b.style.width='0';});
     cells.forEach(function(c){c.style.opacity=0;c.style.transitionDelay='0s';});
   }
-  var cycles=0,MAX_CYCLES=2;
+  /* Demo doimiy jonli: cheksiz aylanish (har bir savol sikli 9s).
+     To'xtab qolmasligi kerak — aks holda savol/vaqt 'yurmayapti' tuyuladi. */
+  var runId=0;
   function run(){
     reset();
-    cycles++;
+    runId++;
     timers.push(setTimeout(function(){beam.style.opacity=1;},120));
     timers.push(setTimeout(function(){beam.style.opacity=0;q.classList.add('in');},T.q));
     optEls.forEach(function(o,ix){
@@ -742,13 +744,17 @@
       timers.push(setTimeout(function(){c.style.transitionDelay=(ix%10)*90+'ms';c.style.opacity=1;},T.mosaic));
     });
     timers.push(setTimeout(function(){devnote.style.opacity=1;},T.note));
-    if(cycles<MAX_CYCLES){timers.push(setTimeout(run,T.total));}
+    // Har bir savol sikli boshida vaqt 01:24 ga qaytadi — real cast'dagi
+    // savol taymeri kabi; aks holda 00:00 da qotib 'yurmayapti' ko'rinadi.
+    t=85;
+    var st=document.getElementById('scTime');if(st){st.textContent='01:24';}
+    timers.push(setTimeout(run,T.total));
   }
   var t=84;
   var tick=function(){
     t--;if(t<0)t=0;
     var m=('0'+Math.floor(t/60)).slice(-2),s=('0'+(t%60)).slice(-2);
-    document.getElementById('scTime').textContent=m+':'+s;
+    var st=document.getElementById('scTime');if(st)st.textContent=m+':'+s;
   };
   function freezeDemo(){
     /* PW/S33 determinizm: animatsiyasiz yakuniy holat — har run bir xil shot.
