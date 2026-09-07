@@ -5,6 +5,18 @@
   <title><%= typeof title !== 'undefined' ? title : 'Talaba ish maydoni' %></title>
   <style>
     .go-gold{color:var(--deborah-semantic-color-status-warning,var(--gold));}
+    .rc-ico-lg{width:44px;height:44px;border-radius:11px;background:rgba(0,229,160,.12);color:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .rc-ico-blue{background:rgba(37,99,235,.14);color:var(--deborah-semantic-color-action-primary);}
+    .rc-ico-gold{background:rgba(245,158,11,.14);color:var(--gold);}
+    .rc-ico-green{background:rgba(0,229,160,.12);color:var(--green);}
+    .rc-ico-red{width:40px;height:40px;border-radius:11px;background:rgba(248,113,113,.12);color:var(--deborah-semantic-color-action-primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .card-cta{display:inline-block;margin-top:12px;text-decoration:none;font-weight:700;font-size:.8rem;}
+    .go-link{display:inline-block;margin-top:6px;text-decoration:none;font-weight:700;font-size:.8rem;}
+    .tb-muted{color:var(--deborah-semantic-color-text-muted);}
+    .tb-strong{color:var(--deborah-semantic-color-text-primary);}
+    .cta-panel{color:var(--deborah-semantic-color-action-primary);}
+    .cta-sec{color:var(--green);}
+    .att-box{margin-top:16px;display:flex;gap:12px;align-items:center;background:var(--deborah-semantic-color-surface-raised);border:1px solid var(--deborah-semantic-color-border-default);border-radius:14px;padding:16px;}
     body{background:var(--deborah-semantic-color-surface-default);min-height:100vh;}
     .quick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;}
     .next-up{background:var(--deborah-semantic-color-surface-raised);border:1px solid var(--deborah-semantic-color-border-default);border-radius:14px;padding:16px;margin-bottom:18px;display:flex;align-items:center;gap:14px;transition:color .25s,background-color .25s,border-color .25s,box-shadow .25s,transform .25s,opacity .25s;}
@@ -21,47 +33,47 @@
       <h1><%= _pt('h1') %></h1>
       <div class="topbar-right">
         <a href="/user/profile" class="btn btn-quiet"><%- icon('user', 14) %> <%= _pt('goProfile') %></a>
-        <span style="font-size:.74rem;font-weight:600;color:var(--deborah-semantic-color-text-muted)"><%= _pt('hello') %>, <span style="color:var(--deborah-semantic-color-text-primary)"><%= username %></span></span>
+        <span class="tb-muted" style="font-size:.74rem;font-weight:600"><%= _pt('hello') %>, <span class="tb-strong"><%= username %></span></span>
       </div>
     </div>
 
     <div class="next-up">
-      <div class="rc-ico" style="width:44px;height:44px;border-radius:11px;background:rgba(0,229,160,.12);color:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0"><%- icon('zap', 20) %></div>
+      <div class="rc-ico rc-ico-lg"><%- icon('zap', 20) %></div>
       <div style="flex:1">
         <div style="font-weight:700;font-size:.92rem"><%= _pt('nextTitle') %></div>
-        <div style="font-size:.76rem;color:var(--deborah-semantic-color-text-muted);font-weight:700"><%= _pt('nextSub') %></div>
+        <div class="tb-muted" style="font-size:.76rem;font-weight:700"><%= _pt('nextSub') %></div>
       </div>
       <a href="/user/panel" class="role-tab" style="text-decoration:none"><%- icon('arrowRight', 13) %> <%= _pt('goPanel') %></a>
-          <a href="/user/profile" style="display:inline-block;margin-top:6px;text-decoration:none;font-weight:700;font-size:.8rem"><%- icon('user', 13) %> <%= _pt('goProfile') %></a>
+          <a href="/user/profile" class="go-link"><%- icon('user', 13) %> <%= _pt('goProfile') %></a>
     </div>
 
     <div class="quick-grid">
       <div class="role-card">
-        <div class="rc-ico" style="background:rgba(37,99,235,.14);color:var(--deborah-semantic-color-action-primary)"><%- icon('grid', 20) %></div>
+        <div class="rc-ico rc-ico-blue"><%- icon('grid', 20) %></div>
         <div class="rc-title"><%= _pt('goPanel') %></div>
         <div class="rc-sub"><%= _pt('cardPanelSub') %></div>
-        <a href="/user/panel" style="display:inline-block;margin-top:12px;text-decoration:none;color:var(--deborah-semantic-color-action-primary);font-weight:700;font-size:.8rem"><%- icon('arrowRight', 13) %> <%= _pt('go') %></a>
+        <a href="/user/panel" class="card-cta cta-panel"><%- icon('arrowRight', 13) %> <%= _pt('go') %></a>
       </div>
       <div class="role-card">
-        <div class="rc-ico" style="background:rgba(245,158,11,.14);color:var(--gold)"><%- icon('award', 20) %></div>
+        <div class="rc-ico rc-ico-gold"><%- icon('award', 20) %></div>
         <div class="rc-title"><%= _pt('cardPortTitle') %></div>
         <div class="rc-sub"><%= _pt('cardPortSub') %></div>
-        <a href="/user/portfolio" class="go-gold" style="display:inline-block;margin-top:12px;text-decoration:none;font-weight:700;font-size:.8rem"><%- icon('arrowRight', 13) %> <%= _pt('go') %></a>
+        <a href="/user/portfolio" class="go-gold card-cta"><%- icon('arrowRight', 13) %> <%= _pt('go') %></a>
       </div>
       <div class="role-card">
-        <div class="rc-ico" style="background:rgba(0,229,160,.12);color:var(--green)"><%- icon('shieldCheck', 20) %></div>
+        <div class="rc-ico rc-ico-green"><%- icon('shieldCheck', 20) %></div>
         <div class="rc-title"><%= _pt('cardSecTitle') %></div>
         <div class="rc-sub"><%= _pt('cardSecSub') %></div>
-        <a href="/user/security-profile" style="display:inline-block;margin-top:12px;text-decoration:none;color:var(--green);font-weight:700;font-size:.8rem"><%- icon('arrowRight', 13) %> <%= _pt('go') %></a>
+        <a href="/user/security-profile" class="card-cta cta-sec"><%- icon('arrowRight', 13) %> <%= _pt('go') %></a>
       </div>
     </div>
 
     <% if (!canAttempt) { %>
-      <div style="margin-top:16px;display:flex;gap:12px;align-items:center;background:var(--deborah-semantic-color-surface-raised);border:1px solid var(--deborah-semantic-color-border-default);border-radius:14px;padding:16px">
-        <div class="rc-ico" style="width:40px;height:40px;border-radius:11px;background:rgba(248,113,113,.12);color:var(--deborah-semantic-color-action-primary);display:flex;align-items:center;justify-content:center;flex-shrink:0"><%- icon('shield', 18) %></div>
+      <div class="att-box">
+        <div class="rc-ico rc-ico-red"><%- icon('shield', 18) %></div>
         <div style="flex:1">
           <div style="font-weight:700;font-size:.9rem"><%= _pt('attTitle') %></div>
-          <div style="font-size:.76rem;color:var(--deborah-semantic-color-text-muted);font-weight:600"><%= _pt('attSub') %></div>
+          <div class="tb-muted" style="font-size:.76rem;font-weight:600"><%= _pt('attSub') %></div>
         </div>
       </div>
     <% } %>
