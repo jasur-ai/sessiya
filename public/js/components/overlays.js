@@ -87,8 +87,8 @@
         '</div>' +
         '<div class="dialog__body"><p class="dlg-confirm-sub" style="margin:0;color:var(--deborah-semantic-color-text-secondary,#5b6472);font-size:.875rem;line-height:1.6"></p></div>' +
         '<div class="dialog__footer">' +
-        '  <button type="button" class="btn btn--quiet" data-no>Bekor</button>' +
-        '  <button type="button" class="btn btn--danger" data-yes></button>' +
+        '  <button type="button" class="btn btn-quiet" data-no>Bekor</button>' +
+        '  <button type="button" class="btn btn-danger" data-yes></button>' +
         '</div>';
       dlg.querySelector('[data-no]').textContent = 'Bekor';
       dlg.querySelector('[data-yes]').textContent = okText || 'Ha';

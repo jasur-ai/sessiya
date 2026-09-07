@@ -207,14 +207,14 @@
   <section class="group" id="group-overlays">
     <h2>Dialog (S15.01)</h2>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button type="button" class="btn btn--primary" data-confirm-demo>Confirm dialog</button>
-      <button type="button" class="btn btn--secondary" data-toast-success>Toast: success</button>
-      <button type="button" class="btn btn--secondary" data-toast-error>Toast: error</button>
+      <button type="button" class="btn btn-primary" data-confirm-demo>Confirm dialog</button>
+      <button type="button" class="btn btn-secondary" data-toast-success>Toast: success</button>
+      <button type="button" class="btn btn-secondary" data-toast-error>Toast: error</button>
     </div>
 
     <h2 style="margin-top:24px">Popover (S15.07)</h2>
     <div style="position:relative;display:inline-block">
-      <button type="button" class="btn btn--secondary" data-popover aria-expanded="false" aria-controls="s15-pop">Menyu ochish</button>
+      <button type="button" class="btn btn-secondary" data-popover aria-expanded="false" aria-controls="s15-pop">Menyu ochish</button>
       <div class="popover" id="s15-pop" role="menu" aria-label="Amallar">
         <button type="button" class="popover__item" role="menuitem">Tahrirlash</button>
         <button type="button" class="popover__item" role="menuitem">Nusxalash</button>
@@ -225,7 +225,7 @@
 
     <h2 style="margin-top:24px">Tooltip (S15.08)</h2>
     <p>
-      <button type="button" class="btn btn--quiet" data-tooltip aria-describedby="s15-tip">Nima bu?</button>
+      <button type="button" class="btn btn-quiet" data-tooltip aria-describedby="s15-tip">Nima bu?</button>
       <span class="tooltip tooltip--top" id="s15-tip" role="tooltip">Qo‘shimcha tushuntirish — faqat matn.</span>
     </p>
   </section>
@@ -256,19 +256,19 @@
         <span class="empty-state__icon"><%- icon('fileText', 24) %></span>
         <h3 class="empty-state__title">Birinchi test yarating</h3>
         <p class="empty-state__desc">Savollaringizni jamlab, talabalar bilan baham ko‘ring — bir necha daqiqa kifoya.</p>
-        <div class="empty-state__actions"><button type="button" class="btn btn--primary">Test yaratish</button></div>
+        <div class="empty-state__actions"><button type="button" class="btn btn-primary">Test yaratish</button></div>
       </div>
       <div class="empty-state empty-state--no-results">
         <span class="empty-state__icon"><%- icon('search', 24) %></span>
         <h3 class="empty-state__title">Hech narsa topilmadi</h3>
         <p class="empty-state__desc"><span class="empty-state__query">"algebra"</span> so‘roviga mos test yo‘q. Filtrlarni tozalab qayta urinib ko‘ring.</p>
-        <div class="empty-state__actions"><button type="button" class="btn btn--quiet">Filtrlarni tozalash</button></div>
+        <div class="empty-state__actions"><button type="button" class="btn btn-quiet">Filtrlarni tozalash</button></div>
       </div>
       <div class="empty-state empty-state--completion">
         <span class="empty-state__icon"><%- icon('check', 24) %></span>
         <h3 class="empty-state__title">Hammasi tayyor!</h3>
         <p class="empty-state__desc">Sessiya yakunlandi, natijalar saqlandi. Endi tahlilni ko‘rishingiz mumkin.</p>
-        <div class="empty-state__actions"><button type="button" class="btn btn--secondary">Natijalarni ko‘rish</button></div>
+        <div class="empty-state__actions"><button type="button" class="btn btn-secondary">Natijalarni ko‘rish</button></div>
       </div>
     </div>
 
@@ -279,7 +279,7 @@
         <div class="message__body">
           <div class="message__title">Saqlash amalga oshmadi</div>
           <div>Javoblaringiz saqlanmadi. Iltimos qayta urinib ko‘ring; muammo davom etsa, qo‘llab-quvvatlash xizmatiga murojaat qiling.</div>
-          <div class="message__actions"><button type="button" class="btn btn--quiet btn--sm">Qayta urinish</button></div>
+          <div class="message__actions"><button type="button" class="btn btn-quiet btn-sm">Qayta urinish</button></div>
         </div>
       </div>
       <div class="message message--warning">
@@ -293,9 +293,9 @@
 
     <h2 style="margin-top:24px">Offline banner (S16.09)</h2>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button type="button" class="btn btn--secondary" data-offline-demo>Offline demo</button>
-      <button type="button" class="btn btn--secondary" data-reconnect-demo>Reconnect demo</button>
-      <button type="button" class="btn btn--secondary" data-online-demo>Online demo</button>
+      <button type="button" class="btn btn-secondary" data-offline-demo>Offline demo</button>
+      <button type="button" class="btn btn-secondary" data-reconnect-demo>Reconnect demo</button>
+      <button type="button" class="btn btn-secondary" data-online-demo>Online demo</button>
     </div>
   </section>
 
@@ -359,19 +359,19 @@
               <td class="dt-cell-main">Algebra</td>
               <td class="dt-num" data-label="Savollar">15</td>
               <td class="dt-ts dt-cell-meta" data-label="Yaratilgan"><span data-label="Sana">2026-05-12</span></td>
-              <td class="dt-actions dt-cell-actions"><button type="button" class="btn btn--quiet btn--sm">Tahrirlash</button></td>
+              <td class="dt-actions dt-cell-actions"><button type="button" class="btn btn-quiet btn-sm">Tahrirlash</button></td>
             </tr>
             <tr class="dt-row" data-name="Geometriya" data-count="9" data-date="2026-06-03">
               <td class="dt-cell-main">Geometriya</td>
               <td class="dt-num" data-label="Savollar">9</td>
               <td class="dt-ts dt-cell-meta" data-label="Yaratilgan"><span data-label="Sana">2026-06-03</span></td>
-              <td class="dt-actions dt-cell-actions"><button type="button" class="btn btn--quiet btn--sm">Tahrirlash</button></td>
+              <td class="dt-actions dt-cell-actions"><button type="button" class="btn btn-quiet btn-sm">Tahrirlash</button></td>
             </tr>
             <tr class="dt-row" data-name="Fizika" data-count="22" data-date="2026-04-18">
               <td class="dt-cell-main">Fizika</td>
               <td class="dt-num" data-label="Savollar">22</td>
               <td class="dt-ts dt-cell-meta" data-label="Yaratilgan"><span data-label="Sana">2026-04-18</span></td>
-              <td class="dt-actions dt-cell-actions"><button type="button" class="btn btn--quiet btn--sm">Tahrirlash</button></td>
+              <td class="dt-actions dt-cell-actions"><button type="button" class="btn btn-quiet btn-sm">Tahrirlash</button></td>
             </tr>
           </tbody>
         </table>

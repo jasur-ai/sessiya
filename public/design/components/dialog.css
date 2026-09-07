@@ -11,6 +11,10 @@
 .dialog {
   width: min(92vw, 560px);
   max-height: min(85vh, 720px);
+  /* reset.css `*{margin:0}` native <dialog> markazlashuvini (UA margin:auto)
+     o'ldiradi — dialog yuqori-chap burchakda qotardi. margin:auto qayta
+     tiklanadi: top-layer'da ekran o'rtasida turadi (S15.01). */
+  margin: auto;
   padding: 0;
   border: 1px solid var(--deborah-semantic-color-border-default, #d3d9e6);
   border-radius: var(--deborah-radius-lg, 16px);
