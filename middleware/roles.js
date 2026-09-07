@@ -80,8 +80,6 @@ export const ROLE_NAV = {
   student: [
     { section: "Talaba" },
     { href: '/user/panel', icon: 'grid', label: 'Panelim' },
-    { href: '/student', icon: 'calendar', label: 'Kalendar' },
-    { href: '/student?tab=assignments', icon: 'fileText', label: 'Topshiriqlar' },
     { href: '/user/portfolio', icon: 'award', label: 'Portfolio' },
     { href: '/user/security-profile', icon: 'shieldCheck', label: 'Xavfsizlik' },
   ],

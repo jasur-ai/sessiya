@@ -16,6 +16,8 @@
   const BC = window.__TB_COPY || {}; // S34m: 3 til copy (serverdan)
   const T = (k, fb) => (BC[k] !== undefined ? BC[k] : fb);
   const OPT_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
+  // Foydalanuvchi talabi (09/2026): har bir YANGI savol uchun default vaqt 20 soniya
+  const DEFAULT_QUESTION_TIME = 20;
 
   // ── State ──
   const state = {
@@ -67,7 +69,7 @@
   async function scheduleSave() {
     const seq = ++saveSeq;
     const ok = await navigator.onLine;
-    if (!ok) { setStatus('offline', 'Oflayn — ulanish kutilmoqda'); return; }
+    if (!ok) { setStatus('offline', T('statusOfflineWait', 'Oflayn — ulanish kutilmoqda')); return; }
     /* S34k FIX: yaroqsiz holatda avtosave 400 'Invalid data' qaytarardi
        (nom bo'sh yoki savollar bo'sh/hammasi bo'sh). Avtosave faqat
        yakka savol holatda ham yuboradi, lekin server-side limit buzilmasa. */
@@ -80,7 +82,10 @@
       // Tahrirlash rejimida (editKey bor) saqlab qolish OK (avvaldan saqlangan);
       // yangi testda esa yubormaslik — server 400 bermasligi uchun.
       if (!init.isEdit) {
-        setStatus('error', 'To\u2018ldirilmagan maydonlar bor');
+        // Aniq xabar: birinchi 2 ta yetishmayotgan maydon (test nomi / savol matni / ...)
+        const top = blocking.slice(0, 2).map(e => e.msg);
+        const more = blocking.length > 2 ? ' …' : '';
+        setStatus('error', (top.length ? top.join(' · ') : T('statusMissing', 'To‘ldirilmagan maydonlar bor')) + more);
         renderErrors();
         return;
       }
@@ -103,16 +108,16 @@
       if (data.success) {
         state.dirty = false;
         init.editKey = data.key || init.editKey;
-        setStatus('saved', 'Saqlandi');
+        setStatus('saved', T('statusSaved', 'Saqlandi'));
         const preview = $('#tb-preview-btn');
         if (preview) preview.disabled = false;
       } else {
-        setStatus('error', 'Saqlashda xato');
-        showToast && showToast('Xato: ' + (data.error || ''), 'err');
+        setStatus('error', T('statusSaveErr', 'Saqlashda xato'));
+        showToast && showToast(T('toastErr', 'Xato: ') + (data.error || ''), 'err');
       }
     } catch (e) {
       if (seq !== saveSeq) return;
-      setStatus('offline', 'Oflayn — qayta uriniladi');
+      setStatus('offline', T('statusOfflineRetry', 'Oflayn — qayta uriniladi'));
     }
   }
 
@@ -131,7 +136,7 @@
   // ── Manual save (sticky Save btn) ──
   async function manualSave() {
     state.dirty = true;
-    setStatus('pending', 'Saqlanmoqda...');
+    setStatus('pending', T('statusSaving', 'Saqlanmoqda...'));
     await scheduleSave();
   }
 
@@ -223,24 +228,24 @@
        bosish = to'g'ri javob belgilash (Kahoot mantiqi), alohida radio YO'Q. */
     const SHAPES = ['▲', '◆', '●', '■', '★', '⬢'];
     const optsHtml = q.options.map((opt, oi) => `
-      <div class="tb-opt${oi === q.correct ? ' is-correct' : ''}" data-opt-card="${oi}" role="radio" aria-checked="${oi === q.correct}" tabindex="0" title="Bosib to'g'ri javob deb belgilang">
+      <div class="tb-opt${oi === q.correct ? ' is-correct' : ''}" data-opt-card="${oi}" role="radio" aria-checked="${oi === q.correct}" tabindex="0" title="${T('optCardTitle', "Bosib to'g'ri javob deb belgilang")}">
         <span class="tb-opt-shape" aria-hidden="true">${SHAPES[oi] || '■'}</span>
-        <input class="inp" type="text" value="${escAttr(opt)}" placeholder="${OPT_LETTERS[oi]}) ${T('optPh', 'variant matni...')}" data-opt="${oi}" aria-label="Variant ${OPT_LETTERS[oi]}">
-        <button type="button" class="tb-opt-remove" data-opt-remove="${oi}" aria-label="Variantni o'chirish" title="Variantni o'chirish">×</button>
+        <input class="inp" type="text" value="${escAttr(opt)}" placeholder="${OPT_LETTERS[oi]}) ${T('optPh', 'variant matni...')}" data-opt="${oi}" aria-label="${T('optAria', 'Variant')} ${OPT_LETTERS[oi]}">
+        <button type="button" class="tb-opt-remove" data-opt-remove="${oi}" aria-label="${T('optRemoveAria', "Variantni o'chirish")}" title="${T('optRemoveAria', "Variantni o'chirish")}">×</button>
       </div>`).join('');
 
     el.innerHTML = `
       <div class="tb-q-head">
-        <span class="tb-q-count">Savol ${qNum} / ${state.questions.length}</span>
+        <span class="tb-q-count">${T('qCount', 'Savol {n} / {m}').split('{n}').join(qNum).split('{m}').join(state.questions.length)}</span>
         <div class="tb-reorder">
-          <button type="button" class="tb-move" data-move="up" aria-label="Yuqoriga ko'chirish" title="Yuqoriga">↑</button>
-          <button type="button" class="tb-move" data-move="down" aria-label="Pastga ko'chirish" title="Pastga">↓</button>
+          <button type="button" class="tb-move" data-move="up" aria-label="${T('moveUpAria', "Yuqoriga ko'chirish")}" title="${T('moveUpAria', "Yuqoriga ko'chirish")}">↑</button>
+          <button type="button" class="tb-move" data-move="down" aria-label="${T('moveDownAria', "Pastga ko'chirish")}" title="${T('moveDownAria', "Pastga ko'chirish")}">↓</button>
         </div>
         <div class="tb-q-overflow-wrap">
-          <button type="button" class="tb-q-overflow-btn" aria-haspopup="menu" aria-expanded="false" aria-label="Savol amallari" data-q-overflow title="Amallar">⋯</button>
+          <button type="button" class="tb-q-overflow-btn" aria-haspopup="menu" aria-expanded="false" aria-label="${T('qActionsAria', 'Savol amallari')}" data-q-overflow title="${T('qActionsTitle', 'Amallar')}">⋯</button>
           <div class="tb-q-menu" role="menu" data-q-menu>
-            <button type="button" role="menuitem" data-act="duplicate"><span>⎕ Nusxalash</span></button>
-            <button type="button" role="menuitem" data-act="delete" class="tb-q-menu-danger"><span>✕ O'chirish</span></button>
+            <button type="button" role="menuitem" data-act="duplicate"><span>⎕ ${T('duplicate', 'Nusxalash')}</span></button>
+            <button type="button" role="menuitem" data-act="delete" class="tb-q-menu-danger"><span>✕ ${T('del', "O'chirish")}</span></button>
           </div>
         </div>
       </div>
@@ -253,33 +258,33 @@
 
       <div class="tb-field">
         <label class="tb-field-label" for="tb-q-type">${T('qType', 'Savol turi')}</label>
-        <select class="inp" id="tb-q-type" data-q-type aria-label="Savol turi">
-          <option value="single_choice"${q.type === 'single_choice' ? ' selected' : ''}>Yagona tanlov</option>
-          <option value="true_false"${q.type === 'true_false' ? ' selected' : ''}>To'g'ri / Noto'g'ri</option>
-          <option value="multiple_select"${q.type === 'multiple_select' ? ' selected' : ''}>Bir nechta tanlov</option>
-          <option value="short_answer"${q.type === 'short_answer' ? ' selected' : ''}>Qisqa javob</option>
-          <option value="exit_ticket"${q.type === 'exit_ticket' ? ' selected' : ''}>Exit ticket</option>
+        <select class="inp" id="tb-q-type" data-q-type aria-label="${T('qType', 'Savol turi')}">
+          <option value="single_choice"${q.type === 'single_choice' ? ' selected' : ''}>${T('typeSingle', 'Yagona tanlov')}</option>
+          <option value="true_false"${q.type === 'true_false' ? ' selected' : ''}>${T('typeTrueFalse', "To'g'ri / Noto'g'ri")}</option>
+          <option value="multiple_select"${q.type === 'multiple_select' ? ' selected' : ''}>${T('typeMulti', 'Bir nechta tanlov')}</option>
+          <option value="short_answer"${q.type === 'short_answer' ? ' selected' : ''}>${T('typeShort', 'Qisqa javob')}</option>
+          <option value="exit_ticket"${q.type === 'exit_ticket' ? ' selected' : ''}>${T('typeExit', 'Exit ticket')}</option>
         </select>
         <span class="tb-hint">${T('qTypeHint', 'Cast sessiyalarida ishlatiladigan savol turi')}</span>
-        ${q.type === 'multiple_select' ? '<span class="tb-hint" data-multi-note>Eslatma: to\'g\'ri javob hozircha bitta radio orqali belgilanadi</span>' : ''}
+        ${q.type === 'multiple_select' ? '<span class="tb-hint" data-multi-note>' + T('multiNote', "Eslatma: to'g'ri javob hozircha bitta radio orqali belgilanadi") + '</span>' : ''}
       </div>
 
       <div class="tb-props-grid">
         <div class="tb-field">
           <label class="tb-field-label" for="tb-q-timing">${T('time', 'Vaqt (soniya)')}</label>
-          <input class="inp" id="tb-q-timing" type="number" min="0" max="600" value="${q.timing || 0}" data-q-timing aria-label="Savol vaqti">
+          <input class="inp" id="tb-q-timing" type="number" min="0" max="600" value="${q.timing || 0}" data-q-timing aria-label="${T('timeAria', 'Savol vaqti')}">
         </div>
         <div class="tb-field">
           <label class="tb-field-label" for="tb-q-tags">${T('tags', 'Teglar (vergul bilan)')}</label>
-          <input class="inp" id="tb-q-tags" type="text" value="${escAttr(q.tags.join(', '))}" data-q-tags placeholder="${T('tagsPh', 'masalan: algebra, kirish')}" aria-label="Teglar">
+          <input class="inp" id="tb-q-tags" type="text" value="${escAttr(q.tags.join(', '))}" data-q-tags placeholder="${T('tagsPh', 'masalan: algebra, kirish')}" aria-label="${T('tagsAria', 'Teglar')}">
         </div>
       </div>
 
       ${q.type === 'short_answer' ? `
         <div class="tb-field">
-          <label class="tb-field-label" for="tb-q-answer">To'g'ri javob <span class="tb-req">*</span></label>
-          <input class="inp" id="tb-q-answer" type="text" value="${escAttr(q.options[0] || '')}" data-q-answer placeholder="Kutilgan javob matni..." aria-label="To'g'ri javob">
-          <span class="tb-hint">O'quvchi yozadigan qisqa javob</span>
+          <label class="tb-field-label" for="tb-q-answer">${T('shortLabel', "To'g'ri javob")} <span class="tb-req">*</span></label>
+          <input class="inp" id="tb-q-answer" type="text" value="${escAttr(q.options[0] || '')}" data-q-answer placeholder="${T('shortPh', 'Kutilgan javob matni...')}" aria-label="${T('shortLabel', "To'g'ri javob")}">
+          <span class="tb-hint">${T('shortHint', "O'quvchi yozadigan qisqa javob")}</span>
         </div>
       ` : `
         <div class="tb-field">
@@ -291,7 +296,7 @@
         </div>
 
         <div class="tb-field">
-          <span class="tb-hint" data-correct-hint>✓ To'g'ri javob: variant kartasini bosib belgilanadi (yashil halqa)</span>
+          <span class="tb-hint" data-correct-hint>${T('correctHint', "✓ To'g'ri javob: variant kartasini bosib belgilanadi (yashil halqa)")}</span>
         </div>
       `}
 
@@ -385,7 +390,7 @@
     $$('[data-opt-remove]', $('.tb-editor')).forEach(btn => {
       btn.addEventListener('click', () => {
         const oi = parseInt(btn.dataset.optRemove, 10);
-        if (q.options.length <= 2) { showToast && showToast('Kamida 2 ta variant bo‘lishi kerak', 'err'); return; }
+        if (q.options.length <= 2) { showToast && showToast(T('minOptions', 'Kamida 2 ta variant bo‘lishi kerak'), 'err'); return; }
         q.options.splice(oi, 1);
         if (q.correct >= q.options.length) q.correct = 0;
         markDirty();
@@ -437,7 +442,7 @@
 
   // ── Question ops ──
   function addQuestion() {
-    const q = { id: nextId(), text: '', options: ['', '', '', ''], correct: 0, explanation: '', tags: [], timing: 0 };
+    const q = { id: nextId(), text: '', options: ['', '', '', ''], correct: 0, explanation: '', tags: [], timing: DEFAULT_QUESTION_TIME };
     state.questions.push(q);
     state.activeId = q.id;
     markDirty();
@@ -507,7 +512,7 @@
       if (choice) {
         // Saqla va chiqish
         state.dirty = false; // guardUnload yana ishga tushmasin
-        setStatus('pending', T('saving', 'Saqlanmoqda...'));
+        setStatus('pending', T('statusSaving', 'Saqlanmoqda...'));
         scheduleSave().then(() => { window.location.href = '/user/panel'; });
       } else {
         // Saqlamasdan chiqish
@@ -541,13 +546,13 @@
   const previewBtn = $('#tb-preview-btn');
   if (previewBtn) {
     previewBtn.addEventListener('click', async () => {
-      if (!state.questions.length) { showToast && showToast(T('addQuestion', "Avval savol qo'shing"), 'err'); return; }
+      if (!state.questions.length) { showToast && showToast(T('noFirstQuestion', "Avval savol qo'shing"), 'err'); return; }
       /* S34o: Ko'rish = YAKKA MASHQ (arena emas). Saqlanmagan bo'lsa avval saqlaymiz. */
       if (state.dirty || !init.editKey) {
         previewBtn.disabled = true;
         await scheduleSave();
         previewBtn.disabled = false;
-        if (!init.editKey) { showToast && showToast('Saqlashda xato', 'err'); return; }
+        if (!init.editKey) { showToast && showToast(T('statusSaveErr', 'Saqlashda xato'), 'err'); return; }
       }
       window.location.href = '/user/practice?source=user&key=' + encodeURIComponent(init.editKey);
     });
@@ -617,7 +622,7 @@
   function parseExcel(file) {
     const msg = $('#tb-import-parse-msg');
     if (typeof XLSX === 'undefined') {
-      importMsg(msg, 'XLSX kutubxonasi yuklanmadi. Internet ulanishini tekshiring.', 'err');
+      importMsg(msg, T('impXlsxNo', 'XLSX kutubxonasi yuklanmadi. Internet ulanishini tekshiring.'), 'err');
       return;
     }
     const reader = new FileReader();
@@ -634,19 +639,19 @@
           const text = String(r[0] || '').trim();
           const opts = [String(r[1] || '').trim(), String(r[2] || '').trim(), String(r[3] || '').trim(), String(r[4] || '').trim()];
           const correctIdx = parseInt(r[5], 10);
-          if (!text) { rowErrors.push({ row: i + 1, msg: 'Savol matni bosh' }); continue; }
-          if (opts.filter(Boolean).length < 2) { rowErrors.push({ row: i + 1, msg: 'Kamida 2 variant' }); continue; }
-          if (isNaN(correctIdx) || correctIdx < 0 || correctIdx > 3) { rowErrors.push({ row: i + 1, msg: "To'g'ri javob 0-3 oralig'ida" }); continue; }
+          if (!text) { rowErrors.push({ row: i + 1, msg: T('impRowNoText', 'Savol matni bosh') }); continue; }
+          if (opts.filter(Boolean).length < 2) { rowErrors.push({ row: i + 1, msg: T('impRowMinOpt', 'Kamida 2 variant') }); continue; }
+          if (isNaN(correctIdx) || correctIdx < 0 || correctIdx > 3) { rowErrors.push({ row: i + 1, msg: T('impRowIdx', "To'g'ri javob 0-3 oralig'ida") }); continue; }
           parsed.push({ text, options: opts, correct: correctIdx });
         }
         importData = parsed;
         renderPreview(parsed, rowErrors);
         const parseMsg = $('#tb-import-parse-msg');
-        if (rowErrors.length) importMsg(parseMsg, `${parsed.length} ta savol tayyor, ${rowErrors.length} ta qator xato`, 'err');
-        else importMsg(parseMsg, `${parsed.length} ta savol tayyor`, 'ok');
+        if (rowErrors.length) importMsg(parseMsg, T('impReadyErr', '{n} ta savol tayyor, {m} ta qator xato').split('{n}').join(parsed.length).split('{m}').join(rowErrors.length), 'err');
+        else importMsg(parseMsg, T('impReady', '{n} ta savol tayyor').split('{n}').join(parsed.length), 'ok');
         goPane(3);
       } catch (err) {
-        importMsg(msg, "Fayl o'qilmadi: " + err.message, 'err');
+        importMsg(msg, T('impReadFail', "Fayl o'qilmadi: {err}").split('{err}').join(err.message), 'err');
       }
     };
     reader.readAsBinaryString(file);
@@ -655,13 +660,13 @@
   function renderPreview(parsed, rowErrors) {
     const wrap = $('#tb-import-preview');
     if (!wrap) return;
-    if (!parsed.length && !rowErrors.length) { wrap.innerHTML = '<div class="ws-lib-empty">Faylda savol topilmadi</div>'; return; }
-    const head = '<table><thead><tr><th>#</th><th>Savol</th><th>A</th><th>B</th><th>C</th><th>D</th><th>To\'g\'ri</th></tr></thead><tbody>';
+    if (!parsed.length && !rowErrors.length) { wrap.innerHTML = '<div class="ws-lib-empty">' + T('impNoRows', 'Faylda savol topilmadi') + '</div>'; return; }
+    const head = '<table><thead><tr><th>#</th><th>' + T('impThQ', 'Savol') + '</th><th>A</th><th>B</th><th>C</th><th>D</th><th>' + T('impThCorrect', "To'g'ri") + '</th></tr></thead><tbody>';
     const rows = parsed.map((p, i) => `<tr>
       <td>${i + 1}</td><td>${escHtml(p.text.slice(0, 40))}</td>
       ${p.options.map(o => `<td>${escHtml(o.slice(0, 16))}</td>`).join('')}
       <td>${OPT_LETTERS[p.correct]}</td></tr>`).join('');
-    const errs = rowErrors.map(e => `<tr><td class="is-error" colspan="7">Qator ${e.row}: ${escHtml(e.msg)}</td></tr>`).join('');
+    const errs = rowErrors.map(e => `<tr><td class="is-error" colspan="7">${T('impRowLabel', 'Qator {n}').split('{n}').join(e.row)}: ${escHtml(e.msg)}</td></tr>`).join('');
     wrap.innerHTML = head + rows + errs + '</tbody></table>';
   }
 
@@ -670,19 +675,20 @@
     importData.forEach(q => state.questions.push(normalize(q)));
     state.activeId = state.questions[state.questions.length - 1].id;
     markDirty();
-    $('#tb-import-done-txt').textContent = `${importData.length} ta savol qo'shildi`;
+    $('#tb-import-done-txt').textContent = `${importData.length} ${T('impDoneCount', "ta savol qo'shildi")}`;
     goPane(4);
   }
 
   function downloadTemplate() {
-    if (typeof XLSX === 'undefined') { showToast && showToast('XLSX kutubxonasi yuklanmadi', 'err'); return; }
+    if (typeof XLSX === 'undefined') { showToast && showToast(T('impXlsxShort', 'XLSX kutubxonasi yuklanmadi'), 'err'); return; }
     const wb = XLSX.utils.book_new();
+    const tplHead = T('impSheetHeader', ['Savol', 'Variant A', 'Variant B', 'Variant C', 'Variant D', "To'g'ri javob (0-3)"]);
     const data = [
-      ['Savol', 'Variant A', 'Variant B', 'Variant C', 'Variant D', "To'g'ri javob (0-3)"],
-      ['1+1 nechiga teng?', '1', '2', '3', '4', 1],
-      ['Eng katta sayyora?', 'Mars', 'Yupiter', 'Saturn', 'Neptun', 1],
+      tplHead,
+      ['1+1=?', '1', '2', '3', '4', 1],
+      ['2+2=?', '3', '4', '5', '6', 1],
     ];
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), 'Savollar');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), T('impSheetName', 'Savollar'));
     XLSX.writeFile(wb, 'deborah-template.xlsx');
   }
 

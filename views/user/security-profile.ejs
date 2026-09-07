@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="uz" dir="ltr">
+<html lang="<%= htmlLang || 'uz' %>" dir="ltr">
 <head>
   <%- include('../partials/head') %>
+  <title><%= pageTitle %> — Deborah</title>
   <style>
     body{background:var(--deborah-semantic-color-surface-default);min-height:100vh;transition:background .3s;}
     body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 55% 40% at 15% 20%,rgba(37,99,235,.1) 0%,transparent 65%),radial-gradient(ellipse 45% 35% at 85% 75%,rgba(56,189,248,.07) 0%,transparent 65%);}
@@ -55,27 +56,31 @@
     @media(max-width:600px){.badge-card{flex-direction:column;}.verify-row{flex-direction:column;}.verify-btn{width:100%;justify-content:center;}}
   </style>
 </head>
+<% const _PC = typeof pageCopy !== 'undefined' ? pageCopy : null;
+   const _PL = typeof pageLang !== 'undefined' ? pageLang : 'uz';
+   const _pt = (k) => { const _v = _PC ? _PC[k] : null; if (!_v) return ''; return (_v[_PL] !== undefined) ? _v[_PL] : (_v.uz || ''); };
+   const ac = (typeof accountCopy !== 'undefined' && accountCopy && accountCopy.account) || {}; %>
 <body>
-  <a href="#main" class="skip-link">Asosiy qismga o'tish →</a>
+  <a href="#main" class="skip-link"><%= _pt('skip') %> →</a>
   <nav class="navbar">
     <a href="/" class="nav-logo"><img src="/images/logo-vintage.png" alt="Deborah" class="logo-img" style="height:34px;width:auto"></a>
     <div class="nav-right">
-      <a href="/user/panel" class="nav-btn" style="text-decoration:none"><%- icon('book', 14) %> Panel</a>
-      <a href="/sessions" class="nav-btn" style="text-decoration:none"><%- icon('monitor', 14) %> Sessiyalar</a>
+      <a href="/user/panel" class="nav-btn" style="text-decoration:none"><%- icon('book', 14) %> <%= _pt('navPanel') %></a>
+      <a href="/sessions" class="nav-btn" style="text-decoration:none"><%- icon('monitor', 14) %> <%= _pt('navSessions') %></a>
       <button type="button" class="nav-btn" data-theme-toggle title="Light mode"><%- icon('moon', 16) %></button>
-      <a href="/user/logout" class="nav-btn" style="text-decoration:none"><%- icon('logOut', 14) %> Chiqish</a>
+      <a href="/user/logout" class="nav-btn" style="text-decoration:none"><%- icon('logOut', 14) %> <%= _pt('navLogout') %></a>
     </div>
   </nav>
 
   <div class="panel" id="main">
-    <div class="greeting"><img src="/images/logo-vintage.png" alt="Deborah" class="logo-img" style="height:30px;width:auto"> Xavfsizlik profili</div>
-    <div class="greeting-sub">Assessment uchun talab qilinadigan xavfsizlik darajasi — preflightdan oldin tayyorgarlikni tekshiring.</div>
+    <div class="greeting"><img src="/images/logo-vintage.png" alt="Deborah" class="logo-img" style="height:30px;width:auto"> <%= _pt('h1') %></div>
+    <div class="greeting-sub"><%= _pt('sub') %></div>
 
-    <div class="sec-title" style="margin-top:0"><%- icon('monitor', 16) %> Faol sessiyalar</div>
+    <div class="sec-title" style="margin-top:0"><%- icon('monitor', 16) %> <%= _pt('sessTitle') %></div>
     <a href="/sessions" style="display:inline-flex;align-items:center;gap:6px;background:var(--deborah-semantic-color-surface-raised);border:1px solid var(--deborah-semantic-color-border-default);border-radius:11px;padding:11px 14px;color:var(--deborah-semantic-color-text-primary);font-size:.82rem;font-weight:700;text-decoration:none;min-height:44px;transition:border-color .2s,transform .2s">
-      <%- icon('logOut', 14) %> Boshqa qurilmalarni ko'rish / yakunlash →
+      <%- icon('logOut', 14) %> <%= _pt('sessMore') %> →
     </a>
-    <div style="font-size:.72rem;color:var(--deborah-semantic-color-text-muted);font-weight:600;margin-top:6px">Akkauntingizga ulangan barcha qurilmalar, oxirgi faollik va yakunlash.</div>
+    <div style="font-size:.72rem;color:var(--deborah-semantic-color-text-muted);font-weight:600;margin-top:6px"><%= _pt('sessDesc') %></div>
 
     <% // 2026-08-27: MFA (Authenticator) faqat admin/o'qituvchi uchun %>
     <% const mfaAllowed = !!(user && (user.role === 'teacher' || user.role === 'admin')); %>
@@ -130,9 +135,9 @@
     </div>
     <div style="font-size:.72rem;color:var(--deborah-semantic-color-text-muted);font-weight:600;margin-top:6px"><%= ms.footer || "MFA yoqilgan bo'lsa, har kirishda parol + 6 xonali kod talab qilinadi." %></div>
     <% } else { %>
-    <div class="sec-title" style="margin-top:18px"><%- icon('shieldCheck', 16) %> Ikki bosqichli tekshiruv (MFA)</div>
+    <div class="sec-title" style="margin-top:18px"><%- icon('shieldCheck', 16) %> <%= _pt('mfaTitle') %></div>
     <div class="mfa-card" style="background:var(--deborah-semantic-color-surface-raised);border-radius:16px;padding:18px;border:1px solid var(--deborah-semantic-color-border-default);">
-      <div class="hemis-profile" style="font-size:.78rem;font-weight:600;line-height:1.6">Authenticator (MFA) sizning akkauntingiz uchun kerak emas — parol bilan kirasiz. Bu funksiya faqat admin va o'qituvchi akkauntlariga qo'llaniladi.</div>
+      <div class="hemis-profile" style="font-size:.78rem;font-weight:600;line-height:1.6"><%= _pt('mfaNotNeeded') %></div>
     </div>
     <% } %>
 
@@ -160,41 +165,41 @@
 
 
     <!-- AUTH A-29: password change -->
-    <div class="sec-title" style="margin-top:18px"><%- icon('key', 16) %> <%= accountCopy.passwordChangeTitle || 'Parolni o\'zgartirish' %></div>
+    <div class="sec-title" style="margin-top:18px"><%- icon('key', 16) %> <%= ac.passwordChangeTitle || 'Parolni o\'zgartirish' %></div>
     <div class="mfa-card">
       <div style="display:flex;flex-direction:column;gap:10px;max-width:420px">
-        <input class="verify-inp" id="pw-current" type="password" placeholder="<%= accountCopy.currentPassword || 'Joriy parol' %>" autocomplete="current-password">
-        <input class="verify-inp" id="pw-new" type="password" placeholder="<%= accountCopy.newPassword || 'Yangi parol' %>" autocomplete="new-password">
+        <input class="verify-inp" id="pw-current" type="password" placeholder="<%= ac.currentPassword || 'Joriy parol' %>" autocomplete="current-password">
+        <input class="verify-inp" id="pw-new" type="password" placeholder="<%= ac.newPassword || 'Yangi parol' %>" autocomplete="new-password">
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <button class="verify-btn" id="pw-change-btn" type="button"><%- icon('check', 14) %> <%= accountCopy.changePasswordBtn || 'Parolni o\'zgartirish' %></button>
+          <button class="verify-btn" id="pw-change-btn" type="button"><%- icon('check', 14) %> <%= ac.changePasswordBtn || 'Parolni o\'zgartirish' %></button>
         </div>
         <div id="pw-msg" class="verdict" style="display:none"></div>
       </div>
     </div>
 
     <!-- AUTH B-24: email change (reauth + double opt-in) — yangi sahifaga havola -->
-    <div class="sec-title" style="margin-top:18px"><%- icon('mail', 16) %> <%= accountCopy.emailChangeTitle || 'Email manzilini o\'zgartirish' %></div>
+    <div class="sec-title" style="margin-top:18px"><%- icon('mail', 16) %> <%= ac.emailChangeTitle || 'Email manzilini o\'zgartirish' %></div>
     <div class="mfa-card">
       <div style="display:flex;flex-direction:column;gap:10px;max-width:420px">
-        <div style="font-size:.78rem;color:var(--deborah-semantic-color-text-muted)"><%= accountCopy.currentEmail || 'Joriy email' %>: <strong><%= userEmail || '—' %></strong></div>
-        <a href="/user/email-change" class="verify-btn ec-change-link"><%- icon('mail', 14) %> <%= accountCopy.emailChangeBtn || 'Emailni o\'zgartirish' %></a>
-        <div class="ec-change-note"><%= accountCopy.emailChangeNote || 'Xavfsizlik uchun parol qayta tasdiqlanadi va ikkala email manzili tasdiqlanadi' %></div>
+        <div style="font-size:.78rem;color:var(--deborah-semantic-color-text-muted)"><%= ac.currentEmail || 'Joriy email' %>: <strong><%= userEmail || '—' %></strong></div>
+        <a href="/user/email-change" class="verify-btn ec-change-link"><%- icon('mail', 14) %> <%= ac.emailChangeBtn || 'Emailni o\'zgartirish' %></a>
+        <div class="ec-change-note"><%= ac.emailChangeNote || 'Xavfsizlik uchun parol qayta tasdiqlanadi va ikkala email manzili tasdiqlanadi' %></div>
       </div>
     </div>
 
     <!-- AUTH A-29: security events feed (PII-minimal) -->
-    <div class="sec-title" style="margin-top:18px"><%- icon('shieldCheck', 16) %> <%= accountCopy.eventsTitle || 'Xavfsizlik hodisalari' %></div>
+    <div class="sec-title" style="margin-top:18px"><%- icon('shieldCheck', 16) %> <%= ac.eventsTitle || 'Xavfsizlik hodisalari' %></div>
     <div class="mfa-card">
       <div id="events-list"><div class="loading"><span class="spinner" style="border-color:var(--deborah-semantic-color-text-muted);border-top-color:var(--deborah-semantic-color-action-primary)"></span></div></div>
     </div>
 
     <% if (user && user.role === 'student') { %>
-    <div class="sec-title" style="margin-top:18px"><%- icon('layers', 16) %> Assessment</div>
+    <div class="sec-title" style="margin-top:18px"><%- icon('layers', 16) %> <%= _pt('assessTitle') %></div>
     <select class="assign-pick" id="assign-pick">
-      <option value="">Assessment tanlang...</option>
+      <option value=""><%= _pt('assessPick') %></option>
     </select>
 
-    <div id="content"><div class="loading"><span class="spinner" style="border-color:var(--deborah-semantic-color-text-muted);border-top-color:var(--deborah-semantic-color-action-primary)"></span> Yuklanmoqda...</div></div>
+    <div id="content"><div class="loading"><span class="spinner" style="border-color:var(--deborah-semantic-color-text-muted);border-top-color:var(--deborah-semantic-color-action-primary)"></span> <%= _pt('loading') %></div></div>
     <% } %>
   </div>
 

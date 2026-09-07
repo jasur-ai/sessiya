@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html lang="uz" dir="ltr">
+<html lang="<%= htmlLang || 'uz' %>" dir="ltr">
 <head>
   <%- include('../partials/head') %>
+  <title><%= typeof title !== 'undefined' ? title : 'Talaba ish maydoni' %></title>
   <style>
     .go-gold{color:var(--deborah-semantic-color-status-warning,var(--gold));}
     body{background:var(--deborah-semantic-color-surface-default);min-height:100vh;}
@@ -10,56 +11,58 @@
     .next-up:hover{border-color:var(--green);}
   </style>
 </head>
+<% const _PC = typeof pageCopy !== 'undefined' ? pageCopy : null;
+   const _PL = typeof pageLang !== 'undefined' ? pageLang : 'uz';
+   const _pt = (k) => { const _v = _PC ? _PC[k] : null; if (!_v) return ''; return (_v[_PL] !== undefined) ? _v[_PL] : (_v.uz || ''); }; %>
 <body>
   <%- include('../partials/sidebar', { active, role, user }) %>
   <main class="main" id="main-content" tabindex="-1">
     <div class="topbar">
-      <h1>Talaba ish maydoni</h1>
+      <h1><%= _pt('h1') %></h1>
       <div class="topbar-right">
-        <a href="/user/profile" class="btn btn-quiet"><%- icon('user', 14) %> Profilim</a>
-        <span style="font-size:.74rem;font-weight:600;color:var(--deborah-semantic-color-text-muted)">Salom, <span style="color:var(--deborah-semantic-color-text-primary)"><%= username %></span></span>
+        <a href="/user/profile" class="btn btn-quiet"><%- icon('user', 14) %> <%= _pt('goProfile') %></a>
+        <span style="font-size:.74rem;font-weight:600;color:var(--deborah-semantic-color-text-muted)"><%= _pt('hello') %>, <span style="color:var(--deborah-semantic-color-text-primary)"><%= username %></span></span>
       </div>
-    </div>
-
-    <div class="role-tabs" role="tablist" aria-label="Bo'limlar">
-      <a href="/student" class="role-tab <%= tab === 'calendar' ? 'active' : '' %>" role="tab" aria-selected="<%= tab === 'calendar' %>"><%- icon('calendar', 14) %> Kalendar</a>
-      <a href="/student?tab=assignments" class="role-tab <%= tab === 'assignments' ? 'active' : '' %>" role="tab" aria-selected="<%= tab === 'assignments' %>"><%- icon('fileText', 14) %> Topshiriqlar</a>
     </div>
 
     <div class="next-up">
       <div class="rc-ico" style="width:44px;height:44px;border-radius:11px;background:rgba(0,229,160,.12);color:var(--green);display:flex;align-items:center;justify-content:center;flex-shrink:0"><%- icon('zap', 20) %></div>
       <div style="flex:1">
-        <div style="font-weight:700;font-size:.92rem">Yaqinlashib kelayotgan topshiriq</div>
-        <div style="font-size:.76rem;color:var(--deborah-semantic-color-text-muted);font-weight:700">Kalendar va topshiriqlar shu yerda ko'rinadi</div>
+        <div style="font-weight:700;font-size:.92rem"><%= _pt('nextTitle') %></div>
+        <div style="font-size:.76rem;color:var(--deborah-semantic-color-text-muted);font-weight:700"><%= _pt('nextSub') %></div>
       </div>
-      <a href="/user/panel" class="role-tab" style="text-decoration:none"><%- icon('arrowRight', 13) %> Panelim</a>
-          <a href="/user/profile" style="display:inline-block;margin-top:6px;text-decoration:none;font-weight:700;font-size:.8rem"><%- icon('user', 13) %> Profilim</a>
+      <a href="/user/panel" class="role-tab" style="text-decoration:none"><%- icon('arrowRight', 13) %> <%= _pt('goPanel') %></a>
+          <a href="/user/profile" style="display:inline-block;margin-top:6px;text-decoration:none;font-weight:700;font-size:.8rem"><%- icon('user', 13) %> <%= _pt('goProfile') %></a>
     </div>
 
     <div class="quick-grid">
       <div class="role-card">
         <div class="rc-ico" style="background:rgba(37,99,235,.14);color:var(--deborah-semantic-color-action-primary)"><%- icon('grid', 20) %></div>
-        <div class="rc-title">Panelim</div>
-        <div class="rc-sub">Testlar, natijalar va ishtirok</div>
-        <a href="/user/panel" style="display:inline-block;margin-top:12px;text-decoration:none;color:var(--deborah-semantic-color-action-primary);font-weight:700;font-size:.8rem"><%- icon('arrowRight', 13) %> O'tish</a>
+        <div class="rc-title"><%= _pt('goPanel') %></div>
+        <div class="rc-sub"><%= _pt('cardPanelSub') %></div>
+        <a href="/user/panel" style="display:inline-block;margin-top:12px;text-decoration:none;color:var(--deborah-semantic-color-action-primary);font-weight:700;font-size:.8rem"><%- icon('arrowRight', 13) %> <%= _pt('go') %></a>
       </div>
       <div class="role-card">
         <div class="rc-ico" style="background:rgba(245,158,11,.14);color:var(--gold)"><%- icon('award', 20) %></div>
-        <div class="rc-title">Portfolio</div>
-        <div class="rc-sub">Evidence portfolio va yutuqlar</div>
-        <a href="/user/portfolio" class="go-gold" style="display:inline-block;margin-top:12px;text-decoration:none;font-weight:700;font-size:.8rem"><%- icon('arrowRight', 13) %> O'tish</a>
+        <div class="rc-title"><%= _pt('cardPortTitle') %></div>
+        <div class="rc-sub"><%= _pt('cardPortSub') %></div>
+        <a href="/user/portfolio" class="go-gold" style="display:inline-block;margin-top:12px;text-decoration:none;font-weight:700;font-size:.8rem"><%- icon('arrowRight', 13) %> <%= _pt('go') %></a>
       </div>
       <div class="role-card">
         <div class="rc-ico" style="background:rgba(0,229,160,.12);color:var(--green)"><%- icon('shieldCheck', 20) %></div>
-        <div class="rc-title">Xavfsizlik profili</div>
-        <div class="rc-sub">Passkey, session va ulangan hisoblar</div>
-        <a href="/user/security-profile" style="display:inline-block;margin-top:12px;text-decoration:none;color:var(--green);font-weight:700;font-size:.8rem"><%- icon('arrowRight', 13) %> O'tish</a>
+        <div class="rc-title"><%= _pt('cardSecTitle') %></div>
+        <div class="rc-sub"><%= _pt('cardSecSub') %></div>
+        <a href="/user/security-profile" style="display:inline-block;margin-top:12px;text-decoration:none;color:var(--green);font-weight:700;font-size:.8rem"><%- icon('arrowRight', 13) %> <%= _pt('go') %></a>
       </div>
     </div>
 
     <% if (!canAttempt) { %>
-      <div style="margin-top:16px">
-        <%- include('../partials/states', { state: 'offline', iconName: 'shield', title: 'Attempt yaratish cheklangan', sub: "Topshiriq tayinlanmagan yoki ruxsat yo'q" }) %>
+      <div style="margin-top:16px;display:flex;gap:12px;align-items:center;background:var(--deborah-semantic-color-surface-raised);border:1px solid var(--deborah-semantic-color-border-default);border-radius:14px;padding:16px">
+        <div class="rc-ico" style="width:40px;height:40px;border-radius:11px;background:rgba(248,113,113,.12);color:var(--deborah-semantic-color-action-primary);display:flex;align-items:center;justify-content:center;flex-shrink:0"><%- icon('shield', 18) %></div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:.9rem"><%= _pt('attTitle') %></div>
+          <div style="font-size:.76rem;color:var(--deborah-semantic-color-text-muted);font-weight:600"><%= _pt('attSub') %></div>
+        </div>
       </div>
     <% } %>
   </main>

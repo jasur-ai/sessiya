@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="uz" dir="ltr">
+<html lang="<%= htmlLang || 'uz' %>" dir="ltr">
 <head>
   <%- include('../partials/head') %>
-  <title>Profilim — Deborah</title>
+  <title><%= pageTitle %></title>
   <style>
     body{background:var(--deborah-semantic-color-surface-default);min-height:100vh;transition:background .3s;}
     body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse 55% 40% at 15% 20%,rgba(37,99,235,.1) 0%,transparent 65%),radial-gradient(ellipse 45% 35% at 85% 75%,rgba(56,189,248,.07) 0%,transparent 65%);}
@@ -51,18 +51,25 @@
     @media (prefers-reduced-motion: reduce){*{animation:none !important;transition:none !important;}}
   </style>
 </head>
+<% /* Profil sahifasi i18n (4 til) — USER_PAGES.profile + pageLang (route) */
+   const _PC = typeof pageCopy !== 'undefined' ? pageCopy : null;
+   const _PL = typeof pageLang !== 'undefined' ? pageLang : 'uz';
+   const _pt = (k) => { const _v = _PC ? _PC[k] : null; if (!_v) return ''; return (_v[_PL] !== undefined) ? _v[_PL] : (_v.uz || ''); };
+   const _loc = { uz: 'uz-UZ', 'uz-cyrl': 'uz-Cyrl-UZ', ru: 'ru-RU', en: 'en-US' }[_PL] || 'uz-UZ';
+   const _rk = { student: 'roleStudent', teacher: 'roleTeacher', admin: 'roleAdmin', proctor: 'roleProctor', marker: 'roleMarker', board: 'roleBoard', teacher_pending: 'roleTeacherPending', teacher_rejected: 'roleTeacherRejected' };
+%>
 <body>
   <nav class="navbar">
     <a class="nav-logo" href="/user/panel"><%- icon('home', 18) %> Deborah</a>
     <div class="nav-right">
-      <a class="nav-btn" href="/user/panel"><%- icon('arrowLeft', 14) %> Panel</a>
-      <a class="nav-btn" href="/user/security-profile"><%- icon('shieldCheck', 14) %> Xavfsizlik</a>
+      <a class="nav-btn" href="/user/panel"><%- icon('arrowLeft', 14) %> <%= _pt('navPanel') %></a>
+      <a class="nav-btn" href="/user/security-profile"><%- icon('shieldCheck', 14) %> <%= _pt('navSecurity') %></a>
     </div>
   </nav>
 
   <main class="panel">
-    <div class="greeting"><%- icon('user', 20) %> Profilim</div>
-    <div class="greeting-sub">Akkaunt ma'lumotlaringiz va zaxira kodlaringiz — bir joyda</div>
+    <div class="greeting"><%- icon('user', 20) %> <%= _pt('h1') %></div>
+    <div class="greeting-sub"><%= _pt('sub') %></div>
 
     <% const p = profile || {}; %>
     <section class="card">
@@ -70,61 +77,60 @@
         <div class="avatar"><%= (p.displayName || p.username || '?').trim().charAt(0).toUpperCase() %></div>
         <div>
           <div class="prof-name"><%= p.displayName || p.username || '—' %></div>
-          <span class="role-badge"><%= { student: 'Talaba', teacher: "O'qituvchi", admin: 'Administrator', proctor: 'Nazoratchi', marker: 'Belgilovchi', board: "Kengash a'zosi", teacher_pending: "O'qituvchi (kutilmoqda)", teacher_rejected: "O'qituvchi (rad etilgan)" }[p.role] || p.role || '—' %></span>
+          <span class="role-badge"><%= (_rk[p.role] ? _pt(_rk[p.role]) : (p.role || '—')) %></span>
         </div>
       </div>
     </section>
 
     <section class="card">
-      <div class="card-h"><%- icon('clipboard', 16) %> Profil ma'lumotlari</div>
+      <div class="card-h"><%- icon('clipboard', 16) %> <%= _pt('secData') %></div>
       <div class="rows">
-        <div class="row"><span class="row-k">Username</span><span class="row-v"><%= p.username || '—' %></span></div>
-        <div class="row"><span class="row-k">Email</span><span class="row-v">
+        <div class="row"><span class="row-k"><%= _pt('rowUsername') %></span><span class="row-v"><%= p.username || '—' %></span></div>
+        <div class="row"><span class="row-k"><%= _pt('rowEmail') %></span><span class="row-v">
           <%= p.email || '—' %>
-          <% if (p.emailVerified) { %><span class="ok-badge"><%- icon('checkCircle', 13) %> tasdiqlangan</span><% } else { %><span class="warn-badge"><%- icon('mail', 13) %> tasdiqlanmagan</span><% } %>
+          <% if (p.emailVerified) { %><span class="ok-badge"><%- icon('checkCircle', 13) %> <%= _pt('verified') %></span><% } else { %><span class="warn-badge"><%- icon('mail', 13) %> <%= _pt('unverified') %></span><% } %>
         </span></div>
-        <div class="row"><span class="row-k">Rol</span><span class="row-v"><%= p.role || '—' %></span></div>
-        <div class="row"><span class="row-k">Kirish usuli</span><span class="row-v"><%= p.authProvider === 'google' ? 'Google akkaunt' : 'Parol' %><%= p.authProvider === 'google' ? ' + ' + (p.hasPassword ? 'parol' : 'faqat Google') : '' %></span></div>
-        <div class="row"><span class="row-k">VIP</span><span class="row-v"><%= p.isVip ? 'VIP a' + 'zo' : 'Standart' %></span></div>
-        <div class="row"><span class="row-k">Ro'yxatdan o'tgan</span><span class="row-v"><%= p.createdAt ? new Date(p.createdAt).toLocaleDateString('uz-UZ') : '—' %></span></div>
+        <div class="row"><span class="row-k"><%= _pt('rowRole') %></span><span class="row-v"><%= (_rk[p.role] ? _pt(_rk[p.role]) : (p.role || '—')) %></span></div>
+        <div class="row"><span class="row-k"><%= _pt('rowAuth') %></span><span class="row-v"><%= p.authProvider === 'google' ? _pt('authGoogle') : _pt('authPassword') %><%= p.authProvider === 'google' ? ' + ' + (p.hasPassword ? _pt('authPassword') : _pt('authOnlyGoogle')) : '' %></span></div>
+        <div class="row"><span class="row-k"><%= _pt('rowReg') %></span><span class="row-v"><%= p.createdAt ? new Date(p.createdAt).toLocaleDateString(_loc) : '—' %></span></div>
       </div>
     </section>
 
     <section class="card">
-      <div class="card-h"><%- icon('shieldCheck', 16) %> Xavfsizlik holati</div>
+      <div class="card-h"><%- icon('shieldCheck', 16) %> <%= _pt('secSecurity') %></div>
       <div class="rows">
-        <div class="row"><span class="row-k">MFA (Authenticator)</span><span class="row-v">
-          <% if (p.mfa && p.mfa.status === 'active') { %><span class="mfa-on">Yoqilgan</span><% } else if (p.role === 'teacher' || p.role === 'admin') { %><span class="mfa-off">O'chirilgan</span><% } else { %><span class="row-v" style="font-weight:600">Kerak emas (faqat admin/o'qituvchi uchun)</span><% } %>
+        <div class="row"><span class="row-k"><%= _pt('rowMfa') %></span><span class="row-v">
+          <% if (p.mfa && p.mfa.status === 'active') { %><span class="mfa-on"><%= _pt('mfaOn') %></span><% } else if (p.role === 'teacher' || p.role === 'admin') { %><span class="mfa-off"><%= _pt('mfaOff') %></span><% } else { %><span class="row-v" style="font-weight:600"><%= _pt('mfaNope') %></span><% } %>
         </span></div>
-        <div class="row"><span class="row-k">Qolgan zaxira kodlar</span><span class="row-v"><%= p.mfa && p.mfa.status === 'active' ? (p.mfa.backupCodesRemaining + ' ta') : '—' %></span></div>
+        <div class="row"><span class="row-k"><%= _pt('rowCodes') %></span><span class="row-v"><%= p.mfa && p.mfa.status === 'active' ? (p.mfa.backupCodesRemaining + ' ta') : '—' %></span></div>
       </div>
       <div class="actions">
-        <a class="btn btn-quiet" href="/user/security-profile"><%- icon('lock', 14) %> Xavfsizlik profilini boshqarish</a>
+        <a class="btn btn-quiet" href="/user/security-profile"><%- icon('lock', 14) %> <%= _pt('secMgrBtn') %></a>
       </div>
     </section>
 
     <section class="card" id="bc-card">
-      <div class="card-h"><%- icon('key', 16) %> Zaxira kodlar (12 ta)</div>
+      <div class="card-h"><%- icon('key', 16) %> <%= _pt('secCodes') %></div>
       <% if (p.mfa && p.mfa.status === 'active') { %>
-        <div class="hint">Zaxira kodlarni ko'rish uchun (yangilab olish) <b>joriy kirish parolingizni</b> kiriting (Authenticator kodi so'ralmaydi). Yangi 12 ta kod yaratiladi, avvalgilari bekor bo'ladi.</div>
+        <div class="hint"><%- _pt('bcHint') %></div>
         <div class="actions">
-          <button class="btn btn-primary" id="bc-open" type="button"><%- icon('key', 14) %> Zaxira kodlarni ko'rsatish</button>
+          <button class="btn btn-primary" id="bc-open" type="button"><%- icon('key', 14) %> <%= _pt('bcShow') %></button>
         </div>
         <div id="bc-result" hidden>
-          <div class="warn-box">⚠️ Bu kodlar <b>faqat bir marta</b> ko'rsatiladi. Hozir nusxalab oling va xavfsiz joyda saqlang — ular MFA kodi yo'qolganda kirish uchun yagona zaxira.</div>
+          <div class="warn-box"><%- _pt('bcWarn') %></div>
           <div class="codes-grid" id="bc-grid"></div>
           <div class="actions">
-            <button class="btn btn-primary" id="bc-copy" type="button"><%- icon('clipboard', 14) %> Barchasini nusxalash</button>
+            <button class="btn btn-primary" id="bc-copy" type="button"><%- icon('clipboard', 14) %> <%= _pt('bcCopy') %></button>
           </div>
         </div>
       <% } else { %>
         <% if (p.role === 'teacher' || p.role === 'admin') { %>
-          <div class="hint">Zaxira kodlar <b>MFA (Authenticator)</b> yoqilganda mavjud bo'ladi. Yoqish: Xavfsizlik profili → MFA.</div>
+          <div class="hint"><%- _pt('bcHintNone') %></div>
           <div class="actions">
-            <a class="btn btn-quiet" href="/user/security-profile"><%- icon('lock', 14) %> MFA yoqish</a>
+            <a class="btn btn-quiet" href="/user/security-profile"><%- icon('lock', 14) %> <%= _pt('mfaOnBtn') %></a>
           </div>
         <% } else { %>
-          <div class="hint">Zaxira kodlar va Authenticator sizning akkauntingiz uchun kerak emas — bu funksiya faqat admin va o'qituvchilarga qo'llaniladi.</div>
+          <div class="hint"><%= _pt('bcHintStudent') %></div>
         <% } %>
       <% } %>
     </section>
@@ -133,19 +139,23 @@
   <!-- Qayta tasdiqlash modali -->
   <div class="modal-back" id="reauth-modal" hidden>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="reauth-title">
-      <h3 id="reauth-title"><%- icon('lock', 16) %> Identifikatsiyani tasdiqlang</h3>
-      <div class="hint">Zaxira kodlaringizni ko'rsatish uchun joriy kirish parolingizni kiriting.</div>
-      <input class="inp" id="reauth-pass" type="password" placeholder="<%= p.isAdminSession ? 'Admin paroli' : 'Joriy kirish paroli' %>" autocomplete="current-password">
+      <h3 id="reauth-title"><%- icon('lock', 16) %> <%= _pt('reauthTitle') %></h3>
+      <div class="hint"><%= _pt('reauthHint') %></div>
+      <input class="inp" id="reauth-pass" type="password" placeholder="<%= p.isAdminSession ? _pt('phAdmin') : _pt('phCurrent') %>" autocomplete="current-password">
       <div class="msg" id="reauth-msg"></div>
       <div class="actions">
-        <button class="btn btn-primary" id="reauth-submit" type="button">Tasdiqlash</button>
-        <button class="btn btn-quiet" id="reauth-cancel" type="button">Bekor qilish</button>
+        <button class="btn btn-primary" id="reauth-submit" type="button"><%= _pt('btnSubmit') %></button>
+        <button class="btn btn-quiet" id="reauth-cancel" type="button"><%= _pt('btnCancel') %></button>
       </div>
     </div>
   </div>
 
   <script>
     window.__CSRF_TOKEN = '<%= csrfToken %>';
+    var __PP = <%- JSON.stringify(pageCopy || {}) %>;
+    var __PL = <%- JSON.stringify(pageLang || 'uz') %>;
+    var __LOC = ({ uz: 'uz-UZ', 'uz-cyrl': 'uz-Cyrl-UZ', ru: 'ru-RU', en: 'en-US' })[__PL] || 'uz-UZ';
+    function __pt(k) { var v = __PP[k]; if (!v) return ''; return (v[__PL] !== undefined) ? v[__PL] : (v.uz || ''); }
     (function () {
       var openBtn = document.getElementById('bc-open');
       if (!openBtn) return;
@@ -170,12 +180,12 @@
       submitBtn.addEventListener('click', async function () {
         var pass = (document.getElementById('reauth-pass') || {}).value || '';
         if (!pass) {
-          msgEl.textContent = 'Joriy kirish parolingizni kiriting.';
+          msgEl.textContent = __pt('jEmpty');
           msgEl.className = 'msg err';
           return;
         }
         submitBtn.disabled = true;
-        msgEl.textContent = 'Tekshirilmoqda…';
+        msgEl.textContent = __pt('jChecking');
         msgEl.className = 'msg';
         try {
           var res = await fetch('/api/profile/backup-codes', {
@@ -185,7 +195,7 @@
           });
           var data = await res.json().catch(function () { return {}; });
           if (!res.ok || !data.ok) {
-            msgEl.textContent = (data && data.message) || ('Xato (' + res.status + ')');
+            msgEl.textContent = (data && data.message) || (__pt('jError') + ' (' + res.status + ')');
             msgEl.className = 'msg err';
             return;
           }
@@ -201,7 +211,7 @@
           document.getElementById('bc-result').hidden = false;
           document.getElementById('bc-card').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         } catch (e) {
-          msgEl.textContent = 'Tarmoq xatosi — qayta urinib ko\u2018ring.';
+          msgEl.textContent = __pt('jNet');
           msgEl.className = 'msg err';
         } finally {
           submitBtn.disabled = false;
@@ -212,17 +222,17 @@
       if (copyBtn) {
         copyBtn.addEventListener('click', function () {
           var codes = Array.prototype.map.call(document.querySelectorAll('.code-chip'), function (el) { return el.textContent; });
-          var text = 'Deborah — zaxira kodlar (' + new Date().toLocaleString('uz-UZ') + ')\n' + codes.join('\n');
+          var text = __pt('clipHeader') + ' (' + new Date().toLocaleString(__LOC) + ')\n' + codes.join('\n');
           if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(text).then(function () {
-              copyBtn.textContent = '✓ Nusxalandi';
-              setTimeout(function () { copyBtn.textContent = 'Barchasini nusxalash'; }, 2000);
+              copyBtn.textContent = __pt('bcCopied');
+              setTimeout(function () { copyBtn.textContent = __pt('bcCopy'); }, 2000);
             });
           } else {
             var ta = document.createElement('textarea');
             ta.value = text; document.body.appendChild(ta); ta.select();
             document.execCommand('copy'); document.body.removeChild(ta);
-            copyBtn.textContent = '✓ Nusxalandi';
+            copyBtn.textContent = __pt('bcCopied');
           }
         });
       }

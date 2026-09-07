@@ -88,10 +88,16 @@ function localeFrom(req) {
   return resolveLocale(req.query.lang || req.cookies?.lang || req.session?.lang || 'uz-Latn');
 }
 
-/** GET /user/portfolio — portfolio UI. */
+/** GET /user/portfolio — portfolio UI (locale: settings/lang > query/cookie). */
 router.get('/user/portfolio', requireAuth, async (req, res) => {
   const userId = uid(req);
-  const locale = localeFrom(req);
+  let sLang = null;
+  try {
+    const { fb } = await import('../firebase/admin.js');
+    const snap = await fb.get(`users/${userId}/settings/lang`);
+    if (snap.exists() && snap.val()) sLang = snap.val();
+  } catch (_) { /* fail-soft */ }
+  const locale = resolveLocale(req.query.lang || sLang || 'uz-Latn');
   const ui = catalogFor(locale);
   const { portfolio, items } = await listItems({ userId });
   res.render('user/portfolio', {

@@ -14,6 +14,10 @@ import { toPrivateUser, normalizeUserRecord } from '../src/modules/auth/user-sch
 import { getStudentAssignments } from '../src/modules/preflight/index.js';
 // AUTH B-16 §12: rejected teacher cooldown — qayta ariza oynasi
 import { TEACHER_COOLDOWN_MS } from '../src/modules/auth/teacher-approval.js';
+// Panel/workspace i18n (uz / uz-cyrl / ru / en) + practice copy
+import { PANEL_COPY, resolvePanelLang, htmlLangOf, localeOf } from '../data/panel-i18n.js';
+import { builderCopyFor } from '../data/test-builder-i18n.js';
+import { practiceCopyFor } from '../data/practice-i18n.js';
 
 const router = Router();
 
@@ -136,20 +140,11 @@ router.use((req, res, next) => {
 router.get('/panel', async (req, res) => {
   const user = req.session.user;
   try {
-    // 🔒 Only load Mock/PRE data for VIP users (server-side hiding)
+    // VIP stealth (user qarori 09/2026): panel'da VIP izlari YO'Q — mock/pre
+    // to'plamlar bloki butunlay olib tashlangan (ko'rinmaydi, yuklanmaydi).
     const isVip = await isCurrentUserVip(req);
-    
-    const promises = [fb.get(`users/${user.safeKey}/tests`)];
-    if (isVip) {
-      promises.push(fb.get(DB_PATHS.MOCK_FANS));
-      promises.push(fb.get(DB_PATHS.PRE_GROUPS));
-    }
-    
-    const [testsSnap, fansSnap, preSnap] = await Promise.all(promises);
-
+    const testsSnap = await fb.get(`users/${user.safeKey}/tests`);
     const tests = testsSnap.val() || {};
-    const fans = isVip ? (fansSnap?.val() || {}) : {};
-    const preGroups = isVip ? (preSnap?.val() || {}) : {};
 
     // AUTH A-28: risk banner copy — user settings'dagi lang (default uz)
     const { resolveAuthLang, AUTH_COPY } = await import('../data/auth-i18n.js');
@@ -178,11 +173,22 @@ router.get('/panel', async (req, res) => {
     } catch (_) { /* fail-soft — banner ko'rsatilmaydi */ }
 
     const _panelCopy = AUTH_COPY[resolveAuthLang(plang)];
+
+    // Panel i18n: 4 til (uz / uz-cyrl / ru / en) — resolve qilingan kod server
+    // tomonidan EJS'ga va client dict (window.__PANEL_COPY) sifatida beriladi.
+    const plangResolved = resolvePanelLang(plang);
+    const panelCopy = PANEL_COPY[plangResolved] || PANEL_COPY.uz;
+
     res.render('user/panel', {
-      title: 'Mening Panelim',
+      title: (panelCopy['ws.title'] || 'Ish maydonim') + ' — Deborah',
       active: 'panel',
-      panelLang: plang,
-      // S34h (BUG fix): sidebar RU/EN lug'ati — oldin berilmagan, sidebar doim uz fallback'da qolardi
+      panelLang: plangResolved,
+      panelLangRaw: plang,
+      htmlLang: htmlLangOf(plangResolved),
+      localeCode: localeOf(plangResolved),
+      panelCopy,
+      panelCopyAll: PANEL_COPY,
+      // S34h (BUG fix): sidebar RU/EN/ЎЗК lug'ati — oldin berilmagan, sidebar doim uz fallback'da qolardi
       fullCopy: _panelCopy,
       copy: { sidebar: _panelCopy.sidebar, header: _panelCopy.header },
       // AUTH A-18: limited mode banner — email verify'siz summative blok
@@ -208,39 +214,25 @@ router.get('/panel', async (req, res) => {
           type: t.type || (Array.isArray(t.questions) && t.questions.length && t.questions.every(q => Array.isArray(q.options)) ? 'variant' : null),
           lastUse: t.lastUsedAt || t.last_used_at || 0,
         })),
-      fans: Object.entries(fans)
-        .sort((a, b) => (a[1].name || '').localeCompare(b[1].name || ''))
-        .map(([key, f]) => ({
-          key,
-          name: f.name || key,
-          count: f.count || (f.questions?.length || 0),
-          createdAt: f.createdAt || 0,
-        })),
-      preGroups: Object.entries(preGroups)
-        .sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0))
-        .map(([key, g]) => ({
-          key,
-          title: g.title || key,
-          chunks: g.chunks || [],
-          count: g.count || 0,
-          total: g.total || 0,
-        })),
-      characters: [], // S25.05: characters panel olib tashlandi
+      fmtDate: (ts) => new Date(ts || Date.now()).toLocaleDateString(localeOf(plangResolved)),
       username: user.username,
-      isVip,
     });
     // Update session with fresh isVip value
     req.session.user.isVip = isVip;
   } catch (err) {
     console.error('User panel error:', err);
     res.render('user/panel', {
-      title: 'Mening Panelim',
+      title: 'Ish maydonim — Deborah',
       active: 'panel',
       panelLang: 'uz',
+      panelLangRaw: 'uz',
+      htmlLang: 'uz',
+      localeCode: 'uz-UZ',
+      panelCopy: PANEL_COPY.uz,
+      panelCopyAll: PANEL_COPY,
       fullCopy: AUTH_COPY.uz,
       copy: { sidebar: AUTH_COPY.uz.sidebar, header: AUTH_COPY.uz.header },
-      tests: [], fans: [], preGroups: [],
-      characters: [],
+      tests: [],
       username: user.username,
       isVip: false,
       error: err.message,
@@ -285,128 +277,24 @@ router.get('/create-test', async (req, res) => {
     } catch (_) {}
   }
 
-  // S34m: create-test 3 til (uz/ru/en) — foydalanuvchi settings/lang asosida
-  let bLang = 'uz';
+  // S34m: create-test 4 til (uz/uz-cyrl/ru/en) — foydalanuvchi settings/lang asosida
+  // Dublikat diktant yo'q: lug'at data/test-builder-i18n.js (server + client bir manba).
+  let bRaw = 'uz';
   try {
     const ls = await fb.get(`users/${req.session.user.safeKey}/settings/lang`);
-    if (ls.exists() && ls.val()) bLang = ls.val();
+    if (ls.exists() && ls.val()) bRaw = ls.val();
   } catch (_) {}
-  const BL = {
-    uz: {
-      title: editKey ? 'Testni tahrirlash' : 'Yangi test yaratish',
-      namePlaceholder: 'Test nomi (masalan: Matematika 2024)',
-      nameRequired: 'Test nomini kiriting — testga nom qoying',
-      questionsTitle: 'Savollar',
-      addQuestion: "Savol qo'shish",
-      excelImport: 'Excel import',
-      excelTemplate: 'Excel shablon yuklab olish',
-      preview: "Ko'rish",
-      save: 'Saqlash',
-      qText: 'Savol matni',
-      qTextReq: 'Savol matnini kiriting — savolga nom bering',
-      qTextPh: 'Savol matnini kiriting...',
-      qType: 'Savol turi',
-      qTypeHint: 'Cast sessiyalarida ishlatiladigan savol turi',
-      time: 'Vaqt (soniya)',
-      tags: 'Teglar (vergul bilan)',
-      tagsPh: 'masalan: algebra, kirish',
-      options: 'Variantlar',
-      optionsMin: 'kamida 2 ta',
-      optPh: 'variant matni...',
-      addOption: "+ Variant qo'shish",
-      correct: "To'g'ri javob",
-      correctHint: "✓ To'g'ri javob: variant kartasini bosib belgilanadi (yashil halqa)",
-      explanation: 'Tushuntirish (izoh)',
-      explanationPh: 'Javob izohi (ixtiyoriy)',
-      noQuestion: 'Savol tanlanmagan',
-      noQuestionSub: "Chapdagi ro'yxatdan savol tanlang yoki yangi qo'shing.",
-      empty: "Hali testlar yo'q",
-      errSummary: 'Diqqat talab qiladigan maydonlar',
-      outlineTitle: 'Savollar',
-      questionsList: "Savollar ro'yxati",
-      duplicate: 'Nusxalash',
-      del: "O'chirish",
-    },
-    ru: {
-      title: editKey ? 'Редактирование теста' : 'Новый тест',
-      namePlaceholder: 'Название теста (например: Математика 2024)',
-      nameRequired: 'Введите название теста — дайте тесту имя',
-      questionsTitle: 'Вопросы',
-      addQuestion: 'Добавить вопрос',
-      excelImport: 'Импорт Excel',
-      excelTemplate: 'Скачать шаблон Excel',
-      preview: 'Просмотр',
-      save: 'Сохранить',
-      qText: 'Текст вопроса',
-      qTextReq: 'Введите текст вопроса — дайте вопросу имя',
-      qTextPh: 'Введите текст вопроса...',
-      qType: 'Тип вопроса',
-      qTypeHint: 'Тип вопроса, используемый в cast-сессиях',
-      time: 'Время (сек)',
-      tags: 'Теги (через запятую)',
-      tagsPh: 'например: алгебра, введение',
-      options: 'Варианты',
-      optionsMin: 'минимум 2',
-      optPh: 'текст варианта...',
-      addOption: '+ Добавить вариант',
-      correct: 'Правильный ответ',
-      correctHint: '✓ Правильный ответ: отметьте, нажав на карточку варианта (зелёная рамка)',
-      explanation: 'Пояснение',
-      explanationPh: 'Пояснение к ответу (необязательно)',
-      noQuestion: 'Вопрос не выбран',
-      noQuestionSub: 'Выберите вопрос из списка слева или добавьте новый.',
-      empty: 'Тестов пока нет',
-      errSummary: 'Поля, требующие внимания',
-      outlineTitle: 'Вопросы',
-      questionsList: 'Список вопросов',
-      duplicate: 'Дублировать',
-      del: 'Удалить',
-    },
-    en: {
-      title: editKey ? 'Edit test' : 'New test',
-      namePlaceholder: 'Test name (e.g.: Math 2024)',
-      nameRequired: 'Enter the test name — give your test a title',
-      questionsTitle: 'Questions',
-      addQuestion: 'Add question',
-      excelImport: 'Excel import',
-      excelTemplate: 'Download Excel template',
-      preview: 'Preview',
-      save: 'Save',
-      qText: 'Question text',
-      qTextReq: 'Enter the question text — give your question a title',
-      qTextPh: 'Enter the question text...',
-      qType: 'Question type',
-      qTypeHint: 'Question type used in cast sessions',
-      time: 'Time (seconds)',
-      tags: 'Tags (comma separated)',
-      tagsPh: 'e.g.: algebra, intro',
-      options: 'Options',
-      optionsMin: 'at least 2',
-      optPh: 'option text...',
-      addOption: '+ Add option',
-      correct: 'Correct answer',
-      correctHint: '✓ Correct answer: click the option card to mark it (green ring)',
-      explanation: 'Explanation',
-      explanationPh: 'Answer explanation (optional)',
-      noQuestion: 'No question selected',
-      noQuestionSub: 'Pick a question from the list on the left or add a new one.',
-      empty: 'No tests yet',
-      errSummary: 'Fields that need attention',
-      outlineTitle: 'Questions',
-      questionsList: 'Question list',
-      duplicate: 'Duplicate',
-      del: 'Delete',
-    },
-  };
-  const bc = BL[bLang] || BL.uz;
+  const bLang = resolvePanelLang(bRaw);
+  const bc = builderCopyFor(bLang);
 
   res.render('user/create-test', {
-    title: bc.title + ' — Deborah',
+    title: (editKey ? bc.titleEdit : bc.title) + ' — Deborah',
     editKey,
     testData,
     isEdit: !!editKey,
-    bc, // S34m: create-test 3 til copy
+    bc, // S34m: create-test 4 til copy (data/test-builder-i18n.js)
     bLang,
+    htmlLang: htmlLangOf(bLang),
   });
 });
 
@@ -820,7 +708,7 @@ router.patch('/api/settings/profile', async (req, res) => {
     const { z } = await import('zod');
     const profileSchema = z.object({
       name: z.string().trim().min(2).max(60).optional(),
-      lang: z.enum(['uz', 'ru', 'en', 'kk']).optional(),
+      lang: z.enum(['uz', 'uz-cyrl', 'ru', 'en', 'kk']).optional(),
       theme: z.enum(['light', 'dark']).optional(),
     }).strict();
     const parsed = profileSchema.safeParse(body);
@@ -945,9 +833,22 @@ router.get('/practice', async (req, res) => {
     // correct NI YUBORMAYMIZ
   })).filter((q) => q.text && q.options.length >= 2);
   if (!qs.length) return res.status(404).render('error', { title: '404', message: 'Savollar topilmadi', status: 404 });
+
+  // Practice i18n: 4 til (uz/uz-cyrl/ru/en) — data/practice-i18n.js
+  let pRaw = 'uz';
+  try {
+    const pSnap = await fb.get(`users/${req.session.user.safeKey}/settings/lang`);
+    if (pSnap.exists() && pSnap.val()) pRaw = pSnap.val();
+  } catch (_) {}
+  const pLang = resolvePanelLang(pRaw);
+  const pCopy = practiceCopyFor(pLang);
+
   return res.render('user/practice', {
-    title: loaded.title + ' — Yakka mashq',
+    title: (pCopy.pageTitle || '{title}').replace('{title}', loaded.title),
     practiceTitle: loaded.title,
+    pLang,
+    htmlLang: htmlLangOf(pLang),
+    pCopy,
     source: String(req.query.source || 'user'),
     key: String(req.query.key || ''),
     chunk: String(req.query.chunk || ''),

@@ -26,6 +26,7 @@ import { fb } from '../firebase/admin.js';
 import { verifyLoginPassword } from '../utils/helpers.js';
 import CONFIG from '../src/config/env.js';
 import { ADMIN_MFA_ACCOUNT } from '../src/modules/auth/admin-security.js';
+import { USER_PAGES, pageLangResolve, PAGE_HTML_LANG } from '../data/user-pages-i18n.js';
 import {
   hasActiveMfa,
   getMfaStatus,
@@ -94,13 +95,32 @@ async function collectProfile(sessionUser) {
   };
 }
 
-/** Barcha rollar uchun "Profilim" sahifasi. */
+/** Barcha rollar uchun "Profilim" sahifasi (4 til — user settings/lang). */
+async function profileLangOf(req) {
+  let raw = 'uz';
+  try {
+    const key = req.session?.user?.safeKey;
+    if (key) {
+      const langSnap = await fb.get(`users/${key}/settings/lang`);
+      if (langSnap.exists() && langSnap.val()) raw = langSnap.val();
+    }
+  } catch (_) { /* fail-soft → uz */ }
+  const l = pageLangResolve(raw);
+  return { raw, l, htmlLang: PAGE_HTML_LANG[l] || 'uz' };
+}
 router.get('/user/profile', profileAuth, async (req, res) => {
+  const { l, htmlLang } = await profileLangOf(req);
+  const pc = USER_PAGES.profile;
+  const pageTitle = (pc.h1[l] || 'Profilim') + ' — Deborah';
   try {
     if (!req.session.user && req.session.admin) {
       const adminProfile = await collectAdminProfile(req.session.admin);
       return res.render('user/profile', {
-        title: 'Profilim',
+        title: pageTitle,
+        pageTitle,
+        pageCopy: pc,
+        pageLang: l,
+        htmlLang,
         user: { username: adminProfile.username, role: 'admin' },
         profile: adminProfile,
         csrfToken: req.session.csrfToken,
@@ -110,7 +130,11 @@ router.get('/user/profile', profileAuth, async (req, res) => {
   try {
     const profile = await collectProfile(req.session.user);
     res.render('user/profile', {
-      title: 'Profilim',
+      title: pageTitle,
+      pageTitle,
+      pageCopy: pc,
+      pageLang: l,
+      htmlLang,
       user: req.session.user,
       profile,
       csrfToken: req.session.csrfToken,

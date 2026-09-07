@@ -75,7 +75,7 @@
   /* ─────────────────────── Confirm dialog ─────────────────────── */
 
   // S15.02/04: confirm — sm variant, focus danger action'ga AUTO tushmaydi
-  function showConfirm(title, sub, okText) {
+  function showConfirm(title, sub, okText, cancelText) {
     return new Promise(function (resolve) {
       const dlg = document.createElement('dialog');
       dlg.className = 'dialog dialog--sm dialog--danger';
@@ -90,7 +90,7 @@
         '  <button type="button" class="btn btn-quiet" data-no>Bekor</button>' +
         '  <button type="button" class="btn btn-danger" data-yes></button>' +
         '</div>';
-      dlg.querySelector('[data-no]').textContent = 'Bekor';
+      dlg.querySelector('[data-no]').textContent = cancelText || 'Bekor';
       dlg.querySelector('[data-yes]').textContent = okText || 'Ha';
       dlg.querySelector('#dlg-c-title').textContent = title || '';
       dlg.querySelector('.dlg-confirm-sub').textContent = sub || '';

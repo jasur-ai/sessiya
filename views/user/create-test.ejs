@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uz" dir="ltr">
+<html lang="<%= htmlLang %>" dir="ltr">
 <head>
   <%- include('../partials/head') %>
   <link rel="stylesheet" href="/design/contexts/test-builder.css?v=s34m">
@@ -16,12 +16,12 @@
   <div class="tb-shell">
     <!-- ── Sticky top bar (S27.01/07) ── -->
     <header class="tb-topbar">
-      <a href="/user/panel" class="tb-back"><%- icon('arrowLeft', 15) %> Panel</a>
+      <a href="/user/panel" class="tb-back"><%- icon('arrowLeft', 15) %> <%= bc.back %></a>
       <div class="tb-title">
-        <input id="tb-name" type="text" placeholder="<%= bc.namePlaceholder %>" maxlength="60" aria-label="Test nomi">
+        <input id="tb-name" type="text" placeholder="<%= bc.namePlaceholder %>" maxlength="60" aria-label="<%= bc.nameAria %>">
       </div>
       <span class="tb-status" id="tb-status" data-save="saved" role="status" aria-live="polite">
-        <span class="tb-status-dot" aria-hidden="true"></span><span id="tb-status-txt">Saqlandi</span>
+        <span class="tb-status-dot" aria-hidden="true"></span><span id="tb-status-txt"><%= bc.statusSaved %></span>
       </span>
       <div class="tb-topbar-actions">
         <button type="button" class="btn btn-quiet" id="tb-preview-btn" data-preview disabled><%- icon('eye', 15) %> <span class="tb-btn-label"><%= bc.preview %></span></button>
@@ -31,17 +31,17 @@
 
     <!-- ── Workspace: outline + editor (S27.02) ── -->
     <div class="tb-body">
-      <aside class="tb-outline" id="tb-outline" aria-label="Savollar ro'yxati">
+      <aside class="tb-outline" id="tb-outline" aria-label="<%= bc.questionsAria %>">
         <div class="tb-outline-hd">
           <span class="tb-outline-title"><%= bc.questionsTitle %></span>
-          <button type="button" class="tb-move tb-outline-toggle" id="tb-outline-close" aria-label="Outline yopish"><%- icon('x', 14) %></button>
+          <button type="button" class="tb-move tb-outline-toggle" id="tb-outline-close" aria-label="<%= bc.importCloseAria %>"><%- icon('x', 14) %></button>
         </div>
         <div class="tb-outline-list" id="tb-outline-list"></div>
         <button type="button" class="btn btn-quiet" id="tb-add-outline" style="width:100%;margin-top:10px"><%- icon('plus', 13) %> <%= bc.addQuestion %></button>
       </aside>
 
       <main class="tb-editor" id="tb-editor">
-        <button type="button" class="tb-outline-toggle" id="tb-outline-open" style="margin-bottom:14px"><%- icon('menu', 14) %> Savollar ro'yxati</button>
+        <button type="button" class="tb-outline-toggle" id="tb-outline-open" style="margin-bottom:14px"><%- icon('menu', 14) %> <%= bc.questionsAria %></button>
 
         <!-- S27.08: error summary -->
         <div class="tb-err-summary" id="tb-err-summary">
@@ -65,33 +65,33 @@
   <div class="tb-import" id="tb-import-modal" hidden>
     <div class="tb-import-dialog">
       <div class="tb-import-hd">
-        <h2 id="tb-import-title">Excel orqali savollar import</h2>
-        <button type="button" class="tb-import-close" id="tb-import-close" aria-label="Yopish"><%- icon('x', 16) %></button>
+        <h2 id="tb-import-title"><%= bc.importTitle %></h2>
+        <button type="button" class="tb-import-close" id="tb-import-close" aria-label="<%= bc.importCloseAria %>"><%- icon('x', 16) %></button>
       </div>
-      <div class="tb-import-steps" aria-label="Import bosqichlari">
-        <span class="tb-import-step is-active" data-step="1"><span class="tb-step-num">1</span> Shablon</span>
-        <span class="tb-import-step" data-step="2"><span class="tb-step-num">2</span> Yuklash</span>
-        <span class="tb-import-step" data-step="3"><span class="tb-step-num">3</span> Tekshirish</span>
-        <span class="tb-import-step" data-step="4"><span class="tb-step-num">4</span> Tasdiqlash</span>
+      <div class="tb-import-steps" aria-label="<%= bc.importStepsAria %>">
+        <span class="tb-import-step is-active" data-step="1"><span class="tb-step-num">1</span> <%= bc.importStep1 %></span>
+        <span class="tb-import-step" data-step="2"><span class="tb-step-num">2</span> <%= bc.importStep2 %></span>
+        <span class="tb-import-step" data-step="3"><span class="tb-step-num">3</span> <%= bc.importStep3 %></span>
+        <span class="tb-import-step" data-step="4"><span class="tb-step-num">4</span> <%= bc.importStep4 %></span>
       </div>
 
       <div class="tb-import-pane is-active" data-pane="1">
-        <p class="tb-import-desc">Shablonda har bir qator bitta savol: Savol, A-D variantlar, to'g'ri javob indeksi (0-3).</p>
+        <p class="tb-import-desc"><%= bc.importDesc %></p>
         <button type="button" class="btn btn-secondary" id="tb-template-btn" style="width:100%"><%- icon('download', 14) %> <%= bc.excelTemplate %></button>
         <div class="tb-import-next">
-          <button type="button" class="btn btn-primary" id="tb-import-next1"><%- icon('arrowRight', 14) %> Davom etish</button>
+          <button type="button" class="btn btn-primary" id="tb-import-next1"><%- icon('arrowRight', 14) %> <%= bc.importNext %></button>
         </div>
       </div>
 
       <div class="tb-import-pane" data-pane="2">
-        <div class="tb-import-zone" id="tb-import-zone" role="button" tabindex="0" aria-label="Excel fayl tanlash">
+        <div class="tb-import-zone" id="tb-import-zone" role="button" tabindex="0" aria-label="<%= bc.importZoneAria %>">
           <span class="tb-import-ico"><%- icon('upload', 26) %></span>
-          <p id="tb-import-zone-txt">Excel fayl tanlash yoki bu yerga tashlash</p>
+          <p id="tb-import-zone-txt"><%= bc.importZoneTxt %></p>
         </div>
         <input type="file" id="tb-import-input" accept=".xlsx,.xls" style="display:none">
         <div class="tb-import-msg" id="tb-import-msg"></div>
         <div class="tb-import-next">
-          <button type="button" class="btn btn-secondary" id="tb-import-back2"><%- icon('arrowLeft', 14) %> Orqaga</button>
+          <button type="button" class="btn btn-secondary" id="tb-import-back2"><%- icon('arrowLeft', 14) %> <%= bc.importBack %></button>
         </div>
       </div>
 
@@ -99,15 +99,15 @@
         <div class="tb-import-preview" id="tb-import-preview"></div>
         <div class="tb-import-msg" id="tb-import-parse-msg"></div>
         <div class="tb-import-next">
-          <button type="button" class="btn btn-secondary" id="tb-import-back3"><%- icon('arrowLeft', 14) %> Orqaga</button>
-          <button type="button" class="btn btn-primary" id="tb-import-confirm"><%- icon('check', 14) %> Qo'shish</button>
+          <button type="button" class="btn btn-secondary" id="tb-import-back3"><%- icon('arrowLeft', 14) %> <%= bc.importBack %></button>
+          <button type="button" class="btn btn-primary" id="tb-import-confirm"><%- icon('check', 14) %> <%= bc.importAdd %></button>
         </div>
       </div>
 
       <div class="tb-import-pane" data-pane="4">
-        <div class="tb-import-msg is-open is-ok" id="tb-import-done"><%- icon('checkCircle', 15) %> <span id="tb-import-done-txt">Savollar qo'shildi</span></div>
+        <div class="tb-import-msg is-open is-ok" id="tb-import-done"><%- icon('checkCircle', 15) %> <span id="tb-import-done-txt"><%= bc.importDone %></span></div>
         <div class="tb-import-next">
-          <button type="button" class="btn btn-primary" id="tb-import-finish"><%- icon('check', 14) %> Yakunlash</button>
+          <button type="button" class="btn btn-primary" id="tb-import-finish"><%- icon('check', 14) %> <%= bc.importFinish %></button>
         </div>
       </div>
     </div>
@@ -118,7 +118,7 @@
     // STEP 27 — server-side initial state (test-builder.js o'qiydi)
     // XSS: JSON'dagi `<` `\u003c` ga aylantiriladi — `<\/script>` breakout'ning oldi olinadi
     window.__CSRF_TOKEN = <%- JSON.stringify(csrfToken || '') %>;
-    window.__TB_COPY = <%- JSON.stringify(bc || {}) %>; // S34m: 3 til
+    window.__TB_COPY = <%- JSON.stringify(bc || {}) %>; // S34m: 4 til (uz/uz-cyrl/ru/en)
     window.__TB_INIT = {
       isEdit: <%= isEdit ? 'true' : 'false' %>,
       editKey: <%- JSON.stringify((editKey || '').replace(/</g, '\\u003c')) %>,

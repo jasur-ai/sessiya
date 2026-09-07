@@ -156,12 +156,14 @@ router.get('/user/security-profile', async (req, res) => {
   } catch (_) {}
   // 4 til account copy (user settings'dagi lang)
   let accountCopy = {};
+  let rawLang = 'uz';
   try {
     const { resolveAuthLang, AUTH_COPY } = await import('../data/auth-i18n.js');
     let lang = 'uz';
     const { fb } = await import('../firebase/admin.js');
     const langSnap = await fb.get(`users/${userKey}/settings/lang`);
     if (langSnap.exists() && langSnap.val()) lang = langSnap.val();
+    rawLang = lang;
     accountCopy = AUTH_COPY[resolveAuthLang(lang)] || {};
   } catch (_) {}
   // C-10: HEMIS bog'lanish holati (REST yoqilganmi / OAuth sozlanganmi / bog'langanmi)
@@ -184,8 +186,15 @@ router.get('/user/security-profile', async (req, res) => {
       };
     }
   } catch (_) {}
+  const { USER_PAGES: _UP, pageLangResolve: _plr, PAGE_HTML_LANG: _phl } = await import('../data/user-pages-i18n.js');
+  const _l = _plr(typeof rawLang !== 'undefined' ? rawLang : 'uz');
+  const _pc = _UP.security;
   res.render('user/security-profile', {
-    title: 'Xavfsizlik profili',
+    title: (_pc.h1[_l] || 'Xavfsizlik profili') + ' — Deborah',
+    pageTitle: (_pc.h1[_l] || 'Xavfsizlik profili'),
+    pageCopy: _pc,
+    pageLang: _l,
+    htmlLang: _phl[_l] || 'uz',
     user: req.session.user,
     userEmail,
     emailVerified,

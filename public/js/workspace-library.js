@@ -26,6 +26,29 @@
     const state = loadState();
     let searchTimer = null;
 
+    // ── Panel i18n dynamic fragmentlar (window.__PT/__PF asosi) ──
+    const L = (k, fb) => (typeof window.__PT === 'function') ? window.__PT(k, fb) : (fb !== undefined ? fb : '');
+    function plurLang() { return (typeof window.__PANEL_LANG !== 'undefined') ? window.__PANEL_LANG : 'uz'; }
+    function pluralIdx(n, forms) {
+      const lang = plurLang();
+      if (lang === 'ru') {
+        if (n % 10 === 1 && n % 100 !== 11) return 0;
+        if (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) return 1;
+        return forms.length > 2 ? 2 : 1;
+      }
+      if (lang === 'en') return n === 1 ? 0 : (forms.length > 1 ? 1 : 0);
+      return 0;
+    }
+    function countFmt(k, n, fb) {
+      let raw = fb;
+      const P = window.__PANEL_COPY || {};
+      const d = P[plurLang()];
+      if (d && d[k] !== undefined) raw = d[k];
+      const forms = String(raw).split('|');
+      const tpl = forms.length > 1 ? (forms[pluralIdx(n, forms)] || forms[0]) : forms[0];
+      return String(tpl).split('{n}').join('<b>' + n + '</b>');
+    }
+
     // ── Saved filter return (S26.12): URL'da ?lib=… → state'ga yuklash ──
     function loadState() {
       const s = { q: '', subject: '', type: '', sort: 'new' };
@@ -85,8 +108,8 @@
         if (state.sort === 'old') return (+a.dataset.created) - (+b.dataset.created);
         if (state.sort === 'name') return (a.dataset.name || '').localeCompare(b.dataset.name || '');
         if (state.sort === 'count') {
-          const ca = parseInt((a.querySelector('.ws-lib-meta')?.textContent || '').match(/(\d+) ta savol/)?.[1] || '0', 10);
-          const cb = parseInt((b.querySelector('.ws-lib-meta')?.textContent || '').match(/(\d+) ta savol/)?.[1] || '0', 10);
+          const ca = parseInt(a.dataset.count || '0', 10);
+          const cb = parseInt(b.dataset.count || '0', 10);
           return cb - ca;
         }
         return (+b.dataset.created) - (+a.dataset.created); // 'new' default
@@ -102,9 +125,12 @@
       if (none) none.hidden = !hasAny || hasVisible || !hasFilterActive();
       if (count) {
         const total = hasAny ? rows.length : 0;
-        count.innerHTML = hasFilterActive()
-          ? `<b>${visible.length}</b> / ${total} ta test`
-          : `<b>${total}</b> ta test`;
+        if (hasFilterActive()) {
+          const f = L('lib.countF', '<b>{v}</b> / <b>{t}</b> ta test');
+          count.innerHTML = f.split('{v}').join('<b>' + visible.length + '</b>').split('{t}').join('<b>' + total + '</b>');
+        } else {
+          count.innerHTML = countFmt('fl.count', total, '{n} ta test');
+        }
       }
       renderChips();
       pushState();
@@ -114,26 +140,30 @@
       return !!(state.q || state.subject || state.type || state.sort !== 'new');
     }
 
-    // ── Chips (S26.06) ──
-    function chip(label, value) {
-      return `<span class="ws-lib-chip">${label}: <strong>${escHtml(value)}</strong> ` +
-        `<button type="button" aria-label="${label} filtrini olib tashlash" data-chip-clear="${label}">${iconSvg('x', 12)}</button></span>`;
+    // ── Chips (S26.06) — tilga bog'liq label'lar i18n kalitlari orqali ──
+    const CHIP_LABELS = { q: 'fl.search', subject: 'fl.subject', type: 'fl.type', sort: 'fl.sort' };
+    function chipLabel(tok) { return L(CHIP_LABELS[tok] || '', tok); }
+    function chip(tok, value) {
+      const lab = chipLabel(tok);
+      const aria = L('fl.removeAria', '{label} filtrini olib tashlash').split('{label}').join(lab);
+      return `<span class="ws-lib-chip">${lab}: <strong>${escHtml(value)}</strong> ` +
+        `<button type="button" aria-label="${aria}" data-chip-clear="${tok}">${iconSvg('x', 12)}</button></span>`;
     }
-
+    function sortChipValue(v) {
+      const map = { old: 'fl.oldest', name: 'fl.byName', count: 'fl.byCount' };
+      return L(map[v] || '', v);
+    }
     function renderChips() {
       if (!active) return;
       const chips = [];
-      if (state.q) chips.push(chip('Qidiruv', state.q));
-      if (state.subject) chips.push(chip('Fan', state.subject));
-      if (state.type) chips.push(chip('Turi', state.type === 'variant' ? 'Variantli' : 'Ochiq'));
-      if (state.sort !== 'new') {
-        const sortLabels = { old: 'Eng eski', name: 'A-Z', count: 'Savollar soni' };
-        chips.push(chip('Saralash', sortLabels[state.sort] || state.sort));
-      }
+      if (state.q) chips.push(chip('q', state.q));
+      if (state.subject) chips.push(chip('subject', state.subject));
+      if (state.type) chips.push(chip('type', state.type === 'variant' ? L('fl.variant', 'Variantli') : L('fl.open', 'Ochiq')));
+      if (state.sort !== 'new') chips.push(chip('sort', sortChipValue(state.sort)));
       if (!chips.length) { active.hidden = true; return; }
       active.hidden = false;
       active.innerHTML = chips.join('') +
-        '<button type="button" class="ws-lib-clear" id="lib-clear-all">Hammasini tozalash</button>';
+        '<button type="button" class="ws-lib-clear" id="lib-clear-all">' + L('lib.clearAll', 'Hammasini tozalash') + '</button>';
       const clearAll = $('#lib-clear-all', active);
       if (clearAll) clearAll.addEventListener('click', clearAllFilters);
     }
@@ -171,11 +201,11 @@
       active.addEventListener('click', (e) => {
         const clearBtn = e.target.closest('[data-chip-clear]');
         if (clearBtn) {
-          const label = clearBtn.dataset.chipClear;
-          if (label === 'Qidiruv') { state.q = ''; if (search) search.value = ''; }
-          if (label === 'Fan') { state.subject = ''; if (subject) subject.value = ''; }
-          if (label === 'Turi') { state.type = ''; if (typeSel) typeSel.value = ''; }
-          if (label === 'Saralash') { state.sort = 'new'; if (sort) sort.value = 'new'; }
+          const tok = clearBtn.dataset.chipClear;
+          if (tok === 'q') { state.q = ''; if (search) search.value = ''; }
+          if (tok === 'subject') { state.subject = ''; if (subject) subject.value = ''; }
+          if (tok === 'type') { state.type = ''; if (typeSel) typeSel.value = ''; }
+          if (tok === 'sort') { state.sort = 'new'; if (sort) sort.value = 'new'; }
           applyFilters();
         }
       });
@@ -239,21 +269,22 @@
         window.openStartModal && window.openStartModal(name, count, '/user/test-arena?source=user&key=' + key);
         return;
       }
-      if (act === 'duplicate') { await apiAction('/user/api/tests/duplicate', { key }, 'Nusxa yaratildi', 'Nusxalashda xato'); return; }
-      if (act === 'visibility') { await apiAction('/user/api/tests/toggle-public', { key }, 'Holat o\'zgartirildi', 'Holatni o\'zgartirib bo\'lmadi'); return; }
+      if (act === 'duplicate') { await apiAction('/user/api/tests/duplicate', { key }, L('act.dupOk', 'Nusxa yaratildi'), L('act.dupErr', 'Nusxalashda xato')); return; }
+      if (act === 'visibility') { await apiAction('/user/api/tests/toggle-public', { key }, L('act.visOk', 'Holat o\'zgartirildi'), L('act.visErr', 'Holatni o\'zgartirib bo\'lmadi')); return; }
       if (act === 'archive') {
         const isArchived = item.closest('.ws-lib-row')?.dataset.archived === '1';
-        await apiAction('/user/api/tests/archive', { key, archived: !isArchived }, isArchived ? 'Arxivdan qaytarildi' : 'Arxivlandi', 'Arxivlashda xato');
+        await apiAction('/user/api/tests/archive', { key, archived: !isArchived }, isArchived ? L('act.archBackOk', 'Arxivdan qaytarildi') : L('act.archOk', 'Arxivlandi'), L('act.archErr', 'Arxivlashda xato'));
         return;
       }
       if (act === 'export') { window.location.href = '/user/api/tests/export?key=' + encodeURIComponent(key); return; }
       if (act === 'delete') {
-        // S26.04: object-named danger confirm
+        // S26.04: object-named danger confirm (i18n)
         const name = item.dataset.name || 'test';
         const ok = await window.showConfirm && window.showConfirm(
-          'Testni o\'chirish',
-          '«' + name + '» testi butunlay o\'chiriladi. Bu amalni ortga qaytarib bo\'lmaydi.',
-          'O\'chirish'
+          L('act.delTitle', 'Testni o\'chirish'),
+          L('act.delMsg', '«{name}» testi butunlay o\'chiriladi. Bu amalni ortga qaytarib bo\'lmaydi.').split('{name}').join(name),
+          L('act.delCta', 'O\'chirish'),
+          L('ui.cancel', 'Bekor')
         );
         if (!ok) return;
         const res = await fetch('/user/api/tests/delete', {
@@ -263,7 +294,7 @@
         });
         const data = await res.json();
         if (data.success) {
-          window.showToast && window.showToast('Test o\'chirildi', 'ok');
+          window.showToast && window.showToast(L('act.delOk', 'Test o\'chirildi'), 'ok');
           // BUG-030: sahifa reload'i ("ikki marta bosdim" hissi manbai) o'rniga —
           // qator joyida o'chiriladi, hisoblagich/bo'sh-holat qayta hisoblanadi
           const row = item.closest('.ws-lib-row');
@@ -272,7 +303,7 @@
           if (row) row.remove();
           applyFilters();
         } else {
-          window.showToast && window.showToast('Xato: ' + (data.error || ''), 'err');
+          window.showToast && window.showToast(L('err.prefix', 'Xato: ') + (data.error || ''), 'err');
         }
       }
     });
@@ -292,10 +323,10 @@
           window.showToast && window.showToast(okMsg, 'ok');
           window.location.reload();
         } else {
-          window.showToast && window.showToast((data.error ? errMsg + ': ' + data.error : errMsg), 'err');
+          window.showToast && window.showToast(L('err.prefix', 'Xato: ') + (data.error ? errMsg + ': ' + data.error : errMsg), 'err');
         }
       } catch (err) {
-        window.showToast && window.showToast(errMsg + ': ' + err.message, 'err');
+        window.showToast && window.showToast(L('err.prefix', 'Xato: ') + errMsg + ': ' + err.message, 'err');
       }
     }
 

@@ -112,10 +112,13 @@ describe('role workspace routes — access control', () => {
     expect(res.text).toContain("Umumiy ko'rinish"); // BUG-034: EN tab olib tashlandi
   });
 
-  it('renders student workspace for admin preview', async () => {
+  it('renders student dashboard without calendar/assignments tabs', async () => {
     const res = await agent.get('/student');
     expect(res.text).toContain('Talaba ish maydoni');
-    expect(res.text).toContain('Kalendar');
+    expect(res.text).toContain('role-card'); // quick-card dashboard
+    // Kalendar butunlay olib tashlandi (nav + tab + placeholder)
+    expect(res.text).not.toContain('Kalendar');
+    expect(res.text).not.toContain('tab=assignments');
   });
 
   it('does not leak secret DTOs (password hash / tokens) into role pages', async () => {

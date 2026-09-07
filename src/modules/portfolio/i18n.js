@@ -31,6 +31,9 @@ const CATALOGS = {
     importStatus: '',
     exportBtn: 'Transkript PDF eksport',
     exportHint: 'Semestr, fan, baho va kredit jadvali',
+    safeParse: 'PDF/Excel xavfsiz parse qilinadi (skript bajarilmaydi).',
+    delAria: "O'chirish",
+
     // AUTH C-13: diplom.edu.uz tekshiruv (P3) — client-side, OneID bilan to'liq flow
     diplomaTitle: 'Diplomani tekshirish',
     diplomaDesc:
@@ -98,6 +101,9 @@ const CATALOGS = {
     importStatus: '',
     exportBtn: 'Транскрипт PDF экспорт',
     exportHint: 'Семестр, фан, баҳо ва кредит жадвали',
+    safeParse: 'PDF/Excel хавфсиз таҳлил қилинади (скрипт бажарилмайди).',
+    delAria: 'Ўчириш',
+
     // AUTH C-13: diplom.edu.uz tekshiruv (P3)
     diplomaTitle: 'Дипломни текшириш',
     diplomaDesc:
@@ -165,6 +171,9 @@ const CATALOGS = {
     importStatus: '',
     exportBtn: 'Экспорт транскрипта PDF',
     exportHint: 'Таблица: семестр, предмет, оценка, кредит',
+    safeParse: 'PDF/Excel обрабатываются безопасно (скрипты не выполняются).',
+    delAria: 'Удалить',
+
     // AUTH C-13: diplom.edu.uz tekshiruv (P3)
     diplomaTitle: 'Проверка диплома',
     diplomaDesc:
@@ -232,6 +241,9 @@ const CATALOGS = {
     importStatus: '',
     exportBtn: 'Export transcript PDF',
     exportHint: 'Table of semesters, subjects, grades and credits',
+    safeParse: 'PDF/Excel are parsed safely (no scripts run).',
+    delAria: 'Delete',
+
     // AUTH C-13: diplom.edu.uz tekshiruv (P3)
     diplomaTitle: 'Verify diploma',
     diplomaDesc:

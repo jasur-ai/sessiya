@@ -1,7 +1,12 @@
 <!DOCTYPE html>
-<html lang="uz" dir="ltr">
+<html lang="<%= htmlLang %>" dir="ltr">
 <head>
   <%- include('../partials/head') %>
+  <% const __pl = (typeof panelCopy !== 'undefined' && panelCopy) ? panelCopy : null; %>
+  <% const __p = (k, d) => (__pl && __pl[k] !== undefined) ? __pl[k] : (d !== undefined ? d : ''); %>
+  <% const __pct = (k, n) => (__pl && __pl[k] !== undefined) ? String(__pl[k]).split('{n}').join(String(n)) : ''; %>
+  <% const __plang = (typeof panelLang !== 'undefined' && panelLang) ? panelLang : 'uz'; %>
+  <% const __pf = (k, n) => { const v = (__pl && __pl[k] !== undefined) ? String(__pl[k]) : ''; if (!v) return ''; const nn = Number(n) || 0; const parts = v.split('|'); if (parts.length === 1) return v.split('{n}').join(String(nn)); let idx = 0; if (__plang === 'ru') { idx = (nn % 10 === 1 && nn % 100 !== 11) ? 0 : ((nn % 10 >= 2 && nn % 10 <= 4 && (nn % 100 < 12 || nn % 100 > 14)) ? 1 : (parts.length > 2 ? 2 : 1)); } else if (__plang === 'en') { idx = nn === 1 ? 0 : (parts.length > 1 ? 1 : 0); } return parts[Math.min(idx, parts.length - 1)].split('{n}').join(String(nn)); }; %>
   <link rel="stylesheet" href="/css/cast-studio.css">
   <link rel="stylesheet" href="/design/contexts/workspace.css">
   <style>
@@ -90,7 +95,7 @@
 </head>
 <body>
   <!-- Skip-link sidebar'da (shell) -->
-  <%- include('../partials/sidebar', { active: 'panel', user: { username }, role: 'student', isVip: (typeof isVip !== 'undefined' && isVip) === true }) %>
+  <%- include('../partials/sidebar', { active: 'panel', user: { username }, role: 'student' }) %>
 
   <main class="main" id="main-content" tabindex="-1">
 
@@ -98,12 +103,12 @@
     <div class="email-verify-banner" id="passkey-nudge" role="region" aria-live="polite" data-testid="passkey-nudge" style="display:none">
       <div class="evb-icon"><%- icon('key', 16) %></div>
       <div class="evb-text">
-        <strong>Tezroq kirish uchun passkey qo&#39;shing</strong>
-        <span>Barmoq izi yoki Face ID bilan bir bosishda kiring — phishing&#39;ga chidamli va paroldan tezroq.</span>
+        <strong data-i18n="pk.title"><%= __p('pk.title') %></strong>
+        <span data-i18n="pk.sub"><%= __p('pk.sub') %></span>
       </div>
       <div class="evb-actions">
-        <a class="btn btn-primary evb-btn" href="/user/security-profile" style="text-decoration:none"><%- icon('shieldCheck', 14) %> Qo&#39;shish</a>
-        <button type="button" class="btn evb-btn evb-ghost" id="passkey-nudge-close" aria-label="Yopish"><%- icon('x', 14) %></button>
+        <a class="btn btn-primary evb-btn" href="/user/security-profile" style="text-decoration:none"><%- icon('shieldCheck', 14) %> <span data-i18n="pk.cta"><%= __p('pk.cta') %></span></a>
+        <button type="button" class="btn evb-btn evb-ghost" id="passkey-nudge-close" aria-label="<%= __p('aria.close') %>"><%- icon('x', 14) %></button>
       </div>
     </div>
 
@@ -118,7 +123,7 @@
         <button type="button" class="btn btn-primary evb-btn" id="risk-banner-trust" style="display:none"><%- icon('check', 14) %> <span id="risk-banner-trust-label"></span></button>
         <button type="button" class="btn evb-btn" id="risk-banner-reauth" style="display:none"><span id="risk-banner-reauth-label"></span></button>
         <button type="button" class="btn evb-btn evb-ghost" id="risk-banner-logout" style="display:none"><span id="risk-banner-logout-label"></span></button>
-        <button type="button" class="btn evb-btn evb-ghost" id="risk-banner-close" aria-label="Yopish"><%- icon('x', 14) %></button>
+        <button type="button" class="btn evb-btn evb-ghost" id="risk-banner-close" aria-label="<%= __p('aria.close') %>"><%- icon('x', 14) %></button>
       </div>
     </div>
 
@@ -139,12 +144,12 @@
     <div class="email-verify-banner banner-warning" role="region" aria-live="polite" data-testid="consent-banner">
       <div class="evb-icon"><%- icon('shieldCheck', 16) %></div>
       <div class="evb-text">
-        <strong>Maxfiylik siyosati yangilandi</strong>
-        <span>Davom etish uchun yangilangan <a href="/privacy" style="color:inherit">Maxfiylik siyosati</a> va <a href="/terms" style="color:inherit">Foydalanish shartlari</a>ga qayta rozilik bering.</span>
+        <strong data-i18n="c.title"><%= __p('c.title') %></strong>
+        <span data-i18n="c.body"><%- __p('c.body') %></span>
       </div>
       <div class="evb-actions">
-        <button type="button" class="btn btn-primary evb-btn" id="btn-consent-grant" data-analytics="consent_regrant"><%- icon('check', 14) %> Rozilik berish</button>
-        <button type="button" class="btn evb-btn evb-ghost" id="btn-consent-dismiss" aria-label="Yopish"><%- icon('x', 14) %></button>
+        <button type="button" class="btn btn-primary evb-btn" id="btn-consent-grant" data-analytics="consent_regrant"><%- icon('check', 14) %> <span data-i18n="c.cta"><%= __p('c.cta') %></span></button>
+        <button type="button" class="btn evb-btn evb-ghost" id="btn-consent-dismiss" aria-label="<%= __p('aria.close') %>"><%- icon('x', 14) %></button>
       </div>
     </div>
     <% } %>
@@ -163,23 +168,24 @@
 
     <div class="topbar">
       <div>
-        <h1 data-i18n="ws.title">Ish maydonim</h1>
-        <div class="ws-header-sub">Salom, <%= username %> — testlaringizni yarating, Cast qiling va natijalarni kuzating.</div>
+        <h1 data-i18n="ws.title"><%= __p('ws.title') %></h1>
+        <div class="ws-header-sub"><%= __p('ws.sub').replace('{name}', username) %></div>
       </div>
       <div class="ws-actions">
         <% /* Demo 1:1: topbar'da til (UZ/RU/EN) + tema tugmasi */ %>
-        <div class="tb-lang" role="group" aria-label="Til" id="panelLangGroup">
+        <div class="tb-lang" role="group" aria-label="<%= __p('aria.lang') %>" id="panelLangGroup">
           <button type="button" data-plang="uz" class="<%= (typeof panelLang !== 'undefined' && panelLang === 'uz') || typeof panelLang === 'undefined' ? 'on' : '' %>">UZ</button>
+          <button type="button" data-plang="uz-cyrl" class="<%= typeof panelLang !== 'undefined' && panelLang === 'uz-cyrl' ? 'on' : '' %>">ЎЗ</button>
           <button type="button" data-plang="ru" class="<%= typeof panelLang !== 'undefined' && panelLang === 'ru' ? 'on' : '' %>">RU</button>
           <button type="button" data-plang="en" class="<%= typeof panelLang !== 'undefined' && panelLang === 'en' ? 'on' : '' %>">EN</button>
         </div>
-        <button class="tb-theme-btn" id="panelThemeBtn" type="button" aria-label="Tema (light/dark)">
+        <button class="tb-theme-btn" id="panelThemeBtn" type="button" aria-label="<%= __p('aria.theme') %>">
           <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
           <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5 5l1.6 1.6M17.4 17.4 19 19M19 5l-1.6 1.6M6.6 17.4 5 19"/></svg>
         </button>
-        <a href="/user/create-test" class="btn btn-primary" data-analytics="ws_new_test"><%- icon('plus', 15) %> <span data-i18n="ws.newTest">Yangi test</span></a>
+        <a href="/user/create-test" class="btn btn-primary" data-analytics="ws_new_test"><%- icon('plus', 15) %> <span data-i18n="ws.newTest"><%= __p('ws.newTest') %></span></a>
         <a href="/user/create-test?quick=1" class="btn btn-quiet" data-analytics="ws_quick_prompt"><%- icon('sparkles', 15) %> <span data-i18n="ws.quick">Quick Prompt</span></a>
-        <a href="/user/profile" class="btn btn-quiet" data-analytics="ws_profile"><%- icon('user', 15) %> <span data-i18n="ws.profile">Profilim</span></a>
+        <a href="/user/profile" class="btn btn-quiet" data-analytics="ws_profile"><%- icon('user', 15) %> <span data-i18n="ws.profile"><%= __p('ws.profile') %></span></a>
       </div>
     </div>
 
@@ -191,108 +197,74 @@
         <div class="ws-resume-ico"><%- icon('gamepad', 22) %></div>
         <div class="ws-resume-body">
           <h2 class="ws-resume-title"><%= tests[0].name %></h2>
-          <p class="ws-resume-meta"><%= tests[0].count %> ta savol · oxirgi yaratilgan</p>
+          <p class="ws-resume-meta"><%= __pf('rsMeta.qcount', tests[0].count) %></p>
         </div>
         <div class="ws-resume-actions">
-          <% if (!isVip) { %>
-          <button type="button" class="btn btn-primary" data-source="user" data-key="<%= tests[0].key %>"><%- icon('gamepad', 15) %> <span data-i18n="ws.cast">Cast qilish</span></button>
-          <% } %>
-          <button type="button" class="btn btn-quiet" onclick="openStartModal('<%= tests[0].name.replace(/'/g, "\\'") %>', <%= tests[0].count %>, '/user/practice?source=user&key=<%= tests[0].key %>')"><%- icon('zap', 15) %> Sinov</button>
+          <button type="button" class="btn btn-primary" data-source="user" data-key="<%= tests[0].key %>"><%- icon('gamepad', 15) %> <span data-i18n="ws.cast"><%= __p('ws.cast') %></span></button>
+          <button type="button" class="btn btn-quiet" data-start-sinov data-name="<%= tests[0].name.replace(/'/g, "\\'") %>" data-count="<%= tests[0].count %>" data-url="/user/practice?source=user&key=<%= tests[0].key %>"><%- icon('zap', 15) %> <span><%= __p('act.practice') %></span></button>
         </div>
       </div>
     <% } else { %>
       <div class="ws-resume">
         <div class="ws-resume-ico"><%- icon('plus', 22) %></div>
         <div class="ws-resume-body">
-          <h2 class="ws-resume-title">Birinchi testingizni yarating</h2>
-          <p class="ws-resume-meta">Bir necha daqiqada boshlang — savollarni kiriting yoki Quick Prompt bilan tez yarating.</p>
+          <h2 class="ws-resume-title"><%= __p('rsEmpty.title') %></h2>
+          <p class="ws-resume-meta"><%= __p('rsEmpty.sub') %></p>
         </div>
         <div class="ws-resume-actions">
-          <a href="/user/create-test" class="btn btn-primary"><%- icon('plus', 15) %> <span data-i18n="ws.newTest">Yangi test</span></a>
+          <a href="/user/create-test" class="btn btn-primary"><%- icon('plus', 15) %> <span data-i18n="ws.newTest"><%= __p('ws.newTest') %></span></a>
           <a href="/user/create-test?quick=1" class="btn btn-quiet"><%- icon('sparkles', 15) %> <span data-i18n="ws.quick">Quick Prompt</span></a>
         </div>
       </div>
     <% } %>
 
-    <!-- Actionable metrics (S25.04) -->
-    <div class="ws-metrics">
-      <a class="ws-metric" href="/user/create-test" data-analytics="ws_metric_new">
-        <span class="ws-metric-ico ws-metric-ico--draft"><%- icon('edit', 17) %></span>
-        <span class="ws-metric-body">
-          <span class="ws-metric-label" data-i18n="ws.myTests">Testlarim</span>
-          <span class="ws-metric-value"><%= tests.length %></span>
-          <span class="ws-metric-hint">Yangi test yaratish</span>
-        </span>
-      </a>
-      <a class="ws-metric" href="/user/practice?source=user" data-analytics="ws_metric_practice">
-        <span class="ws-metric-ico ws-metric-ico--evidence"><%- icon('zap', 17) %></span>
-        <span class="ws-metric-body">
-          <span class="ws-metric-label" data-i18n="ws.practice">Sinov rejimi</span>
-          <span class="ws-metric-value"><%= tests.filter(t => t.isPublic).length %></span>
-          <span class="ws-metric-hint">Ommaviy testlar sinov uchun</span>
-        </span>
-      </a>
-      <% if (typeof isVip !== 'undefined' && isVip) { %>
-        <a class="ws-metric" href="/user/practice?source=mock" data-analytics="ws_metric_mock">
-          <span class="ws-metric-ico ws-metric-ico--attention"><%- icon('bookOpen', 17) %></span>
-          <span class="ws-metric-body">
-            <span class="ws-metric-label">Mock to'plamlar</span>
-            <span class="ws-metric-value"><%= fans.length %></span>
-            <span class="ws-metric-hint">Tayyor mock testlar</span>
-          </span>
-        </a>
-      <% } %>
-    </div>
-
     <!-- Search (S25.07: skeleton + error + empty) -->
     <div class="ws-sec-hd">
-      <h2 class="ws-sec-title">Qidirish</h2>
+      <h2 class="ws-sec-title" data-i18n="search.title"><%= __p('search.title') %></h2>
     </div>
-    <% if (typeof isVip !== 'undefined' && isVip) { %>
     <div class="ws-search" style="margin-bottom:14px">
-      <input class="ws-search-inp" id="search-inp" placeholder="Test nomi bo'yicha qidirish..." aria-label="Test qidirish">
-      <button type="button" class="ws-search-btn" onclick="doSearch()"><%- icon('search', 14) %> Qidirish</button>
+      <input class="ws-search-inp" id="search-inp" placeholder="<%= __p('search.ph') %>" aria-label="<%= __p('search.aria') %>">
+      <button type="button" class="ws-search-btn" id="ws-search-btn"><%- icon('search', 14) %> <span><%= __p('search.btn') %></span></button>
     </div>
     <div id="search-results"></div>
-    <% } %>
 
     <!-- ════ Test Library (S26) ════ -->
     <div class="ws-sec-hd" style="margin-top:28px">
-      <h2 class="ws-sec-title" data-i18n="ws.library">Testlar kutubxonasi</h2>
-      <a href="/user/create-test" class="ws-sec-action"><%- icon('plus', 13) %> <span data-i18n="ws.newTest">Yangi test</span></a>
+      <h2 class="ws-sec-title" data-i18n="ws.library"><%= __p('lib.title') %></h2>
+      <a href="/user/create-test" class="ws-sec-action"><%- icon('plus', 13) %> <span data-i18n="ws.newTest"><%= __p('ws.newTest') %></span></a>
     </div>
 
     <!-- S26.06: Filter toolbar (STEP 18 filter-bar asosida) -->
-    <div class="ws-lib-filters" role="search" aria-label="Testlar filtri">
+    <div class="ws-lib-filters" role="search" aria-label="<%= __p('lib.aria') %>">
       <label class="ws-lib-search ws-lib-filter">
-        <span class="ws-lib-filter-label" id="lib-search-label">Qidirish</span>
-        <input type="search" id="lib-search" class="inp" placeholder="Test nomi, fan..." aria-labelledby="lib-search-label" autocomplete="off">
+        <span class="ws-lib-filter-label" id="lib-search-label"><%= __p('fl.search') %></span>
+        <input type="search" id="lib-search" class="inp" placeholder="<%= __p('search.ph') %>" aria-labelledby="lib-search-label" autocomplete="off">
       </label>
       <label class="ws-lib-filter">
-        <span class="ws-lib-filter-label" id="lib-subject-label">Fan</span>
+        <span class="ws-lib-filter-label" id="lib-subject-label"><%= __p('fl.subject') %></span>
         <select id="lib-subject" class="sel" aria-labelledby="lib-subject-label">
-          <option value="">Barchasi</option>
+          <option value=""><%= __p('fl.all') %></option>
           <% const libSubjects = [...new Set(tests.map(t => t.subject).filter(Boolean))].sort(); %>
           <% libSubjects.forEach(s => { %><option value="<%= s %>"><%= s %></option><% }); %>
         </select>
       </label>
       <label class="ws-lib-filter">
-        <span class="ws-lib-filter-label" id="lib-type-label">Turi</span>
+        <span class="ws-lib-filter-label" id="lib-type-label"><%= __p('fl.type') %></span>
         <select id="lib-type" class="sel" aria-labelledby="lib-type-label">
-          <option value="">Barchasi</option>
-          <option value="variant">Variantli</option>
+          <option value=""><%= __p('fl.all') %></option>
+          <option value="variant"><%= __p('fl.variant') %></option>
         </select>
       </label>
       <label class="ws-lib-filter">
-        <span class="ws-lib-filter-label" id="lib-sort-label">Saralash</span>
+        <span class="ws-lib-filter-label" id="lib-sort-label"><%= __p('fl.sort') %></span>
         <select id="lib-sort" class="sel" aria-labelledby="lib-sort-label">
-          <option value="new">Eng yangi</option>
-          <option value="old">Eng eski</option>
-          <option value="name">Nomi (A-Z)</option>
-          <option value="count">Savollar soni</option>
+          <option value="new"><%= __p('fl.newest') %></option>
+          <option value="old"><%= __p('fl.oldest') %></option>
+          <option value="name"><%= __p('fl.byName') %></option>
+          <option value="count"><%= __p('fl.byCount') %></option>
         </select>
       </label>
-      <span class="ws-lib-count" id="lib-count" aria-live="polite"><b><%= tests.length %></b> ta test</span>
+      <span class="ws-lib-count" id="lib-count" aria-live="polite"><%= __pf('fl.count', tests.length) %></span>
     </div>
 
     <!-- S26.06: active filter chips -->
@@ -300,50 +272,48 @@
 
     <!-- S26.10: empty / filtered-none / rows -->
     <div id="lib-empty" class="ws-lib-empty" hidden>
-      <div class="ws-lib-empty-title" data-i18n="ws.empty">Hali testlar yo'q</div>
-      <div class="ws-lib-empty-sub">Birinchi testingizni yarating — 5 soniyada boshlang.</div>
-      <a href="/user/create-test" class="ws-state-action" style="margin-top:12px"><%- icon('plus', 14) %> Birinchi testni yaratish</a>
+      <div class="ws-lib-empty-title" data-i18n="ws.empty"><%= __p('ws.empty') %></div>
+      <div class="ws-lib-empty-sub"><%= __p('lib.emptySub') %></div>
+      <a href="/user/create-test" class="ws-state-action" style="margin-top:12px"><%- icon('plus', 14) %> <%= __p('lib.emptyCta') %></a>
     </div>
     <div id="lib-none" class="ws-lib-empty" hidden>
-      <div class="ws-lib-empty-title">Hech narsa topilmadi</div>
-      <div class="ws-lib-empty-sub">Filtr yoki qidiruv so'rovini o'zgartirib ko'ring.</div>
-      <button type="button" class="ws-state-action" id="lib-clear-none" style="margin-top:12px"><%- icon('x', 13) %> Filtrlarni tozalash</button>
+      <div class="ws-lib-empty-title"><%= __p('lib.noneTitle') %></div>
+      <div class="ws-lib-empty-sub"><%= __p('lib.noneSub') %></div>
+      <button type="button" class="ws-state-action" id="lib-clear-none" style="margin-top:12px"><%- icon('x', 13) %> <%= __p('lib.clearBtn') %></button>
     </div>
 
     <div id="lib-list" class="ws-lib-list">
       <% tests.forEach(t => { %>
-        <div class="ws-lib-row<%= t.archived ? ' is-archived' : '' %>" data-key="<%= t.key %>" data-name="<%= t.name.toLowerCase() %>" data-subject="<%= t.subject || '' %>" data-type="<%= t.type || '' %>" data-public="<%= t.isPublic ? '1' : '0' %>" data-archived="<%= t.archived ? '1' : '0' %>" data-created="<%= t.createdAt %>">
+        <div class="ws-lib-row<%= t.archived ? ' is-archived' : '' %>" data-key="<%= t.key %>" data-name="<%= t.name.toLowerCase() %>" data-subject="<%= t.subject || '' %>" data-type="<%= t.type || '' %>" data-public="<%= t.isPublic ? '1' : '0' %>" data-archived="<%= t.archived ? '1' : '0' %>" data-count="<%= t.count %>" data-created="<%= t.createdAt %>">
           <div class="ws-lib-ico"><%- icon(t.archived ? 'archive' : 'edit', 20) %></div>
           <div class="ws-lib-main">
             <div class="ws-lib-name"><%= t.name %></div>
             <div class="ws-lib-meta">
-              <span class="ws-lib-chip-small"><%= t.count %> ta savol</span>
-              <% if (t.type) { %><span class="ws-lib-chip-small"><%= t.type === 'variant' ? 'Variantli' : 'Ochiq' %></span><% } %>
+              <span class="ws-lib-chip-small"><%= __pf('row.qcount', t.count) %></span>
+              <% if (t.type) { %><span class="ws-lib-chip-small"><%= t.type === 'variant' ? __p('fl.variant') : __p('fl.open') %></span><% } %>
               <% if (t.subject) { %><span class="ws-lib-chip-small ws-lib-subject"><%= t.subject %></span><% } %>
-              <span class="ws-lib-date"><%= new Date(t.updatedAt || t.createdAt).toLocaleDateString('uz-UZ') %></span>
-              <% if (t.lastUse) { %><span class="ws-lib-chip-small">Oxirgi: <%= new Date(t.lastUse).toLocaleDateString('uz-UZ') %></span><% } %>
-              <% if (t.archived) { %><span class="ws-lib-chip-small">Arxivlangan</span><% } %>
+              <span class="ws-lib-date"><%= fmtDate(t.updatedAt || t.createdAt) %></span>
+              <% if (t.lastUse) { %><span class="ws-lib-chip-small"><%= __p('row.lastPrefix') %><%= fmtDate(t.lastUse) %></span><% } %>
+              <% if (t.archived) { %><span class="ws-lib-chip-small"><%= __p('row.archived') %></span><% } %>
             </div>
           </div>
           <div class="ws-lib-actions">
-            <span class="ws-vis ws-vis--<%= t.isPublic ? 'public' : 'private' %>" title="<%= t.isPublic ? 'Barcha ko\'ra oladi' : 'Faqat siz ko\'rasiz' %>">
-              <%- icon(t.isPublic ? 'globe' : 'shield', 12) %> <%= t.isPublic ? 'Ommaviy' : 'Shaxsiy' %>
+            <span class="ws-vis ws-vis--<%= t.isPublic ? 'public' : 'private' %>" title="<%= t.isPublic ? __p('vis.pubTitle') : __p('vis.privTitle') %>">
+              <%- icon(t.isPublic ? 'globe' : 'shield', 12) %> <%= t.isPublic ? __p('vis.public') : __p('vis.private') %>
             </span>
-            <% if (!isVip) { %>
-            <button type="button" class="btn btn-primary btn-sm" data-source="user" data-key="<%= t.key %>"><%- icon('gamepad', 14) %> Cast</button>
-            <% } %>
+            <button type="button" class="btn btn-primary btn-sm" data-source="user" data-key="<%= t.key %>"><%- icon('gamepad', 14) %> <%= __p('ws.cast') %></button>
             <div class="ws-lib-overflow-wrap">
-              <button type="button" class="ws-lib-overflow-btn" aria-haspopup="menu" aria-expanded="false" aria-label="<%= t.name %> uchun amallar" data-overflow="<%= t.key %>"><%- icon('more', 18) %></button>
+              <button type="button" class="ws-lib-overflow-btn" aria-haspopup="menu" aria-expanded="false" aria-label="<%= __p('aria.rowActs').split('{name}').join(t.name) %>" data-overflow="<%= t.key %>"><%- icon('more', 18) %></button>
               <div class="ws-lib-menu" role="menu" data-menu="<%= t.key %>">
-                <button type="button" role="menuitem" data-act="edit" data-key="<%= t.key %>"><%- icon('edit', 15) %> Tahrirlash</button>
-                <button type="button" role="menuitem" data-act="practice" data-key="<%= t.key %>" data-name="<%= t.name %>" data-count="<%= t.count %>"><%- icon('zap', 15) %> Sinov</button>
-                <a role="menuitem" href="/user/practice?source=user&key=<%= t.key %>"><%- icon('book', 15) %> Yakka mashq</a>
-                <button type="button" role="menuitem" data-act="duplicate" data-key="<%= t.key %>"><%- icon('copy', 15) %> Nusxalash</button>
-                <button type="button" role="menuitem" data-act="visibility" data-key="<%= t.key %>"><%- icon(t.isPublic ? 'shield' : 'globe', 15) %> <%= t.isPublic ? 'Shaxsiy qilish' : 'Ommaviy qilish' %></button>
-                <button type="button" role="menuitem" data-act="export" data-key="<%= t.key %>"><%- icon('download', 15) %> Eksport (JSON)</button>
-                <button type="button" role="menuitem" data-act="archive" data-key="<%= t.key %>"><%- icon('archive', 15) %> <%= t.archived ? 'Arxivdan qaytarish' : 'Arxivlash' %></button>
+                <button type="button" role="menuitem" data-act="edit" data-key="<%= t.key %>"><%- icon('edit', 15) %> <%= __p('menu.edit') %></button>
+                <button type="button" role="menuitem" data-act="practice" data-key="<%= t.key %>" data-name="<%= t.name %>" data-count="<%= t.count %>"><%- icon('zap', 15) %> <%= __p('menu.practice') %></button>
+                <a role="menuitem" href="/user/practice?source=user&key=<%= t.key %>"><%- icon('book', 15) %> <%= __p('menu.solo') %></a>
+                <button type="button" role="menuitem" data-act="duplicate" data-key="<%= t.key %>"><%- icon('copy', 15) %> <%= __p('menu.duplicate') %></button>
+                <button type="button" role="menuitem" data-act="visibility" data-key="<%= t.key %>"><%- icon(t.isPublic ? 'shield' : 'globe', 15) %> <%= t.isPublic ? __p('menu.toPrivate') : __p('menu.toPublic') %></button>
+                <button type="button" role="menuitem" data-act="export" data-key="<%= t.key %>"><%- icon('download', 15) %> <%= __p('menu.export') %></button>
+                <button type="button" role="menuitem" data-act="archive" data-key="<%= t.key %>"><%- icon('archive', 15) %> <%= t.archived ? __p('menu.unarchive') : __p('menu.archive') %></button>
                 <div class="ws-lib-menu-sep" role="separator"></div>
-                <button type="button" role="menuitem" class="ws-lib-menu-danger" data-act="delete" data-key="<%= t.key %>" data-name="<%= t.name %>"><%- icon('trash', 15) %> O'chirish</button>
+                <button type="button" role="menuitem" class="ws-lib-menu-danger" data-act="delete" data-key="<%= t.key %>" data-name="<%= t.name %>"><%- icon('trash', 15) %> <%= __p('menu.delete') %></button>
               </div>
             </div>
           </div>
@@ -351,106 +321,35 @@
       <% }); %>
     </div>
 
-    <!-- S26.07/08: Ready sets — user-facing taxonomy, honest copy -->
-    <div class="ws-tax-hd">
-      <h2 class="ws-tax-title"><%- icon('book', 18) %> Tayyor to'plamlar</h2>
-      <span class="ws-tax-sub">O'qituvchilar uchun tayyorlangan mashq to'plamlari (VIP)</span>
-    </div>
-
-    <% if (typeof isVip === 'undefined' || !isVip) { %>
-      <!-- S26.08: permission/upgrade state — honest copy, hidden emas -->
-      <div class="ws-upgrade">
-        <div class="ws-upgrade-ico"><%- icon('lock', 18) %></div>
-        <div class="ws-upgrade-body">
-          <div class="ws-upgrade-title">Tayyor to'plamlar VIP imkoniyati</div>
-          <div class="ws-upgrade-desc">Fanlar bo'yicha tayyor testlar va subtestlar to'plami VIP a'zolar uchun ochiq. Sizda hozircha bu imkoniyat yo'q.</div>
-        </div>
-      </div>
-    <% } else if (fans.length === 0 && preGroups.length === 0) { %>
-      <div class="ws-lib-empty">
-        <div class="ws-lib-empty-title">Tayyor to'plamlar hozircha yo'q</div>
-        <div class="ws-lib-empty-sub">Yaqinda qo'shiladi — o'z testlaringiz bilan boshlang.</div>
-      </div>
-    <% } else { %>
-      <% if (fans.length > 0) { %>
-        <div class="ws-tax-hd" style="margin-top:8px">
-          <h3 class="ws-tax-title" style="font-size:.95rem">Fanlar bo'yicha to'plamlar</h3>
-          <span class="ws-tax-sub"><%= fans.length %> ta to'plam</span>
-        </div>
-        <div class="ws-ready-grid">
-          <% fans.forEach(f => { %>
-            <div class="ws-ready-card">
-              <div class="ws-ready-head">
-                <div class="ws-ready-ico"><%- icon('book', 18) %></div>
-                <div class="ws-ready-name"><%= f.name %></div>
-              </div>
-              <div class="ws-ready-meta"><span class="ws-lib-chip-small"><%= f.count %> ta savol</span></div>
-              <div class="ws-ready-desc">Fanga oid tayyor mashq testi.</div>
-              <div class="ws-ready-actions">
-                <button type="button" class="btn btn-quiet btn-sm" onclick="openStartModal('<%= f.name.replace(/'/g, "\\'") %>', <%= f.count %>, '/user/practice?source=mock&key=<%= f.key %>')"><%- icon('zap', 13) %> Sinov</button>
-                <a class="btn btn-quiet btn-sm" style="text-decoration:none" href="/user/practice?source=mock&key=<%= f.key %>"><%- icon('book', 13) %> Mashq</a>
-
-              </div>
-            </div>
-          <% }); %>
-        </div>
-      <% } %>
-
-      <% if (preGroups.length > 0) { %>
-        <div class="ws-tax-hd" style="margin-top:20px">
-          <h3 class="ws-tax-title" style="font-size:.95rem">Bosqichli to'plamlar (PRE)</h3>
-          <span class="ws-tax-sub">Subtestlar — bilimni bosqichma-bosqich tekshiradi</span>
-        </div>
-        <div class="ws-ready-grid">
-          <% preGroups.forEach(g => { %>
-            <% (g.chunks || []).forEach(c => { %>
-              <div class="ws-ready-card">
-                <div class="ws-ready-head">
-                  <div class="ws-ready-ico"><%- icon('layers', 18) %></div>
-                  <div class="ws-ready-name"><%= g.title %> — <%= c.name %></div>
-                </div>
-                <div class="ws-ready-meta"><span class="ws-lib-chip-small"><%= c.count %> ta savol</span></div>
-                <div class="ws-ready-desc">Bosqichli to'plam subtestsi.</div>
-                <div class="ws-ready-actions">
-                  <button type="button" class="btn btn-quiet btn-sm" onclick="openStartModal('<%= (g.title + ' - ' + c.name).replace(/'/g, "\\'") %>', <%= c.count %>, '/user/practice?source=pre&key=<%= g.key %>&chunk=<%= c.id %>')"><%- icon('zap', 13) %> Sinov</button>
-                  <a class="btn btn-quiet btn-sm" style="text-decoration:none" href="/user/practice?source=pre&key=<%= g.key %>&chunk=<%= c.id %>"><%- icon('book', 13) %> Mashq</a>
-  
-                </div>
-              </div>
-            <% }); %>
-          <% }); %>
-        </div>
-      <% } %>
-    <% } %>
   </main>
 
   <!-- AUTH B-23: kontekstual opt-in banner (2-3 sessiyadan keyin so'raladi) -->
   <div id="push-optin" class="push-optin" role="dialog" aria-live="polite" hidden>
     <div class="push-optin-box">
       <div class="push-optin-txt">
-        <div class="push-optin-title"><%- icon('bell', 14) %> <span data-i18n="pushOptin">Bildirishnomalarni yoqishni xohlaysizmi?</span></div>
-        <div class="push-optin-sub" data-i18n="pushOptinSub">Natijalar va eslatmalar haqida bildirishnoma oling</div>
+        <div class="push-optin-title"><%- icon('bell', 14) %> <span data-i18n="pushOptin"><%= __p('pushOptin') %></span></div>
+        <div class="push-optin-sub" data-i18n="pushOptinSub"><%= __p('pushOptinSub') %></div>
       </div>
       <div class="push-optin-actions">
-        <button type="button" id="push-optin-yes" class="btn btn-primary btn-sm">Ha, yoqish</button>
-        <button type="button" id="push-optin-no" class="btn btn-ghost btn-sm">Hozir emas</button>
+        <button type="button" id="push-optin-yes" class="btn btn-primary btn-sm"><%= __p('popt.yes') %></button>
+        <button type="button" id="push-optin-no" class="btn btn-ghost btn-sm"><%= __p('popt.no') %></button>
       </div>
     </div>
   </div>
 
   <!-- Start Modal -->
-  <div class="modal-overlay" id="start-modal" onclick="if(event.target===this)closeStartModal()">
+  <div class="modal-overlay" id="start-modal" data-close-modal>
     <div class="modal-box">
-      <div class="modal-title"><%- icon('zap', 20) %> <span id="start-modal-title">Test</span></div>
-      <div class="modal-sub" id="start-modal-sub">5 ta savol &bull; Sinov rejimi</div>
+      <div class="modal-title"><%- icon('zap', 20) %> <span id="start-modal-title"><%= __p('menu.myPanel') %></span></div>
+      <div class="modal-sub" id="start-modal-sub"></div>
       <hr class="modal-divider">
       <div id="start-modal-settings">
-        <div class="modal-section-label">⏱️ Savol vaqti (soniya)</div>
+        <div class="modal-section-label">⏱️ <span data-i18n="mod.timeLbl"><%= __p('mod.timeLbl') %></span></div>
         <div class="modal-time-grid" id="start-time-grid"></div>
       </div>
       <div class="modal-actions">
-        <button class="modal-btn modal-btn-secondary" onclick="closeStartModal()">Bekor qilish</button>
-        <button class="modal-btn modal-btn-primary" onclick="confirmStartQuiz()">Boshlash</button>
+        <button class="modal-btn modal-btn-secondary" data-act="close"><span data-i18n="mod.cancel"><%= __p('mod.cancel') %></span></button>
+        <button class="modal-btn modal-btn-primary" data-act="start"><span data-i18n="mod.start"><%= __p('mod.start') %></span></button>
       </div>
     </div>
   </div>
@@ -485,26 +384,37 @@
   <script src="/js/workspace-library.js" defer></script>
   <script src="/js/push.js" defer></script>
   <script defer>
-  /* ── S34h: PANEL I18N — UZ/RU/EN client-side (sidebar+workspace) ── */
+  /* ── PANEL I18N (4 til: uz / uz-cyrl / ru / en) — yagona manba __PANEL_COPY.
+     Server copy data/panel-i18n.js dan keladi; EJS static matnlar allaqachon
+     to'g'ri tilda render qilingan, data-i18n esa bosish paytidagi tezkor
+     almashuv uchun. Bitta listener — dublikat PATCH/reload YO'Q. ── */
+  window.__PANEL_LANG = <%- JSON.stringify(panelLang || 'uz') %>;
+  window.__PANEL_COPY = <%- JSON.stringify(panelCopyAll || { uz: panelCopy || {} }) %>;
   (function(){
-    var PL = {
-      ru: {
-        'ws.title':'Моё рабочее место','ws.newTest':'Новый тест','ws.quick':'Quick Prompt',
-        'ws.profile':'Мой профиль','ws.cast':'Транслировать','ws.myTests':'Мои тесты',
-        'ws.practice':'Пробный режим','ws.library':'Библиотека тестов','ws.empty':'Тестов пока нет',
-        'menu.myPanel':'Моя панель','menu.calendar':'Календарь','menu.portfolio':'Портфолио',
-        'menu.security':'Безопасность','menu.profile':'Мой профиль','menu.logout':'Выйти'
-      },
-      en: {
-        'ws.title':'My workspace','ws.newTest':'New test','ws.quick':'Quick Prompt',
-        'ws.profile':'My profile','ws.cast':'Cast','ws.myTests':'My tests',
-        'ws.practice':'Practice mode','ws.library':'Test library','ws.empty':'No tests yet',
-        'menu.myPanel':'My panel','menu.calendar':'Calendar','menu.portfolio':'Portfolio',
-        'menu.security':'Security','menu.profile':'My profile','menu.logout':'Log out'
-      }
+    var P = window.__PANEL_COPY || {};
+    // Flat (faqat bitta til) bo'lsa nest qilib olamiz — server har doim to'liq 4 til beradi
+    if (P.uz === undefined && P['ws.title'] !== undefined) P = { uz: P };
+    var cur = (P[window.__PANEL_LANG] !== undefined) ? window.__PANEL_LANG : 'uz';
+    window.__PANEL_LANG = cur;
+    window.__PT = function(k, fb){
+      var d = P[cur] || {};
+      return (d[k] !== undefined) ? d[k] : (fb !== undefined ? fb : '');
+    };
+    // Son ko'plik shakli (ru: 3, en: 2, uz/uz-cyrl: 1) — '|' bilan ajratilgan shakllar
+    window.__PF = function(k, n, fb){
+      var d = P[cur] || {};
+      var v = (d[k] !== undefined) ? String(d[k]) : (fb !== undefined ? String(fb) : '');
+      if (!v) return '';
+      var nn = Number(n) || 0;
+      var parts = v.split('|');
+      if (parts.length === 1) return v.split('{n}').join(String(nn));
+      var idx = 0;
+      if (cur === 'ru') { idx = (nn % 10 === 1 && nn % 100 !== 11) ? 0 : ((nn % 10 >= 2 && nn % 10 <= 4 && (nn % 100 < 12 || nn % 100 > 14)) ? 1 : (parts.length > 2 ? 2 : 1)); }
+      else if (cur === 'en') { idx = nn === 1 ? 0 : (parts.length > 1 ? 1 : 0); }
+      return (parts[Math.min(idx, parts.length - 1)] || '').split('{n}').join(String(nn));
     };
     function apply(l){
-      var d = PL[l]; if(!d) return;
+      var d = P[l]; if(!d) return;
       document.querySelectorAll('[data-i18n]').forEach(function(el){
         var k = el.getAttribute('data-i18n');
         if (d[k] !== undefined) el.innerHTML = d[k];
@@ -515,37 +425,22 @@
       group.querySelectorAll('button').forEach(function(b){
         b.addEventListener('click', function(){
           var l = b.getAttribute('data-plang');
-          if (b.classList.contains('on')) return;
-          /* client-side darhol (reload'gacha) */
-          apply(l);
-          fetch('/user/api/settings/profile',{method:'PATCH',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({lang:l})})
-            .then(function(r){ if(r.ok){ location.reload(); } else { console.warn('lang save failed'); } })
+          if (l === cur || b.classList.contains('on')) return;
+          group.querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x === b); });
+          apply(l); // client-side darhol (reload'gacha)
+          fetch('/user/api/settings/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ lang: l }) })
+            .then(function(r){ if (r.ok) { location.reload(); } else { console.warn('lang save failed'); } })
             .catch(function(){});
         });
       });
     }
-  })();
-  /* ── Demo 1:1: topbar til + tema (real API bilan) ── */
-  (function(){
-    var group=document.getElementById('panelLangGroup');
-    if(group){
-      group.querySelectorAll('button').forEach(function(b){
-        b.addEventListener('click',function(){
-          var l=b.getAttribute('data-plang');
-          if(b.classList.contains('on'))return;
-          fetch('/user/api/settings/profile',{method:'PATCH',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({lang:l})})
-            .then(function(r){if(r.ok){location.reload();}else{console.warn('lang save failed');}})
-            .catch(function(){});
-        });
-      });
-    }
-    var tbtn=document.getElementById('panelThemeBtn');
-    if(tbtn){
-      tbtn.addEventListener('click',function(){
-        var T=window.DeborahTheme;
-        var next=(T&&T.isLight&&T.isLight())?'dark':'light';
-        if(T&&T.setState){T.setState(next);}else if(T&&T.apply){T.apply(next);}
-        fetch('/user/api/settings/profile',{method:'PATCH',headers:{'Content-Type':'application/json'},credentials:'same-origin',body:JSON.stringify({theme:next})}).catch(function(){});
+    var tbtn = document.getElementById('panelThemeBtn');
+    if (tbtn) {
+      tbtn.addEventListener('click', function(){
+        var T = window.DeborahTheme;
+        var next = (T && T.isLight && T.isLight()) ? 'dark' : 'light';
+        if (T && T.setState) { T.setState(next); } else if (T && T.apply) { T.apply(next); }
+        fetch('/user/api/settings/profile', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ theme: next }) }).catch(function(){});
       });
     }
   })();
@@ -656,49 +551,54 @@
     })();
   </script>
   <script>
-    // ── Search (S25.07: skeleton + inline retry + contextual empty) ──
-    // S35.05: apostrophe normalizatsiya — o' / o‘ / oʼ bir xil topiladi
+    // ── Search (skeleton + inline retry + contextual empty) — CSP uchun
+    //    inline onclick yo'q: #ws-search-btn delegation + Enter. ──
     async function doSearch() {
       const raw = document.getElementById('search-inp').value;
       const q = (window.DeborahTerms ? window.DeborahTerms.searchNormalize(raw) : String(raw).trim());
       const wrap = document.getElementById('search-results');
       const live = document.getElementById('ws-live');
+      const Txt = (k, fb) => window.__PT ? window.__PT(k, fb) : (fb || '');
       if (!q) { wrap.innerHTML = ''; return; }
-      // Skeleton
       wrap.innerHTML = '<div class="ws-skeleton-card skeleton" aria-hidden="true"></div>';
       try {
         const res = await fetch('/user/api/tests/search?q=' + encodeURIComponent(q));
         if (!res.ok) throw new Error('Server ' + res.status);
         const data = await res.json();
         if (!data.results || !data.results.length) {
-          wrap.innerHTML = '<div class="ws-state"><div class="ws-state-title">Hech narsa topilmadi</div><div class="ws-state-sub">Boshqa kalit so\'z bilan urinib ko\'ring.</div><button class="ws-state-action" onclick="doSearch()">Qayta urinish</button></div>';
+          wrap.innerHTML = '<div class="ws-state"><div class="ws-state-title">' + Txt('sr.emptyTitle', 'Hech narsa topilmadi') + '</div><div class="ws-state-sub">' + Txt('sr.emptySub', "Boshqa kalit so'z bilan urinib ko'ring.") + '</div><button class="ws-state-action" data-retry> ' + Txt('sr.retry', 'Qayta urinish') + '</button></div>';
           return;
         }
         wrap.innerHTML = data.results.map(r => `
           <div class="search-result-card">
             <div style="flex:1;min-width:0">
               <div class="sr-name">${svgIcon('edit', 14)} ${esc(r.testName)}</div>
-              <div class="sr-meta">${esc(r.userName)} &bull; ${r.count} ta savol</div>
+              <div class="sr-meta">${Txt('sr.meta', '{author} • {n} ta savol').split('{author}').join(esc(r.userName)).split('{n}').join(r.count)}</div>
             </div>
-            <button class="sr-start" onclick="location.href='/host?source=user&key=${encodeURIComponent(esc(r.testKey))}&testName=${encodeURIComponent(esc(r.testName))}'">${svgIcon('zap', 12)} Sinov</button>
+            <a class="sr-start" href="/host?source=user&key=${encodeURIComponent(esc(r.testKey))}&testName=${encodeURIComponent(esc(r.testName))}" style="text-decoration:none">${svgIcon('zap', 12)} ${Txt('act.practice', 'Sinov')}</a>
           </div>
         `).join('');
-        if (live) live.textContent = data.results.length + ' ta natija topildi';
+        if (live) live.textContent = Txt('sr.count', '{n} ta natija topildi').split('{n}').join(data.results.length);
       } catch(e) {
-        wrap.innerHTML = '<div class="ws-state ws-state--error"><div class="ws-state-title">Yuklab bo\'lmadi</div><div class="ws-state-sub">' + esc(e.message) + '</div><button class="ws-state-action" onclick="doSearch()">Qayta urinish</button></div>';
+        wrap.innerHTML = '<div class="ws-state ws-state--error"><div class="ws-state-title">' + Txt('sr.loadFailTitle', "Yuklab bo'lmadi") + '</div><div class="ws-state-sub">' + esc(e.message) + '</div><button class="ws-state-action" data-retry>' + Txt('sr.retry', 'Qayta urinish') + '</button></div>';
       }
     }
+    const searchBtn = document.getElementById('ws-search-btn');
+    if (searchBtn) searchBtn.addEventListener('click', doSearch);
+    const searchInp = document.getElementById('search-inp');
+    if (searchInp) searchInp.addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
 
-    // ── Start Modal ──
+    // ── Start Modal (CSP: delegation; vaqt ro'yxatida 20 qo'shildi, default 20) ──
     let startModalData = null;
-    const TIME_OPTS = [5, 10, 15, 30, 45, 60, 90, 120];
+    const TIME_OPTS = [5, 10, 15, 20, 30, 45, 60, 90, 120];
+    const DEFAULT_TIME = 20;
 
     function renderTimeGrid(containerId, selected) {
       const el = document.getElementById(containerId);
       if (!el) return;
       el.innerHTML = TIME_OPTS.map(t =>
-        '<button type="button" class="modal-time-opt' + (t === selected ? ' selected' : '') + '" onclick="selTime(\'' + containerId + '\',' + t + ')">' +
-        '<div class="tv">' + t + '</div><div class="tl">soniya</div></button>'
+        '<button type="button" class="modal-time-opt' + (t === selected ? ' selected' : '') + '" data-time="' + t + '">' +
+        '<div class="tv">' + t + '</div><div class="tl">' + (window.__PT ? window.__PT('mod.unit', 'soniya') : 'soniya') + '</div></button>'
       ).join('');
     }
 
@@ -713,9 +613,10 @@
 
     function openStartModal(name, count, url) {
       startModalData = { url };
+      const Txt = (k, fb) => window.__PT ? window.__PT(k, fb) : (fb || '');
       document.getElementById('start-modal-title').textContent = name;
-      document.getElementById('start-modal-sub').textContent = count + ' ta savol &bull; Sinov rejimi';
-      if (!selectedTimes['start-time-grid']) selectedTimes['start-time-grid'] = 15;
+      document.getElementById('start-modal-sub').textContent = (window.__PF ? window.__PF('mod.sub', count, '{n} ta savol \u2022 Sinov rejimi') : Txt('mod.sub', '{n} ta savol \u2022 Sinov rejimi').split('{n}').join(count));
+      if (!selectedTimes['start-time-grid']) selectedTimes['start-time-grid'] = DEFAULT_TIME;
       renderTimeGrid('start-time-grid', selectedTimes['start-time-grid']);
       document.getElementById('start-modal').classList.add('open');
     }
@@ -727,35 +628,39 @@
 
     function confirmStartQuiz() {
       if (startModalData && startModalData.url) {
-        // S34o: tanlangan vaqt URL'ga — practice sahifada ko'rinadi
         const sep = startModalData.url.includes('?') ? '&' : '?';
-        window.location.href = startModalData.url + sep + 'time=' + (selectedTimes['start-time-grid'] || 15);
+        window.location.href = startModalData.url + sep + 'time=' + (selectedTimes['start-time-grid'] || DEFAULT_TIME);
       }
       closeStartModal();
     }
 
-    // ── Cast Setup Studio ──
+    // Delegatsiya: modal (overlay/close/start/vaqt), Sinov tugmalari, retry
     document.addEventListener('click', function (e) {
+      const overlay = e.target.closest('#start-modal');
+      if (overlay && e.target === overlay) { closeStartModal(); return; }
+      if (e.target.closest && e.target.closest('#start-modal [data-act="close"]')) { closeStartModal(); return; }
+      if (e.target.closest && e.target.closest('#start-modal [data-act="start"]')) { confirmStartQuiz(); return; }
+      const tOpt = e.target.closest('#start-time-grid .modal-time-opt');
+      if (tOpt && tOpt.dataset.time) { selTime('start-time-grid', parseInt(tOpt.dataset.time, 10)); return; }
+      const sinov = e.target.closest('[data-start-sinov]');
+      if (sinov) {
+        openStartModal(sinov.dataset.name || 'Test', parseInt(sinov.dataset.count, 10) || 0, sinov.dataset.url || '/user/practice?source=user');
+        return;
+      }
+      const retry = e.target.closest('[data-retry]');
+      if (retry && typeof doSearch === 'function') { doSearch(); return; }
+      // Cast Setup Studio
       const btn = e.target.closest('[data-source]');
-      if (!btn || !btn.dataset.source) return;
-      const reference = {
-        source: btn.dataset.source,
-        key: btn.dataset.key,
-        chunk: btn.dataset.chunk || null,
-      };
-      const nameEl = btn.closest('.ws-test-card, .ws-resume, .fan-btn, .pre-sub-btn');
-      const meta = document.getElementById('cast-studio-desc');
-      if (meta && nameEl) {
-        const name = nameEl.querySelector('.ws-test-name, .ws-resume-title, .fan-btn-name, .pre-sub-name');
-        if (name) meta.textContent = 'Test: ' + name.textContent.trim();
+      if (btn && btn.dataset.source) {
+        const reference = { source: btn.dataset.source, key: btn.dataset.key, chunk: btn.dataset.chunk || null };
+        const nameEl = btn.closest('.ws-test-card, .ws-resume, .fan-btn, .pre-sub-btn');
+        const meta = document.getElementById('cast-studio-desc');
+        if (meta && nameEl) {
+          const name = nameEl.querySelector('.ws-test-name, .ws-resume-title, .fan-btn-name, .pre-sub-name');
+          if (name) meta.textContent = (window.__PT ? window.__PT('meta.test', 'Test: ') : 'Test: ') + name.textContent.trim();
+        }
+        if (window.CastStudio) window.CastStudio.open(reference);
       }
-      if (window.CastStudio) {
-        window.CastStudio.open(reference);
-      }
-    });
-
-    document.getElementById('search-inp')?.addEventListener('keydown', e => {
-      if (e.key === 'Enter') doSearch();
     });
   </script>
 

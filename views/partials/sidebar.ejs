@@ -13,13 +13,25 @@ const _sb = ((typeof copy !== 'undefined' && copy.sidebar) ? copy.sidebar : ((ty
 const _tc = ((typeof copy !== 'undefined' && copy.header) ? copy.header : ((typeof fullCopy !== 'undefined' && fullCopy && fullCopy.header) ? fullCopy.header : null));
 // S14 (BUG-087): sidebar 4 til — copy.sidebar (AUTH_COPY[l]); copy yo'qsa uz fallback
 const _st = (k, fb) => (_sb && _sb[k]) ? _sb[k] : fb;
-const _roleLabel = (typeof roleLabel !== 'undefined' && roleLabel)
-  ? roleLabel
-  : _st('role' + String(_role || '').charAt(0).toUpperCase() + String(_role || '').slice(1), ({ admin: 'Administrator', teacher: "O'qituvchi", student: 'Talaba', proctor: 'Proktor', marker: 'Baholovchi', board: "Hay'at" })[_role] || 'Talaba');
+// Til bo'yicha tarjima ustuvor (AUTH sidebar dict); aks holda UZ default
+const _roleKey = 'role' + String(_role || '').charAt(0).toUpperCase() + String(_role || '').slice(1);
+const _roleLabel = (_sb && _sb[_roleKey])
+  ? _sb[_roleKey]
+  : ((typeof roleLabel !== 'undefined' && roleLabel) ? roleLabel : ({ admin: 'Administrator', teacher: "O'qituvchi", student: 'Talaba', proctor: 'Proktor', marker: 'Baholovchi', board: "Hay'at" })[_role] || 'Talaba');
 const _nav = (typeof navItems !== 'undefined' && navItems) ? navItems : null;
 const _isActive = (href) => {
   if (!href || href === '/') return _active === href;
   return _active === href || _active.indexOf(href) === 0;
+};
+// S34h: ROLE_NAV label/section'larini user tili bo'yicha tarjima qilish
+// (navCopy routes/roles.js dan keladi; _sb — AUTH sidebar dict fallback)
+const _navKeyMap = { 'Panelim': 'myPanel', 'Topshiriqlar': 'assignments', 'Portfolio': 'portfolio', 'Xavfsizlik': 'security', "Umumiy ko'rinish": 'overview', 'Kurslar': 'courses', 'Baholashlar': 'assessments', 'Baholash navbati': 'gradingQueue', 'Testlarim': 'myTests', 'Yangi test': 'newTest', 'AI Studiya': 'aiStudio', 'Jonli monitoring': 'liveMonitor', 'Kamera tekshiruvi': 'cameraReview', 'Boshqaruv markazi': 'commandCenter', 'Belgilash': 'marking', "Ko'rib chiqish": 'consider', 'Ratifikatsiya': 'ratification', 'Board': 'board', 'Grading': 'grading' };
+const _navSecMap = { "Ish maydoni": 'secWork', 'Asboblar': 'secTools', 'Talaba': 'roleStudent', 'Proktor': 'roleProctor', 'Baholovchi': 'roleMarker', "Hay'at": 'roleBoard', 'Akkaunt': 'secAccount' };
+const _nC = (typeof navCopy !== 'undefined' && navCopy) ? navCopy : null;
+const _nT = (k, fb) => {
+  if (_nC && k && _nC[k]) return _nC[k];
+  if (_sb && k && _sb[k]) return _sb[k];
+  return fb;
 };
 %>
 <a href="#main-content" class="skip-link">Asosiy kontentga o'tish</a>
@@ -37,8 +49,7 @@ const _isActive = (href) => {
 
   <div class="shell-role-chip" role="status">
     <span class="shell-role-ico"><%- icon('user', 13) %></span>
-    <span class="shell-role-label"><%= (typeof isVip !== 'undefined' && isVip && _role === 'student') ? 'VIP Talaba' : _roleLabel %></span>
-    <% if (typeof isVip !== 'undefined' && isVip && _role === 'student') { %><span class="shell-role-vip">VIP</span><% } %>
+    <span class="shell-role-label"><%= _roleLabel %></span>
     <% if (_uname) { %><span class="shell-role-user">@<%= _uname %></span><% } %>
   </div>
 
@@ -46,17 +57,14 @@ const _isActive = (href) => {
     <% if (_nav) { %>
       <% _nav.forEach(item => { %>
         <% if (item.section) { %>
-          <div class="shell-nav-sec"><%= item.section %></div>
+          <div class="shell-nav-sec"><%= _nT(_navSecMap[item.section] || '', item.section) %></div>
         <% } else { %>
           <a href="<%= item.href %>" class="shell-nav-link<%= _isActive(item.href) ? ' active' : '' %>" aria-current="<%= _isActive(item.href) ? 'page' : 'false' %>">
             <span class="shell-nav-ico"><%- icon(item.icon || 'chevronDown', 16) %></span>
-            <span><%= item.label %></span>
+            <span><%= _nT(_navKeyMap[item.label] || '', item.label) %></span>
           </a>
         <% } %>
       <% }); %>
-    <% if (_nav && typeof isVip !== 'undefined' && isVip && _role === 'student') { %>
-      <a href="/user/ai-studio" class="shell-nav-link"><span class="shell-nav-ico"><%- icon('sparkles', 16) %></span><span>AI Studiya</span></a>
-    <% } %>
     <% } else if (_role === 'admin') { %>
       <div class="shell-nav-sec">Boshqaruv</div>
       <a href="/admin/dashboard" class="shell-nav-link<%= _isActive('/admin/dashboard') ? ' active' : '' %>"><span class="shell-nav-ico"><%- icon('grid', 16) %></span><span>Dashboard</span></a>
@@ -123,12 +131,8 @@ const _isActive = (href) => {
     <% } else if (_role === 'student') { %>
       <div class="shell-nav-sec"><%= _st('roleStudent', 'Talaba') %></div>
       <a href="/user/panel" class="shell-nav-link<%= _active === 'panel' ? ' active' : '' %>"><span class="shell-nav-ico"><%- icon('grid', 16) %></span><span><%= _st('myPanel', 'Panelim') %></span></a>
-      <a href="/student" class="shell-nav-link<%= _isActive('/student') ? ' active' : '' %>"><span class="shell-nav-ico"><%- icon('calendar', 16) %></span><span><%= _st('calendar', 'Kalendar') %></span></a>
       <a href="/user/portfolio" class="shell-nav-link"><span class="shell-nav-ico"><%- icon('award', 16) %></span><span><%= _st('portfolio', 'Portfolio') %></span></a>
       <a href="/user/security-profile" class="shell-nav-link"><span class="shell-nav-ico"><%- icon('shieldCheck', 16) %></span><span><%= _st('security', 'Xavfsizlik') %></span></a>
-      <% if (typeof isVip !== 'undefined' && isVip) { %>
-      <a href="/user/ai-studio" class="shell-nav-link"><span class="shell-nav-ico"><%- icon('sparkles', 16) %></span><span>AI Studiya</span></a>
-      <% } %>
     <% } else if (_role === 'proctor') { %>
       <div class="shell-nav-sec"><%= _st('roleProctor', 'Proktor') %></div>
       <a href="/proctor" class="shell-nav-link<%= _active === 'monitor' ? ' active' : '' %>"><span class="shell-nav-ico"><%- icon('monitor', 16) %></span><span><%= _st('liveMonitor', 'Jonli monitoring') %></span></a>
