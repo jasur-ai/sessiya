@@ -2319,7 +2319,10 @@ router.post('/user/login',
       // BUG-039: javobni SMTP bloklamasin — maks 5s kutamiz, yuborish orqada
       // davom etadi (mock/tez provider'da race zudlik bilan fulfilled bo'ladi).
       await Promise.race([
-        sendVerifyCode({ userKey, email, lang }).catch(() => {}),
+        sendVerifyCode({ userKey, email, lang }).then((r) => {
+          // 09/2026: yuborilmasa jim o'tmaymiz — server log'da aniq ko'rinadi
+          if (!r || !r.ok) console.warn(`[register] verify kod yuborilmadi (${r?.error || 'unknown'})`);
+        }).catch((err) => console.warn('[register] verify send error:', err?.message || err)),
         new Promise((resolve) => setTimeout(resolve, 5000)),
       ]);
 

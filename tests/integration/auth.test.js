@@ -236,11 +236,19 @@ describe('Auth — STYLE STEP 25 (teacher workspace panel)', () => {
     expect(html).toContain('id="main-content"');
   });
 
-  it('S25.02 — header: Yangi test primary + Quick Prompt secondary', async () => {
+  it("S25.02 — header: til+tema; Quick Prompt/Profilim/topbar'dagi 'Yangi test' olib tashlangan (09/2026 qaror)", async () => {
     const { html } = await fetchPanel();
-    expect(html).toContain('Yangi test');
-    expect(html).toContain('Quick Prompt');
-    expect(html).toMatch(/btn btn-primary[^>]*>.*Yangi test/);
+    // Topbar'da faqat til guruhi + tema tugmasi; ikkinchi 'Yangi test', Quick Prompt, Profilim yo'q
+    expect(html).toContain('id="panelThemeBtn"');
+    expect(html).toContain('data-plang="uz"');
+    expect(html).not.toContain('ws_quick_prompt');
+    expect(html).not.toContain('ws_profile');
+    expect(html).not.toContain('data-analytics="ws_new_test"');
+    // (Eslatma: 'Quick Prompt' matni window.__PANEL_COPY i18n JSON'ida saqlanadi —
+    // strukturaviy tekshiruv data-analytics attributlari orqali)
+    expect(html).not.toContain('data-ws-quick-link');
+    // Topbar (ws-actions) ichida /user/create-test havolasi YO'Q
+    expect(html).not.toMatch(/class="ws-actions"[\s\S]{0,800}?href="\/user\/create-test"/);
   });
 
   it('S25.03/05 — first-use action, characters olib tashlandi', async () => {
@@ -583,9 +591,14 @@ describe('Auth — STYLE STEP 26 (test library)', () => {
     expect(html).toContain('ws-lib-overflow-btn');
     expect(html).toContain('aria-haspopup="menu"');
     expect(html).toContain('ws-lib-menu-danger');
-    for (const act of ['edit', 'practice', 'duplicate', 'visibility', 'export', 'archive', 'delete']) {
+    // 09/2026 qaror: menyu tozalandi — Sinov/Yakka mashq dublikatlari yo'q;
+    // Eksport (JSON) oddiy user'da ko'rinmaydi (faqat VIP/rahbariyat).
+    for (const act of ['edit', 'duplicate', 'visibility', 'archive', 'delete']) {
       expect(html).toContain(`data-act="${act}"`);
     }
+    expect(html).not.toContain('data-act="practice"');
+    expect(html).not.toContain('data-act="export"');
+    expect(html).not.toMatch(/role="menuitem"[^>]*href="\/user\/practice/);
     expect(html).not.toContain('act-del');
   });
 
@@ -629,12 +642,27 @@ describe('Auth — STYLE STEP 26 (test library)', () => {
   });
 });
 
+/** 09/2026 export gating testi uchun: username bo'yicha isVip flag o'zgartirish. */
+async function setUserVipFlag(username, val) {
+  const users = await fb.get('users');
+  if (!users.exists()) throw new Error('users topilmadi');
+  for (const [k, u] of Object.entries(users.val())) {
+    if (u && u.username === username) {
+      await fb.set(`users/${k}/isVip`, val === true);
+      return;
+    }
+  }
+  throw new Error(`user topilmadi: ${username}`);
+}
+
 describe('S27 — Test Builder professional authoring workspace', () => {
   let builderCookie = '';
   let savedKey = '';
+  let builderUname = '';
 
   beforeAll(async () => {
     const uname = `bld_${Date.now() % 1000000}`;
+    builderUname = uname;
     const pw = 'sirli-parol-2026';
     const { csrf: csrfR, cookie: cookieR } = await getCsrf();
     await postForm('/user/login', cookieR, {
@@ -697,10 +725,17 @@ describe('S27 — Test Builder professional authoring workspace', () => {
     savedKey = data.key;
     expect(savedKey).toBeTruthy();
 
-    // Saqlangan qiymatlarni export orqali qayta o'qiymiz
+    // 09/2026 qaror: export oddiy (non-VIP) user uchun 403; VIP/rahbariyat 200.
+    const exp403 = await fetch(`${serverUrl}/user/api/tests/export?key=${savedKey}`, {
+      headers: { cookie: builderCookie },
+    });
+    expect(exp403.status).toBe(403);
+
+    await setUserVipFlag(builderUname, true);
     const exp = await fetch(`${serverUrl}/user/api/tests/export?key=${savedKey}`, {
       headers: { cookie: builderCookie },
     });
+    await setUserVipFlag(builderUname, false);
     expect(exp.status).toBe(200);
     const exported = await exp.json();
     const test = exported.test;

@@ -311,6 +311,13 @@ async function sendOnce(msg, { provider, sendImpl }) {
 
 /** Mock transport — hech qaerga yubormaydi; log + messageId (dev/test). */
 async function sendViaMock(msg) {
+  // BUG-FIX 09/2026: production'da mock transport "yubordi" deb jim o'tib
+  // ketardi → foydalanuvchi kodni olmay, hech qanday xato ko'rmas edi.
+  // Production'da mock taqiqlanadi: xato aniq ko'rinadi (UI 502 + email_log failed),
+  // deploy'da EMAIL_PROVIDER=smtp/postmark sozlanishi shart ekani ochiq aytiladi.
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('EMAIL_PROVIDER=mock production uchun taqiqlangan — SMTP/Postmark sozlang');
+  }
   // Log'da email mazmuni YO'Q (PII); faqat meta.
   console.info(`[email:mock] would-send to=${maskEmail(msg.to)} tag=${msg.tag || '-'} subject="${msg.subject}"`);
   return { messageId: `mock-${Date.now()}-${Math.random().toString(16).slice(2, 8)}` };

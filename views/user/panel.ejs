@@ -14,22 +14,23 @@
     .ws-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
     /* ── AUTH A-18: email verify banner + modal ── */
-    .email-verify-banner{display:flex;align-items:center;gap:12px;padding:12px 16px;margin-bottom:16px;border:1px solid var(--deborah-semantic-color-border-default,rgba(99,102,241,.35));border-radius:var(--deborah-radius-md,14px);background:var(--deborah-semantic-color-action-primary-soft,rgba(99,102,241,.09));}
-    .email-verify-banner .evb-icon{flex-shrink:0;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:var(--deborah-semantic-color-action-primary,rgba(99,102,241,.16));color:var(--deborah-semantic-color-action-primary,#6366f1);}
+    .email-verify-banner{display:flex;align-items:center;gap:12px;padding:12px 16px;margin-bottom:16px;border:1px solid var(--deborah-semantic-color-border-default,rgba(201,165,101,.35));border-radius:var(--deborah-radius-md,14px);background:var(--deborah-semantic-color-action-primary-soft,rgba(201,165,101,.09));}
+    .email-verify-banner .evb-icon{flex-shrink:0;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:var(--deborah-semantic-color-action-primary,rgba(201,165,101,.16));color:var(--deborah-semantic-color-action-primary,#c9a565);}
     .email-verify-banner .evb-text{flex:1;display:flex;flex-direction:column;gap:2px;font-size:.86rem;color:var(--deborah-semantic-color-text-secondary);}
     .email-verify-banner .evb-text strong{color:var(--deborah-semantic-color-text-primary);font-size:.92rem;}
     .email-verify-banner .evb-btn{flex-shrink:0;min-height:40px;}
-    .evm-err{color:var(--deborah-semantic-color-text-danger,#e5484d);font-size:.84rem;font-weight:600;margin-bottom:8px;}
-    .evm-resend{margin-top:12px;font-size:.82rem;font-weight:600;color:var(--deborah-semantic-color-action-primary,#6366f1);background:none;border:none;cursor:pointer;min-height:44px;}
+    .evm-err{color:var(--deborah-semantic-color-status-danger,#c05b44);font-size:.84rem;font-weight:600;margin-bottom:8px;}
+    .evm-note{color:var(--deborah-semantic-color-text-secondary,#8b93a7);font-size:.82rem;font-weight:600;margin:-6px 0 10px;}
+    .evm-resend{margin-top:12px;font-size:.82rem;font-weight:600;color:var(--deborah-semantic-color-action-primary,#c9a565);background:none;border:none;cursor:pointer;min-height:44px;}
     .evm-resend:disabled{opacity:.5;cursor:not-allowed;}
     .evm-resend:not(:disabled):hover{text-decoration:underline;}
-    .evm-resend:focus-visible{outline:2px solid var(--deborah-semantic-color-action-primary,#6366f1);outline-offset:2px;border-radius:8px;}
-    .evm-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--deborah-semantic-color-action-primary,#6366f1);color:#fff;padding:12px 20px;border-radius:12px;font-weight:700;font-size:.9rem;opacity:0;transition:opacity 200ms ease,transform 200ms ease;z-index:600;box-shadow:0 8px 24px rgba(0,0,0,.25);}
+    .evm-resend:focus-visible{outline:2px solid var(--deborah-semantic-color-action-primary,#c9a565);outline-offset:2px;border-radius:8px;}
+    .evm-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--deborah-semantic-color-action-primary,#c9a565);color:var(--deborah-semantic-color-action-on-action,#1a1305);padding:12px 20px;border-radius:12px;font-weight:700;font-size:.9rem;opacity:0;transition:opacity 200ms ease,transform 200ms ease;z-index:600;box-shadow:0 8px 24px rgba(0,0,0,.25);}
     .evm-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
     .evm-foot{margin-top:12px;text-align:center;}
     .evm-update-email{font-size:.8rem;font-weight:600;color:var(--deborah-semantic-color-text-muted);text-decoration:underline;text-underline-offset:3px;min-height:44px;display:inline-flex;align-items:center;justify-content:center;padding:0 4px;}
-    .evm-update-email:hover{color:var(--deborah-semantic-color-action-primary,#6366f1);}
-    .evm-update-email:focus-visible{outline:2px solid var(--deborah-semantic-color-action-primary,#6366f1);outline-offset:2px;border-radius:8px;}
+    .evm-update-email:hover{color:var(--deborah-semantic-color-action-primary,#c9a565);}
+    .evm-update-email:focus-visible{outline:2px solid var(--deborah-semantic-color-action-primary,#c9a565);outline-offset:2px;border-radius:8px;}
     @media (max-width:640px){.email-verify-banner{flex-wrap:wrap;}.email-verify-banner .evb-btn{width:100%;}}
 
     /* ── Modals (saqlangan — start + cast studio) ── */
@@ -55,7 +56,7 @@
     .modal-sub{color:var(--deborah-semantic-color-text-muted);font-size:.88rem;margin-bottom:16px;font-weight:600;}
     .modal-actions{display:flex;gap:8px;margin-top:16px;}
     .modal-btn{flex:1;border:none;border-radius:var(--deborah-radius-sm,10px);padding:12px;font-family:var(--deborah-typography-font-body,var(--font-body));font-size:.9rem;font-weight:700;cursor:pointer;min-height:44px;}
-    .modal-btn-primary{background:var(--deborah-semantic-color-action-primary);color:var(--deborah-semantic-color-action-on-action,#fff);}
+    .modal-btn-primary{background:var(--deborah-semantic-color-action-primary);color:var(--deborah-semantic-color-action-on-action,#1a1305);}
     .modal-btn-primary:hover{background:var(--deborah-semantic-color-action-primary-hover);}
     .modal-btn-secondary{background:var(--deborah-semantic-color-surface-nested);color:var(--deborah-semantic-color-text-secondary);}
     .modal-btn-secondary:hover{background:var(--deborah-semantic-color-surface-default);}
@@ -80,7 +81,7 @@
     .ws-search-inp:focus{border-color:var(--deborah-semantic-color-action-primary);box-shadow:0 0 0 3px var(--deborah-semantic-color-focus);}
     .ws-search-inp::placeholder{color:var(--deborah-semantic-color-text-muted);}
     .ws-search-btn{background:var(--deborah-semantic-color-surface-nested);border:1px solid var(--deborah-semantic-color-border-default);border-radius:var(--deborah-radius-sm,10px);padding:0 16px;color:var(--deborah-semantic-color-text-secondary);font-family:var(--deborah-typography-font-body,var(--font-body));font-size:.9rem;font-weight:700;cursor:pointer;min-height:44px;display:inline-flex;align-items:center;gap:6px;transition:background-color 120ms ease,color 120ms ease;}
-    .ws-search-btn:hover{background:var(--deborah-semantic-color-action-primary);color:var(--deborah-semantic-color-action-on-action,#fff);}
+    .ws-search-btn:hover{background:var(--deborah-semantic-color-action-primary);color:var(--deborah-semantic-color-action-on-action,#1a1305);}
 
 
     /* ── Search result cards ── */
@@ -91,16 +92,18 @@
     .sr-start:hover{background:var(--deborah-semantic-color-status-success);border-color:var(--deborah-semantic-color-status-success);color:#fff;}
 
     @media(max-width:600px){.tc-actions{flex-wrap:wrap;}}
-    /* ── 09/2026: reklama-uslub jonli tugmalar (Cast qilish / Sinab ko'rish) ── */
-    .act-cast, .act-sinov { position: relative; overflow: hidden; border: 0 !important; color: #fff !important;
-      font-weight: 800 !important; text-shadow: 0 1px 2px rgba(0,0,0,.28); background-image: none !important;
-      box-shadow: 0 6px 18px rgba(0,0,0,.22); transition: transform .16s ease, box-shadow .16s ease, filter .16s ease; }
-    .act-cast { background: linear-gradient(135deg,#4f46e5 0%,#6d28d9 55%,#be123c 100%) !important; }
-    .act-sinov { background: linear-gradient(135deg,#c2410c 0%,#be123c 60%,#9f1239 100%) !important; }
-    .act-cast:hover, .act-sinov:hover { transform: translateY(-2px) scale(1.03); filter: brightness(1.08); box-shadow: 0 10px 26px rgba(0,0,0,.32); }
+    /* ── 09/2026: Cast qilish / Sinov tugmalari — bitta issiq palitra (oltin/bronza).
+          Reklamadagi aralash yorqin gradientlar (ko'k-binafsha-qizil / qizil) olib
+          tashlandi: qizil/ko'k yo'q, premium oltin-jigarrang tokenlar ishlatiladi. ── */
+    .act-cast, .act-sinov { position: relative; overflow: hidden; border: 0 !important;
+      background-image: none !important; font-weight: 800 !important;
+      box-shadow: 0 6px 18px rgba(10,8,4,.28); transition: transform .16s ease, box-shadow .16s ease, filter .16s ease; }
+    .act-cast { background: linear-gradient(135deg, #d9b465 0%, #c9a565 55%, #a37f3a 100%) !important; color: #1a1305 !important; }
+    .act-sinov { background: linear-gradient(135deg, #8a6a2e 0%, #7e5f28 60%, #5f471d 100%) !important; color: #faf5e8 !important; }
+    .act-cast:hover, .act-sinov:hover { transform: translateY(-2px) scale(1.03); filter: brightness(1.1); box-shadow: 0 10px 26px rgba(10,8,4,.34); }
     .act-cast:active, .act-sinov:active { transform: translateY(0) scale(.99); }
     .act-cast::after, .act-sinov::after { content: ''; position: absolute; top: 0; left: -80%; width: 50%; height: 100%;
-      background: linear-gradient(105deg, transparent, rgba(255,255,255,.38), transparent); transform: skewX(-20deg);
+      background: linear-gradient(105deg, transparent, rgba(255,255,255,.22), transparent); transform: skewX(-20deg);
       transition: left .45s ease; pointer-events: none; }
     .act-cast:hover::after, .act-sinov:hover::after { left: 135%; }
     @media (prefers-reduced-motion: reduce) { .act-cast, .act-sinov { transition: none; } .act-cast::after, .act-sinov::after { display: none; } }
@@ -196,9 +199,9 @@
           <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8Z"/></svg>
           <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5 5l1.6 1.6M17.4 17.4 19 19M19 5l-1.6 1.6M6.6 17.4 5 19"/></svg>
         </button>
-        <a href="/user/create-test" class="btn btn-primary" data-analytics="ws_new_test"><%- icon('plus', 15) %> <span data-i18n="ws.newTest"><%= __p('ws.newTest') %></span></a>
-        <a href="/user/create-test?quick=1" class="btn btn-quiet" data-analytics="ws_quick_prompt"><%- icon('sparkles', 15) %> <span data-i18n="ws.quick">Quick Prompt</span></a>
-        <a href="/user/profile" class="btn btn-quiet" data-analytics="ws_profile"><%- icon('user', 15) %> <span data-i18n="ws.profile"><%= __p('ws.profile') %></span></a>
+        <% /* 09/2026 (user qarori): topbar'da faqat til + tema. Quick Prompt, Profilim
+              va dublikat 'Yangi test' olib tashlandi — yangi test faqat kutubxona
+              sarlavhasida bitta joyda turadi (pastda shartli ko'rinadi). */ %>
       </div>
     </div>
 
@@ -224,10 +227,8 @@
           <h2 class="ws-resume-title"><%= __p('rsEmpty.title') %></h2>
           <p class="ws-resume-meta"><%= __p('rsEmpty.sub') %></p>
         </div>
-        <div class="ws-resume-actions">
-          <a href="/user/create-test" class="btn btn-primary"><%- icon('plus', 15) %> <span data-i18n="ws.newTest"><%= __p('ws.newTest') %></span></a>
-          <a href="/user/create-test?quick=1" class="btn btn-quiet"><%- icon('sparkles', 15) %> <span data-i18n="ws.quick">Quick Prompt</span></a>
-        </div>
+        <% /* 09/2026: bo'sh holatda tugmalar olib tashlandi — 'Yangi test'
+              faqat kutubxonadagi yagona CTA'da ko'rinadi (dublikat yo'q). */ %>
       </div>
     <% } %>
 
@@ -244,7 +245,11 @@
     <!-- ════ Test Library (S26) ════ -->
     <div class="ws-sec-hd" style="margin-top:28px">
       <h2 class="ws-sec-title" data-i18n="ws.library"><%= __p('lib.title') %></h2>
+      <% /* 09/2026 (user qarori): 'Yangi test' faqat bitta joyda — testlar
+            borida kutubxona sarlavhasida; bo'sh holatda kutubxona empty-CTA'si. */ %>
+      <% if (tests.length > 0) { %>
       <a href="/user/create-test" class="ws-sec-action"><%- icon('plus', 13) %> <span data-i18n="ws.newTest"><%= __p('ws.newTest') %></span></a>
+      <% } %>
     </div>
 
     <!-- S26.06: Filter toolbar (STEP 18 filter-bar asosida) -->
@@ -319,13 +324,16 @@
             <div class="ws-lib-overflow-wrap">
               <button type="button" class="ws-lib-overflow-btn" aria-haspopup="menu" aria-expanded="false" aria-label="<%= __p('aria.rowActs').split('{name}').join(t.name) %>" data-overflow="<%= t.key %>"><%- icon('more', 18) %></button>
               <div class="ws-lib-menu" role="menu" data-menu="<%= t.key %>">
+                <% /* 09/2026 (user qarori): tartibli boshqaruv menyusi — Sinov/Yakka
+                      mashq dublikatlari va aralash ranglar olib tashlandi. Eksport
+                      faqat VIP/rahbariyat (oddiy user'da ko'rinmaydi). */ %>
                 <button type="button" role="menuitem" data-act="edit" data-key="<%= t.key %>"><%- icon('edit', 15) %> <%= __p('menu.edit') %></button>
-                <button type="button" role="menuitem" data-act="practice" data-key="<%= t.key %>" data-name="<%= t.name %>" data-count="<%= t.count %>"><%- icon('zap', 15) %> <%= __p('menu.practice') %></button>
-                <a role="menuitem" href="/user/practice?source=user&key=<%= t.key %>"><%- icon('book', 15) %> <%= __p('menu.solo') %></a>
                 <button type="button" role="menuitem" data-act="duplicate" data-key="<%= t.key %>"><%- icon('copy', 15) %> <%= __p('menu.duplicate') %></button>
                 <button type="button" role="menuitem" data-act="visibility" data-key="<%= t.key %>"><%- icon(t.isPublic ? 'shield' : 'globe', 15) %> <%= t.isPublic ? __p('menu.toPrivate') : __p('menu.toPublic') %></button>
-                <button type="button" role="menuitem" data-act="export" data-key="<%= t.key %>"><%- icon('download', 15) %> <%= __p('menu.export') %></button>
                 <button type="button" role="menuitem" data-act="archive" data-key="<%= t.key %>"><%- icon('archive', 15) %> <%= t.archived ? __p('menu.unarchive') : __p('menu.archive') %></button>
+                <% if (typeof canExportJson !== 'undefined' && canExportJson) { %>
+                <button type="button" role="menuitem" data-act="export" data-key="<%= t.key %>"><%- icon('download', 15) %> <%= __p('menu.export') %></button>
+                <% } %>
                 <div class="ws-lib-menu-sep" role="separator"></div>
                 <button type="button" role="menuitem" class="ws-lib-menu-danger" data-act="delete" data-key="<%= t.key %>" data-name="<%= t.name %>"><%- icon('trash', 15) %> <%= __p('menu.delete') %></button>
               </div>
@@ -685,7 +693,8 @@
   <div class="modal-overlay" id="email-verify-modal" role="dialog" aria-modal="true" aria-labelledby="evm-title">
     <div class="modal-box">
       <div class="modal-title" id="evm-title"><%- icon('mail', 18) %> <%= verifyCopy.modalTitle || 'Emailni tasdiqlash' %></div>
-      <div class="modal-sub"><%= userEmail ? (verifyCopy.modalSub || 'Kod ' + userEmail + ' manziliga yuborildi').replace('{email}', userEmail) : (verifyCopy.modalSubNoEmail || 'Emailingizga yuborilgan kodni kiriting') %></div>
+      <div class="modal-sub"><%= userEmail ? (verifyCopy.modalSub || 'Kod {email} manziliga yuboriladi').replace('{email}', userEmail) : (verifyCopy.modalSubNoEmail || 'Emailingizga yuborilgan kodni kiriting') %></div>
+      <div class="evm-note" id="evm-note" role="status" aria-live="polite" style="display:none"></div>
       <div class="evm-err" id="evm-err" style="display:none" role="alert"></div>
       <label class="lbl" for="evm-code"><%= verifyCopy.codeLabel || 'Tasdiqlash kodi' %></label>
       <input class="inp" id="evm-code" name="code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" autocomplete="one-time-code" placeholder="••••••" required aria-required="true">
@@ -716,6 +725,10 @@
     var t = <%- JSON.stringify({
       resend: verifyCopy.resend || 'Qayta yuborish',
       resendCountdown: verifyCopy.resendCountdown || 'Qayta yuborish ({s}s)',
+      sendingNote: verifyCopy.sendingNote || 'Kod yuborilmoqda…',
+      sentNote: verifyCopy.sentNote || 'Kod yuborildi — emailni tekshiring',
+      recentSent: verifyCopy.recentSent || 'Kod yaqinda yuborilgan — emailni tekshiring',
+      deliveryFailed: verifyCopy.deliveryFailed || "Kodni yuborib bo'lmadi — keyinroq qayta urining",
       errInvalidFormat: verifyCopy.errInvalidFormat || '6 xonali kod kiriting',
       errNetwork: verifyCopy.errNetwork || "Ulanishda muammo — qayta urinib ko'ring",
       errInvalidCode: verifyCopy.errInvalidCode || "Kod noto'g'ri yoki eskirgan",
@@ -724,14 +737,27 @@
       errTooManyAttempts: verifyCopy.errTooManyAttempts || "Juda ko'p urinish — birozdan keyin qayta urining",
       errResend: verifyCopy.errResend || "Qayta yuborishda xatolik — birozdan keyin urining",
       errGeneric: 'Xatolik yuz berdi',
+      emailNeeded: verifyCopy.emailNeeded || "Hisobingizda email yo'q",
       success: verifyCopy.success || 'Email tasdiqlandi',
       // B-28 §08/§10: expiry UX + resend limit UX
       expiredCta: verifyCopy.expiredCta || 'Yangi kod yuborish',
       limitReached: verifyCopy.limitReached || "Kunlik limit tugadi — keyinroq urinib ko'ring",
     }) %>;
+    // 09/2026: userEmail (xavfsiz — JSON) — sentNote'ga to'ldirish uchun
+    var knownEmail = <%- JSON.stringify(userEmail || '') %>;
+    var note = document.getElementById('evm-note');
 
-    function startResendTimer() {
-      var left = 60;
+    function setNote(msg) {
+      if (!note) return;
+      note.textContent = msg || '';
+      note.style.display = msg ? 'block' : 'none';
+    }
+    function hideMsgs() {
+      err.style.display = 'none';
+      setNote('');
+    }
+    function startResendTimer(secs) {
+      var left = Math.max(5, Number(secs) || 60);
       btnResend.disabled = true;
       btnResend.textContent = t.resendCountdown.replace('{s}', left);
       clearInterval(timer);
@@ -743,16 +769,70 @@
     }
 
     function showErr(msg) {
+      setNote('');
       err.textContent = msg;
       err.style.display = 'block';
     }
 
+    // 09/2026 BUG-FIX (user: "kod emailga kelmayapti"): send'ning HAR QANDAY
+    // natijasi endi ko'rinadi — muvaffaqiyat, cooldown yoki xato (jim emas).
+    function handleSendResult(r) {
+      var body = (r && r.j) || {};
+      var e = body.error;
+      var wait = body.retryAfterSeconds ? Number(body.retryAfterSeconds) : 60;
+      if (r.status === 200 && body.ok) {
+        setNote((t.sentNote || '').split('{email}').join(knownEmail || 'emailingiz'));
+        startResendTimer(60);
+        return;
+      }
+      if (r.status === 429 && e === 'resend_cooldown') {
+        // B-28 §09: kod yaqinda yuborilgan — joriy kod hali amal qiladi
+        setNote(t.recentSent || '');
+        startResendTimer(wait);
+        return;
+      }
+      if (r.status === 429) {
+        showErr(t.limitReached);
+        btnResend.disabled = true;
+        return;
+      }
+      if (r.status === 400 && e === 'email_required') {
+        showErr(t.emailNeeded || '');
+        btnResend.disabled = false;
+        btnResend.textContent = t.resend;
+        return;
+      }
+      // 09/2026: delivery muvaffaqiyatsiz (502 send_failed) — aniq xabar, yashirin emas
+      if (r.status === 502 || e === 'send_failed') {
+        showErr(t.deliveryFailed || '');
+        btnResend.disabled = false;
+        btnResend.textContent = t.resend;
+        return;
+      }
+      showErr(t.errResend || '');
+      btnResend.disabled = false;
+      btnResend.textContent = t.resend;
+    }
+
+    function attemptSend() {
+      hideMsgs();
+      setNote(t.sendingNote || '');
+      btnResend.disabled = true;
+      btnResend.textContent = t.resend + '…';
+      postVerify('/api/auth/verify/send', {}, handleSendResult);
+    }
+
     if (btnOpen) btnOpen.addEventListener('click', function () {
       overlay.classList.add('open');
-      startResendTimer();
       input.focus();
+      // BUG-FIX 09/2026: modal ochilishi bilan kod yuborishga URINAMIZ —
+      // ilgari hech narsa yuborilmasdi (faqat 60s'lik sanoq ko'rinardi).
+      attemptSend();
     });
-    if (btnCancel) btnCancel.addEventListener('click', function () { overlay.classList.remove('open'); });
+    if (btnCancel) btnCancel.addEventListener('click', function () {
+      overlay.classList.remove('open');
+      clearInterval(timer);
+    });
     overlay.addEventListener('click', function (e) { if (e.target === overlay) overlay.classList.remove('open'); });
 
     function postVerify(path, body, cb) {
@@ -806,12 +886,7 @@
     });
 
     btnResend.addEventListener('click', function () {
-      err.style.display = 'none';
-      postVerify('/api/auth/verify/send', {}, function (r) {
-        if (r.status === 200 && r.j.ok) { startResendTimer(); }
-        else if (r.status === 429) showErr(t.limitReached); // B-28 §10
-        else showErr(t.errResend);
-      });
+      attemptSend();
     });
 
     // Native OTP autofill (A-18 §19)

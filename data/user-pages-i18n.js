@@ -337,10 +337,10 @@ export const USER_PAGES = {
       'en': 'Security profile',
     },
     'sub': {
-      'uz': 'Assessment uchun talab qilinadigan xavfsizlik darajasi — preflightdan oldin tayyorgarlikni tekshiring.',
-      'uz-cyrl': 'Assessment учун талаб қилинадиган хавфсизлик даражаси — preflightдан олдин тайёргарликни текширинг.',
-      'ru': 'Требуемый для Assessment уровень безопасности — проверьте готовность перед preflight.',
-      'en': 'The security level required for assessments — check readiness before preflight.',
+      'uz': 'Hisobingiz xavfsizligini boshqaring: faol sessiyalar, parol, email va xavfsizlik hodisalari.',
+      'uz-cyrl': 'Ҳисобингиз хавфсизлигини бошқаринг: фаол сессиялар, парол, email ва хавфсизлик ҳодисалари.',
+      'ru': 'Управляйте безопасностью аккаунта: активные сессии, пароль, email и события безопасности.',
+      'en': 'Manage your account security: active sessions, password, email and security events.',
     },
     'sessTitle': {
       'uz': 'Faol sessiyalar',
@@ -372,24 +372,8 @@ export const USER_PAGES = {
       'ru': 'Authenticator (MFA) не нужен для вашего аккаунта — вы входите по паролю. Эта функция доступна только аккаунтам администраторов и преподавателей.',
       'en': 'Authenticator (MFA) is not needed for your account — you sign in with a password. This feature applies only to admin and teacher accounts.',
     },
-    'assessTitle': {
-      'uz': 'Assessment',
-      'uz-cyrl': 'Assessment',
-      'ru': 'Assessment',
-      'en': 'Assessment',
-    },
-    'assessPick': {
-      'uz': 'Assessment tanlang...',
-      'uz-cyrl': 'Assessment танланг...',
-      'ru': 'Выберите Assessment...',
-      'en': 'Select assessment...',
-    },
-    'loading': {
-      'uz': 'Yuklanmoqda...',
-      'uz-cyrl': 'Юкланмоқда...',
-      'ru': 'Загрузка...',
-      'en': 'Loading...',
-    },
+    // 09/2026 (user qarori): assessTitle/assessPick/loading olib tashlandi —
+    // talaba uchun security sahifasidagi Assessments tanlagichi endi yo'q.
   },
   student: {
     'h1': {

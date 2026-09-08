@@ -165,11 +165,18 @@ export async function sendVerifyCode({ userKey, email, lang = 'uz' }) {
     tag: 'verify',
   }).catch((err) => {
     console.warn('[email:verify] send failed:', err?.message || err);
-    return { ok: false };
+    return { ok: false, error: String(err?.message || err).slice(0, 300) };
   });
 
+  // BUG-FIX 09/2026 (user: "kod emailga kelmayapti"): ilgari yuborish
+  // muvaffaqiyatsiz bo'lsa ham { ok:true, delivery:'queued' } qaytardi —
+  // UI "yuborildi" deb ko'rsatib, email hech qachon bormas edi (jim yutqazish).
+  // Endi yetkazib bo'lmasa 502 send_failed → UI aniq xato ko'rsatadi.
+  if (!sent || sent.ok !== true) {
+    return { ok: false, error: 'send_failed', httpStatus: 502 };
+  }
   const preview = process.env.NODE_ENV !== 'production' ? code : null;
-  return { ok: true, code: preview, delivery: sent.ok ? 'sent' : 'queued' };
+  return { ok: true, code: preview, delivery: 'sent' };
 }
 
 /**

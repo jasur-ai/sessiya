@@ -65,6 +65,11 @@ router.post('/api/auth/verify/send', requireAuth, async (req, res) => {
 
   const result = await sendVerifyCode({ userKey, email, lang });
   if (!result.ok) {
+    // 09/2026: send muvaffaqiyatsiz (mas. production'da EMAIL_PROVIDER=mock) —
+    // server log'da ko'rinishi kerak; UI aniq xato oladi (endi jim qaytmaydi).
+    if (result.error === 'send_failed') {
+      console.warn(`[email:verify] kod yuborilmadi user=${userKey} -> ${email} (delivery failed)`);
+    }
     return res
       .status(result.httpStatus || 400)
       .json({ error: result.error, retryAfterSeconds: result.retryAfterSeconds });

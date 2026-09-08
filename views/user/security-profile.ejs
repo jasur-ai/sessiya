@@ -193,17 +193,11 @@
       <div id="events-list"><div class="loading"><span class="spinner" style="border-color:var(--deborah-semantic-color-text-muted);border-top-color:var(--deborah-semantic-color-action-primary)"></span></div></div>
     </div>
 
-    <% if (user && user.role === 'student') { %>
-    <div class="sec-title" style="margin-top:18px"><%- icon('layers', 16) %> <%= _pt('assessTitle') %></div>
-    <select class="assign-pick" id="assign-pick">
-      <option value=""><%= _pt('assessPick') %></option>
-    </select>
-
-    <div id="content"><div class="loading"><span class="spinner" style="border-color:var(--deborah-semantic-color-text-muted);border-top-color:var(--deborah-semantic-color-action-primary)"></span> <%= _pt('loading') %></div></div>
-    <% } %>
+    <% /* 09/2026 (user qarori): 'Assessments' tanlagichi bu sahifadan olib tashlandi —
+          talaba uchun kerak emas (assessments o'z sahifasida: /user/assignments).
+          security-profile.js ham endi yuklanmaydi. */ %>
   </div>
 
-  <script src="/js/security-profile.js"></script>
   <% if (mfaAllowed) { %><script src="/js/mfa-settings.js"></script><% } %><% /* BUG-011: mfa-settings.js faqat MFA bloki render qilinganda yuklanadi */ %>
   <script src="/js/passkey-settings.js"></script>
   <script src="/js/account-settings.js" defer></script>

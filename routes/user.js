@@ -218,6 +218,9 @@ router.get('/panel', async (req, res) => {
       username: user.username,
       // 09/2026: Cast studio — VIP userlargina to'liq sozlamalar (studioSimple=false)
       isVip: !!isVip,
+      // 09/2026 (user qarori): Eksport (JSON) faqat VIP/rahbariyat uchun —
+      // oddiy (non-VIP) user'da 3-nuqta menyusida ko'rinmaydi va API ham bloklanadi.
+      canExportJson: !!isVip || ['teacher', 'admin', 'board'].includes(user.role),
     });
     // Update session with fresh isVip value
     req.session.user.isVip = isVip;
@@ -237,6 +240,7 @@ router.get('/panel', async (req, res) => {
       tests: [],
       username: user.username,
       isVip: false,
+      canExportJson: false,
       error: err.message,
       riskCopy: {},
     });
@@ -264,6 +268,14 @@ router.get('/assignments', async (req, res) => {
 
 // ── Create Test Page ──
 router.get('/create-test', async (req, res) => {
+  // 09/2026 (user qarori): Quick Prompt oddiy userlarga kerak emas — havolalar
+  // panel'dan olib tashlandi; to'g'ridan-to'g'ri ?quick=1 ham oddiy user uchun
+  // oddiy yaratish sahifasiga qaytariladi (VIP/rahbariyat uchun ochiq qoladi).
+  if (req.query.quick === '1' || req.query.quick === 'true') {
+    const quickVip = await isCurrentUserVip(req).catch(() => false);
+    const quickStaff = ['teacher', 'admin', 'board'].includes(req.session?.user?.role);
+    if (!quickVip && !quickStaff) return res.redirect('/user/create-test');
+  }
   // S15 BUG-093: ?edit kaliti ham traversal kelishi mumkin edi (boshqa userning
   // maxfiy testini edit sahifasida o'qib olish). Whitelist.
   const editKey = req.query.edit ? safeTestKey(req.query.edit) : null;
@@ -470,11 +482,22 @@ router.post('/api/tests/archive', async (req, res) => {
 });
 
 // ── Export Test as JSON (S26.03 overflow) ──
+// 09/2026 (user qarori): faqat VIP/rahbariyat — oddiy (non-VIP) user'da API ham 403.
 router.get('/api/tests/export', async (req, res) => {
   try {
+    const user = req.session.user;
+    let isVip = user?.isVip === true;
+    if (!isVip && user?.safeKey) {
+      try {
+        const vipSnap = await fb.get(`users/${user.safeKey}/isVip`);
+        isVip = vipSnap.exists() && vipSnap.val() === true;
+      } catch (_) { /* fail-soft */ }
+    }
+    const isStaff = ['teacher', 'admin', 'board'].includes(user?.role);
+    if (!isVip && !isStaff) return res.status(403).json({ error: 'forbidden' });
     const key = safeTestKey(req.query.key); // S15 BUG-093
     if (!key) return res.status(400).json({ error: 'Yaroqsiz test kaliti' });
-    const snap = await fb.get(`users/${req.session.user.safeKey}/tests/${key}`);
+    const snap = await fb.get(`users/${user.safeKey}/tests/${key}`);
     if (!snap.exists()) return res.status(404).json({ error: 'Test topilmadi' });
     const name = (snap.val().name || 'test').replace(/[^\w\-]+/g, '_').slice(0, 40);
     res.setHeader('Content-Type', 'application/json');

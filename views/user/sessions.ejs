@@ -106,11 +106,19 @@
         <% }); %>
       </div>
 
+      <% /* 09/2026 (user qarori): tugma 'Boshqa barchasini o'chirish' — joriy
+            qurilma O'ZI o'chirilmaydi (server ham faqat boshqalarni yakunlaydi).
+            Boshqa sessiya bo'lmasa tugma ko'rsatilmaydi. */ %>
+      <% const othersCount = sessions.filter(function (s) { return s.sessionId !== currentSessionId; }).length; %>
+      <% if (othersCount > 0) { %>
       <form method="POST" action="/sessions/revoke-all" data-confirm-all="<%= copy.sessions.revokeAllConfirm %>">
         <input type="hidden" name="_csrf" value="<%= csrfToken %>">
         <input type="hidden" name="lang" value="<%= lang %>">
         <button type="submit" class="btn-revoke-all" data-analytics="session_revoke_all"><%- icon('shield', 16) %> <%= copy.sessions.revokeAll %></button>
       </form>
+      <% } else { %>
+      <div class="sec-hint"><%- icon('check', 14) %> <%= copy.sessions.noOthers %></div>
+      <% } %>
 
       <div class="sec-hint"><%- icon('info', 14) %> <%= copy.sessions.hint %></div>
     <% } %>
