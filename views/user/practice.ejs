@@ -91,6 +91,33 @@
     .pr-rv-e{font-size:.78rem;color:var(--deborah-semantic-color-text-muted);margin-top:8px;border-top:1px dashed var(--deborah-semantic-color-border-subtle);padding-top:8px;}
     @media (max-width:560px){ .pr-wrap{padding:14px 10px 80px;} .pr-q{font-size:.95rem;} }
     @media print { .pr-top,.pr-nav,.no-print,.pr-dots{display:none !important;} body{background:#fff;} }
+
+    /* ── 09/2026: Sinov — reklama-uslub yorqin sahna (Kahoot ruhida) ── */
+    .pr-top { border-bottom: 1px solid var(--deborah-semantic-color-border-subtle); }
+    .pr-opt {
+      position: relative; overflow: hidden;
+      border-left: 6px solid var(--accent, #4f46e5);
+      transition: border-color .14s ease, background-color .14s ease, transform .14s ease, box-shadow .14s ease;
+    }
+    .pr-opt:nth-child(4n+1) { --accent:#4f46e5; --g1:#3730a3; --g2:#4f46e5; }
+    .pr-opt:nth-child(4n+2) { --accent:#be123c; --g1:#9f1239; --g2:#be123c; }
+    .pr-opt:nth-child(4n+3) { --accent:#b45309; --g1:#92400e; --g2:#a16207; }
+    .pr-opt:nth-child(4n+4) { --accent:#7c3aed; --g1:#5b21b6; --g2:#7c3aed; }
+    .pr-opt b { color: var(--accent); font-weight: 800; }
+    .pr-opt:hover { transform: translateX(3px); box-shadow: 0 6px 16px rgba(0,0,0,.12); }
+    .pr-opt.sel {
+      border-left-color: transparent; color: #fff; font-weight: 700;
+      background: linear-gradient(135deg, var(--g1), var(--g2)) !important;
+      border-color: transparent; box-shadow: 0 10px 24px rgba(0,0,0,.22);
+      animation: pr-pop .22s ease;
+    }
+    .pr-opt.sel b { color: #fff; }
+    .pr-opt.sel input { accent-color: #fff; }
+    @keyframes pr-pop { 0% { transform: scale(1); } 55% { transform: scale(1.03); } 100% { transform: scale(1); } }
+    @media (prefers-reduced-motion: reduce) {
+      .pr-opt, .pr-opt.sel { transition: none; animation: none; }
+      .pr-opt:hover { transform: none; }
+    }
   </style>
 </head>
 <body>

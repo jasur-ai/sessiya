@@ -91,6 +91,19 @@
     .sr-start:hover{background:var(--deborah-semantic-color-status-success);border-color:var(--deborah-semantic-color-status-success);color:#fff;}
 
     @media(max-width:600px){.tc-actions{flex-wrap:wrap;}}
+    /* ── 09/2026: reklama-uslub jonli tugmalar (Cast qilish / Sinab ko'rish) ── */
+    .act-cast, .act-sinov { position: relative; overflow: hidden; border: 0 !important; color: #fff !important;
+      font-weight: 800 !important; text-shadow: 0 1px 2px rgba(0,0,0,.28); background-image: none !important;
+      box-shadow: 0 6px 18px rgba(0,0,0,.22); transition: transform .16s ease, box-shadow .16s ease, filter .16s ease; }
+    .act-cast { background: linear-gradient(135deg,#4f46e5 0%,#6d28d9 55%,#be123c 100%) !important; }
+    .act-sinov { background: linear-gradient(135deg,#c2410c 0%,#be123c 60%,#9f1239 100%) !important; }
+    .act-cast:hover, .act-sinov:hover { transform: translateY(-2px) scale(1.03); filter: brightness(1.08); box-shadow: 0 10px 26px rgba(0,0,0,.32); }
+    .act-cast:active, .act-sinov:active { transform: translateY(0) scale(.99); }
+    .act-cast::after, .act-sinov::after { content: ''; position: absolute; top: 0; left: -80%; width: 50%; height: 100%;
+      background: linear-gradient(105deg, transparent, rgba(255,255,255,.38), transparent); transform: skewX(-20deg);
+      transition: left .45s ease; pointer-events: none; }
+    .act-cast:hover::after, .act-sinov:hover::after { left: 135%; }
+    @media (prefers-reduced-motion: reduce) { .act-cast, .act-sinov { transition: none; } .act-cast::after, .act-sinov::after { display: none; } }
   </style>
 </head>
 <body>
@@ -200,8 +213,8 @@
           <p class="ws-resume-meta"><%= __pf('rsMeta.qcount', tests[0].count) %></p>
         </div>
         <div class="ws-resume-actions">
-          <button type="button" class="btn btn-primary" data-source="user" data-key="<%= tests[0].key %>"><%- icon('gamepad', 15) %> <span data-i18n="ws.cast"><%= __p('ws.cast') %></span></button>
-          <button type="button" class="btn btn-quiet" data-start-sinov data-name="<%= tests[0].name.replace(/'/g, "\\'") %>" data-count="<%= tests[0].count %>" data-url="/user/practice?source=user&key=<%= tests[0].key %>"><%- icon('zap', 15) %> <span><%= __p('act.practice') %></span></button>
+          <button type="button" class="btn act-cast" data-source="user" data-key="<%= tests[0].key %>"><%- icon('gamepad', 15) %> <span data-i18n="ws.cast"><%= __p('ws.cast') %></span></button>
+          <button type="button" class="btn act-sinov" data-start-sinov data-name="<%= tests[0].name.replace(/'/g, "\\'") %>" data-count="<%= tests[0].count %>" data-url="/user/practice?source=user&key=<%= tests[0].key %>"><%- icon('zap', 15) %> <span><%= __p('act.practice') %></span></button>
         </div>
       </div>
     <% } else { %>
@@ -301,7 +314,8 @@
             <span class="ws-vis ws-vis--<%= t.isPublic ? 'public' : 'private' %>" title="<%= t.isPublic ? __p('vis.pubTitle') : __p('vis.privTitle') %>">
               <%- icon(t.isPublic ? 'globe' : 'shield', 12) %> <%= t.isPublic ? __p('vis.public') : __p('vis.private') %>
             </span>
-            <button type="button" class="btn btn-primary btn-sm" data-source="user" data-key="<%= t.key %>"><%- icon('gamepad', 14) %> <%= __p('ws.cast') %></button>
+            <button type="button" class="btn act-cast btn-sm" data-source="user" data-key="<%= t.key %>"><%- icon('gamepad', 14) %> <%= __p('ws.cast') %></button>
+            <button type="button" class="btn act-sinov btn-sm" data-start-sinov data-name="<%= t.name.replace(/'/g, "\\'") %>" data-count="<%= t.count %>" data-url="/user/practice?source=user&key=<%= t.key %>"><%- icon('zap', 14) %> <%= __p('act.practice') %></button>
             <div class="ws-lib-overflow-wrap">
               <button type="button" class="ws-lib-overflow-btn" aria-haspopup="menu" aria-expanded="false" aria-label="<%= __p('aria.rowActs').split('{name}').join(t.name) %>" data-overflow="<%= t.key %>"><%- icon('more', 18) %></button>
               <div class="ws-lib-menu" role="menu" data-menu="<%= t.key %>">
@@ -349,7 +363,7 @@
       </div>
       <div class="modal-actions">
         <button class="modal-btn modal-btn-secondary" data-act="close"><span data-i18n="mod.cancel"><%= __p('mod.cancel') %></span></button>
-        <button class="modal-btn modal-btn-primary" data-act="start"><span data-i18n="mod.start"><%= __p('mod.start') %></span></button>
+        <button class="modal-btn modal-btn-primary act-sinov" data-act="start"><span data-i18n="mod.start"><%= __p('mod.start') %></span></button>
       </div>
     </div>
   </div>

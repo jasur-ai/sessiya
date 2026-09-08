@@ -2,7 +2,9 @@
  * Deborah — Portfolio Routes (AUTH A-12)
  * -------------------------------------
  * Student evidence portfolio backed by the local DB (fb):
- *   - GET    /user/portfolio                   — portfolio UI (4-til)
+ *   (09/2026: end-user portfolio UI sahifasi foydalanuvchi qarori bilan
+ *    olib tashlandi — /user/portfolio 404 qaytaradi; API/share/export
+ *    quyida saqlanadi.)
  *   - GET    /api/user/portfolio               — my items
  *   - POST   /api/user/portfolio/items         — add evidence (default-private)
  *   - PATCH  /api/user/portfolio/items/:id     — set visibility (owner-only)
@@ -38,7 +40,7 @@ import {
   buildUserTranscriptPdf,
 } from '../src/modules/portfolio/index.js';
 import { PortfolioImportError, SUPPORTED_EXTENSIONS, MAX_FILE_BYTES } from '../src/modules/portfolio/index.js';
-import { catalogFor, resolveLocale } from '../src/modules/portfolio/index.js';
+import { resolveLocale } from '../src/modules/portfolio/index.js';
 
 const router = Router();
 
@@ -88,27 +90,9 @@ function localeFrom(req) {
   return resolveLocale(req.query.lang || req.cookies?.lang || req.session?.lang || 'uz-Latn');
 }
 
-/** GET /user/portfolio — portfolio UI (locale: settings/lang > query/cookie). */
-router.get('/user/portfolio', requireAuth, async (req, res) => {
-  const userId = uid(req);
-  let sLang = null;
-  try {
-    const { fb } = await import('../firebase/admin.js');
-    const snap = await fb.get(`users/${userId}/settings/lang`);
-    if (snap.exists() && snap.val()) sLang = snap.val();
-  } catch (_) { /* fail-soft */ }
-  const locale = resolveLocale(req.query.lang || sLang || 'uz-Latn');
-  const ui = catalogFor(locale);
-  const { portfolio, items } = await listItems({ userId });
-  res.render('user/portfolio', {
-    title: ui.title,
-    user: req.session.user,
-    portfolio,
-    items,
-    ui,
-    locale,
-    csrfToken: res.locals.csrfToken,
-  });
+/** GET /user/portfolio — 09/2026: UI sahifasi olib tashlangan (foydalanuvchi qarori). */
+router.get('/user/portfolio', requireAuth, (req, res) => {
+  res.status(404).send('Portfolio sahifasi olib tashlandi');
 });
 
 /** GET /api/user/portfolio — my items. */

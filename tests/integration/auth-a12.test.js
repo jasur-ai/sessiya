@@ -67,11 +67,11 @@ async function registerAndLogin() {
   return { username: uname, cookie: sessionCookie };
 }
 
-/** Portfolio page'dan CSRF token + cookie. */
+/** 09/2026: portfolio UI sahifasi olib tashlangan — CSRF authed panel'dan olinadi. */
 async function portfolioSession(cookie) {
-  const res = await fetch(`${serverUrl}/user/portfolio`, { headers: { cookie } });
+  const res = await fetch(`${serverUrl}/user/panel`, { headers: { cookie } });
   const html = await res.text();
-  const m = html.match(/const CSRF = '([^']*)'/);
+  const m = html.match(/name="_csrf" value="([^"]+)"/);
   return { csrf: m ? m[1] : '', cookie };
 }
 

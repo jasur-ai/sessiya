@@ -759,3 +759,100 @@ html[data-theme="light"] .tb-shell {
 #tb-q-editor .tb-field-label { font-size: .78rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; color: var(--tb-label); }
 #tb-q-editor textarea.inp { min-height: 96px; font-size: 1.08rem; }
 
+
+/* ═══════════════════════════════════════════════════════════════
+   09/2026 — Excel import UX: karta-preview, jonli dublikat
+   ogohlantirishi, drag'da is-drag holati, light-temada oq emas
+   ═══════════════════════════════════════════════════════════════ */
+/* Import zonasi — drag ustida */
+.tb-import-zone.is-drag {
+  border-color: var(--deborah-semantic-color-action-primary) !important;
+  background: var(--deborah-semantic-color-action-primary-soft, rgba(37,94,219,.10)) !important;
+  transform: scale(1.012);
+  box-shadow: 0 8px 24px rgba(0,0,0,.10);
+}
+.tb-import-zone { transition: border-color 140ms ease, background-color 140ms ease, transform 140ms ease, box-shadow 140ms ease; }
+
+/* Preview — jadval emas, karta ko'rinishi */
+.tb-import-preview { padding: 8px; }
+.tb-ip-list { display: flex; flex-direction: column; gap: 10px; }
+.tb-ip-card {
+  border: 1px solid var(--deborah-semantic-color-border-subtle);
+  background: var(--deborah-semantic-color-surface-raised);
+  border-radius: var(--deborah-radius-md, 12px);
+  padding: 10px 12px;
+}
+.tb-ip-q { display: flex; align-items: flex-start; gap: 8px; font-weight: 700; font-size: .88rem; }
+.tb-ip-num {
+  flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--deborah-semantic-color-action-primary-soft, rgba(37,94,219,.14));
+  color: var(--deborah-semantic-color-action-primary);
+  font-size: .72rem; font-weight: 800;
+}
+.tb-ip-q-txt { line-height: 1.35; }
+.tb-ip-opts { list-style: none; margin: 8px 0 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.tb-ip-opt {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-radius: 10px;
+  background: var(--deborah-semantic-color-surface-nested);
+  border: 1.5px solid transparent;
+  font-size: .8rem; font-weight: 600;
+}
+.tb-ip-opt-letter {
+  flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--deborah-semantic-color-text-muted);
+  color: #fff; font-size: .68rem; font-weight: 800;
+}
+.tb-ip-opt.is-correct { border-color: var(--deborah-semantic-color-status-success); background: color-mix(in srgb, var(--deborah-semantic-color-status-success) 10%, transparent); }
+.tb-ip-opt.is-correct .tb-ip-opt-letter { background: var(--deborah-semantic-color-status-success); }
+.tb-ip-exp { margin-top: 6px; font-size: .76rem; font-weight: 600; color: var(--deborah-semantic-color-text-muted); }
+.tb-ip-errors {
+  margin-top: 2px; border: 1px solid var(--deborah-semantic-color-status-danger);
+  background: var(--deborah-semantic-color-status-danger-soft, rgba(239,68,68,.08));
+  border-radius: var(--deborah-radius-md, 12px);
+  padding: 8px 12px;
+}
+.tb-ip-errors-title { color: var(--deborah-semantic-color-status-danger); font-weight: 800; font-size: .8rem; }
+.tb-ip-errors ul { margin: 4px 0 0; padding-left: 18px; }
+.tb-ip-errors li { font-size: .78rem; font-weight: 600; color: var(--deborah-semantic-color-status-danger); padding: 1px 0; }
+.tb-ip-empty { padding: 22px 12px; text-align: center; font-weight: 700; color: var(--deborah-semantic-color-text-muted); }
+@media (max-width: 560px) { .tb-ip-opts { grid-template-columns: 1fr; } }
+
+/* Dublikat variant karta — jonli belgilash */
+.tb-opt.is-dup { border-color: var(--deborah-semantic-color-status-danger) !important; box-shadow: 0 0 0 1px var(--deborah-semantic-color-status-danger); }
+.tb-dup-warn {
+  display: flex; align-items: center; gap: 8px;
+  margin: 6px 0 10px; padding: 9px 12px;
+  border: 1.5px solid #eab308;
+  border-radius: var(--deborah-radius-sm, 10px);
+  background: color-mix(in srgb, #eab308 12%, transparent);
+  font-size: .82rem; font-weight: 700;
+  color: #a16207;
+}
+.tb-dup-warn[hidden] { display: none; }
+[data-theme="dark"] .tb-dup-warn,
+[data-resolved-theme="dark"] .tb-dup-warn { color: #fde68a; border-color: rgba(250,204,21,.65); background: rgba(250,204,21,.10); }
+.tb-dup-warn-ico { color: #ca8a04; }
+[data-theme="dark"] .tb-dup-warn-ico,
+[data-resolved-theme="dark"] .tb-dup-warn-ico { color: #facc15; }
+
+/* Ogohlantirishlar to'plami — oq emas, aniq rangli */
+.tb-err-summary { background: #fde8dd !important; border: 2px solid #e07b39 !important; }
+.tb-err-summary .tb-err-summary-title { color: #9a3412 !important; }
+.tb-err-summary-list li { color: #7c2d12 !important; }
+[data-theme="dark"] .tb-err-summary,
+[data-resolved-theme="dark"] .tb-err-summary { background: rgba(220,38,38,.16) !important; border-color: #ef4444 !important; }
+[data-theme="dark"] .tb-err-summary .tb-err-summary-title,
+[data-resolved-theme="dark"] .tb-err-summary .tb-err-summary-title { color: #fca5a5 !important; }
+[data-theme="dark"] .tb-err-summary-list li,
+[data-resolved-theme="dark"] .tb-err-summary-list li { color: #fecaca !important; }
+
+/* Light-tema: ish maydoni tepasi sof oq emas — iliq yorug'lik */
+[data-resolved-theme="light"] .tb-shell,
+[data-theme="light"] .tb-shell {
+  background:
+    radial-gradient(1100px 320px at 50% -80px, rgba(214,166,72,.20), transparent 72%),
+    var(--deborah-semantic-color-surface-default);
+}

@@ -156,8 +156,46 @@
       if (filled.length && q.correct >= q.options.length) {
         errors.push({ qId: q.id, msg: `${T('qText', 'Savol')} ${i + 1}: ${T('correct', 'to\u2018g\u2018ri javob')} xato` });
       }
+      const dupIdx = dupIndexes(q.options);
+      if (dupIdx.length) {
+        const names = dupIdx.map(oi => `\u201C${q.options[oi].trim()}\u201D`).join(', ');
+        errors.push({ qId: q.id, msg: `${T('qText', 'Savol')} ${i + 1}: ${T('dupOptions', 'bir xil variantlar mumkin emas: {v}').split('{v}').join(names)}` });
+      }
     });
     return errors;
+  }
+
+  // Bir xil variant indekslari (bo'sh emas, katta-kichik harf farqisiz)
+  function dupIndexes(options) {
+    const seen = new Map();
+    (options || []).forEach((o, oi) => {
+      const v = String(o || '').trim().toLowerCase();
+      if (!v) return;
+      if (!seen.has(v)) seen.set(v, []);
+      seen.get(v).push(oi);
+    });
+    const out = [];
+    for (const idxs of seen.values()) if (idxs.length > 1) out.push(...idxs);
+    return out;
+  }
+
+  // Aktual (faol) savol variantlari ichida bir xillarni jonli belgilaydi
+  function updateDupWarn(q) {
+    const warn = $('#tb-dup-warn');
+    if (!warn || !q || q.type === 'short_answer') return;
+    const idxs = dupIndexes(q.options);
+    const txt = $('#tb-dup-warn-txt');
+    if (idxs.length) {
+      const names = [...new Set(idxs.map(oi => q.options[oi].trim()))].map(n => `\u201C${escHtml(n)}\u201D`).join(', ');
+      if (txt) txt.textContent = T('dupOptions', 'bir xil variantlar mumkin emas: {v}').split('{v}').join(names);
+      warn.hidden = false;
+    } else {
+      warn.hidden = true;
+    }
+    $$('[data-opt-card]').forEach(card => {
+      const oi = parseInt(card.dataset.optCard, 10);
+      card.classList.toggle('is-dup', idxs.includes(oi));
+    });
   }
 
   function renderErrors() {
@@ -295,6 +333,7 @@
           </div>
         </div>
 
+        <div class="tb-dup-warn" id="tb-dup-warn" role="alert" hidden><span class="tb-dup-warn-ico">⚠</span><span id="tb-dup-warn-txt"></span></div>
         <div class="tb-field">
           <span class="tb-hint" data-correct-hint>${T('correctHint', "✓ To'g'ri javob: variant kartasini bosib belgilanadi (yashil halqa)")}</span>
         </div>
@@ -357,6 +396,7 @@
         q.options[oi] = inp.value;
         markDirty();
         renderErrors();
+        updateDupWarn(q);
       });
     });
 
@@ -438,6 +478,7 @@
         });
       });
     }
+    updateDupWarn(q);
   }
 
   // ── Question ops ──
@@ -588,9 +629,9 @@
     const input = $('#tb-import-input');
     zone.addEventListener('click', () => input.click());
     zone.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); } });
-    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.style.borderColor = 'var(--deborah-semantic-color-action-primary)'; });
-    zone.addEventListener('dragleave', () => { zone.style.borderColor = ''; });
-    zone.addEventListener('drop', (e) => { e.preventDefault(); zone.style.borderColor = ''; const f = e.dataTransfer.files[0]; f && parseExcel(f); });
+    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('is-drag'); });
+    zone.addEventListener('dragleave', () => { zone.classList.remove('is-drag'); });
+    zone.addEventListener('drop', (e) => { e.preventDefault(); zone.classList.remove('is-drag'); const f = e.dataTransfer.files[0]; f && parseExcel(f); });
     input.addEventListener('change', () => { const f = input.files[0]; f && parseExcel(f); });
 
     $('#tb-template-btn').addEventListener('click', downloadTemplate);
@@ -635,14 +676,21 @@
         const rowErrors = [];
         for (let i = 1; i < rows.length; i++) {
           const r = rows[i];
-          if (!r || !r[0]) continue;
+          if (!r) continue;
           const text = String(r[0] || '').trim();
+          const emptyRow = !text && !String(r[1] || '').trim() && !String(r[2] || '').trim() && !String(r[3] || '').trim() && !String(r[4] || '').trim();
+          if (emptyRow) continue; // bo'sh qator — shunchaki o'tkazib yuboriladi
           const opts = [String(r[1] || '').trim(), String(r[2] || '').trim(), String(r[3] || '').trim(), String(r[4] || '').trim()];
           const correctIdx = parseInt(r[5], 10);
+          const explanation = String(r[6] || '').trim();
           if (!text) { rowErrors.push({ row: i + 1, msg: T('impRowNoText', 'Savol matni bosh') }); continue; }
           if (opts.filter(Boolean).length < 2) { rowErrors.push({ row: i + 1, msg: T('impRowMinOpt', 'Kamida 2 variant') }); continue; }
           if (isNaN(correctIdx) || correctIdx < 0 || correctIdx > 3) { rowErrors.push({ row: i + 1, msg: T('impRowIdx', "To'g'ri javob 0-3 oralig'ida") }); continue; }
-          parsed.push({ text, options: opts, correct: correctIdx });
+          // bir xil variantlar (import'da ham) — ogohlantirish
+          const seen = new Set(); const dups = [];
+          opts.forEach((o) => { const k = o.toLowerCase(); if (o && seen.has(k) && !dups.includes(o)) dups.push(o); seen.add(k); });
+          if (dups.length) { rowErrors.push({ row: i + 1, msg: T('impRowDup', 'Bir xil variantlar: {v}').split('{v}').join(dups.join(', ')) }); continue; }
+          parsed.push({ text, options: opts, correct: correctIdx, explanation });
         }
         importData = parsed;
         renderPreview(parsed, rowErrors);
@@ -660,34 +708,50 @@
   function renderPreview(parsed, rowErrors) {
     const wrap = $('#tb-import-preview');
     if (!wrap) return;
-    if (!parsed.length && !rowErrors.length) { wrap.innerHTML = '<div class="ws-lib-empty">' + T('impNoRows', 'Faylda savol topilmadi') + '</div>'; return; }
-    const head = '<table><thead><tr><th>#</th><th>' + T('impThQ', 'Savol') + '</th><th>A</th><th>B</th><th>C</th><th>D</th><th>' + T('impThCorrect', "To'g'ri") + '</th></tr></thead><tbody>';
-    const rows = parsed.map((p, i) => `<tr>
-      <td>${i + 1}</td><td>${escHtml(p.text.slice(0, 40))}</td>
-      ${p.options.map(o => `<td>${escHtml(o.slice(0, 16))}</td>`).join('')}
-      <td>${OPT_LETTERS[p.correct]}</td></tr>`).join('');
-    const errs = rowErrors.map(e => `<tr><td class="is-error" colspan="7">${T('impRowLabel', 'Qator {n}').split('{n}').join(e.row)}: ${escHtml(e.msg)}</td></tr>`).join('');
-    wrap.innerHTML = head + rows + errs + '</tbody></table>';
+    if (!parsed.length && !rowErrors.length) { wrap.innerHTML = '<div class="tb-ip-empty">' + T('impNoRows', 'Faylda savol topilmadi') + '</div>'; return; }
+    // Karta ko'rinishi: har savol o'z kartasida; to'g'ri variant yashil halqa, xato qatorlar alohida
+    const cards = parsed.map((p, i) => {
+      const opts = p.options.map((o, oi) => {
+        const cls = oi === p.correct ? ' is-correct' : '';
+        const letter = p.correct === oi ? '✓' : OPT_LETTERS[oi];
+        return `<li class="tb-ip-opt${cls}"><span class="tb-ip-opt-letter">${letter}</span><span class="tb-ip-opt-txt">${escHtml(o)}</span></li>`;
+      }).join('');
+      const exp = p.explanation ? `<div class="tb-ip-exp">${T('impExplainTag', 'Izoh')}: ${escHtml(p.explanation)}</div>` : '';
+      return `<div class="tb-ip-card">
+        <div class="tb-ip-q"><span class="tb-ip-num">${i + 1}</span><span class="tb-ip-q-txt">${escHtml(p.text)}</span></div>
+        <ul class="tb-ip-opts">${opts}</ul>${exp}
+      </div>`;
+    }).join('');
+    const errs = rowErrors.length ? `<div class="tb-ip-errors" role="alert"><div class="tb-ip-errors-title">${T('impErrTitle', 'Xato qatorlar')}:</div><ul>${rowErrors.map(e => `<li>${T('impRowLabel', 'Qator {n}').split('{n}').join(e.row)}: ${escHtml(e.msg)}</li>`).join('')}</ul></div>` : '';
+    wrap.innerHTML = `<div class="tb-ip-list">${cards}${errs}</div>`;
   }
 
   function confirmImport() {
     if (!importData || !importData.length) return;
+    const firstIdx = state.questions.length;
     importData.forEach(q => state.questions.push(normalize(q)));
     state.activeId = state.questions[state.questions.length - 1].id;
-    markDirty();
-    $('#tb-import-done-txt').textContent = `${importData.length} ${T('impDoneCount', "ta savol qo'shildi")}`;
+    // Darhol ko'rinadigan natija: ro'yxat + editor yangilanadi, so'ng tez saqlash
+    render();
+    renderErrors();
+    manualSave().catch(() => {});
+    if (firstIdx === 0) focusQuestionText();
+    $('#tb-import-done-txt').textContent = `${importData.length} ${T('impDoneCount', "ta savol qo'shildi va saqlandi")}`;
     goPane(4);
   }
 
   function downloadTemplate() {
     if (typeof XLSX === 'undefined') { showToast && showToast(T('impXlsxShort', 'XLSX kutubxonasi yuklanmadi'), 'err'); return; }
     const wb = XLSX.utils.book_new();
-    const tplHead = T('impSheetHeader', ['Savol', 'Variant A', 'Variant B', 'Variant C', 'Variant D', "To'g'ri javob (0-3)"]);
-    const data = [
-      tplHead,
-      ['1+1=?', '1', '2', '3', '4', 1],
-      ['2+2=?', '3', '4', '5', '6', 1],
-    ];
+    const tplHead = T('impSheetHeader', ['Savol', 'Variant A', 'Variant B', 'Variant C', 'Variant D', "To'g'ri javob (0-3)", 'Izoh (ixtiyoriy)']);
+    const samples = T('impSamples', [
+      ['O\'zbekiston poytaxti qaysi shahar?', 'Toshkent', 'Samarqand', 'Buxoro', 'Andijon', 0, 'Geografiya — poytaxtlar'],
+      ['2 + 3 × 4 nechaga teng?', '20', '14', '24', '12', 1, 'Amallar tartibi: birinchi ko\'paytirish'],
+      ['Quyosh tizimidagi eng katta sayyora qaysi?', 'Saturn', 'Yer', 'Yupiter', 'Mars', 2, 'Yupiter — eng katta gaz giganti'],
+      ['9 ning kvadrati nechaga teng?', '18', '81', '27', '90', 1, '9 × 9 = 81'],
+      ['Kvadratning barcha tomonlari...', 'har xil', 'teng', 'juft', 'qisqa', 1, 'Kvadrat — hamma tomoni teng'],
+    ]);
+    const data = [tplHead].concat(samples);
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), T('impSheetName', 'Savollar'));
     XLSX.writeFile(wb, 'deborah-template.xlsx');
   }

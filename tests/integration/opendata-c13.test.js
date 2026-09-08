@@ -99,13 +99,15 @@ describe('AUTH C-13 — diplom.edu.uz tekshiruv (P3, client-side)', () => {
     expect(loc).toBe('https://diplom.edu.uz');
   });
 
-  it('portfolio sahifasi diplom kartasini ko\'rsatadi (4 til copy key bor)', async () => {
+  it('09/2026: portfolio UI sahifasi olib tashlangan — /user/portfolio 404 (API saqlanadi)', async () => {
     const { cookie } = await registerAndLogin();
     const res = await fetch(`${serverUrl}/user/portfolio`, { headers: { cookie } });
-    expect(res.status).toBe(200);
-    const html = await res.text();
-    expect(html).toMatch(/diplomaTitle|btnDiplomaCheck|diplom\.edu\.uz/i);
-    // SSRF yo'q: sahifa hech qanday server-side fetch endpoint'iga ega emas
-    expect(html).not.toMatch(/fetch\(['"]https?:\/\/(?!diplom)/);
+    expect(res.status).toBe(404);
+    // API (diploma-check) ishlashda davom etadi
+    const apiRes = await fetch(`${serverUrl}/api/user/portfolio/diploma-check`, {
+      headers: { cookie },
+      redirect: 'manual',
+    });
+    expect(apiRes.status).toBe(302);
   });
 });

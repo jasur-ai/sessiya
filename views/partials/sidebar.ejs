@@ -129,10 +129,10 @@ const _nT = (k, fb) => {
       <a href="/user/create-test" class="shell-nav-link"><span class="shell-nav-ico"><%- icon('plus', 16) %></span><span><%= _st('newTest', 'Yangi test') %></span></a>
       <a href="/user/ai-studio" class="shell-nav-link"><span class="shell-nav-ico"><%- icon('sparkles', 16) %></span><span>AI Studiya</span></a>
     <% } else if (_role === 'student') { %>
-      <div class="shell-nav-sec"><%= _st('roleStudent', 'Talaba') %></div>
-      <a href="/user/panel" class="shell-nav-link<%= _active === 'panel' ? ' active' : '' %>"><span class="shell-nav-ico"><%- icon('grid', 16) %></span><span><%= _st('myPanel', 'Panelim') %></span></a>
-      <a href="/user/portfolio" class="shell-nav-link"><span class="shell-nav-ico"><%- icon('award', 16) %></span><span><%= _st('portfolio', 'Portfolio') %></span></a>
-      <a href="/user/security-profile" class="shell-nav-link"><span class="shell-nav-ico"><%- icon('shieldCheck', 16) %></span><span><%= _st('security', 'Xavfsizlik') %></span></a>
+      <% /* 09/2026: Portfolio bo'limi olib tashlandi (foydalanuvchi qarori).
+             'Ish maydoni' bo'limi ichida workspace (Panelim) turadi; Xavfsizlik Akkaunt'ga o'tdi. */ %>
+      <div class="shell-nav-sec">Ish maydoni</div>
+      <a href="/user/panel" class="shell-nav-link<%= _active === 'panel' ? ' active' : '' %>"><span class="shell-nav-ico"><%- icon('grid', 16) %></span><span><%= _st('myPanel', 'Ish maydonim') %></span></a>
     <% } else if (_role === 'proctor') { %>
       <div class="shell-nav-sec"><%= _st('roleProctor', 'Proktor') %></div>
       <a href="/proctor" class="shell-nav-link<%= _active === 'monitor' ? ' active' : '' %>"><span class="shell-nav-ico"><%- icon('monitor', 16) %></span><span><%= _st('liveMonitor', 'Jonli monitoring') %></span></a>
@@ -151,6 +151,7 @@ const _nT = (k, fb) => {
     <% } %>
     <div class="shell-nav-sec"><%= _st('secAccount', 'Akkaunt') %></div>
     <a href="/user/profile" class="shell-nav-link<%= _isActive('/user/profile') ? ' active' : '' %>"><span class="shell-nav-ico"><%- icon('user', 16) %></span><span><%= _st('myProfile', 'Profilim') %></span></a>
+    <% if (_role === 'student') { %><a href="/user/security-profile" class="shell-nav-link<%= _isActive('/user/security-profile') ? ' active' : '' %>"><span class="shell-nav-ico"><%- icon('shieldCheck', 16) %></span><span><%= _st('security', 'Xavfsizlik') %></span></a><% } %>
     <% // BUG-037: doim ko'rinadigan Chiqish — POST + CSRF (BUG-032), dropdown ochilmasdan ham ├── %>
     <form method="post" action="/user/logout" style="margin:0;display:block;width:100%">
       <input type="hidden" name="_csrf" value="<%= typeof csrfToken !== 'undefined' ? csrfToken : '' %>">

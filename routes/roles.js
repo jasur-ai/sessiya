@@ -118,7 +118,7 @@ router.get('/teacher', requireRole('teacher'), async (req, res) => {
   }));
 });
 
-// ── Student Workspace (assignments / portfolio — Kalendar olib tashlangan, 09/2026) ──
+// ── Student Workspace (Portfolio bo'limi olib tashlangan, 09/2026) ──
 router.get('/student', requireRole('student'), async (req, res) => {
   const role = 'student';
   const ctx = await langCtx(req);
