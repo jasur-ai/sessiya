@@ -856,3 +856,332 @@ html[data-theme="light"] .tb-shell {
     radial-gradient(1100px 320px at 50% -80px, rgba(214,166,72,.20), transparent 72%),
     var(--deborah-semantic-color-surface-default);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   09/2026 (user qarori) — YAKUNIY POLISH:
+   • "Diqqat talab qiladigan maydonlar" — issiq jigarrang/amber (qizil EMAS,
+     dark rejimda ham ko'z qamashtirmaydi);
+   • Excel import — haqiqiy dialog + bitta oddiy panel (bosqichlar yo'q),
+     builderning oltin-jigarrang tilida, light/dark uchun alohida.
+   Bu blok fayl oxirida — kaskadda ustun.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── 1. Xato xulosasi: issiq jigarrang palitra ── */
+.tb-err-summary {
+  background: #f9f0df !important;
+  border: 2px solid #c9943f !important;
+  border-radius: 14px !important;
+  color: #6d4c1c !important;
+}
+.tb-err-summary .tb-err-summary-title {
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  color: #8a5a1e !important;
+}
+.tb-err-summary .tb-err-summary-title .icon-inline { color: #c9943f; }
+.tb-err-summary .tb-err-summary-list li { color: #6d4c1c !important; }
+.tb-err-summary .tb-err-summary-list li::before { color: #c9943f !important; }
+[data-theme="dark"] .tb-err-summary,
+[data-resolved-theme="dark"] .tb-err-summary,
+html:not([data-theme="light"]):not([data-resolved-theme="light"]) .tb-err-summary {
+  background: rgba(201,148,63,.10) !important;
+  border-color: rgba(214,189,140,.45) !important;
+  color: #e6c687 !important;
+}
+[data-theme="dark"] .tb-err-summary .tb-err-summary-title,
+[data-resolved-theme="dark"] .tb-err-summary .tb-err-summary-title,
+html:not([data-theme="light"]):not([data-resolved-theme="light"]) .tb-err-summary .tb-err-summary-title {
+  color: #ecd0a0 !important;
+}
+[data-theme="dark"] .tb-err-summary .tb-err-summary-list li,
+[data-resolved-theme="dark"] .tb-err-summary .tb-err-summary-list li,
+html:not([data-theme="light"]):not([data-resolved-theme="light"]) .tb-err-summary .tb-err-summary-list li {
+  color: #d8c49b !important;
+}
+[data-theme="dark"] .tb-err-summary .tb-err-summary-list li::before,
+[data-resolved-theme="dark"] .tb-err-summary .tb-err-summary-list li::before,
+html:not([data-theme="light"]):not([data-resolved-theme="light"]) .tb-err-summary .tb-err-summary-list li::before {
+  color: #d6b26e !important;
+}
+/* Qolgan qizil qoldiqlar — issiq jigarrangga */
+.tb-outline-item.is-invalid { border-color: var(--k-red, #b0522d) !important; }
+.tb-status[data-save="error"] { color: var(--k-red, #b0522d) !important; }
+.tb-opt.is-dup { border-color: #c9943f !important; box-shadow: 0 0 0 1px #c9943f !important; }
+.tb-dup-warn {
+  border-color: #c9943f !important;
+  background: rgba(201,148,63,.12) !important;
+  color: #8a5a1e !important;
+}
+.tb-dup-warn .tb-dup-warn-ico { color: #c9943f !important; }
+[data-theme="dark"] .tb-dup-warn,
+[data-resolved-theme="dark"] .tb-dup-warn,
+html:not([data-theme="light"]):not([data-resolved-theme="light"]) .tb-dup-warn {
+  border-color: rgba(214,189,140,.5) !important;
+  background: rgba(214,189,140,.10) !important;
+  color: #e6c687 !important;
+}
+[data-theme="dark"] .tb-dup-warn .tb-dup-warn-ico,
+[data-resolved-theme="dark"] .tb-dup-warn .tb-dup-warn-ico,
+html:not([data-theme="light"]):not([data-resolved-theme="light"]) .tb-dup-warn .tb-dup-warn-ico {
+  color: #e2c27f !important;
+}
+
+/* ── 2. Import dialog — DARK (default) ── */
+.tb-import {
+  position: fixed; inset: 0; z-index: 220;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+  background: rgba(12,9,4,.66);
+  backdrop-filter: blur(7px);
+}
+.tb-import:not([hidden]) { display: flex; }
+.tb-import-dialog {
+  width: min(660px, 94vw);
+  max-height: min(88vh, 840px);
+  display: flex; flex-direction: column; overflow: hidden;
+  background: #231b10;
+  border: 1px solid rgba(214,189,140,.3);
+  border-radius: 20px;
+  box-shadow: 0 30px 90px rgba(0,0,0,.55);
+  color: #f2ede3;
+}
+.tb-import-hd {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 14px;
+  padding: 20px 22px 10px;
+}
+.tb-import-hd h2 {
+  margin: 0; font-size: 1.12rem; font-weight: 900; letter-spacing: .01em;
+  display: flex; align-items: center; gap: 9px; color: #f2ede3;
+}
+.tb-import-hd h2 .icon-inline { color: #e2c27f; }
+.tb-import-sub { margin: 6px 0 0; font-size: .82rem; line-height: 1.55; color: #b6a67e; font-weight: 600; max-width: 520px; }
+.tb-import-close {
+  appearance: none; flex-shrink: 0; width: 34px; height: 34px;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid rgba(214,189,140,.3); border-radius: 10px;
+  background: rgba(255,255,255,.05); color: #e9dfc8; cursor: pointer; transition: .15s ease;
+}
+.tb-import-close:hover { background: rgba(214,189,140,.16); color: #fff; }
+.tb-import-body {
+  padding: 8px 22px 0; min-height: 0; flex: 1;
+  display: flex; flex-direction: column;
+}
+.tb-import-stage { display: flex; flex-direction: column; gap: 12px; }
+.tb-import-stage[hidden] { display: none; }
+.tb-import-zone {
+  border: 2px dashed rgba(214,189,140,.45) !important;
+  border-radius: 16px !important;
+  padding: 32px 20px !important;
+  text-align: center; cursor: pointer;
+  background: rgba(214,189,140,.05) !important;
+  transition: border-color .15s ease, background-color .15s ease, transform .15s ease, box-shadow .15s ease;
+}
+.tb-import-zone:hover, .tb-import-zone:focus-visible {
+  border-color: #e2c27f !important;
+  background: rgba(214,189,140,.10) !important;
+  outline: none;
+}
+.tb-import-zone.is-drag {
+  border-color: #e2c27f !important;
+  background: rgba(226,194,127,.14) !important;
+  transform: scale(1.012);
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+.tb-import-zone .tb-import-ico { color: #e2c27f; display: inline-flex; margin-bottom: 4px; }
+.tb-import-zone p { margin: 0; font-size: .96rem; font-weight: 800; color: #f2ede3; }
+.tb-import-zone-sub {
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-top: 8px; font-size: .76rem; font-weight: 600; color: #b6a67e;
+}
+.tb-import-template {
+  align-self: center;
+  display: inline-flex; align-items: center; gap: 7px;
+  background: transparent; border: 1px dashed rgba(214,189,140,.4); border-radius: 999px;
+  color: #cdbb90; font-weight: 700; font-size: .8rem;
+  padding: 7px 14px; cursor: pointer; font-family: inherit; transition: .15s ease;
+}
+.tb-import-template:hover { border-color: #e2c27f; color: #f2ede3; background: rgba(214,189,140,.08); }
+.tb-import-msg {
+  font-size: .84rem; font-weight: 700; border-radius: 11px; padding: 9px 12px;
+  display: none; align-items: center; gap: 8px;
+}
+.tb-import-msg.is-open { display: flex; }
+.tb-import-msg.is-ok { background: rgba(125,150,112,.12); color: #a9c39c; border: 1px solid rgba(125,150,112,.42); }
+.tb-import-msg.is-err { background: rgba(224,162,92,.10); color: #e8bd8a; border: 1px solid rgba(224,162,92,.45); }
+.tb-import-preview {
+  max-height: min(42vh, 340px); overflow-y: auto;
+  border: 1px solid rgba(214,189,140,.22); border-radius: 14px; padding: 8px;
+  scrollbar-width: thin;
+}
+.tb-ip-card {
+  border: 1px solid rgba(214,189,140,.16);
+  background: rgba(255,255,255,.03);
+  border-radius: 12px; padding: 10px 12px; margin-bottom: 8px;
+}
+.tb-ip-card:last-child { margin-bottom: 0; }
+.tb-ip-q { display: flex; align-items: flex-start; gap: 8px; font-weight: 800; font-size: .86rem; line-height: 1.4; }
+.tb-ip-num {
+  flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(226,194,127,.18); color: #e2c27f;
+  font-size: .7rem; font-weight: 800;
+}
+.tb-ip-opt {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 9px; border-radius: 10px;
+  background: rgba(15,12,8,.4); border: 1px solid transparent;
+  font-size: .78rem; font-weight: 700;
+}
+.tb-ip-opt-letter {
+  flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(214,189,140,.25); color: #f2ede3; font-size: .66rem; font-weight: 800;
+}
+.tb-ip-opt.is-correct { border-color: rgba(125,150,112,.65); background: rgba(125,150,112,.12); }
+.tb-ip-opt.is-correct .tb-ip-opt-letter { background: #7d9670; color: #0d1f0a; }
+.tb-ip-exp { margin-top: 6px; font-size: .76rem; font-weight: 600; color: #b6a67e; }
+.tb-ip-errors {
+  border: 1px solid rgba(224,162,92,.5); background: rgba(224,162,92,.10);
+  border-radius: 12px; padding: 9px 12px; margin-top: 8px;
+}
+.tb-ip-errors-title { color: #e8bd8a; font-weight: 800; font-size: .8rem; }
+.tb-ip-errors ul { margin: 5px 0 0 18px; padding: 0; }
+.tb-ip-errors li { font-size: .78rem; font-weight: 600; color: #d9b98f; padding: 1px 0; }
+.tb-ip-empty { padding: 26px 12px; text-align: center; font-weight: 800; color: #b6a67e; }
+.tb-import-done {
+  display: flex; align-items: center; gap: 14px;
+  border-radius: 14px; padding: 18px;
+  background: rgba(125,150,112,.10); border: 1.5px solid rgba(125,150,112,.4);
+}
+.tb-import-done-ico { color: #7d9670; display: inline-flex; flex-shrink: 0; }
+.tb-import-done-title { font-weight: 900; font-size: 1rem; color: #a9c39c; }
+.tb-import-done-sub { font-size: .8rem; font-weight: 600; color: #b6a67e; margin-top: 3px; }
+.tb-import-actions {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 22px 20px; margin-top: 14px;
+  border-top: 1px solid rgba(214,189,140,.14);
+}
+.tb-import .btn-quiet {
+  background: rgba(255,255,255,.05) !important;
+  border: 1px solid rgba(214,189,140,.3) !important;
+  color: #e9dfc8 !important;
+}
+.tb-import .btn-quiet:hover { background: rgba(214,189,140,.14) !important; color: #fff !important; }
+.tb-import .btn-primary {
+  background: linear-gradient(120deg, var(--ld-gold, #c2a06a), var(--ld-gold2, #d6bd8c)) !important;
+  color: #141006 !important; border: none !important;
+  font-weight: 900 !important;
+  box-shadow: 0 6px 18px rgba(194,160,106,.35) !important;
+}
+.tb-import .btn-primary:hover:not(:disabled) { filter: brightness(1.06); transform: translateY(-1px); }
+.tb-import .btn-primary:disabled { opacity: .5; filter: grayscale(.35); box-shadow: none !important; cursor: not-allowed; }
+
+/* ── 3. Import dialog — LIGHT ── */
+html[data-theme="light"] .tb-import,
+html[data-resolved-theme="light"] .tb-import { background: rgba(78,58,26,.42); }
+html[data-theme="light"] .tb-import-dialog,
+html[data-resolved-theme="light"] .tb-import-dialog {
+  background: #fffdf6;
+  border-color: rgba(140,105,45,.3);
+  box-shadow: 0 26px 80px rgba(96,70,24,.28);
+  color: #2d2413;
+}
+html[data-theme="light"] .tb-import-hd h2,
+html[data-resolved-theme="light"] .tb-import-hd h2 { color: #2d2413; }
+html[data-theme="light"] .tb-import-hd h2 .icon-inline,
+html[data-resolved-theme="light"] .tb-import-hd h2 .icon-inline { color: #8a6a1f; }
+html[data-theme="light"] .tb-import-sub,
+html[data-resolved-theme="light"] .tb-import-sub { color: #7a6a44; }
+html[data-theme="light"] .tb-import-close,
+html[data-resolved-theme="light"] .tb-import-close {
+  border-color: rgba(122,90,30,.3); background: #f4ecda; color: #6d4c1c;
+}
+html[data-theme="light"] .tb-import-close:hover,
+html[data-resolved-theme="light"] .tb-import-close:hover { background: #eadfc6; }
+html[data-theme="light"] .tb-import-zone,
+html[data-resolved-theme="light"] .tb-import-zone {
+  border-color: #b99a63 !important; background: #faf4e5 !important;
+}
+html[data-theme="light"] .tb-import-zone:hover,
+html[data-resolved-theme="light"] .tb-import-zone:hover,
+html[data-theme="light"] .tb-import-zone:focus-visible,
+html[data-resolved-theme="light"] .tb-import-zone:focus-visible {
+  border-color: #8a6a1f !important; background: #f6ecd6 !important;
+}
+html[data-theme="light"] .tb-import-zone.is-drag,
+html[data-resolved-theme="light"] .tb-import-zone.is-drag {
+  border-color: #8a6a1f !important; background: #f3e6c8 !important;
+}
+html[data-theme="light"] .tb-import-zone p,
+html[data-resolved-theme="light"] .tb-import-zone p { color: #2d2413; }
+html[data-theme="light"] .tb-import-zone .tb-import-ico,
+html[data-resolved-theme="light"] .tb-import-zone .tb-import-ico { color: #8a6a1f; }
+html[data-theme="light"] .tb-import-zone-sub,
+html[data-resolved-theme="light"] .tb-import-zone-sub { color: #7a6a44; }
+html[data-theme="light"] .tb-import-template,
+html[data-resolved-theme="light"] .tb-import-template {
+  border-color: rgba(122,90,30,.35); color: #7a5a1e;
+}
+html[data-theme="light"] .tb-import-template:hover,
+html[data-resolved-theme="light"] .tb-import-template:hover {
+  border-color: #8a6a1f; background: #f6ecd6; color: #2d2413;
+}
+html[data-theme="light"] .tb-import-msg.is-ok,
+html[data-resolved-theme="light"] .tb-import-msg.is-ok {
+  background: rgba(85,122,74,.10); color: #557a4a; border-color: rgba(85,122,74,.4);
+}
+html[data-theme="light"] .tb-import-msg.is-err,
+html[data-resolved-theme="light"] .tb-import-msg.is-err {
+  background: rgba(166,92,30,.08); color: #96531a; border-color: rgba(166,92,30,.4);
+}
+html[data-theme="light"] .tb-import-preview,
+html[data-resolved-theme="light"] .tb-import-preview { border-color: rgba(122,90,30,.25); }
+html[data-theme="light"] .tb-ip-card,
+html[data-resolved-theme="light"] .tb-ip-card {
+  border-color: rgba(122,90,30,.16); background: #faf4e6;
+}
+html[data-theme="light"] .tb-ip-num,
+html[data-resolved-theme="light"] .tb-ip-num {
+  background: rgba(138,106,31,.14); color: #8a6a1f;
+}
+html[data-theme="light"] .tb-ip-opt,
+html[data-resolved-theme="light"] .tb-ip-opt { background: #f1e8d2; }
+html[data-theme="light"] .tb-ip-opt-letter,
+html[data-resolved-theme="light"] .tb-ip-opt-letter { background: #e0d2b0; color: #4a3b18; }
+html[data-theme="light"] .tb-ip-opt.is-correct,
+html[data-resolved-theme="light"] .tb-ip-opt.is-correct {
+  border-color: rgba(85,122,74,.7); background: rgba(85,122,74,.10);
+}
+html[data-theme="light"] .tb-ip-opt.is-correct .tb-ip-opt-letter,
+html[data-resolved-theme="light"] .tb-ip-opt.is-correct .tb-ip-opt-letter { background: #7d9670; color: #fff; }
+html[data-theme="light"] .tb-ip-exp,
+html[data-resolved-theme="light"] .tb-ip-exp,
+html[data-theme="light"] .tb-ip-empty,
+html[data-resolved-theme="light"] .tb-ip-empty { color: #7a6a44; }
+html[data-theme="light"] .tb-ip-errors,
+html[data-resolved-theme="light"] .tb-ip-errors {
+  border-color: rgba(166,92,30,.5); background: rgba(166,92,30,.08);
+}
+html[data-theme="light"] .tb-ip-errors-title,
+html[data-resolved-theme="light"] .tb-ip-errors-title { color: #96531a; }
+html[data-theme="light"] .tb-ip-errors li,
+html[data-resolved-theme="light"] .tb-ip-errors li { color: #7c4621; }
+html[data-theme="light"] .tb-import-done,
+html[data-resolved-theme="light"] .tb-import-done {
+  background: rgba(85,122,74,.08); border-color: rgba(85,122,74,.45);
+}
+html[data-theme="light"] .tb-import-done-title,
+html[data-resolved-theme="light"] .tb-import-done-title { color: #3f6b35; }
+html[data-theme="light"] .tb-import-done-sub,
+html[data-resolved-theme="light"] .tb-import-done-sub { color: #7a6a44; }
+html[data-theme="light"] .tb-import-actions,
+html[data-resolved-theme="light"] .tb-import-actions { border-top-color: rgba(122,90,30,.16); }
+html[data-theme="light"] .tb-import .btn-quiet,
+html[data-resolved-theme="light"] .tb-import .btn-quiet {
+  background: #f1e8d2 !important; border-color: rgba(122,90,30,.3) !important; color: #6d4c1c !important;
+}
+html[data-theme="light"] .tb-import .btn-quiet:hover,
+html[data-resolved-theme="light"] .tb-import .btn-quiet:hover {
+  background: #e9dcc0 !important; color: #2d2413 !important;
+}

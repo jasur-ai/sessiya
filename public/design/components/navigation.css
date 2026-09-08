@@ -123,9 +123,29 @@ body.shell-open { overflow: hidden; }
 .shell-account-menu-item--logout:hover .shell-nav-ico { color: var(--deborah-semantic-color-action-primary); }
 
 /* Account menu qisqa ekranda scroll qilmaydi (faqat nav scroll qiladi) */
+/* 09/2026 (user qarori): tema kaliti BIRTA QATOR — wrap yo'q, ixcham */
 .shell-account-menu .theme-segmented {
-  flex-wrap: wrap; gap: 4px; margin: 0; padding: 2px 10px 8px;
+  flex-wrap: nowrap;
+  gap: 2px;
+  width: 100%;
+  justify-content: center;
+  margin: 0;
+  padding: 4px 6px 8px;
   border-bottom: 1px solid var(--deborah-semantic-color-border-default);
+  border-radius: 0;
+  background: transparent;
+  border: none;
+}
+.shell-account-menu .theme-segmented button {
+  flex: 1 1 0;
+  white-space: nowrap;
+  padding: 4px 5px;
+  font-size: 0.75rem;
+  min-width: 0;
+}
+.shell-account-menu .theme-segmented button.is-active {
+  background: var(--deborah-semantic-color-action-primary, #1746D1);
+  color: var(--deborah-semantic-color-action-on-action, #FFF);
 }
 
 /* ── Public nav (nav.ejs — landing bo'lmagan public sahifalar) ── */

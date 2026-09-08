@@ -1,5 +1,7 @@
-<!-- Cast Setup Studio (STEP 28) — professional mode/privacy/summary dialog -->
-<div class="cast-studio-overlay" id="cast-studio-overlay" role="dialog" aria-modal="true" aria-labelledby="cast-studio-title" aria-describedby="cast-studio-desc" data-studio-dialog>
+<!-- Cast Setup Studio (STEP 28) — professional mode/privacy/summary dialog
+     data-studio-simple=true (09/2026): VIP bo'lmagan userlar uchun
+     Kahoot-uslub minimal xona sozlamalari (full sozlamalar faqat VIP) -->
+<div class="cast-studio-overlay" id="cast-studio-overlay" role="dialog" aria-modal="true" aria-labelledby="cast-studio-title" aria-describedby="cast-studio-desc" data-studio-dialog data-studio-simple="<%= (typeof studioSimple === 'undefined' || studioSimple) ? 'true' : 'false' %>">
   <div class="cast-studio-dialog cast-surface">
     <div class="cast-studio-header">
       <div class="cast-studio-heading">

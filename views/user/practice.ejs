@@ -52,6 +52,7 @@
       font-size:.74rem;font-weight:800;cursor:pointer;font-family:inherit;
     }
     .pr-dot.done{background:var(--deborah-semantic-color-action-primary-soft, color-mix(in srgb, var(--deborah-semantic-color-action-primary) 14%, transparent));border-color:var(--deborah-semantic-color-action-primary);color:var(--deborah-semantic-color-text-primary);}
+    .pr-dot.miss{background:rgba(180,83,9,.14);border-color:#b45309;color:#b45309;}
     .pr-dot.cur{outline:2px solid var(--deborah-semantic-color-action-primary);outline-offset:1px;}
     .pr-card{
       background:var(--deborah-semantic-color-surface-raised);
@@ -118,6 +119,62 @@
       .pr-opt, .pr-opt.sel { transition: none; animation: none; }
       .pr-opt:hover { transform: none; }
     }
+
+    /* ── 09/2026 (user qarori): javobdan keyin DARHOL natija (Kahoot tarzi).
+       Oldinga o'tish faqat javob berilgach; noto'g'ri = issiq jigarrang,
+       to'g'ri = yashil. Qizil ko'z oladigan emas. ── */
+    .pr-hint{
+      display:none;align-items:center;gap:8px;margin:0 0 12px;padding:8px 12px;
+      font-size:.82rem;font-weight:700;border-radius:10px;
+      color:#b45309;background:color-mix(in srgb,#b45309 9%,transparent);
+      border:1px solid rgba(180,83,9,.35);
+    }
+    .pr-hint.show{display:flex;}
+    .pr-opt[data-st="dim"]{opacity:.55;pointer-events:none;}
+    .pr-opt[data-st="right"]{
+      background:color-mix(in srgb, var(--deborah-semantic-color-status-success,#16a34a) 10%,transparent) !important;
+      border-color:var(--deborah-semantic-color-status-success,#16a34a) !important;
+      border-left-color:var(--deborah-semantic-color-status-success,#16a34a) !important;
+      box-shadow:0 0 0 1px var(--deborah-semantic-color-status-success,#16a34a);
+      pointer-events:none;
+    }
+    .pr-opt[data-st="right"] b{color:var(--deborah-semantic-color-status-success,#16a34a);}
+    .pr-opt[data-st="right"] .pr-chk{color:var(--deborah-semantic-color-status-success,#16a34a);}
+    .pr-opt[data-st="wrong"]{
+      background:color-mix(in srgb,#b45309 8%,transparent) !important;
+      border-color:#b45309 !important;border-left-color:#b45309 !important;
+      box-shadow:0 0 0 1px #b45309;
+      pointer-events:none;
+    }
+    .pr-opt[data-st="wrong"] b,.pr-opt[data-st="wrong"] .pr-chk{color:#b45309;}
+    .pr-opt .pr-chk{margin-left:auto;font-weight:900;font-size:1rem;align-self:center;}
+    .pr-fb{
+      display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+      margin:4px 0 14px;padding:11px 14px;border-radius:13px;
+      font-weight:800;font-size:.92rem;
+      animation:pr-fb-in .18s ease;
+    }
+    @keyframes pr-fb-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+    @media (prefers-reduced-motion: reduce){.pr-fb{animation:none}}
+    .pr-fb.is-ok{
+      color:var(--deborah-semantic-color-status-success,#16a34a);
+      background:color-mix(in srgb, var(--deborah-semantic-color-status-success,#16a34a) 9%,transparent);
+      border:1.5px solid color-mix(in srgb, var(--deborah-semantic-color-status-success,#16a34a) 45%,transparent);
+    }
+    .pr-fb.is-bad{
+      color:#b45309;background:color-mix(in srgb,#b45309 9%,transparent);
+      border:1.5px solid rgba(180,83,9,.4);
+    }
+    [data-resolved-theme="dark"] .pr-fb.is-bad,
+    [data-theme="dark"] .pr-fb.is-bad{color:#e2a464;}
+    .pr-fb-correct{margin-left:auto;font-size:.78rem;font-weight:700;color:var(--deborah-semantic-color-text-muted);}
+    .pr-fb-correct b{color:var(--deborah-semantic-color-status-success,#16a34a);}
+    .pr-next-ready{animation:pr-glow 1.3s ease 2;}
+    @keyframes pr-glow{
+      0%,100%{box-shadow:0 0 0 0 rgba(79,70,229,.0)}
+      50%{box-shadow:0 0 0 7px rgba(79,70,229,.16)}
+    }
+    @media (prefers-reduced-motion: reduce){.pr-next-ready{animation:none}}
   </style>
 </head>
 <body>
@@ -130,6 +187,7 @@
     <div class="pr-meta"><%= pCopy.meta %></div>
     <div class="pr-timer" id="qtimer" aria-live="polite"></div>
     <div class="pr-dots" id="dots"></div>
+    <div class="pr-hint" id="pr-hint" role="status" aria-live="polite"></div>
     <div id="quiz"></div>
     <div id="result" hidden></div>
   </main>
@@ -144,72 +202,145 @@
     const t = (k, fb) => (PC[k] !== undefined ? PC[k] : fb);
     const fill = (k, fb, map) => t(k, fb).split('{n}').join(map.n != null ? map.n : '').split('{m}').join(map.m != null ? map.m : '').split('{total}').join(map.total != null ? map.total : '').split('{correct}').join(map.correct != null ? map.correct : '').split('{title}').join(map.title != null ? map.title : '');
 
+    /* 09/2026 (user qarori):
+       — javobsiz savoldan oldinga o'tib bo'lmaydi (Next/Finish/dots bloklanadi);
+       — javob tanlansa DARHOL to'g'ri/noto'g'ri natija chiqadi (Kahoot tarzi);
+       — vaqt tugasa savol "o'tkazib yuborilgan" sifatida yopiladi va natija
+         ko'rsatiladi (javob -1 — serverda noto'g'ri hisoblanadi). */
     /* S34o: URL'dan vaqt (soniya) — panel Sinov modalida tanlangan */
     const PER_Q_TIME = Math.max(0, parseInt(new URLSearchParams(location.search).get('time'), 10) || 0);
-    const answers = new Array(QUESTIONS.length).fill(-1);
+    const answers = new Array(QUESTIONS.length).fill(-1);  // tanlangan variant (yoki -1)
+    const revealed = new Array(QUESTIONS.length).fill(false); // savol yopilgan (javob yoki vaqt)
+    const missed = new Array(QUESTIONS.length).fill(false);   // vaqt tugab javobsiz qolgan
     let cur = 0;
     let timeLeft = PER_Q_TIME;
     let timerIv = null;
+
+    function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;'); }
+    function correctOf(i) {
+      const c = QUESTIONS[i] && QUESTIONS[i].correct;
+      const n = QUESTIONS[i] && QUESTIONS[i].options ? QUESTIONS[i].options.length : 0;
+      return Number.isInteger(c) && c >= 0 && c < n ? c : -1;
+    }
+    function hint(msg) {
+      const h = document.getElementById('pr-hint');
+      if (!h) return;
+      h.textContent = '⚠ ' + msg;
+      h.classList.add('show');
+      clearTimeout(hint._iv);
+      hint._iv = setTimeout(() => h.classList.remove('show'), 2600);
+    }
+    function clearTimer() { clearInterval(timerIv); timerIv = null; }
     function startTimer() {
-      clearInterval(timerIv);
-      if (!PER_Q_TIME) return; // vaqt o'chirilgan — cheklovsiz
-      timeLeft = PER_Q_TIME;
+      clearTimer();
       const el = document.getElementById('qtimer');
+      if (!PER_Q_TIME || revealed[cur]) { if (el && !PER_Q_TIME) el.textContent = ''; return; }
+      timeLeft = PER_Q_TIME;
       if (!el) return;
-      const tick = () => {
-        el.textContent = '⏱ ' + String(Math.floor(timeLeft / 60)).padStart(2, '0') + ':' + String(timeLeft % 60).padStart(2, '0');
-        if (timeLeft <= 0) {
-          clearInterval(timerIv);
-          /* vaqt tugadi — javobsiz bo'lsa -1 qoldiriladi, keyingi savol */
-          if (cur < QUESTIONS.length - 1) { cur++; renderQ(); renderDots(); }
-          else finish();
-          return;
-        }
+      const fmt = () => '⏱ ' + String(Math.floor(timeLeft / 60)).padStart(2, '0') + ':' + String(timeLeft % 60).padStart(2, '0');
+      el.textContent = fmt();
+      timerIv = setInterval(() => {
         timeLeft--;
-      };
-      tick();
-      timerIv = setInterval(tick, 1000);
+        el.textContent = fmt();
+        if (timeLeft <= 0) {
+          clearTimer();
+          el.textContent = '';
+          if (!revealed[cur]) {
+            missed[cur] = true;
+            answers[cur] = -1;
+            revealed[cur] = true;
+            renderQ();
+            renderDots();
+          }
+        }
+      }, 1000);
     }
 
     const dots = document.getElementById('dots');
     function renderDots() {
-      dots.innerHTML = QUESTIONS.map((_, i) =>
-        `<button type="button" class="pr-dot${answers[i] >= 0 ? ' done' : ''}${i === cur ? ' cur' : ''}" data-i="${i}" aria-label="${fill('dotAria', 'Savol {n}', { n: i + 1 })}">${i + 1}</button>`).join('');
-      dots.querySelectorAll('.pr-dot').forEach((d) => d.addEventListener('click', () => { cur = +d.dataset.i; renderQ(); renderDots(); }));
+      dots.innerHTML = QUESTIONS.map((_, i) => {
+        let cls = 'pr-dot';
+        if (revealed[i]) cls += ' done' + (missed[i] ? ' miss' : '');
+        if (i === cur) cls += ' cur';
+        const unlock = i === cur || revealed[i] || (i === cur + 1 && revealed[cur]);
+        if (!unlock) cls += ' locked';
+        return `<button type="button" class="${cls}" data-i="${i}" ${unlock ? '' : 'tabindex="-1" aria-disabled="true"'} aria-label="${fill('dotAria', 'Savol {n}', { n: i + 1 })}">${i + 1}</button>`;
+      }).join('');
+      dots.querySelectorAll('.pr-dot').forEach((d) => d.addEventListener('click', () => {
+        const i = +d.dataset.i;
+        if (i === cur || revealed[i] || (i === cur + 1 && revealed[cur])) { cur = i; renderQ(); renderDots(); }
+        else hint(t('answerFirst', 'Avval savolga javob bering'));
+      }));
     }
 
     const quiz = document.getElementById('quiz');
     function renderQ() {
       startTimer();
       const q = QUESTIONS[cur];
+      const qc = correctOf(cur);
+      const isRev = revealed[cur];
+      const chosen = answers[cur];
+      const opts = q.options.map((o, j) => {
+        let st = '';
+        if (isRev) {
+          if (j === qc) st = 'right';
+          else if (j === chosen) st = 'wrong';
+          else st = 'dim';
+        } else if (j === chosen) st = 'sel';
+        const mark = isRev && j === qc ? '<span class="pr-chk">✓</span>'
+          : (isRev && j === chosen && j !== qc ? '<span class="pr-chk">✗</span>' : '');
+        return `<label class="pr-opt${st ? ' ' + st : ''}"${st ? ` data-st="${st}"` : ''}>
+          <input type="radio" name="q${cur}" value="${j}" ${(j === chosen && !isRev) ? 'checked' : ''} ${isRev ? 'disabled tabindex="-1"' : ''}>
+          <span><b>${String.fromCharCode(65 + j)})</b> ${esc(o)}</span>
+          ${mark}
+        </label>`;
+      }).join('');
+
+      let fb = '';
+      if (isRev) {
+        const okTxt = qc >= 0 ? `${t('correctIs', 'To‘g‘ri javob')}: <b>${String.fromCharCode(65 + qc)}) ${esc(q.options[qc])}</b>` : '';
+        const who = missed[cur] ? 'miss' : (chosen === qc ? 'ok' : 'bad');
+        const head = missed[cur] ? '⏱ ' + t('timedOut', 'Vaqt tugadi')
+          : (chosen === qc ? '✅ ' + t('ok', 'To‘g‘ri!') : '❌ ' + t('notOk', 'Noto‘g‘ri'));
+        fb = `<div class="pr-fb is-${who === 'ok' ? 'ok' : 'bad'}" role="status" aria-live="polite">
+          <span>${head}</span>
+          ${okTxt ? `<span class="pr-fb-correct">${okTxt}</span>` : ''}
+        </div>`;
+      }
+
+      const isLast = cur === QUESTIONS.length - 1;
+      const navBtn = isLast
+        ? `<button type="button" class="btn btn-primary" id="finish" ${isRev ? '' : 'disabled'}>${t('finish', '✅ Yakunlash')}</button>`
+        : `<button type="button" class="btn btn-primary${isRev ? ' pr-next-ready' : ''}" id="next" ${isRev ? '' : 'disabled'}>${t('next', 'Keyingi →')}</button>`;
+
       quiz.innerHTML = `
         <div class="pr-card">
           <div class="pr-q">${cur + 1} / ${QUESTIONS.length}. ${esc(q.text)}</div>
-          ${q.options.map((o, j) => `
-            <label class="pr-opt${answers[cur] === j ? ' sel' : ''}">
-              <input type="radio" name="q${cur}" value="${j}" ${answers[cur] === j ? 'checked' : ''}>
-              <span><b>${String.fromCharCode(65 + j)})</b> ${esc(o)}</span>
-            </label>`).join('')}
+          ${opts}
+          ${fb}
           <div class="pr-nav">
             <button type="button" class="btn btn-quiet" id="prev" ${cur === 0 ? 'disabled' : ''}>${t('prev', '← Oldingi')}</button>
-            ${cur === QUESTIONS.length - 1
-              ? `<button type="button" class="btn btn-primary" id="finish">${t('finish', '✅ Yakunlash')}</button>`
-              : `<button type="button" class="btn btn-primary" id="next">${t('next', 'Keyingi →')}</button>`}
+            ${navBtn}
           </div>
         </div>`;
       quiz.querySelectorAll('input[type=radio]').forEach((r) => r.addEventListener('change', () => {
+        if (revealed[cur]) return;
         answers[cur] = +r.value;
-        renderQ(); renderDots();
+        missed[cur] = false;
+        revealed[cur] = true;
+        clearTimer();
+        const qEl = document.getElementById('qtimer');
+        if (qEl) qEl.textContent = '';
+        renderQ(); // darhol natija
+        renderDots();
       }));
       const prev = quiz.querySelector('#prev');
-      if (prev) prev.addEventListener('click', () => { cur--; renderQ(); renderDots(); });
+      if (prev) prev.addEventListener('click', () => { if (cur > 0) { cur--; renderQ(); renderDots(); } });
       const next = quiz.querySelector('#next');
-      if (next) next.addEventListener('click', () => { cur++; renderQ(); renderDots(); });
+      if (next) next.addEventListener('click', () => { if (revealed[cur] && cur < QUESTIONS.length - 1) { cur++; renderQ(); renderDots(); } });
       const fin = quiz.querySelector('#finish');
-      if (fin) fin.addEventListener('click', finish);
+      if (fin) fin.addEventListener('click', () => { if (revealed[cur]) finish(); });
     }
-
-    function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;'); }
 
     async function finish() {
       const unanswered = answers.filter((a) => a < 0).length;

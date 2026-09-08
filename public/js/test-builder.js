@@ -612,18 +612,18 @@
     }
   });
 
-  // ── Excel import (S27.09) ──
+  // ── Excel import (09/2026 user qarori: bitta oddiy panel — bosqichlar yo'q) ──
   let importData = null;
   const importModal = $('#tb-import-modal');
   const importBtn = $('#tb-import-btn');
   if (importBtn && importModal) {
     importBtn.addEventListener('click', openImport);
     $('#tb-import-close').addEventListener('click', closeImport);
+    $('#tb-import-cancel').addEventListener('click', closeImport);
     importModal.addEventListener('click', (e) => { if (e.target === importModal) closeImport(); });
-
-    $('#tb-import-next1').addEventListener('click', () => goPane(2));
-    $('#tb-import-back2').addEventListener('click', () => goPane(1));
-    $('#tb-import-back3').addEventListener('click', () => goPane(2));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !importModal.hidden) { e.preventDefault(); closeImport(); }
+    });
 
     const zone = $('#tb-import-zone');
     const input = $('#tb-import-input');
@@ -631,7 +631,11 @@
     zone.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); } });
     zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('is-drag'); });
     zone.addEventListener('dragleave', () => { zone.classList.remove('is-drag'); });
-    zone.addEventListener('drop', (e) => { e.preventDefault(); zone.classList.remove('is-drag'); const f = e.dataTransfer.files[0]; f && parseExcel(f); });
+    zone.addEventListener('drop', (e) => {
+      e.preventDefault(); zone.classList.remove('is-drag');
+      const f = e.dataTransfer.files[0];
+      if (f) { input.files = e.dataTransfer.files; parseExcel(f); }
+    });
     input.addEventListener('change', () => { const f = input.files[0]; f && parseExcel(f); });
 
     $('#tb-template-btn').addEventListener('click', downloadTemplate);
@@ -639,20 +643,39 @@
     $('#tb-import-finish').addEventListener('click', closeImport);
   }
 
+  function showImportStage(name) {
+    $$('.tb-import-stage').forEach((s) => { s.hidden = s.dataset.importStage !== name; });
+    const confirmBtn = $('#tb-import-confirm');
+    const finishBtn = $('#tb-import-finish');
+    if (confirmBtn) {
+      const n = importData && importData.length ? importData.length : 0;
+      const lbl = $('#tb-import-confirm-lbl');
+      if (lbl) lbl.textContent = n ? T('importAdd', "Qo'shish") + ' (' + n + ')' : T('importAdd', "Qo'shish");
+      confirmBtn.hidden = name === 'done';
+      confirmBtn.disabled = name !== 'review' || n === 0;
+    }
+    if (finishBtn) finishBtn.hidden = name !== 'done';
+  }
+  function clearImportMsgs() {
+    ['tb-import-msg', 'tb-import-parse-msg'].forEach((id) => {
+      const m = $(id);
+      if (m) { m.textContent = ''; m.classList.remove('is-open', 'is-err', 'is-ok'); }
+    });
+  }
   function openImport() {
     importData = null;
     $('#tb-import-input').value = '';
-    goPane(1);
+    const preview = $('#tb-import-preview');
+    if (preview) preview.innerHTML = '';
+    clearImportMsgs();
+    showImportStage('pick');
     importModal.hidden = false;
+    const zone = $('#tb-import-zone');
+    if (zone) setTimeout(() => zone.focus(), 50);
   }
   function closeImport() {
     importModal.hidden = true;
     importData = null;
-  }
-  function goPane(n) {
-    $$('.tb-import-pane').forEach(p => p.classList.remove('is-active'));
-    $$(`[data-pane="${n}"]`).forEach(p => p.classList.add('is-active'));
-    $$('.tb-import-step').forEach(s => s.classList.toggle('is-active', s.dataset.step === String(n)));
   }
   function importMsg(el, txt, type) {
     el.textContent = txt;
@@ -695,9 +718,12 @@
         importData = parsed;
         renderPreview(parsed, rowErrors);
         const parseMsg = $('#tb-import-parse-msg');
+        const pv = $('#tb-import-preview');
+        if (pv) pv.scrollTop = 0;
         if (rowErrors.length) importMsg(parseMsg, T('impReadyErr', '{n} ta savol tayyor, {m} ta qator xato').split('{n}').join(parsed.length).split('{m}').join(rowErrors.length), 'err');
         else importMsg(parseMsg, T('impReady', '{n} ta savol tayyor').split('{n}').join(parsed.length), 'ok');
-        goPane(3);
+        if (parsed.length || rowErrors.length) showImportStage('review');
+        else importMsg($('#tb-import-msg'), T('impNoRows', 'Faylda savol topilmadi'), 'err');
       } catch (err) {
         importMsg(msg, T('impReadFail', "Fayl o'qilmadi: {err}").split('{err}').join(err.message), 'err');
       }
@@ -737,7 +763,7 @@
     manualSave().catch(() => {});
     if (firstIdx === 0) focusQuestionText();
     $('#tb-import-done-txt').textContent = `${importData.length} ${T('impDoneCount', "ta savol qo'shildi va saqlandi")}`;
-    goPane(4);
+    showImportStage('done');
   }
 
   function downloadTemplate() {

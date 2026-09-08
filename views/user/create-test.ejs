@@ -6,10 +6,6 @@
   <style>
     .tb-props-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
     @media (max-width: 640px) { .tb-props-grid { grid-template-columns: 1fr; } }
-    .tb-import-body { display: none; }
-    .tb-import-body.is-open { display: block; }
-    .tb-import-pane { display: none; }
-    .tb-import-pane.is-active { display: block; }
   </style>
 </head>
 <body>
@@ -61,54 +57,54 @@
     </div>
   </div>
 
-  <!-- ── Excel import modal (S27.09) ── -->
+  <!-- ── Excel import (09/2026 user qarori): bitta oddiy panel —
+       fayl tanlash → ko'rib chiqish → qo'shish bir ekranda, bosqichlar yo'q ── -->
   <div class="tb-import" id="tb-import-modal" hidden>
     <div class="tb-import-dialog">
       <div class="tb-import-hd">
-        <h2 id="tb-import-title"><%= bc.importTitle %></h2>
+        <div>
+          <h2 id="tb-import-title"><%- icon('upload', 17) %> <%= bc.importTitle %></h2>
+          <p class="tb-import-sub"><%= bc.importDesc %></p>
+        </div>
         <button type="button" class="tb-import-close" id="tb-import-close" aria-label="<%= bc.importCloseAria %>"><%- icon('x', 16) %></button>
       </div>
-      <div class="tb-import-steps" aria-label="<%= bc.importStepsAria %>">
-        <span class="tb-import-step is-active" data-step="1"><span class="tb-step-num">1</span> <%= bc.importStep1 %></span>
-        <span class="tb-import-step" data-step="2"><span class="tb-step-num">2</span> <%= bc.importStep2 %></span>
-        <span class="tb-import-step" data-step="3"><span class="tb-step-num">3</span> <%= bc.importStep3 %></span>
-        <span class="tb-import-step" data-step="4"><span class="tb-step-num">4</span> <%= bc.importStep4 %></span>
+
+      <div class="tb-import-body">
+        <!-- 1. Tanlash -->
+        <section class="tb-import-stage" data-import-stage="pick">
+          <div class="tb-import-zone" id="tb-import-zone" role="button" tabindex="0" aria-label="<%= bc.importZoneAria %>">
+            <span class="tb-import-ico"><%- icon('upload', 30) %></span>
+            <p id="tb-import-zone-txt"><%= bc.importZoneTxt %></p>
+            <span class="tb-import-zone-sub" id="tb-import-zone-sub"><%- icon('info', 12) %> <%= bc.importZoneSub %></span>
+          </div>
+          <input type="file" id="tb-import-input" accept=".xlsx,.xls" style="display:none">
+          <button type="button" class="tb-import-template" id="tb-template-btn"><%- icon('download', 14) %> <%= bc.excelTemplate %></button>
+          <div class="tb-import-msg" id="tb-import-msg" role="status"></div>
+        </section>
+
+        <!-- 2. Ko'rib chiqish -->
+        <section class="tb-import-stage" data-import-stage="review" hidden>
+          <div class="tb-import-preview" id="tb-import-preview" tabindex="0"></div>
+          <div class="tb-import-msg" id="tb-import-parse-msg" role="status"></div>
+        </section>
+
+        <!-- 3. Tayyor -->
+        <section class="tb-import-stage" data-import-stage="done" hidden>
+          <div class="tb-import-done" role="status" aria-live="polite">
+            <span class="tb-import-done-ico"><%- icon('checkCircle', 30) %></span>
+            <div>
+              <div class="tb-import-done-title" id="tb-import-done-txt"><%= bc.importDone %></div>
+              <div class="tb-import-done-sub"><%= bc.importDoneSub %></div>
+            </div>
+          </div>
+        </section>
       </div>
 
-      <div class="tb-import-pane is-active" data-pane="1">
-        <p class="tb-import-desc"><%= bc.importDesc %></p>
-        <button type="button" class="btn btn-secondary" id="tb-template-btn" style="width:100%"><%- icon('download', 14) %> <%= bc.excelTemplate %></button>
-        <div class="tb-import-next">
-          <button type="button" class="btn btn-primary" id="tb-import-next1"><%- icon('arrowRight', 14) %> <%= bc.importNext %></button>
-        </div>
-      </div>
-
-      <div class="tb-import-pane" data-pane="2">
-        <div class="tb-import-zone" id="tb-import-zone" role="button" tabindex="0" aria-label="<%= bc.importZoneAria %>">
-          <span class="tb-import-ico"><%- icon('upload', 26) %></span>
-          <p id="tb-import-zone-txt"><%= bc.importZoneTxt %></p>
-        </div>
-        <input type="file" id="tb-import-input" accept=".xlsx,.xls" style="display:none">
-        <div class="tb-import-msg" id="tb-import-msg"></div>
-        <div class="tb-import-next">
-          <button type="button" class="btn btn-secondary" id="tb-import-back2"><%- icon('arrowLeft', 14) %> <%= bc.importBack %></button>
-        </div>
-      </div>
-
-      <div class="tb-import-pane" data-pane="3">
-        <div class="tb-import-preview" id="tb-import-preview"></div>
-        <div class="tb-import-msg" id="tb-import-parse-msg"></div>
-        <div class="tb-import-next">
-          <button type="button" class="btn btn-secondary" id="tb-import-back3"><%- icon('arrowLeft', 14) %> <%= bc.importBack %></button>
-          <button type="button" class="btn btn-primary" id="tb-import-confirm"><%- icon('check', 14) %> <%= bc.importAdd %></button>
-        </div>
-      </div>
-
-      <div class="tb-import-pane" data-pane="4">
-        <div class="tb-import-msg is-open is-ok" id="tb-import-done"><%- icon('checkCircle', 15) %> <span id="tb-import-done-txt"><%= bc.importDone %></span></div>
-        <div class="tb-import-next">
-          <button type="button" class="btn btn-primary" id="tb-import-finish"><%- icon('check', 14) %> <%= bc.importFinish %></button>
-        </div>
+      <div class="tb-import-actions">
+        <button type="button" class="btn btn-quiet" id="tb-import-cancel" data-import-btn="cancel"><%- icon('x', 14) %> <%= bc.importCancel %></button>
+        <span style="flex:1"></span>
+        <button type="button" class="btn btn-primary" id="tb-import-confirm" data-import-btn="confirm" disabled><%- icon('check', 14) %> <span id="tb-import-confirm-lbl"><%= bc.importAdd %></span></button>
+        <button type="button" class="btn btn-primary" id="tb-import-finish" data-import-btn="finish" hidden><%- icon('check', 14) %> <%= bc.importFinish %></button>
       </div>
     </div>
   </div>

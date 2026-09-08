@@ -216,6 +216,8 @@ router.get('/panel', async (req, res) => {
         })),
       fmtDate: (ts) => new Date(ts || Date.now()).toLocaleDateString(localeOf(plangResolved)),
       username: user.username,
+      // 09/2026: Cast studio — VIP userlargina to'liq sozlamalar (studioSimple=false)
+      isVip: !!isVip,
     });
     // Update session with fresh isVip value
     req.session.user.isVip = isVip;
@@ -825,13 +827,21 @@ async function loadPracticeQuestions(req, res) {
 router.get('/practice', async (req, res) => {
   const loaded = await loadPracticeQuestions(req, res);
   if (loaded.err) return;
-  const qs = (loaded.questions || []).map((q, i) => ({
-    id: i,
-    text: String(q?.text || ''),
-    type: q?.type || 'single_choice',
-    options: Array.isArray(q?.options) ? q.options.map((o) => String(o || '')) : [],
-    // correct NI YUBORMAYMIZ
-  })).filter((q) => q.text && q.options.length >= 2);
+  const qs = (loaded.questions || []).map((q, i) => {
+    const nOpts = Array.isArray(q?.options) ? q.options.length : 0;
+    const cIdx = Number(q?.correct);
+    return {
+      id: i,
+      text: String(q?.text || ''),
+      type: q?.type || 'single_choice',
+      options: Array.isArray(q?.options) ? q.options.map((o) => String(o || '')) : [],
+      // 09/2026 (user qarori): har savoldan keyin darhol to'g'ri/noto'g'ri
+      // natija chiqishi uchun correct clientga yuboriladi (Kahoot tarzi).
+      // Yakuniy baho baribir server (/user/api/practice/grade) hisoblaydi.
+      correct: Number.isInteger(cIdx) && cIdx >= 0 && cIdx < nOpts ? cIdx : -1,
+      explanation: String(q?.explanation || ''),
+    };
+  }).filter((q) => q.text && q.options.length >= 2);
   if (!qs.length) return res.status(404).render('error', { title: '404', message: 'Savollar topilmadi', status: 404 });
 
   // Practice i18n: 4 til (uz/uz-cyrl/ru/en) — data/practice-i18n.js

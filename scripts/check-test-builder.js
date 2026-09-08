@@ -104,11 +104,12 @@ for (const needle of ['function validate(', 'tb-err-summary', 'is-invalid']) {
 console.log('— S27.09 import modal');
 for (const [label, needle] of [
   ['modal', 'tb-import-modal'],
-  ['pane steps', 'tb-import-pane'],
+  ['single-panel stage', 'data-import-stage'],
   ['template', 'tb-template-btn'],
   ['confirm', 'tb-import-confirm'],
   ['preview', 'tb-import-preview'],
   ['row errors', 'rowErrors'],
+  ['cancel btn', 'tb-import-cancel'],
 ]) {
   if (!view.includes(needle) && !js.includes(needle)) bad(`S27.09: ${label} yo‘q (${needle})`);
   else ok(`S27.09: ${label} mavjud`);

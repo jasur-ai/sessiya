@@ -470,3 +470,39 @@
   .cast-studio-body { padding: var(--deborah-spacing-4, 16px); }
   .cast-studio-header, .cast-studio-footer { padding: var(--deborah-spacing-4, 16px); }
 }
+
+/* ── 09/2026 SIMPLE MODE (Classic Live — VIP bo'lmagan user uchun) ──
+   Kahoot-uslub minimal xona sozlamalari; to'liq professional sirt VIPda. */
+.cs-s-hero {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 2px 0 6px;
+}
+.cs-s-preset {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 800;
+  font-size: .95rem;
+  color: var(--deborah-semantic-color-text-primary);
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--deborah-semantic-color-action-primary-soft);
+  border: 1px solid var(--deborah-semantic-color-action-primary-border);
+}
+.cs-s-preset .icon-inline { color: var(--deborah-semantic-color-action-primary); }
+.cs-s-tag {
+  font-size: .78rem;
+  font-weight: 600;
+  color: var(--deborah-semantic-color-text-muted);
+}
+.cs-s-hint {
+  display: block;
+  font-size: .7rem;
+  font-weight: 600;
+  color: var(--deborah-semantic-color-text-muted);
+  margin-top: 5px;
+  line-height: 1.45;
+}

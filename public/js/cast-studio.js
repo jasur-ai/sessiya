@@ -33,6 +33,13 @@
     'cs-partial-chips': 'scoring.partialCredit',
     'cs-sfx-chips': 'presentation.soundEffects',
     'cs-motion-chips': 'presentation.motion',
+    // 09/2026 simple mode (Kahoot uslubi — VIP bo'lmagan userlar)
+    'cs-s-timer-chips': 'timer.defaultSeconds',
+    'cs-s-auto-chips': 'timer.mode',
+    'cs-s-lb-chips': 'leaderboard.visibility',
+    'cs-s-sfx-chips': 'presentation.soundEffects',
+    'cs-s-theme-chips': 'presentation.themeId',
+    'cs-s-music-chips': 'presentation.lobbyMusic',
   };
 
   let studioState = {
@@ -47,6 +54,10 @@
     abort: null,
     customized: false,
     focusedBeforeOpen: null,
+    // 09/2026 (user qarori): VIP bo'lmaganlar uchun soddalashgan
+    // Kahoot-uslub sozlamalar ko'rinishi (to'liq sozlamalar faqat VIP)
+    simple: false,
+    simpleFallbackUsed: false,
   };
 
   function el(id) { return document.getElementById(id); }
@@ -63,15 +74,21 @@
   // ── Open / close (S28.09: initial focus + focus restore) ──
   function openStudio(reference) {
     studioState.reference = reference;
-    studioState.draftConfig = { presetId: 'responsive_accuracy', overrides: {} };
     studioState.error = null;
     studioState.preflight = null;
     studioState.customized = false;
     studioState.requestId = crypto.randomUUID();
     studioState.focusedBeforeOpen = document.activeElement;
+    studioState.simpleFallbackUsed = false;
 
     const overlay = el('cast-studio-overlay');
     if (!overlay) return;
+    // 09/2026: data-studio-simple=true → Kahoot uslubi (Classic Live) minimal
+    studioState.simple = overlay.dataset.studioSimple === 'true';
+    studioState.draftConfig = studioState.simple
+      ? { presetId: 'classic_live', overrides: {} }
+      : { presetId: 'responsive_accuracy', overrides: {} };
+
     overlay.classList.add('open');
     overlay.classList.remove('is-dirty');
     studioState.open = true;
@@ -311,15 +328,75 @@
         ${summaries.join('')}
       </div>`;
 
-    body.innerHTML = `
-      <div class="cast-modes-label">Rejim tanlang</div>
-      <div class="cast-modes" role="radiogroup" aria-label="Cast rejimi">${modeCards}</div>
+    // ── 09/2026 SIMPLE MODE (Kahoot uslubi — VIP bo'lmagan userlar):
+    // mode cards + pace/think/timer-mode/scoring/join/advanced sozlamalar
+    // KO'RSATILMAYDI. Faqat: savol vaqti, avto-yopish, jadval, ovoz,
+    // orqa fon, fon musiqasi. VIP uchun yuqoridagi to'liq sirt qoladi.
+    if (studioState.simple) {
+      const govNote = (gov && gov.lockedFields && Object.keys(gov.lockedFields).length)
+        ? govBanner
+        : '';
+      const simpleSummaries = summaries.filter((s) => /--danger|--warning|Kutilgan davomiylik/.test(s));
+      body.innerHTML = `
+        <div class="cs-s-hero">
+          <span class="cs-s-preset">${icon('zap', 15)} Classic Live</span>
+          <span class="cs-s-tag">Kahoot uslubi — tez va to‘g‘ri javob ko‘proq ball keltiradi</span>
+        </div>
 
-      ${govBanner}
-      ${summary}
-      ${essentials}
-      ${preflightHtml}
-    `;
+        ${govNote}
+        ${summary}
+
+        <div class="cast-studio-section">
+          <div class="cast-modes-label">Xona sozlamalari</div>
+          <div class="cast-row">
+            <div class="cs-field">
+              <label>Savol vaqti ${lockMark('cs-s-timer-chips')}</label>
+              <div class="cast-chips" id="cs-s-timer-chips"></div>
+            </div>
+            <div class="cs-field">
+              <label>Avtomatik o‘tkazish ${lockMark('cs-s-auto-chips')}</label>
+              <div class="cast-chips" id="cs-s-auto-chips"></div>
+              <span class="cs-s-hint">Yoniq — vaqt tugagach savol o‘zi yopiladi va natija chiqadi; siz “Keyingisi”ni bosasiz.</span>
+            </div>
+          </div>
+          <div class="cast-row">
+            <div class="cs-field">
+              <label>O‘yin jadvali ${lockMark('cs-s-lb-chips')}</label>
+              <div class="cast-chips" id="cs-s-lb-chips"></div>
+            </div>
+            <div class="cs-field">
+              <label>Ovoz effektlari ${lockMark('cs-s-sfx-chips')}</label>
+              <div class="cast-chips" id="cs-s-sfx-chips"></div>
+            </div>
+          </div>
+          <div class="cast-row">
+            <div class="cs-field">
+              <label>Orqa fon (tema) ${lockMark('cs-s-theme-chips')}</label>
+              <div class="cast-chips" id="cs-s-theme-chips"></div>
+              <span class="cs-s-hint">Qorong‘i yoki yoruq sahna uslubi.</span>
+            </div>
+            <div class="cs-field">
+              <label>Fon musiqasi ${lockMark('cs-s-music-chips')}</label>
+              <div class="cast-chips" id="cs-s-music-chips"></div>
+              <span class="cs-s-hint">Lobbi va savol paytidagi musiqa hajmi.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="cs-preflight">
+          ${simpleSummaries.join('')}
+        </div>`;
+    } else {
+      body.innerHTML = `
+        <div class="cast-modes-label">Rejim tanlang</div>
+        <div class="cast-modes" role="radiogroup" aria-label="Cast rejimi">${modeCards}</div>
+
+        ${govBanner}
+        ${summary}
+        ${essentials}
+        ${preflightHtml}
+      `;
+    }
 
     wireBody(pf, hasBlockers, cur);
     renderFooter();
@@ -356,6 +433,12 @@
       });
     }
 
+    // 09/2026 simple mode (Kahoot uslubi) — faqat minimal chips
+    if (studioState.simple) {
+      wireSimpleChips(pf, cur);
+      return;
+    }
+
     // Chips
     renderChips('cs-pace-chips',
       [['instructor', 'O‘qituvchi boshqaradi'], ['self_paced', 'O‘z tezligida'], ['student', 'Talaba o‘zi']],
@@ -370,6 +453,43 @@
     renderChips('cs-partial-chips', [['true', 'Yoqilgan'], ['false', 'O‘chiq']], String(cur('scoring.partialCredit', false)), (v) => setOverride('scoring', { partialCredit: v === 'true' }), pf);
     renderChips('cs-sfx-chips', [['off', 'O‘chiq'], ['low', 'Past'], ['on', 'Yoniq']], cur('presentation.soundEffects', 'low'), (v) => setOverride('presentation', { soundEffects: v }), pf);
     renderChips('cs-motion-chips', [['full', 'To‘liq'], ['reduced', 'Qisqartirilgan'], ['none', 'Yo‘q']], cur('presentation.motion', 'reduced'), (v) => setOverride('presentation', { motion: v }), pf);
+  }
+
+  // ── 09/2026 Simple mode chips (Classic Live — VIP bo'lmagan userlar) ──
+  function wireSimpleChips(pf, cur) {
+    const m = (path, fb) => cur(path, fb);
+    const timerMode = String(m('timer.mode', 'strict'));
+    const timerSec = timerMode === 'off' ? '0' : String(m('timer.defaultSeconds', 20));
+    renderChips('cs-s-timer-chips',
+      [['10', '10s'], ['15', '15s'], ['20', '20s'], ['30', '30s'], ['45', '45s'], ['60', '60s'], ['0', 'Vaqtsiz']],
+      timerSec, (v) => {
+        if (v === '0') { setOverride('timer', { mode: 'off' }); return; }
+        const mode = m('timer.mode', 'strict') === 'off' ? 'strict' : m('timer.mode', 'strict');
+        setOverride('timer', { mode, defaultSeconds: Number(v) });
+      }, pf);
+    renderChips('cs-s-auto-chips',
+      [['strict', 'Yoniq'], ['soft', 'O‘chiq']],
+      timerMode === 'off' ? 'soft' : timerMode,
+      (v) => setOverride('timer', { mode: v }), pf);
+    const lbVis = m('leaderboard.visibility', 'top_n');
+    const lbFreq = m('leaderboard.frequency', 'every_question');
+    const lbSel = lbVis === 'top_n' ? 'top_every' : (lbFreq === 'end_only' ? 'end' : 'off');
+    renderChips('cs-s-lb-chips',
+      [['top_every', 'Har savoldan keyin'], ['end', 'Faqat yakunda'], ['off', 'Yashirin']],
+      lbSel, (v) => {
+        if (v === 'top_every') setOverride('leaderboard', { visibility: 'top_n', finalVisibility: 'top_n', frequency: 'every_question' });
+        else if (v === 'end') setOverride('leaderboard', { visibility: 'off_during_learning', finalVisibility: 'top_n', frequency: 'end_only' });
+        else setOverride('leaderboard', { visibility: 'off_during_learning', finalVisibility: 'off_during_learning', frequency: 'never' });
+      }, pf);
+    renderChips('cs-s-sfx-chips',
+      [['off', 'O‘chiq'], ['low', 'Past'], ['on', 'Yoniq']],
+      m('presentation.soundEffects', 'low'), (v) => setOverride('presentation', { soundEffects: v }), pf);
+    renderChips('cs-s-theme-chips',
+      [['focus_dark', 'Qorong‘i'], ['focus_light', 'Yoruq']],
+      m('presentation.themeId', 'focus_dark'), (v) => setOverride('presentation', { themeId: v }), pf);
+    renderChips('cs-s-music-chips',
+      [['off', 'O‘chiq'], ['low', 'Past'], ['on', 'Yoniq']],
+      m('presentation.lobbyMusic', 'off'), (v) => setOverride('presentation', { lobbyMusic: v }), pf);
   }
 
   function renderChips(containerId, options, selected, onPick, pf) {
@@ -459,6 +579,20 @@
       });
       window.location.assign(data.directorUrl);
     } catch (err) {
+      // 09/2026 simple mode: Classic Live institut siyosatida ruxsat
+      // etilmasa — avtomatik tavsiya etilgan rejimga o'tib qayta urinamiz
+      if (studioState.simple && !studioState.simpleFallbackUsed && studioState.draftConfig.presetId === 'classic_live'
+          && /PRESET_NOT_APPROVED|not approved|ruxsat etilmagan/i.test(String((err && err.message) || ''))) {
+        studioState.simpleFallbackUsed = true;
+        studioState.draftConfig = {
+          presetId: 'responsive_accuracy',
+          overrides: { timer: { mode: 'strict', defaultSeconds: 20 }, presentation: { soundEffects: 'low' } },
+        };
+        studioState.customized = false;
+        runPreflight();
+        submit();
+        return;
+      }
       studioState.submitting = false;
       if (launchBtn) {
         launchBtn.disabled = (studioState.preflight && (studioState.preflight.blockers || []).length > 0);
@@ -490,6 +624,8 @@
       status.innerHTML = '<span class="cs-dirty-dot"></span>Blokerdan oldin ishga tushirib bo‘lmaydi';
     } else if (studioState.customized) {
       status.innerHTML = '<span class="cs-dirty-dot"></span>O‘zgartirishlar kiritilgan';
+    } else if (studioState.simple) {
+      status.textContent = 'Classic Live — standart sozlamalar (20 soniya)';
     } else {
       status.textContent = 'Safe default: Responsive Accuracy';
     }
