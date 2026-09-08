@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="<%= htmlLang %>" dir="ltr">
+<head>
+  <%- include('../partials/head') %>
+  <link rel="stylesheet" href="/css/presentations.css">
+  <style>
+    body { background: var(--deborah-semantic-color-surface-default); color: var(--deborah-semantic-color-text-primary); }
+    .ps-hub { max-width: 1200px; margin: 0 auto; padding: 26px 22px 90px; }
+    .ps-hub-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
+    .ps-hub-title { margin: 0; font-size: 1.5rem; font-weight: 900; letter-spacing: -.01em; }
+    .ps-hub-sub { margin: 4px 0 0; color: var(--deborah-semantic-color-text-muted); font-weight: 600; font-size: .92rem; }
+    .ps-hub-cta { background: linear-gradient(135deg,#d9b465,#a37f3a); color: #1a1305; border: 0; border-radius: 14px;
+      padding: 12px 20px; font-weight: 800; font-size: .94rem; cursor: pointer; display: inline-flex; gap: 8px; align-items: center;
+      box-shadow: 0 6px 0 rgba(90,64,22,.35); min-height: 46px; font-family: inherit; text-decoration: none; }
+    .ps-hub-cta:hover { filter: brightness(1.06); }
+    .ps-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(252px, 1fr)); gap: 18px; margin-top: 22px; }
+    .ps-card { position: relative; border-radius: 20px; overflow: hidden; cursor: pointer; background: var(--deborah-semantic-color-surface-raised);
+      border: 1px solid var(--deborah-semantic-color-border-default); box-shadow: var(--shadow-md, 0 8px 22px rgba(0,0,0,.07));
+      transition: transform .14s ease, box-shadow .14s ease; }
+    .ps-card:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(0,0,0,.12); }
+    .ps-card.is-archived { opacity: .68; }
+    .ps-thumb { height: 152px; display: flex; align-items: center; justify-content: center; position: relative; }
+    .ps-thumb-slides { background: linear-gradient(150deg,#efe2c4 0 46%,#f6ecd9 46%); }
+    .ps-thumb-canvas { background: linear-gradient(150deg,#5b4317,#a37f3a); }
+    .ps-thumb-mono { width: 86px; height: 62px; border-radius: 9px; display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 1.35rem; box-shadow: 0 10px 18px rgba(0,0,0,.22); transform: rotate(-2deg); }
+    .ps-thumb-slides .ps-thumb-mono { background: #241a0c; color: #f6ecd9; }
+    .ps-thumb-canvas .ps-thumb-mono { background: #f6ecd9; color: #241a0c; }
+    .ps-engine-chip { position: absolute; top: 10px; left: 10px; font-size: .66rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase;
+      background: rgba(20,13,6,.55); color: #f6ecd9; border-radius: 50px; padding: 4px 10px; backdrop-filter: blur(4px); }
+    .ps-card-body { padding: 13px 14px 12px; display: flex; align-items: center; gap: 8px; }
+    .ps-card-name { margin: 0; font-weight: 800; font-size: .95rem; line-height: 1.3; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ps-card-meta { display: flex; gap: 10px; align-items: center; padding: 0 14px 12px; color: var(--deborah-semantic-color-text-muted); font-size: .76rem; font-weight: 600; }
+    .ps-card-actions { position: absolute; right: 10px; top: 10px; display: flex; gap: 6px; }
+    .ps-mini-btn { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--deborah-semantic-color-border-default);
+      background: var(--deborah-semantic-color-surface-raised); color: var(--deborah-semantic-color-text-secondary); cursor: pointer;
+      display: inline-flex; align-items: center; justify-content: center; }
+    .ps-mini-btn:hover { color: var(--deborah-semantic-color-action-primary); border-color: var(--deborah-semantic-color-action-primary); }
+    .ps-mini-btn.ps-play { background: linear-gradient(135deg,#d9b465,#a37f3a); color: #1a1305; border-color: transparent; }
+    .ps-empty { margin-top: 26px; border: 1.5px dashed var(--deborah-semantic-color-border-default); border-radius: 22px; padding: 46px 20px; text-align: center; }
+    .ps-empty-title { font-weight: 900; font-size: 1.1rem; }
+    .ps-empty-sub { color: var(--deborah-semantic-color-text-muted); font-size: .9rem; margin: 6px auto 16px; max-width: 420px; font-weight: 600; }
+    .ps-sec-hd { display: flex; align-items: center; gap: 10px; margin: 30px 0 0; }
+    .ps-sec-hd h2 { font-size: .86rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; margin: 0; color: var(--deborah-semantic-color-text-secondary); }
+    .ps-sec-line { flex: 1; height: 1px; background: var(--deborah-semantic-color-border-subtle); }
+  </style>
+</head>
+<body>
+  <%- include('../partials/sidebar', { active: 'presentations', user: { username }, role: 'student' }) %>
+  <main class="main ps-hub" id="main-content" tabindex="-1">
+    <div class="ps-hub-head">
+      <div>
+        <h1 class="ps-hub-title" data-i18n="hubTitle"><%= pCopy.hubTitle %></h1>
+        <p class="ps-hub-sub" data-i18n="hubSub"><%= pCopy.hubSub %></p>
+      </div>
+      <button type="button" class="ps-hub-cta" id="prs-create-open"><span>+</span> <%= pCopy.newDeck %></button>
+    </div>
+
+    <% const visible = decks.filter(d => !d.archived); %>
+    <% if (visible.length === 0) { %>
+      <div class="ps-empty">
+        <div class="ps-empty-title"><%= pCopy.emptyTitle %></div>
+        <div class="ps-empty-sub"><%= pCopy.emptySub %></div>
+        <button type="button" class="ps-hub-cta" id="prs-create-open-2"><span>+</span> <%= pCopy.emptyCta %></button>
+      </div>
+    <% } else { %>
+      <div class="ps-grid" id="ps-grid">
+        <% visible.forEach(d => { %>
+          <div class="ps-card" data-key="<%= d.key %>" data-engine="<%= d.engine %>" data-name="<%= d.name.replace(/'/g, "\\'") %>" role="button" tabindex="0" aria-label="<%= d.name %>">
+            <div class="ps-thumb ps-thumb-<%= d.engine %>">
+              <span class="ps-engine-chip"><%= d.engine === 'canvas' ? 'Canva' : 'Slides' %></span>
+              <span class="ps-thumb-mono"><%= (d.name || '?').trim().charAt(0).toUpperCase() %></span>
+              <div class="ps-card-actions">
+                <a class="ps-mini-btn ps-play" href="/user/presentations/<%= d.key %>/view" title="<%= pCopy.present %>" aria-label="<%= pCopy.present %>">▶</a>
+                <button type="button" class="ps-mini-btn ps-ov" data-act="menu" aria-label="<%= pCopy.rename %>">⋮</button>
+              </div>
+            </div>
+            <div class="ps-card-body">
+              <h3 class="ps-card-name"><%= d.name %></h3>
+            </div>
+            <div class="ps-card-meta">
+              <span><%= d.slideCount %> <%= d.slideCount === 1 ? pCopy.slideCount.split('{n}').join('1') : (pCopy.slideCountF || pCopy.slideCount).split('|')[0].split('{n}').join(d.slideCount) %></span>
+              <span>·</span>
+              <span><%= fmtDate(d.updatedAt) %></span>
+            </div>
+            <div class="ps-pop" id="pop-<%= d.key %>" hidden>
+              <button type="button" data-act="open"><%= pCopy.open %></button>
+              <button type="button" data-act="rename"><%= pCopy.rename %></button>
+              <button type="button" data-act="dup"><%= pCopy.duplicate %></button>
+              <button type="button" data-act="archive"><%= pCopy.archive %></button>
+              <button type="button" data-act="delete" class="ps-pop-danger"><%= pCopy.delete %></button>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+
+    <% const archived = decks.filter(d => d.archived); %>
+    <% if (archived.length) { %>
+      <div class="ps-sec-hd"><h2><%= pCopy.unarchive %></h2><div class="ps-sec-line"></div></div>
+      <div class="ps-grid">
+        <% archived.forEach(d => { %>
+          <div class="ps-card is-archived" data-key="<%= d.key %>" data-engine="<%= d.engine %>" data-name="<%= d.name.replace(/'/g, "\\'") %>" role="button" tabindex="0" aria-label="<%= d.name %>">
+            <div class="ps-thumb ps-thumb-<%= d.engine %>">
+              <span class="ps-engine-chip"><%= d.engine === 'canvas' ? 'Canva' : 'Slides' %></span>
+              <span class="ps-thumb-mono"><%= (d.name || '?').trim().charAt(0).toUpperCase() %></span>
+              <div class="ps-card-actions">
+                <button type="button" class="ps-mini-btn ps-ov" data-act="menu" aria-label="<%= pCopy.rename %>">⋮</button>
+              </div>
+            </div>
+            <div class="ps-card-body"><h3 class="ps-card-name"><%= d.name %></h3></div>
+            <div class="ps-card-meta"><span><%= d.slideCount %> sl</span><span>·</span><span><%= fmtDate(d.updatedAt) %></span></div>
+            <div class="ps-pop" id="pop-<%= d.key %>" hidden>
+              <button type="button" data-act="unarchive"><%= pCopy.unarchive %></button>
+              <button type="button" data-act="delete" class="ps-pop-danger"><%= pCopy.delete %></button>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+  </main>
+
+  <!-- Create modal -->
+  <div class="ps-modal-overlay" id="prs-create" hidden>
+    <div class="ps-modal" role="dialog" aria-modal="true" aria-labelledby="prs-create-title">
+      <div class="ps-modal-head">
+        <h3 id="prs-create-title"><%= pCopy.createTitle %></h3>
+        <button type="button" class="ps-modal-x" data-close aria-label="Yopish">✕</button>
+      </div>
+      <label class="ps-lbl" for="prs-engine-slides"><%= pCopy.engineSlides %></label>
+      <div class="ps-engine-grid" role="radiogroup" aria-label="<%= pCopy.engineSlides %>">
+        <label class="ps-engine-card" data-engine-card="slides">
+          <input type="radio" name="prs-engine" value="slides" checked hidden>
+          <div class="ps-eng-name">Google Slides <span class="ps-eng-badge">uslubi</span></div>
+          <div class="ps-eng-sub"><%= pCopy.engineSlidesSub %></div>
+        </label>
+        <label class="ps-engine-card" data-engine-card="canvas">
+          <input type="radio" name="prs-engine" value="canvas" hidden>
+          <div class="ps-eng-name">Canva <span class="ps-eng-badge">uslubi</span></div>
+          <div class="ps-eng-sub"><%= pCopy.engineCanvasSub %></div>
+        </label>
+      </div>
+      <label class="ps-lbl" style="margin-top:14px"><%= pCopy.howStart %></label>
+      <div class="ps-start-row">
+        <label class="ps-start-opt"><input type="radio" name="prs-start" value="blank" checked> <%= pCopy.startBlank %></label>
+        <label class="ps-start-opt"><input type="radio" name="prs-start" value="test" <%= tests.length ? '' : 'disabled' %>> <%= pCopy.startTest %></label>
+      </div>
+      <div id="prs-test-pick" hidden>
+        <select id="prs-test-key" class="ps-inp">
+          <% tests.forEach(t => { %><option value="<%= t.key %>"><%= t.name %> (<%= t.count %>)</option><% }); %>
+        </select>
+        <% if (!tests.length) { %><div class="ps-hint"><%= pCopy.noTests %></div><% } %>
+      </div>
+      <label class="ps-lbl" style="margin-top:14px" for="prs-name"><%= pCopy.nameLbl %></label>
+      <input class="ps-inp" id="prs-name" maxlength="120" placeholder="<%= pCopy.namePh %>" autocomplete="off">
+      <div class="ps-modal-actions">
+        <button type="button" class="ps-btn ps-btn-quiet" data-close><%= pCopy.cancel %></button>
+        <button type="button" class="ps-btn ps-btn-gold" id="prs-create-go"><%= pCopy.createBtn %></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rename modal -->
+  <div class="ps-modal-overlay" id="prs-rename" hidden>
+    <div class="ps-modal" role="dialog" aria-modal="true" aria-labelledby="prs-rename-title">
+      <div class="ps-modal-head">
+        <h3 id="prs-rename-title"><%= pCopy.renameTitle %></h3>
+        <button type="button" class="ps-modal-x" data-close aria-label="Yopish">✕</button>
+      </div>
+      <input class="ps-inp" id="prs-rename-name" maxlength="120" autocomplete="off">
+      <div class="ps-modal-actions">
+        <button type="button" class="ps-btn ps-btn-quiet" data-close><%= pCopy.cancel %></button>
+        <button type="button" class="ps-btn ps-btn-gold" id="prs-rename-go"><%= pCopy.rename %></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="ps-toast" id="ps-toast" role="status" aria-live="polite"></div>
+  <script src="/js/present-hub.js" defer></script>
+</body>
+</html>

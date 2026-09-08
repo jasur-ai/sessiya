@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="<%= htmlLang %>" dir="ltr">
+<head>
+  <%- include('../partials/head') %>
+  <link rel="stylesheet" href="/css/presentations.css">
+</head>
+<body class="ps-v-body">
+  <div class="ps-v" id="ps-v">
+    <div class="ps-v-frame" id="ps-v-frame">
+      <div class="ps-v-canvas" id="ps-v-canvas"></div>
+    </div>
+  </div>
+  <div class="ps-v-hint">← → bo‘sh joy: navigatsiya · Esc: chiqish</div>
+  <div class="ps-v-bar">
+    <span class="ps-v-name" id="ps-v-name"></span>
+    <span class="ps-v-count" id="ps-v-count"></span>
+    <div class="ps-v-dots" id="ps-v-dots"></div>
+    <button type="button" class="ps-v-exit" id="ps-v-exit"><%= pCopy.exitView %> Esc</button>
+  </div>
+
+  <script>
+    window.__PRS = { deck: <%- deckJSON %>, COPY: <%- JSON.stringify(pCopy || {}) %> };
+  </script>
+  <script src="/js/present-view.js"></script>
+</body>
+</html>

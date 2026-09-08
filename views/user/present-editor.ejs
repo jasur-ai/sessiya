@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="<%= htmlLang %>" dir="ltr">
+<head>
+  <%- include('../partials/head') %>
+  <link rel="stylesheet" href="/css/presentations.css">
+</head>
+<body class="ps-ed-body">
+  <div class="ps-ed" id="ps-ed">
+    <header class="ps-ed-top">
+      <a class="ps-ed-back" href="/user/presentations" id="ed-back"><span>←</span> <span data-i18n="back"><%= pCopy.back %></span></a>
+      <input class="ps-ed-name" id="ed-name" maxlength="120" aria-label="<%= pCopy.nameLbl %>">
+      <span class="ps-ed-engine" id="ed-engine"></span>
+      <div class="ps-ed-spacer"></div>
+      <div class="ps-ed-status" id="ed-status" role="status" aria-live="polite"></div>
+      <a class="ps-ed-present" id="ed-present" href="#"><span>▶</span> <span data-i18n="present"><%= pCopy.present %></span></a>
+    </header>
+    <div class="ps-ed-cols">
+      <aside class="ps-ed-left" aria-label="<%= pCopy.edSlides %>">
+        <button type="button" class="ps-add-slide" id="ed-add-slide"><span>+</span> <span data-i18n="addSlide"><%= pCopy.addSlide %></span></button>
+        <div class="ps-layout-row" id="ed-layouts" hidden>
+          <button type="button" class="ps-layout-chip" data-layout="blank"><%= pCopy.layoutBlank %></button>
+          <button type="button" class="ps-layout-chip" data-layout="title"><%= pCopy.layoutTitle %></button>
+          <button type="button" class="ps-layout-chip" data-layout="titlebody"><%= pCopy.layoutTitleBody %></button>
+        </div>
+        <div class="ps-thumbs" id="ed-thumbs" role="listbox" aria-label="<%= pCopy.edSlides %>"></div>
+        <div class="ps-left-foot">
+          <button type="button" class="ps-ico-btn" id="ed-slide-up" title="<%= pCopy.moveUp %>">↑</button>
+          <button type="button" class="ps-ico-btn" id="ed-slide-down" title="<%= pCopy.moveDown %>">↓</button>
+          <button type="button" class="ps-ico-btn" id="ed-slide-dup" title="<%= pCopy.dupSlide %>">⧉</button>
+          <button type="button" class="ps-ico-btn danger" id="ed-slide-del" title="<%= pCopy.delSlide %>">✕</button>
+        </div>
+      </aside>
+      <section class="ps-ed-center" id="ed-center" aria-label="<%= pCopy.edSlide %>">
+        <div class="ps-ed-stage-bg" aria-hidden="true"></div>
+        <div class="ps-frame" id="ed-frame">
+          <div class="ps-canvas" id="ed-canvas"></div>
+        </div>
+      </section>
+      <aside class="ps-ed-right" id="ed-inspector" aria-label="Sozlamalar"></aside>
+    </div>
+  </div>
+
+  <script>
+    window.__PRS = {
+      deck: <%- deckJSON %>,
+      CSRF: <%- JSON.stringify(csrfToken || '') %>,
+      COPY: <%- JSON.stringify(pCopy || {}) %>
+    };
+  </script>
+  <script src="/js/present-editor.js"></script>
+</body>
+</html>

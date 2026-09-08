@@ -433,6 +433,12 @@ app.get('/health', (req, res) => {
   app.use('/', aiGenerateRoutes);
   app.use('/', profileRoutes);
   app.use('/user', userRoutes);
+  // 09/2026: Taqdimotlar (Presentations) — user-scoped; /user/presentations
+  // sahifalari + /user/api/presentations API (requireAuth o'zida).
+  // DIQQAT: top-level `presentationRoutes` (routes/presentation.js — admin
+  // canonical) bilan nom to'qnashmasligi uchun alohida nom ishlatiladi.
+  const { default: userPresentationRoutes } = await import('./routes/presentations.js');
+  app.use('/user', userPresentationRoutes);
   app.use('/', gameRoutes);
   app.use('/arena', arenaRoutes);
 
