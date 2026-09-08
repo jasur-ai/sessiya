@@ -316,6 +316,7 @@
   justify-content: center;
   z-index: 100;
 }
+.modal-overlay[hidden] { display: none !important; }
 .modal-box { padding: 28px; max-width: 420px; width: 90%; }
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
 
@@ -489,6 +490,10 @@
   justify-content: center;
   z-index: 200;
 }
+/* 09/2026 (user qarori): hidden atributli overlaylar hech qachon ko'rinmaydi —
+   avval CSS display:flex [hidden]ni yengib, barcha drawerlar (Tezkor savol,
+   POE, Semantic Board…) sahifani qoplab bosishlarni yutardi (X ham ishlamasdi). */
+.qp-overlay[hidden] { display: none !important; }
 .qp-drawer {
   width: 100%;
   max-width: 560px;

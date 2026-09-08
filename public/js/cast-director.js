@@ -45,6 +45,7 @@
     }
   })();
   let phase = 'LOBBY_OPEN';
+  let _autoOpenedFirst = false; // 09/2026: boshlashda 1-savol avto-ochilishi (bir marta)
   let timerInterval = null;
   let closesAt = null;
   let revision = BOOT.initialRevision || 1;
@@ -334,6 +335,13 @@
         $('dir-question').hidden = false;
         setHealth('online');
         announce('Sessiya boshlandi');
+        // 09/2026 (user qarori): "Sessiyani boshlash" bosilishi bilanoq birinchi
+        // savol AVTOMATIK ochiladi (reklama/demo'dagi kabi) — alohida bosish shart emas.
+        // Server savollar bo'lmasa sessiyani o'zi yakunlaydi.
+        if (!_autoOpenedFirst) {
+          _autoOpenedFirst = true;
+          try { send('cast:questionOpen', {}).catch(() => {}); } catch (_) { /* noop */ }
+        }
         break;
       case 'cast:questionPreview': {
         phase = 'THINK_TIME';
@@ -1481,7 +1489,7 @@
 
   // Keyboard shortcuts (disabled while typing)
   const keyMap = {
-    ' ': 'cast:sessionStart|cast:questionOpen',
+    // 09/2026: Space maxsus ishlanadi (pastda) — lobby'da boshlash, THINK'da savol ochish
     'p': 'cast:questionPause',
     'r': 'cast:questionResume',
     'c': 'cast:questionClose',
@@ -1491,10 +1499,19 @@
   };
   document.addEventListener('keydown', (e) => {
     if (e.target.matches('input, textarea, select')) return;
+    if (e.key === ' ') {
+      e.preventDefault();
+      const startBtn = $('btn-start-session');
+      const nextBtn = $('btn-next');
+      if (startBtn && !startBtn.disabled) startBtn.click();
+      else if (phase === 'THINK_TIME') { try { send('cast:questionOpen', {}).catch(() => {}); } catch (_) {} }
+      else if (nextBtn && !nextBtn.disabled) nextBtn.click();
+      return;
+    }
     const map = keyMap[e.key.toLowerCase()];
     if (!map) return;
     const type = map.split('|').pop();
-    const btn = { 'cast:sessionStart': 'btn-start-session', 'cast:questionPause': 'btn-pause', 'cast:questionResume': 'btn-resume', 'cast:questionClose': 'btn-close', 'cast:questionReveal': 'btn-reveal', 'cast:questionNext': 'btn-next' }[type];
+    const btn = { 'cast:questionPause': 'btn-pause', 'cast:questionResume': 'btn-resume', 'cast:questionClose': 'btn-close', 'cast:questionReveal': 'btn-reveal', 'cast:questionNext': 'btn-next' }[type];
     if (btn && !$(btn).disabled) $(btn).click();
   });
 
