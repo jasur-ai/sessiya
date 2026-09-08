@@ -9,13 +9,16 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { io } from 'socket.io-client';
 import fs from 'fs';
+import os from 'os';
+import path from 'path';
 import { startE2E, stopE2E, newContext, newPage, loginAsUser, serverUrl } from './cast-e2e.helper.js';
 import { createSession, generateSessionId, generateJoinCode, upsertRole } from '../../services/cast/session-store.js';
 import { initialState } from '../../services/cast/state-machine.js';
 import { CAST_LB_VISIBILITY, CAST_LB_FREQUENCY } from '../../utils/cast-constants.js';
 
 let ctx;
-const SHOTS = '/home/user/shots';
+// CI (GitHub Actions) / lokal — /home/user yozilmasligi mumkin: tmp ishlatamiz
+const SHOTS = process.env.SHOTS_DIR || path.join(os.tmpdir(), 'cast-icons-shots');
 fs.mkdirSync(SHOTS, { recursive: true });
 
 beforeAll(async () => { await startE2E(); ctx = await newContext(); await loginAsUser(ctx); }, 60000);

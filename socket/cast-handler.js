@@ -1592,7 +1592,7 @@ export function setupCastHandlers(io, socket) {
         for (const entry of ranked) {
           const personal = personalProjection(ranked, entry.participantId, 1);
           if (!personal) continue;
-          io.to(participantRoom(sessionId, entry.participantId)).emit('cast:podiumShow', {
+          io.to(trackedSocketsFor(entry.participantId)).emit('cast:podiumShow', {
             questionId: state.questionId,
             personal,
             totalParticipants: ranked.length,
@@ -1674,9 +1674,9 @@ export function setupCastHandlers(io, socket) {
       for (const entry of ranked) {
         const personal = personalProjection(ranked, entry.participantId, 1);
         if (!personal) continue;
-        // C4-09: private room orqali (per-socket Map har socket'da alohida — room
-        // join'lar bo'lsa ishonchli yetkaziladi)
-        io.to(participantRoom(sessionId, entry.participantId)).emit(CAST_EVENTS.LEADERBOARD_UPDATED, {
+        // C4-09: shaxsiy proyeksiya faqat ushbu participant'ning tracked socket'lariga
+        // (identity server-side; boshqa participant/socket olmaydi — S32.05)
+        io.to(trackedSocketsFor(entry.participantId)).emit(CAST_EVENTS.LEADERBOARD_UPDATED, {
           mode: 'personal',
           visibility: activeVisibility,
           personal,

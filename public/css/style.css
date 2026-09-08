@@ -268,31 +268,31 @@
 /* S11.02: ambient override global body::before bilan birga olib tashlandi —
    sahifa konteksti o'z gradient'ini boshqaradi. Scrollbar overrides qoladi. */
 [data-theme="light"] ::-webkit-scrollbar-track {
-  background: rgba(15,22,48,.03) !important;
+  background: rgba(15,22,48,.03);
 }
 [data-theme="light"] ::-webkit-scrollbar-thumb {
-  background: rgba(37,99,235,.15) !important;
+  background: rgba(37,99,235,.15);
 }
 [data-theme="light"] ::-webkit-scrollbar-thumb:hover {
-  background: rgba(37,99,235,.25) !important;
+  background: rgba(37,99,235,.25);
 }
 
 /* ── Light theme navbar ── */
 [data-theme="light"] .navbar,
 body.theme-light .navbar {
-  background: rgba(240,242,248,.88) !important;
-  border-bottom-color: rgba(15,22,48,.08) !important;
+  background: rgba(240,242,248,.88);
+  border-bottom-color: rgba(15,22,48,.08);
 }
 
 [data-theme="light"] .btn-ghost,
 body.theme-light .btn-ghost {
-  background: rgba(15,22,48,.04) !important;
-  border-color: rgba(15,22,48,.1) !important;
+  background: rgba(15,22,48,.04);
+  border-color: rgba(15,22,48,.1);
 }
 
 [data-theme="light"] .btn-ghost:hover:not(:disabled),
 body.theme-light .btn-ghost:hover:not(:disabled) {
-  background: rgba(15,22,48,.08) !important;
+  background: rgba(15,22,48,.08);
 }
 
 /* ═══════════════════════════════════════════════════════════════
