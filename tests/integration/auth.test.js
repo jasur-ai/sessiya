@@ -250,11 +250,13 @@ describe('Auth — STYLE STEP 25 (teacher workspace panel)', () => {
     expect(html).not.toContain('selectChar');
   });
 
-  it('S25.04 — actionable metrics mavjud', async () => {
+  it('S25.04 — demo metrikalar olib tashlangan (kutubxona modeli)', async () => {
     const { html } = await fetchPanel();
-    expect(html).toContain('ws-metrics');
-    expect(html).toContain('ws-metric-label');
-    expect(html).toContain('Testlarim');
+    // 09/2026 qaror: metrics/VIP/upgrade demolari end-user'dan olib tashlandi
+    expect(html).not.toContain('ws-metrics');
+    expect(html).not.toContain('ws-upgrade');
+    expect(html).toContain('ws-lib-list');
+    expect(html).toContain('ws-search');
   });
 
   it('S25.10 — logout shell-account, topbar emas', async () => {
@@ -596,11 +598,12 @@ describe('Auth — STYLE STEP 26 (test library)', () => {
     expect(html).toContain('ws-lib-active');
   });
 
-  it('S26.07/08 — user-facing taxonomy + upgrade state (non-VIP honest copy)', async () => {
+  it("S26.07/08 — VIP/upgrade end-user'da ko'rinmaydi (kutubxona oddiy model)", async () => {
     const { html } = await fetchPanel();
-    expect(html).toContain("Tayyor to'plamlar");
-    expect(html).toContain('ws-upgrade');
-    expect(html).toContain('VIP imkoniyati');
+    // 09/2026 qaror: VIP end-user ko'rinmaydi; upgrade/taxonomy demolari yo'q
+    expect(html).not.toContain('ws-upgrade');
+    expect(html).not.toContain('VIP imkoniyati');
+    expect(html).not.toContain("Tayyor to'plamlar");
     expect(html).not.toContain('Mock Testlar');
   });
 

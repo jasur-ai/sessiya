@@ -126,9 +126,10 @@ describe('S14.12: integration + migrations', () => {
     // (hierarxiya accordion talab qilmaydi). Open/close holati yo'q.
     expect(panel).not.toMatch(/toggleAcc\(/);
     expect(panel).not.toMatch(/acc-header/);
-    // Natija: section sarlavhalari + ready grid
-    expect(panel).toMatch(/ws-tax-hd/);
-    expect(panel).toMatch(/ws-ready-grid/);
+    // 09/2026: metrics/VIP/upgrade demolari olib tashlandi — kutubxona modeli
+    // Natija: qidiruv + testlar kutubxonasi sectionlari
+    expect(panel).toMatch(/ws-search/);
+    expect(panel).toMatch(/ws-lib-list/);
   });
 
   it('landing-how tabs wired to tabs.js (tablist/tabpanel ids)', () => {
