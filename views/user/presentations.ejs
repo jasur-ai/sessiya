@@ -85,6 +85,7 @@
             </div>
             <div class="ps-pop" id="pop-<%= d.key %>" hidden>
               <button type="button" data-act="open"><%= pCopy.open %></button>
+              <button type="button" data-act="export">↧ <%= pCopy.exportLbl %></button>
               <button type="button" data-act="rename"><%= pCopy.rename %></button>
               <button type="button" data-act="dup"><%= pCopy.duplicate %></button>
               <button type="button" data-act="archive"><%= pCopy.archive %></button>
@@ -153,6 +154,11 @@
       </div>
       <label class="ps-lbl" style="margin-top:14px" for="prs-name"><%= pCopy.nameLbl %></label>
       <input class="ps-inp" id="prs-name" maxlength="120" placeholder="<%= pCopy.namePh %>" autocomplete="off">
+      <div class="ps-import-row">
+        <button type="button" class="ps-import-btn" id="prs-import-btn">⬆ <%= pCopy.importBtn %></button>
+        <span class="ps-r-hint" id="prs-import-hint" hidden><%= pCopy.importBusy %></span>
+        <input type="file" id="prs-import-file" accept=".pptx" hidden>
+      </div>
       <div class="ps-modal-actions">
         <button type="button" class="ps-btn ps-btn-quiet" data-close><%= pCopy.cancel %></button>
         <button type="button" class="ps-btn ps-btn-gold" id="prs-create-go"><%= pCopy.createBtn %></button>
@@ -176,6 +182,9 @@
   </div>
 
   <div class="ps-toast" id="ps-toast" role="status" aria-live="polite"></div>
+  <script>window.__PRS_COPY = <%- JSON.stringify({ exportPdf: pCopy.exportPdf, exportPptx: pCopy.exportPptx, exportPng: pCopy.exportPng, exportJpg: pCopy.exportJpg, exportBusy: pCopy.exportBusy, exportFail: pCopy.exportFail }) %>;</script>
+  <script src="/js/present-export.js" defer></script>
   <script src="/js/present-hub.js" defer></script>
+  <script src="/js/icon-kit.js"></script>
 </body>
 </html>

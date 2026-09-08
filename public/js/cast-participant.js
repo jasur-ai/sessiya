@@ -41,6 +41,20 @@
   let a11y = null;
   // C4-04 (item 20): personal accommodation — noTimer/longTimeMs (join ack'dan)
   let accommodation = null;
+  // C4-09: shohsupa (auto-podium) — eng so'nggi personal projection + overlay boshqaruvi
+  let podiumPersonal = null;
+  let podiumHideTimer = null;
+  function hidePodium(keepPanel) {
+    const ov = $('part-podium');
+    if (ov) ov.hidden = true;
+    if (podiumHideTimer) { clearTimeout(podiumHideTimer); podiumHideTimer = null; }
+    // S32 panel: yangi savol kelganda tozalanadi; session end'da esa yakuniy
+    // shaxsiy reyting ko'rinib turishi kerak (keepPanel=true).
+    if (!keepPanel) {
+      const panel = $('part-leaderboard');
+      if (panel) panel.hidden = true;
+    }
+  }
 
   // C4-04: accessibility bootstrap (theme/motion/hints/timer policy)
   if (window.CastA11yInit) {
@@ -327,12 +341,14 @@
   // ── Question render ──
   function renderQuestion(q, phase, preserveIds = null) {
     currentQuestion = q;
+    clearStageCountdown();
     show('part-question');
     selectedIds = new Set(preserveIds || []);
     $('part-q-meta').textContent = phase === 'REVOTE_OPEN' ? 'Qayta ovoz berish' : 'Savol';
     $('part-q-text').textContent = q.text;
     const wrap = $('part-options');
     wrap.innerHTML = '';
+    wrap.hidden = false;
     const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
     q.options.forEach((o, i) => {
       const btn = document.createElement('button');
@@ -373,6 +389,28 @@
     // Single-choice: show submit when one selected; multi-select: always show
     const isMulti = currentQuestion && currentQuestion.type === 'multiple_select';
     $('part-submit').hidden = selectedIds.size === 0;
+  }
+
+  // ── C4-08: staging countdown (savol ochilguncha ko'rinadigan 3-2-1) ──
+  let stageTimer = null;
+  function clearStageCountdown() {
+    if (stageTimer) { clearInterval(stageTimer); stageTimer = null; }
+    const el = $('part-stage-cd');
+    if (el) el.hidden = true;
+  }
+  function startStageCountdown(sec) {
+    clearStageCountdown();
+    const el = $('part-stage-cd');
+    const num = $('part-stage-num');
+    if (!el || !num || !sec) return;
+    num.textContent = String(sec);
+    el.hidden = false;
+    const t0 = Date.now();
+    stageTimer = setInterval(() => {
+      const left = sec - Math.floor((Date.now() - t0) / 1000);
+      if (left <= 0) { num.textContent = '0'; clearStageCountdown(); }
+      else num.textContent = String(left);
+    }, 250);
   }
 
   // ── C3-04 Confidence buttons ──
@@ -875,17 +913,38 @@
 
   function handleEvent(eventName, data) {
     switch (eventName) {
-      case 'cast:questionPreview':
-        show('part-question');
-        $('part-q-text').textContent = `Fikrlash vaqti: ${data.thinkSeconds || 0}s`;
+      case 'cast:questionPreview': {
+        hidePodium();
+        // C4-08 staging: 3-sekund qoidasi — avval faqat savol + ko'rinadigan countdown,
+        // keyin (questionOpened'da) variantlar ochiladi
+        const think = Math.max(0, Math.round(Number(data.thinkSeconds) || 0));
+        const q = data.question || null;
+        if (q && think > 0) {
+          currentVoteRound = 1;
+          currentQuestion = q;
+          selectedIds = new Set();
+          stopTimer();
+          show('part-question');
+          $('part-q-meta').textContent = 'Savol';
+          $('part-q-text').textContent = q.text;
+          const wrap = $('part-options');
+          if (wrap) { wrap.innerHTML = ''; wrap.hidden = true; }
+          const sub = $('part-submit'); if (sub) sub.hidden = true;
+          const conf = $('part-confidence'); if (conf) conf.hidden = true;
+          startStageCountdown(think);
+        }
         setState(STATE.THINKING);
+        renderState();
         break;
+      }
       case 'cast:questionOpened':
         currentVoteRound = 1;
+        hidePodium();
         if (data.question) renderQuestion(data.question, 'QUESTION_OPEN');
         break;
       case 'cast:quickPromptLive':
         currentVoteRound = 1;
+        hidePodium();
         if (data.question) renderQuestion(data.question, 'QUESTION_OPEN');
         break;
       case 'cast:transferOpened':
@@ -899,6 +958,7 @@
         break;
       case 'cast:discussionStarted': {
         currentVoteRound = 1;
+        hidePodium();
         stopTimer();
         show('part-question');
         const instr = data.instructions ? `<br>💬 ${escapeHtml(data.instructions)}` : '';
@@ -911,6 +971,7 @@
       }
       case 'cast:revoteOpened': {
         currentVoteRound = 2;
+        hidePodium();
         // showPreviousOnRevote=true → oldingi tanlovni belgilab ko'rsatish
         if (data.question) renderQuestion(data.question, 'REVOTE_OPEN', data.showPrevious !== false ? lastSubmittedIds : null);
         else {
@@ -943,8 +1004,40 @@
         if (reasoningEl) reasoningEl.hidden = true;
         transferActive = false; // C3-08: transfer flow yakunlandi
         break;
+      case 'cast:podiumShow': {
+        // C4-09: savol yakunidan 3s o'tib — shaxsiy o'rin overlay.
+        // Participant'ga shaxsiy payload keladi (data.personal); public broadcast
+        // (personal'siz) participant'da e'tiborsiz qoldiriladi — projector/director uchun.
+        if (!data || !data.personal) break;
+        hidePodium();
+        const ov = $('part-podium');
+        if (!ov) break;
+        const pers = data.personal || podiumPersonal;
+        $('part-podium-num').textContent = pers && typeof pers.rank === 'number' ? String(pers.rank) : '—';
+        const word = $('part-podium-word');
+        if (word) word.textContent = t('podium.place');
+        const mine = $('part-podium-mine');
+        if (mine) mine.textContent = pers ? String(displayAlias || t('podium.you')) : '';
+        const scoreEl = $('part-podium-score');
+        if (pers && typeof pers.score === 'number') {
+          scoreEl.hidden = false;
+          scoreEl.textContent = t('podium.score', { s: pers.score });
+        } else if (scoreEl) scoreEl.hidden = true;
+        ov.hidden = false;
+        const hold = Math.max(0, Number(data.autoHoldMs) || 0);
+        if (hold > 0) {
+          podiumHideTimer = setTimeout(() => {
+            const e2 = $('part-podium');
+            if (e2) e2.hidden = true;
+            podiumHideTimer = null;
+          }, hold);
+        }
+        announce(t('podium.title'), false);
+        break;
+      }
       case 'cast:questionRevealed':
         stopTimer();
+        hidePodium();
         show('part-reveal');
         const correct = new Set(data.correctOptionIds || []);
         const wasCorrect = currentQuestion && [...selectedIds].every((id) => correct.has(id)) && selectedIds.size === correct.size;
@@ -1000,6 +1093,7 @@
       case 'cast:leaderboardUpdated': {
         // STYLE S32: personal projection — participant-private (o'zi + neighbor'lar)
         if (data.mode !== 'personal') break;
+        podiumPersonal = data.personal || null;
         const wrap = $('part-leaderboard');
         const body = $('part-leaderboard-body');
         const badge = $('part-leaderboard-badge');
@@ -1202,6 +1296,7 @@
       }
       case 'cast:sessionEnded':
         stopTimer();
+        hidePodium(true);
         if (spSyncInterval) { clearInterval(spSyncInterval); spSyncInterval = null; }
         show('part-reveal');
         $('part-reveal-emoji').textContent = '🏁';

@@ -6,8 +6,8 @@
   "join.card": "Номер карты",
   "join.cardPlaceholder": "CARD-001",
   "join.delivery": "Откуда участвуете?",
-  "join.delivery.inRoom": "🏫 В классе (in-room)",
-  "join.delivery.remote": "🏠 Удалённо (remote)",
+  "join.delivery.inRoom": "В классе (in-room)",
+  "join.delivery.remote": "Удалённо (remote)",
   "join.btn": "Присоединиться",
   "join.joining": "Подключение…",
   "join.err.required": "Введите код и имя",
@@ -85,5 +85,13 @@
   "governance.removeOnly": "Вы были удалены — можете присоединиться снова с новым именем.",
   "director.rotateCode": "🔄 Сменить код",
   "director.block": "🚫 Заблокировать",
-  "director.remove": "✖ Удалить"
+  "director.remove": "✖ Удалить",
+  "stage.think": "Вопрос начнётся",
+  "podium.title": "Подиум",
+  "podium.note": "Готовьтесь к следующему вопросу…",
+  "podium.you": "Вы",
+  "podium.place": "место",
+  "podium.score": "{s} баллов",
+  "podium.empty": "Рейтинга пока нет",
+  "podium.rankAria": "{n} место"
 }

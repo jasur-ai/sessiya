@@ -773,7 +773,7 @@ describe('S27 — Test Builder professional authoring workspace', () => {
     expect(js).toContain('navigator.onLine');
     expect(js).toContain('data-move="up"');
     expect(js).toContain('data-move="down"');
-    // S34l: native radio YO'Q — variant kartalari role="radio" (Kahoot modeli)
+    // S34l: native radio YO'Q — variant kartalari role="radio" (jonli viktorina modeli)
     expect(js).toContain('role="radiogroup"');
     expect(js).toContain('role="radio"');
     expect(js).toContain('aria-checked=');

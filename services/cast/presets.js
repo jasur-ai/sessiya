@@ -103,7 +103,7 @@ export const PRESET_REGISTRY = {
       playback: {
         advanceMode: CAST_ADVANCE_MODE.HOST_CONTROLLED,
         closeTrigger: [CAST_CLOSE_TRIGGER.HOST_OR_SOFT_TIMEOUT, CAST_CLOSE_TRIGGER.ALL_ANSWERED],
-        thinkSeconds: 0,
+        thinkSeconds: 3,
         minimumOpenSeconds: 3,
       },
       timer: { mode: CAST_TIMER_MODE.STRICT, defaultSeconds: 20, allowHostExtend: true, maxExtensionsPerQuestion: 2 },

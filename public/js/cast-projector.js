@@ -130,6 +130,7 @@
   }
 
   function renderQuestion(q, phase) {
+    clearProjStageCountdown();
     $('proj-lobby').hidden = true;
     $('proj-question').hidden = false;
     $('proj-reveal').hidden = true;
@@ -137,6 +138,7 @@
     applyFontFloor($('proj-q-text'), 26);
     const wrap = $('proj-options');
     wrap.innerHTML = '';
+    wrap.hidden = false;
     q.options.forEach((o, i) => { wrap.appendChild(renderOptionRow(o, i, false)); });
     if (q.closesAt) { closesAt = q.closesAt; startTimer(); }
     else { stopTimer(); $('proj-timer-num').textContent = '—'; $('proj-timer-label').textContent = ''; }
@@ -170,6 +172,37 @@
       bars.appendChild(row);
     });
     box.hidden = false;
+  }
+
+  // C4-08: staging countdown (projector) — savol ochilishigacha ko'rinadigan soniya
+  let projStageTimer = null;
+  function clearProjStageCountdown() {
+    if (projStageTimer) { clearInterval(projStageTimer); projStageTimer = null; }
+    const el = $('proj-stage-cd');
+    if (el) el.hidden = true;
+  }
+  // C4-09: shohsupa (auto-podium) — so'nggi public Top-N proyeksiya
+  let podiumTopN = null;
+  let podiumHideTimer = null;
+  function hidePodium() {
+    const ov = $('proj-podium');
+    if (ov) ov.hidden = true;
+    if (podiumHideTimer) { clearTimeout(podiumHideTimer); podiumHideTimer = null; }
+  }
+
+  function startProjStageCountdown(sec) {
+    clearProjStageCountdown();
+    const el = $('proj-stage-cd');
+    const num = $('proj-stage-num');
+    if (!el || !num || !sec) return;
+    num.textContent = String(sec);
+    el.hidden = false;
+    const t0 = Date.now();
+    projStageTimer = setInterval(() => {
+      const left = sec - Math.floor((Date.now() - t0) / 1000);
+      if (left <= 0) { num.textContent = '0'; clearProjStageCountdown(); }
+      else num.textContent = String(left);
+    }, 250);
   }
 
   function renderReveal(data) {
@@ -211,10 +244,33 @@
         if (data.count !== undefined) c.textContent = t('proj.count', { n: data.count });
         break;
       }
-      case 'cast:questionPreview':
-        if (data.thinkSeconds) { $('proj-q-meta').textContent = `Fikrlash vaqti: ${data.thinkSeconds}s`; }
+      case 'cast:questionPreview': {
+        hidePodium();
+        // C4-08 staging: avval faqat savol + countdown; variantlar questionOpened'da
+        const think = Math.max(0, Math.round(Number(data.thinkSeconds) || 0));
+        const q = data.question || null;
+        if (q && think > 0) {
+          window.__lastQuestion = q;
+          $('proj-lobby').hidden = true;
+          $('proj-reveal').hidden = true;
+          $('proj-code-chip').hidden = true;
+          $('proj-question').hidden = false;
+          $('proj-q-meta').textContent = 'Savol';
+          $('proj-q-text').textContent = q.text;
+          applyFontFloor($('proj-q-text'), 26);
+          const wrap = $('proj-options');
+          if (wrap) { wrap.innerHTML = ''; wrap.hidden = true; }
+          stopTimer();
+          $('proj-timer-num').textContent = '—';
+          $('proj-timer-label').textContent = '';
+          startProjStageCountdown(think);
+        } else if (think > 0) {
+          $('proj-q-meta').textContent = `Fikrlash vaqti: ${think}s`;
+        }
         break;
+      }
       case 'cast:questionOpened':
+        hidePodium();
         $('proj-q-meta').textContent = `Savol ${(data.question?.position ?? '')}`;
         if (data.question) {
           window.__lastQuestion = data.question;
@@ -240,7 +296,59 @@
         $('proj-timer-num').textContent = '—';
         $('proj-timer-label').textContent = '';
         break;
+      case 'cast:podiumShow': {
+        // C4-09: projector'da katta shohsupa — TOP_N qatorlari
+        const ov = $('proj-podium');
+        const rows = $('proj-podium-rows');
+        if (!ov || !rows) break;
+        hidePodium();
+        const board = $('proj-leaderboard');
+        if (board) board.hidden = true;
+        const entries = (podiumTopN && podiumTopN.entries) || [];
+        rows.textContent = '';
+        if (!entries.length) {
+          const li = document.createElement('li');
+          li.className = 'p-row';
+          const nm = document.createElement('span');
+          nm.className = 'p-name';
+          nm.textContent = t('podium.empty');
+          li.appendChild(nm);
+          rows.appendChild(li);
+        } else {
+          entries.forEach((e, i) => {
+            const li = document.createElement('li');
+            li.className = 'p-row' + (e.rank <= 3 ? ' r' + e.rank : '');
+            li.style.setProperty('--p-stagger', (i * 110) + 'ms');
+            const med = document.createElement('span');
+            med.className = 'p-med';
+            med.textContent = String(e.rank);
+            med.setAttribute('aria-label', t('podium.rankAria', { n: e.rank }));
+            const nm = document.createElement('span');
+            nm.className = 'p-name';
+            nm.textContent = String(e.displayAlias || '—').slice(0, 28);
+            li.append(med, nm);
+            if (e.scoreDisplay) {
+              const sc = document.createElement('span');
+              sc.className = 'p-score up';
+              sc.textContent = String(e.scoreDisplay);
+              li.appendChild(sc);
+            }
+            rows.appendChild(li);
+          });
+        }
+        ov.hidden = false;
+        const hold = Math.max(0, Number(data.autoHoldMs) || 0);
+        if (hold > 0) {
+          podiumHideTimer = setTimeout(() => {
+            const e2 = $('proj-podium');
+            if (e2) e2.hidden = true;
+            podiumHideTimer = null;
+          }, hold);
+        }
+        break;
+      }
       case 'cast:questionRevealed':
+        hidePodium();
         renderReveal(data);
         break;
       case 'cast:answerCount':
@@ -309,6 +417,8 @@
       case 'cast:leaderboardUpdated': {
         // STYLE S32: public Top-N — neutral list, max 5 (server allaqachon clamps)
         if (data.mode !== 'public_top_n') break;
+        podiumTopN = data.topN || null;
+        hidePodium(); // eski overlay bo'lsa tozalanadi (yangisi podiumShow'da ochiladi)
         const wrap = $('proj-leaderboard');
         const list = $('proj-leaderboard-list');
         if (!wrap || !list) break;
@@ -452,6 +562,7 @@
       }
       case 'cast:sessionEnded':
         stopTimer();
+        hidePodium();
         $('proj-question').hidden = true;
         $('proj-reveal').hidden = true;
         $('proj-lobby').hidden = false;

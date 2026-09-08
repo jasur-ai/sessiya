@@ -521,7 +521,7 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   S34k — KAHOOT-STYLE: yorqin, katta, rangli, oson
+   S34k — LIVE-QUIZ STYLE: yorqin, katta, rangli, oson
    Har savol yorqin, har variant o'z rangida, katta rounded kartalar
    ═══════════════════════════════════════════════════════════════ */
 .tb-shell { --k-red: #b0522d; --k-green: #7d9670; }
@@ -595,7 +595,7 @@
   background: var(--tb-input-bg) !important; color: var(--tb-text) !important; font-weight: 600 !important;
 }
 
-/* VAARIANTLAR — Kahoot ranglari */
+/* VAARIANTLAR — jonli viktorina ranglari */
 /* S34l: variant BIR XIL rangda (binafsha) — qizil FAQAT xato uchun */
 .tb-opt {
   display: flex; align-items: center; gap: 10px;
@@ -667,7 +667,7 @@
 
 
 /* ═══════════════════════════════════════════════════════════════
-   S34l — KAHOOT STRUKTURA: 2x2 GRID + shakl belgilar + bir xil rang
+   S34l — VIKTORINA STRUKTURA: 2x2 GRID + shakl belgilar + bir xil rang
    S34n: DARK/LIGHT to'liq qo'llab-quvvatlash (tema o'zgaruvchilari)
    ═══════════════════════════════════════════════════════════════ */
 /* S34p: DARK = vintage qora-jigar (oq YO'Q); LIGHT = och qog'oz */
@@ -708,7 +708,7 @@ html[data-theme="light"] .tb-shell {
   --tb-outline-bg: rgba(252,248,238,.8);
   --tb-outline-item: rgba(122,90,30,.1);
 }
-/* Variantlar 2x2 GRID (Kahoot kabi) */
+/* Variantlar 2x2 GRID (jonli viktorina kabi) */
 .tb-options[data-opts-wrap] {
   display: grid !important;
   grid-template-columns: repeat(2, 1fr) !important;
@@ -752,7 +752,7 @@ html[data-theme="light"] .tb-shell {
 .tb-outline-item.is-invalid { border-color: #b0522d !important; }
 .tb-outline-item.is-invalid .tb-outline-num { background: #b0522d !important; color: #fff !important; }
 
-/* Savol kartasi markazda, kattaroq (Kahoot max 720px) */
+/* Savol kartasi markazda, kattaroq (jonli-viktorina max 720px) */
 .tb-editor, #tb-editor { max-width: 780px; margin: 0 auto; width: 100%; }
 
 /* Savol matni katta, oq karta ichida */

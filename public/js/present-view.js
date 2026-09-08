@@ -8,6 +8,8 @@
   const T = (k, fb) => (COPY[k] !== undefined ? COPY[k] : (fb !== undefined ? fb : k));
   const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const hex = (v, f) => (typeof v === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(v) ? v : f);
+  // masofaviy URL → same-origin proksi (CSP + export taint)
+  const dispSrc = (s) => { if (!s) return ''; return /^https?:/i.test(s) ? '/user/api/img?u=' + encodeURIComponent(s) : s; };
 
   const slides = deck.slides || [];
   let cur = 0;
@@ -56,7 +58,7 @@
         const shape = k === 'circle' ? 'border-radius:50%' : (k === 'triangle' ? 'clip-path:polygon(50% 0,100% 100%,0 100%)' : (k === 'diamond' ? 'border-radius:6px;transform:scale(.8) rotate(45deg)' : 'border-radius:4px'));
         return '<div style="' + st + shape + ';background:' + hex(e.fill, '#c9a565') + '"></div>';
       }
-      if (e.type === 'image' && e.src) return '<img style="' + st + 'object-fit:contain" src="' + esc(e.src) + '" alt="">';
+      if (e.type === 'image' && e.src) return '<img style="' + st + 'object-fit:contain" src="' + esc(dispSrc(e.src)) + '" alt="">';
       return '';
     }).join('');
   }
@@ -112,4 +114,13 @@
   layout();
   if (slides.length === 0) { canvas.innerHTML = '<div style="position:absolute;inset:0;background:#241a0c;color:#f6ecd9;display:flex;align-items:center;justify-content:center;font-family:sans-serif">—</div>'; }
   show(0);
+
+  // yuklab olish (PDF/PPTX/PNG/JPG)
+  const expBtn = document.getElementById('ps-v-export');
+  if (expBtn && window.PresentExport) {
+    window.PresentExport.attachMenu(expBtn, deck, {
+      pdf: T('exportPdf', 'PDF'), pptx: T('exportPptx', 'PPTX — PowerPoint'), png: T('exportPng', 'PNG — rasm'), jpg: T('exportJpg', 'JPG — rasm'),
+      busy: T('exportBusy', 'Tayyorlanmoqda…'), fail: T('exportFail', 'Yuklab olishda xatolik'),
+    });
+  }
 })();

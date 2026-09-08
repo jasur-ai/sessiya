@@ -6,8 +6,8 @@
   "join.card": "Karta raqami",
   "join.cardPlaceholder": "CARD-001",
   "join.delivery": "Qayerdan qatnashasiz?",
-  "join.delivery.inRoom": "🏫 Sinfda (in-room)",
-  "join.delivery.remote": "🏠 Uzoqdan (remote)",
+  "join.delivery.inRoom": "Sinfda (in-room)",
+  "join.delivery.remote": "Uzoqdan (remote)",
   "join.btn": "Qo‘shilish",
   "join.joining": "Qo‘shilmoqda…",
   "join.err.required": "Kod va ism kiritilishi shart",
@@ -85,5 +85,13 @@
   "governance.removeOnly": "Chiqarilgansiz — yangi ism bilan qayta qo‘shilishingiz mumkin.",
   "director.rotateCode": "🔄 Kodni almashtirish",
   "director.block": "🚫 Bloklash",
-  "director.remove": "✖ Chiqarish"
+  "director.remove": "✖ Chiqarish",
+  "stage.think": "Savol boshlanishi",
+  "podium.title": "Shohsupa",
+  "podium.note": "Keyingi savolga tayyorlaning…",
+  "podium.you": "Siz",
+  "podium.place": "o‘rin",
+  "podium.score": "{s} ball",
+  "podium.empty": "Reyting hali yo‘q",
+  "podium.rankAria": "{n}-o‘rin"
 }

@@ -6,8 +6,8 @@
   "join.card": "Card number",
   "join.cardPlaceholder": "CARD-001",
   "join.delivery": "Where are you joining from?",
-  "join.delivery.inRoom": "🏫 In the room",
-  "join.delivery.remote": "🏠 Remote",
+  "join.delivery.inRoom": "In the room",
+  "join.delivery.remote": "Remote",
   "join.btn": "Join",
   "join.joining": "Joining…",
   "join.err.required": "Code and name are required",
@@ -85,5 +85,13 @@
   "governance.removeOnly": "You were removed — you may rejoin with a new name.",
   "director.rotateCode": "🔄 Rotate code",
   "director.block": "🚫 Block",
-  "director.remove": "✖ Remove"
+  "director.remove": "✖ Remove",
+  "stage.think": "Question starting",
+  "podium.title": "Podium",
+  "podium.note": "Get ready for the next question…",
+  "podium.you": "You",
+  "podium.place": "place",
+  "podium.score": "{s} pts",
+  "podium.empty": "No ranking yet",
+  "podium.rankAria": "rank {n}"
 }

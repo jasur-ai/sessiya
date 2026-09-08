@@ -214,8 +214,10 @@ export async function createApp() {
   }));
   app.use(compression());
   // rawBody capture — Manus signed webhook HMAC tekshiruvi uchun (Prompt 58 §11)
-  app.use(express.json({ limit: '10mb', verify: (req, res, buf) => { req.rawBody = buf.toString('utf8'); } }));
-  app.use(express.urlencoded({ extended: true, limit: '10mb', verify: (req, res, buf) => { req.rawBody = req.rawBody || buf.toString('utf8'); } }));
+  // limit 25mb: 09/2026 Presentations eksporti — 60 ta slayd JPEG (base64) bitta
+  // POST'da /user/api/presentations/:id/export'ga yuboriladi.
+  app.use(express.json({ limit: '25mb', verify: (req, res, buf) => { req.rawBody = buf.toString('utf8'); } }));
+  app.use(express.urlencoded({ extended: true, limit: '25mb', verify: (req, res, buf) => { req.rawBody = req.rawBody || buf.toString('utf8'); } }));
 
   // BUG-084 (S14): cookie-parser — ?lang= cookie'si YOZILARDI lekin hech kim o'qimasdi
   // (req.cookies app bo'ylab undefined; auth/session/oidc/mfa/reset/roster/portfolio 16 joyda).

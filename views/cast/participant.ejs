@@ -61,8 +61,8 @@
           <label class="part-field">
             <span data-i18n="join.delivery">Qayerdan qatnashasiz?</span>
             <select class="cast-input" id="join-delivery">
-              <option value="in_room" data-i18n="join.delivery.inRoom">🏫 Sinfda (in-room)</option>
-              <option value="remote" data-i18n="join.delivery.remote">🏠 Uzoqdan (remote)</option>
+              <option value="in_room" data-i18n="join.delivery.inRoom">Sinfda (in-room)</option>
+              <option value="remote" data-i18n="join.delivery.remote">Uzoqdan (remote)</option>
             </select>
           </label>
           <!-- C4-03: paper-card mode'da karta raqami (ixtiyoriy — expected count uchun) -->
@@ -141,6 +141,10 @@
       <div class="part-state-banner" id="part-state-banner" data-state="" aria-live="polite" hidden></div>
       <div class="part-q-meta" id="part-q-meta">—</div>
       <div class="part-q-text" id="part-q-text">—</div>
+      <div class="stage-cd" id="part-stage-cd" hidden aria-live="polite">
+        <span class="stage-cd-num" id="part-stage-num">3</span>
+        <span class="stage-cd-lbl" data-i18n="stage.think">Savolga tayyorlaning</span>
+      </div>
       <div class="part-options" id="part-options"></div>
       <div class="part-timer" id="part-timer">—</div>
       <button class="cast-btn cast-btn-primary part-submit" id="part-submit" data-i18n="answer.send" hidden>Javobni yuborish</button>
@@ -291,6 +295,20 @@
       </div>
     </div>
 
+    <!-- C4-09: Shohsupa (avto podium) — savol yopilgach qisqa ko'rinadi -->
+    <div id="part-podium" class="part-podium" hidden role="status">
+      <div class="podium-card">
+        <div class="podium-kicker" data-i18n="podium.title">Shohsupa</div>
+        <div class="podium-rank">
+          <span class="podium-rank-num" id="part-podium-num">—</span>
+          <span class="podium-rank-word" id="part-podium-word">o‘rin</span>
+        </div>
+        <div class="podium-mine" id="part-podium-mine"></div>
+        <div class="podium-score" id="part-podium-score" hidden></div>
+        <div class="podium-note" data-i18n="podium.note">Keyingi savolga tayyorlaning…</div>
+      </div>
+    </div>
+
     <!-- Reveal -->
     <div id="part-reveal" class="part-center" hidden>
       <div class="part-card cast-surface">
@@ -311,5 +329,6 @@
   <!-- STYLE S32: shared leaderboard renderer -->
   <script src="/js/cast-leaderboard.js"></script>
   <script src="/js/cast-participant.js"></script>
+  <script src="/js/icon-kit.js"></script>
 </body>
 </html>

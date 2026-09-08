@@ -31,6 +31,9 @@ const MAX_NAME = 120;
 const HEX = /^#[0-9a-fA-F]{3,8}$/;
 const KEY_RE = /^[A-Za-z0-9_-]{1,48}$/;
 const URL_RE = /^https?:\/\/[^\s"<>]{5,400}$/i;
+// 09/2026 (user qarori): rasm endi nafaqat URL — fayl upload (data:image) ham
+// qo'llab-quvvatlanadi. Hajm cheki ~2.4MB base64 (client 1280px gacha downscale qiladi).
+const DATAIMG_RE = /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=\s]{100,2400000}$/;
 const LAYOUTS = ['blank', 'title', 'titlebody'];
 const KINDS = ['rect', 'circle', 'triangle', 'diamond', 'line'];
 const EL_TYPES = ['text', 'list', 'shape', 'image'];
@@ -125,7 +128,15 @@ function sanitizeDeck(body, existing) {
       if (e.type === 'shape') {
         return { ...base, kind: KINDS.includes(e.kind) ? e.kind : 'rect', fill: hexOr(e.fill, '#c9a565'), stroke: hexOr(e.stroke, 'transparent') === 'transparent' ? 'transparent' : hexOr(e.stroke, 'transparent'), strokeW: num(e.strokeW, 0, 24, 0) };
       }
-      return { ...base, src: typeof e.src === 'string' && URL_RE.test(e.src) ? e.src : '' };
+      // rasm: data: (upload) yoki http(s) (URL) — masofaviy URL same-origin proxy'ga
+      // aylantiriladi (CSP img-src 'self' data: blob: + export'da canvas taint bo'lmasligi).
+      // Allaqachon proxy'langan src (saqlash idempotent) ham o'tadi.
+      let src = typeof e.src === 'string' ? e.src.slice(0, 2600) : '';
+      if (src.startsWith('/user/api/img?u=')) src = src;
+      else if (DATAIMG_RE.test(src)) src = src;
+      else if (URL_RE.test(src)) src = '/user/api/img?u=' + encodeURIComponent(src);
+      else src = '';
+      return { ...base, src };
     }).filter(Boolean);
     return { id: safeKey(String(s.id || '')) || 'sl' + uid(), layout, bg, elements };
   }).filter(Boolean);
@@ -403,6 +414,308 @@ router.post('/api/presentations/:id/archive', async (req, res) => {
   const archived = !!(req.body && req.body.archived);
   await fb.update(`users/${user.safeKey}/presentations/${existing.key}`, { archived, updatedAt: Date.now() });
   res.json({ ok: true, archived });
+});
+
+// ── 09/2026: Rasm URL-proksi (CSP img-src 'self' data: blob: sababli tashqi
+// rasm to'g'ridan-to'g'ri <img> da ko'rinmaydi; eksport'da ham canvas taint
+// bo'lmasligi uchun hamma rasm same-origin orqali yuklanadi). SSRF-ga qarshi
+// private/link-local manzillar bloklanadi, hajm+vaqt chegarasi bor. ──
+const BLOCKED_HOST_RE = /^(localhost|0\.0\.0\.0|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|169\.254\.|::1$|\[::1\]|\[fc|\[fd)/i;
+router.get('/api/img', async (req, res) => {
+  const raw = String(req.query.u || '').slice(0, 600);
+  if (!URL_RE.test(raw)) return res.status(400).end();
+  try {
+    const host = new URL(raw).hostname;
+    if (BLOCKED_HOST_RE.test(host)) return res.status(400).end();
+  } catch (_) { return res.status(400).end(); }
+  try {
+    const ctrl = new AbortController();
+    const to = setTimeout(() => ctrl.abort(), 9000);
+    const r = await fetch(raw, { redirect: 'follow', signal: ctrl.signal, headers: { 'User-Agent': 'Deborah-presentations/1.0' } });
+    clearTimeout(to);
+    if (!r.ok) return res.status(502).end();
+    const len = Number(r.headers.get('content-length') || 0);
+    if (len > 8 * 1024 * 1024) return res.status(413).end();
+    const buf = Buffer.from(await r.arrayBuffer());
+    if (buf.length > 8 * 1024 * 1024) return res.status(413).end();
+    res.setHeader('Cache-Control', 'private, max-age=600');
+    const ct = String(r.headers.get('content-type') || '');
+    if (/^image\//i.test(ct)) res.setHeader('Content-Type', ct);
+    res.end(buf);
+  } catch (_) { res.status(502).end(); }
+});
+
+// ═══ PPTX IMPORT (09/2026 — user qarori: tashqi PowerPoint fayldan deck) ═══
+// Parser: minimal ZIP o'quvchi (store+deflate), ppt/slides/slideN.xml →
+// matn shakllari (a:t, rPr: sz/b/srgbClr) + rasmlar (blip → media) — 1280×720
+// modelga masshtablanadi. Node zlib inflateRaw — tashqi qaramlik yo'q.
+import { inflateRawSync } from 'zlib';
+
+function zipEntries(buf) {
+  const out = [];
+  let eocd = -1;
+  for (let i = buf.length - 22; i >= Math.max(0, buf.length - 70000); i--) {
+    if (buf.readUInt32LE(i) === 0x06054b50) { eocd = i; break; }
+  }
+  if (eocd < 0) return out;
+  const count = buf.readUInt16LE(eocd + 10);
+  let off = buf.readUInt32LE(eocd + 16);
+  for (let n = 0; n < count; n++) {
+    if (off + 46 > buf.length || buf.readUInt32LE(off) !== 0x02014b50) break;
+    const method = buf.readUInt16LE(off + 10);
+    const csize = buf.readUInt32LE(off + 20);
+    const nlen = buf.readUInt16LE(off + 28);
+    const elen = buf.readUInt16LE(off + 30);
+    const clen = buf.readUInt16LE(off + 32);
+    const lho = buf.readUInt32LE(off + 42);
+    const name = buf.toString('utf8', off + 46, off + 46 + nlen);
+    const dataStart = lho + 30 + buf.readUInt16LE(lho + 26) + buf.readUInt16LE(lho + 28);
+    let data;
+    try {
+      data = method === 0 ? buf.subarray(dataStart, dataStart + csize)
+        : method === 8 ? inflateRawSync(buf.subarray(dataStart, dataStart + csize)) : null;
+    } catch (_) { data = null; }
+    if (data) out.push({ name, data });
+    off += 46 + nlen + elen + clen;
+  }
+  return out;
+}
+
+function unq(s) {
+  return String(s || '').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&#39;/g, "'");
+}
+function parseSlideXml(xml, relMap) {
+  const els = [];
+  const spRe = /<p:sp>([\s\S]*?)<\/p:sp>/g;
+  let m;
+  while ((m = spRe.exec(xml))) {
+    const block = m[1];
+    const off = /<a:off x="(-?\d+)" y="(-?\d+)"\/>/.exec(block);
+    const ext = /<a:ext cx="(\d+)" cy="(\d+)"\/>/.exec(block);
+    if (!off || !ext) continue;
+    const x = +off[1], y = +off[2], w = +ext[1], h = +ext[2];
+    const paras = [];
+    const pRe = /<a:p>([\s\S]*?)<\/a:p>/g;
+    let p;
+    while ((p = pRe.exec(block))) {
+      const txts = [];
+      const tRe = /<a:t>([\s\S]*?)<\/a:t>/g;
+      let t;
+      while ((t = tRe.exec(p[1]))) txts.push(unq(t[1]));
+      const text = txts.join('').trim();
+      if (text) paras.push({ text });
+    }
+    if (!paras.length) continue;
+    // barcha run'lar bo'yicha birinchi format (sz/b/srgbClr)
+    const firstRp = /<a:rPr[^>]*sz="(\d+)"[^>]*b="(\d)"[^>]*>([\s\S]*?)<\/a:rPr>|<a:rPr[^>]*sz="(\d+)"[^>]*>([\s\S]*?)<\/a:rPr>/.exec(block);
+    const col = /<a:srgbClr val="([0-9A-Fa-f]{6})"/.exec(block);
+    let fontSize = 24, bold = false;
+    if (firstRp) {
+      const sz = firstRp[1] || firstRp[4];
+      if (sz) fontSize = Math.min(200, Math.max(10, Math.round(+sz / 100)));
+      bold = firstRp[2] === '1';
+    }
+    const color = col ? '#' + col[1].toLowerCase() : '#241a0c';
+    // agar juda ko'p qator bo'lsa — ro'yxat emas, matn (qatorlar \n)
+    els.push({ x, y, w, h, text: paras.map((q) => q.text).join('\n'), fontSize, bold, color });
+  }
+  // rasmlar
+  const picRe = /<p:pic>([\s\S]*?)<\/p:pic>/g;
+  while ((m = picRe.exec(xml))) {
+    const block = m[1];
+    const rid = /r:embed="rId(\d+)"/.exec(block);
+    const off = /<a:off x="(-?\d+)" y="(-?\d+)"\/>/.exec(block);
+    const ext = /<a:ext cx="(\d+)" cy="(\d+)"\/>/.exec(block);
+    if (!rid || !off || !ext) continue;
+    const target = relMap[+rid[1]];
+    if (!target) continue;
+    els.push({ x: +off[1], y: +off[2], w: +ext[1], h: +ext[2], img: target });
+  }
+  return els;
+}
+
+router.post('/api/presentations/import', async (req, res) => {
+  try {
+    const user = req.session.user;
+    const chunks = [];
+    let size = 0;
+    for await (const c of req) {
+      size += c.length;
+      if (size > 25 * 1024 * 1024) return res.status(413).json({ error: 'Fayl juda katta (25 MB limit)' });
+      chunks.push(c);
+    }
+    const buf = Buffer.concat(chunks);
+    const entries = zipEntries(buf);
+    const entry = (n) => entries.find((e) => e.name === n);
+    const slideNos = [];
+    for (const e of entries) {
+      const m = /^ppt\/slides\/slide(\d+)\.xml$/.exec(e.name);
+      if (m) slideNos.push(+m[1]);
+    }
+    slideNos.sort((a, b) => a - b);
+    if (!slideNos.length) return res.status(400).json({ error: 'PPTX faylda slayd topilmadi' });
+
+    // media → dataURL (har bir rel uchun)
+    const mediaCache = new Map();
+    const mediaDataUrl = (relTarget) => {
+      const name = 'ppt/' + String(relTarget || '').replace(/^\.\.\//, 'slides/../').replace(/^\.\.\/ppt\//, '').replace('../media/', 'media/');
+      const clean = name.replace(/^ppt\//, '');
+      const fileName = clean.startsWith('media/') ? clean : ('media/' + clean.split('/').pop());
+      if (mediaCache.has(fileName)) return mediaCache.get(fileName);
+      const e2 = entries.find((x) => x.name === 'ppt/' + fileName);
+      if (!e2) { mediaCache.set(fileName, null); return null; }
+      const ext = (fileName.split('.').pop() || 'png').toLowerCase();
+      const mime = ext === 'jpg' || ext === 'jpeg' ? 'image/jpeg' : ext === 'gif' ? 'image/gif' : ext === 'webp' ? 'image/webp' : ext === 'svg' ? 'image/svg+xml' : 'image/png';
+      const b64 = e2.data.toString('base64');
+      const url = `data:${mime};base64,${b64}`;
+      mediaCache.set(fileName, url);
+      return url;
+    };
+
+    // slayd o'lchami (16:9 default)
+    let cx = 12192000, cy = 6858000;
+    const pres = entry('ppt/presentation.xml');
+    if (pres) {
+      const sm = /<p:sldSz[^>]*cx="(\d+)"[^>]*cy="(\d+)"/.exec(pres.data.toString('utf8'));
+      if (sm) { cx = +sm[1]; cy = +sm[2]; }
+    }
+    const scale = Math.min(SLIDE_W / cx, SLIDE_H / cy);
+    const ox = Math.round((SLIDE_W - cx * scale) / 2);
+    const oy = Math.round((SLIDE_H - cy * scale) / 2);
+
+    const slides = [];
+    for (const n of slideNos) {
+      const xmlEntry = entry(`ppt/slides/slide${n}.xml`);
+      const relEntry = entry(`ppt/slides/_rels/slide${n}.xml.rels`);
+      const relMap = {};
+      if (relEntry) {
+        const re = /<Relationship[^>]*Id="rId(\d+)"[^>]*Target="([^"]+)"/g;
+        let mm;
+        const rels = relEntry.data.toString('utf8');
+        while ((mm = re.exec(rels))) {
+          const type = /Type="[^"]*\/(image|media)\/"/.exec(mm[0]);
+          if (type) relMap[+mm[1]] = mm[2];
+        }
+      }
+      let rawEls = [];
+      try {
+        rawEls = parseSlideXml(xmlEntry.data.toString('utf8'), relMap);
+      } catch (_) { rawEls = []; }
+      const elements = rawEls.slice(0, MAX_ELS).map((r, i) => {
+        const x = Math.round(r.x * scale + ox);
+        const y = Math.round(r.y * scale + oy);
+        const w = Math.max(8, Math.round(r.w * scale));
+        const h = Math.max(8, Math.round(r.h * scale));
+        if (r.img) {
+          const src = mediaDataUrl(r.img);
+          return src ? { id: 'el' + uid() + i, type: 'image', x, y, w, h, src } : null;
+        }
+        return {
+          id: 'el' + uid() + i, type: 'text', x, y, w, h,
+          text: r.text, fontSize: r.fontSize, bold: r.bold, italic: false,
+          color: r.color, align: 'left', font: 'body',
+        };
+      }).filter(Boolean);
+      if (!elements.length) continue;
+      slides.push({ id: 'sl' + uid(), layout: 'blank', bg: { type: 'solid', c1: '#ffffff' }, elements });
+      if (slides.length >= MAX_SLIDES) break;
+    }
+    if (!slides.length) return res.status(400).json({ error: 'PPTX ichida tahrirlanadigan kontent topilmadi' });
+
+    const headerName = String(req.headers['x-pptx-name'] || '').replace(/\.pptx$/i, '').slice(0, MAX_NAME).trim();
+    const name = headerName || ('Import ' + new Date().toLocaleDateString('uz'));
+    const deck = {
+      id: 'prs' + uid(),
+      name,
+      engine: 'canvas',
+      slides,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      archived: false,
+    };
+    const out = sanitizeDeck(deck, null);
+    const final = { id: deck.id, name: out.name, engine: out.engine, slides: out.slides, createdAt: Date.now(), updatedAt: Date.now(), archived: false };
+    await fb.set(`users/${user.safeKey}/presentations/${deck.id}`, final);
+    res.json({ ok: true, key: deck.id, name: final.name, slideCount: final.slides.length });
+  } catch (err) {
+    res.status(400).json({ error: 'PPTX o‘qilmadi: ' + (err.message || 'format noto‘g‘ri') });
+  }
+});
+
+// ═══ EKSPORT (09/2026 — user qarori: PDF, PPTX, PNG, JPG yuklab olish) ═══
+// Client har slaydni 1280x720 JPEG qilib POST qiladi → server PDF (pure-JS
+// writer, JPEG DCTDecode embed) yoki PPTX (pptxgenjs, full-bleed rasm) qaytaradi.
+// PNG/JPG (zip) client tomonda yig'iladi (present-export.js).
+function buildPdfJpeg(pages) {
+  // pages: Buffer[] (JPEG 1280x720) — sahifa 960x540pt (1280x720 @ 72dpi)
+  const chunks = [];
+  const push = (s) => chunks.push(Buffer.from(s, 'latin1'));
+  push('%PDF-1.4\n%\xE2\xE3\xCF\xD3\n');
+  const offsets = [0];
+  let objNum = 1;
+  const add = (body) => { offsets[objNum] = Buffer.concat(chunks).length; push(objNum + ' 0 obj\n' + body + '\nendobj\n'); return objNum++; };
+  const kids = [];
+  for (let i = 0; i < pages.length; i++) {
+    const imgRef = objNum;
+    add(`<< /Type /XObject /Subtype /Image /Width 1280 /Height 720 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${pages[i].length} >>\nstream\n`);
+    chunks.push(pages[i]);
+    push('\nendstream');
+    const contRef = objNum;
+    const cont = Buffer.from(`q 960 0 0 540 0 0 cm /Im${imgRef} Do Q\n`, 'latin1');
+    add(`<< /Length ${cont.length} >>\nstream\n`);
+    chunks.push(cont);
+    push('endstream');
+    const pageRef = objNum;
+    add(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 960 540] /Resources << /XObject << /Im${imgRef} ${imgRef} 0 R >> >> /Contents ${contRef} 0 R >>`);
+    kids.push(`${pageRef} 0 R`);
+  }
+  const catalogRef = 1;
+  add('<< /Type /Catalog /Pages 2 0 R >>');
+  add(`<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${kids.length} >>`);
+  const xrefStart = Buffer.concat(chunks).length;
+  let xref = `xref\n0 ${objNum}\n0000000000 65535 f \n`;
+  for (let i = 1; i < objNum; i++) xref += String(offsets[i]).padStart(10, '0') + ' 00000 n \n';
+  push(xref + `trailer\n<< /Size ${objNum} /Root ${catalogRef} 0 R >>\nstartxref\n${xrefStart}\n%%EOF\n`);
+  return Buffer.concat(chunks);
+}
+
+router.post('/api/presentations/:id/export', async (req, res) => {
+  try {
+    const user = req.session.user;
+    const existing = await loadDeck(user, req.params.id);
+    if (!existing) return res.status(404).json({ error: 'Topilmadi' });
+    const fmt = req.body && req.body.fmt === 'pptx' ? 'pptx' : 'pdf';
+    const pages = Array.isArray(req.body && req.body.pages) ? req.body.pages.slice(0, 60) : [];
+    if (!pages.length) return res.status(400).json({ error: 'Slaydlar yo‘q' });
+    const jpegs = [];
+    for (const p of pages) {
+      const b64 = typeof p === 'string' ? p : (p && typeof p.data === 'string' ? p.data : '');
+      if (!b64 || !/^[A-Za-z0-9+/=\s]{200,9000000}$/.test(b64)) return res.status(400).json({ error: 'Yaroqsiz rasm' });
+      jpegs.push(Buffer.from(b64.replace(/\s/g, ''), 'base64'));
+    }
+    let buf;
+    let ctype;
+    let ext = fmt;
+    if (fmt === 'pptx') {
+      const PptxGenJS = (await import('pptxgenjs')).default;
+      const p = new PptxGenJS();
+      p.layout = 'LAYOUT_16x9';
+      p.author = 'Deborah';
+      for (const j of jpegs) p.addSlide().addImage({ data: 'data:image/jpeg;base64,' + j.toString('base64'), x: 0, y: 0, w: 10, h: 5.625 });
+      buf = await p.write({ outputType: 'nodebuffer' });
+      ctype = 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+    } else {
+      buf = buildPdfJpeg(jpegs);
+      ctype = 'application/pdf';
+    }
+    const safe = String(existing.name || 'taqdimot').replace(/[^\w\u0400-\u04FF\u00C0-\u024F -]+/g, '').replace(/\s+/g, ' ').trim().slice(0, 90) || 'taqdimot';
+    res.setHeader('Content-Type', ctype);
+    res.setHeader('Content-Disposition', `attachment; filename="presentation.${ext}"; filename*=UTF-8''${encodeURIComponent(safe)}.${ext}`);
+    res.setHeader('Content-Length', buf.length);
+    res.end(buf);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 export default router;

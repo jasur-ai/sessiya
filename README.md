@@ -3,7 +3,7 @@
 **Jonli sayt:** <https://deborah-ncj.onrender.com>
 **Stack:** Node.js 20 (ESM), Express, Socket.io, Firebase (Realtime DB + Auth admin), EJS, Playwright + Vitest (492 test fayl, CI'da majburiy).
 
-Deborah — o'zbek tilidagi ta'lim platformasi: jonli dars o'yinlari (Kahoot uslubi), test va amaliyotlar, imtihonlarni to'liq boshqarish, AI yordamchi va tahlillar.
+Deborah — o'zbek tilidagi ta'lim platformasi: jonli dars o'yinlari (jonli viktorina uslubi), test va amaliyotlar, imtihonlarni to'liq boshqarish, AI yordamchi va tahlillar.
 
 ---
 

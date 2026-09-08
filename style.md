@@ -26,7 +26,7 @@
 
 | # | Platform | UI Style | Color Theme | Best Feature |
 |---|----------|----------|-------------|--------------|
-| 1 | **Kahoot!** | Playful, high-octane game-show | Violet, Red, Blue, Yellow (#46178f, #e21b3c, #1368ce, #d8a409) | Geometrik shaklli javob kartalari |
+| 1 | **Jonli viktorina platformasi** | Playful, high-octane game-show | Violet, Red, Blue, Yellow (#46178f, #e21b3c, #1368ce, #d8a409) | Geometrik shaklli javob kartalari |
 | 2 | **Quizizz** | Gamified, structured | Deep navy, indigo, teal (#0b1a2e, #4f46e5, #14b8a6) | Meme reactions, avatar animations |
 | 3 | **Blooket** | Arcade, candy-like | Bubblegum pink, sky blue (#ff6b9d, #4ecdc4) | Collectible characters (Blooks) |
 | 4 | **Gimkit** | Indie game, sleek dark | Dark base + neon (#1a1a2e, #ff2e63, #00ff7f) | Economy-driven gameplay |
@@ -156,7 +156,7 @@
 | 93 | **OpenTriviaDB** | Community trivia |
 | 94 | **JSON Quiz** | Static quiz data |
 | 95 | **Quizlet API** | Flashcard integration |
-| 96 | **Kahoot API** | Game creation |
+| 96 | **Jonli viktorina API** | Game creation |
 | 97 | **ClassKit** | Apple education |
 | 98 | **Google Classroom API** | LMS integration |
 | 99 | **Canvas API** | Education ecosystem |
@@ -200,7 +200,7 @@
 |------|----------|----------|------|-------------------|
 | 🥇 | **Typeform** | 10/10 | Custom premium | Conversational flow, premium feel |
 | 🥇 | **Duolingo** | 10/10 | Green #58cc02 | Mascot-driven, gamification mastery |
-| 🥈 | **Kahoot!** | 9.5/10 | Violet #46178f | Game-show energy, iconic shapes |
+| 🥈 | **Jonli viktorina platformasi** | 9.5/10 | Violet #46178f | Game-show energy, iconic shapes |
 | 🥈 | **Blooket** | 9.5/10 | Bubblegum pink | Arcade gamification, character system |
 | 🥈 | **Gimkit** | 9.5/10 | Dark + neon | Economy system, indie game feel |
 | 🥉 | **Brilliant** | 9/10 | Purple + white | Clean minimal, interactive problems |
@@ -261,7 +261,7 @@ Neon:      #FF2E63 (Pink) / #00FF7F (Green) / #00D4FF (Cyan)
 Surface:   #161B22 / #16213E
 ```
 
-**Pattern 3: Purple/Violet Energy** (15% — Kahoot, Typeform style)
+**Pattern 3: Purple/Violet Energy** (15% — jonli viktorina, Typeform style)
 ```
 Primary:   #7C3AED / #6D28D9 / #46178F
 Dark Bg:   #0F0A1A / #1A0A2E
@@ -1044,7 +1044,7 @@ Components/
 
 | Inspiration | Elements Used |
 |-------------|--------------|
-| **Kahoot!** | Option shape system, game-show energy |
+| **Jonli viktorina platformasi** | Option shape system, game-show energy |
 | **Typeform** | One-question flow, premium feel |
 | **Duolingo** | Character system, streak mechanics |
 | **Gimkit** | Dark + neon, economy system |
@@ -1073,7 +1073,7 @@ Components/
 # ═══════════════════════════════════════════════════════════
 
 > Research-based compilation of the best CSS transitions and animations
-> from top 20 global platforms (Kahoot, Typeform, Duolingo, Gimkit, etc.)
+> from top 20 global platforms (jonli-viktorina platformalari, Typeform, Duolingo, Gimkit, etc.)
 
 ---
 
@@ -2070,7 +2070,7 @@ Before diving into animations, here are the 10 core easing curves used across al
 
 ### A4.1 optEntry — Javob variantlari kirishi
 ```css
-/* Variant 1: Sequential fade up (Kahoot-style) */
+/* Variant 1: Sequential fade up (jonli-viktorina uslubi) */
 .option-card:nth-child(1) { animation: optFadeUp 400ms var(--ease-out) 0ms both; }
 .option-card:nth-child(2) { animation: optFadeUp 400ms var(--ease-out) 80ms both; }
 .option-card:nth-child(3) { animation: optFadeUp 400ms var(--ease-out) 160ms both; }
@@ -3966,7 +3966,7 @@ Skeleton:              ease-in-out           [gentle pulse]
 
 > **Animations Library v2.0** — 100+ Animations × 10 Variatsiyalar = 1000+ Kombinatsiyalar
 > 
-> Research-based compilation from Kahoot, Typeform, Duolingo, Gimkit, Apple HIG,
+> Research-based compilation from jonli-viktorina platformalari, Typeform, Duolingo, Gimkit, Apple HIG,
 > Material Design 3, Framer Motion, and top Dribbble/Behance designs.
 > All animations use GPU-accelerated properties (transform, opacity) for 60fps performance.
 > With reduced-motion accessibility support.

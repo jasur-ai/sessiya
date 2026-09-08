@@ -859,7 +859,7 @@ router.get('/practice', async (req, res) => {
       type: q?.type || 'single_choice',
       options: Array.isArray(q?.options) ? q.options.map((o) => String(o || '')) : [],
       // 09/2026 (user qarori): har savoldan keyin darhol to'g'ri/noto'g'ri
-      // natija chiqishi uchun correct clientga yuboriladi (Kahoot tarzi).
+      // natija chiqishi uchun correct clientga yuboriladi (jonli viktorina tarzi).
       // Yakuniy baho baribir server (/user/api/practice/grade) hisoblaydi.
       correct: Number.isInteger(cIdx) && cIdx >= 0 && cIdx < nOpts ? cIdx : -1,
       explanation: String(q?.explanation || ''),

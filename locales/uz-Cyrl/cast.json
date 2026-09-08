@@ -6,8 +6,8 @@
   "join.card": "Карта рақами",
   "join.cardPlaceholder": "CARD-001",
   "join.delivery": "Қаердан қатнашасиз?",
-  "join.delivery.inRoom": "🏫 Синфда (in-room)",
-  "join.delivery.remote": "🏠 Узоқдан (remote)",
+  "join.delivery.inRoom": "Синфда (in-room)",
+  "join.delivery.remote": "Узоқдан (remote)",
   "join.btn": "Қўшилиш",
   "join.joining": "Қўшилмоқда…",
   "join.err.required": "Код ва исм киритилиши шарт",
@@ -85,5 +85,13 @@
   "governance.removeOnly": "Чиқарилгансиз — янги исм билан қайта қўшилишингиз мумкин.",
   "director.rotateCode": "🔄 Кодни алмаштириш",
   "director.block": "🚫 Блоклаш",
-  "director.remove": "✖ Чиқариш"
+  "director.remove": "✖ Чиқариш",
+  "stage.think": "Савол бошланиши",
+  "podium.title": "Шоҳсупа",
+  "podium.note": "Кейинги саволга тайёрланинг…",
+  "podium.you": "Сиз",
+  "podium.place": "ўрин",
+  "podium.score": "{s} балл",
+  "podium.empty": "Рейтинг ҳали йўқ",
+  "podium.rankAria": "{n}-ўрин"
 }

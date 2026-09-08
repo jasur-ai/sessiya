@@ -33,7 +33,7 @@
     'cs-partial-chips': 'scoring.partialCredit',
     'cs-sfx-chips': 'presentation.soundEffects',
     'cs-motion-chips': 'presentation.motion',
-    // 09/2026 simple mode (Kahoot uslubi — VIP bo'lmagan userlar)
+    // 09/2026 simple mode (jonli viktorina uslubi — VIP bo'lmagan userlar)
     'cs-s-timer-chips': 'timer.defaultSeconds',
     'cs-s-auto-chips': 'timer.mode',
     'cs-s-lb-chips': 'leaderboard.visibility',
@@ -55,7 +55,7 @@
     customized: false,
     focusedBeforeOpen: null,
     // 09/2026 (user qarori): VIP bo'lmaganlar uchun soddalashgan
-    // Kahoot-uslub sozlamalar ko'rinishi (to'liq sozlamalar faqat VIP)
+    // Jonli-viktorina-uslub sozlamalar ko'rinishi (to'liq sozlamalar faqat VIP)
     simple: false,
     simpleFallbackUsed: false,
   };
@@ -83,7 +83,7 @@
 
     const overlay = el('cast-studio-overlay');
     if (!overlay) return;
-    // 09/2026: data-studio-simple=true → Kahoot uslubi (Classic Live) minimal
+    // 09/2026: data-studio-simple=true → jonli viktorina uslubi (Classic Live) minimal
     studioState.simple = overlay.dataset.studioSimple === 'true';
     studioState.draftConfig = studioState.simple
       ? { presetId: 'classic_live', overrides: {} }
@@ -328,7 +328,7 @@
         ${summaries.join('')}
       </div>`;
 
-    // ── 09/2026 SIMPLE MODE (Kahoot uslubi — VIP bo'lmagan userlar):
+    // ── 09/2026 SIMPLE MODE (jonli viktorina uslubi — VIP bo'lmagan userlar):
     // mode cards + pace/think/timer-mode/scoring/join/advanced sozlamalar
     // KO'RSATILMAYDI. Faqat: savol vaqti, avto-yopish, jadval, ovoz,
     // orqa fon, fon musiqasi. VIP uchun yuqoridagi to'liq sirt qoladi.
@@ -340,7 +340,7 @@
       body.innerHTML = `
         <div class="cs-s-hero">
           <span class="cs-s-preset">${icon('zap', 15)} Classic Live</span>
-          <span class="cs-s-tag">Kahoot uslubi — tez va to‘g‘ri javob ko‘proq ball keltiradi</span>
+          <span class="cs-s-tag">Jonli viktorina uslubi — tez va to‘g‘ri javob ko‘proq ball keltiradi</span>
         </div>
 
         ${govNote}
@@ -433,7 +433,7 @@
       });
     }
 
-    // 09/2026 simple mode (Kahoot uslubi) — faqat minimal chips
+    // 09/2026 simple mode (jonli viktorina uslubi) — faqat minimal chips
     if (studioState.simple) {
       wireSimpleChips(pf, cur);
       return;

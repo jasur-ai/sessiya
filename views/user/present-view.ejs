@@ -15,12 +15,14 @@
     <span class="ps-v-name" id="ps-v-name"></span>
     <span class="ps-v-count" id="ps-v-count"></span>
     <div class="ps-v-dots" id="ps-v-dots"></div>
+    <button type="button" class="ps-v-export" id="ps-v-export"><span>↧</span> <%= pCopy.exportLbl %></button>
     <button type="button" class="ps-v-exit" id="ps-v-exit"><%= pCopy.exitView %> Esc</button>
   </div>
 
   <script>
-    window.__PRS = { deck: <%- deckJSON %>, COPY: <%- JSON.stringify(pCopy || {}) %> };
+    window.__PRS = { deck: <%- deckJSON %>, CSRF: <%- JSON.stringify(csrfToken || '') %>, COPY: <%- JSON.stringify(pCopy || {}) %> };
   </script>
+  <script src="/js/present-export.js"></script>
   <script src="/js/present-view.js"></script>
 </body>
 </html>

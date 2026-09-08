@@ -39,6 +39,10 @@
     <div id="proj-question" class="proj-question" hidden>
       <div class="proj-q-meta" id="proj-q-meta">—</div>
       <div class="proj-q-text" id="proj-q-text">—</div>
+      <div class="stage-cd proj-stage-cd" id="proj-stage-cd" hidden aria-live="polite">
+        <span class="stage-cd-num" id="proj-stage-num">3</span>
+        <span class="stage-cd-lbl" data-i18n="stage.think">Savolga tayyorlaning</span>
+      </div>
       <div class="proj-options" id="proj-options"></div>
       <div class="proj-timer" id="proj-timer" role="timer"><span class="proj-timer-num" id="proj-timer-num">—</span><span class="proj-timer-label" id="proj-timer-label"></span><span class="proj-timer-ring" id="proj-timer-ring" aria-hidden="true"></span></div>
       <div class="proj-count" id="proj-answered"></div>
@@ -87,6 +91,14 @@
     </div>
 
     <!-- Reveal -->
+    <!-- C4-09: Shohsupa (avto podium) — projector'da katta ko'rinish -->
+    <div id="proj-podium" class="proj-podium" hidden>
+      <div class="proj-podium-inner">
+        <div class="podium-kicker" data-i18n="podium.title">Shohsupa</div>
+        <ol class="podium-rows" id="proj-podium-rows"></ol>
+      </div>
+    </div>
+
     <div id="proj-reveal" hidden>
       <div class="proj-q-text" id="proj-reveal-text">—</div>
       <div class="proj-options" id="proj-reveal-options"></div>
@@ -114,5 +126,6 @@
   <!-- STYLE S32: shared leaderboard renderer -->
   <script src="/js/cast-leaderboard.js"></script>
   <script src="/js/cast-projector.js"></script>
+  <script src="/js/icon-kit.js"></script>
 </body>
 </html>

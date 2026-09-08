@@ -12,6 +12,7 @@
       <span class="ps-ed-engine" id="ed-engine"></span>
       <div class="ps-ed-spacer"></div>
       <div class="ps-ed-status" id="ed-status" role="status" aria-live="polite"></div>
+      <button type="button" class="ps-ed-export" id="ed-export" title="<%= pCopy.exportLbl %>"><span>↧</span> <span data-i18n="exportLbl"><%= pCopy.exportLbl %></span></button>
       <a class="ps-ed-present" id="ed-present" href="#"><span>▶</span> <span data-i18n="present"><%= pCopy.present %></span></a>
     </header>
     <div class="ps-ed-cols">
@@ -47,6 +48,7 @@
       COPY: <%- JSON.stringify(pCopy || {}) %>
     };
   </script>
+  <script src="/js/present-export.js"></script>
   <script src="/js/present-editor.js"></script>
 </body>
 </html>

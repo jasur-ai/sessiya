@@ -91,6 +91,48 @@
   const goBtn = $('#prs-create-go');
   if (goBtn) goBtn.addEventListener('click', createGo);
 
+  // ── PowerPoint (.pptx) import — 09/2026 ──
+  const impBtn = $('#prs-import-btn');
+  const impFile = $('#prs-import-file');
+  const impHint = $('#prs-import-hint');
+  if (impBtn && impFile) {
+    impBtn.addEventListener('click', () => impFile.click());
+    impFile.addEventListener('change', async () => {
+      const f = impFile.files && impFile.files[0];
+      impFile.value = '';
+      if (!f) return;
+      const nameInp2 = $('#prs-name');
+      if (nameInp2 && !nameInp2.value.trim() && f.name) nameInp2.value = f.name.replace(/\.pptx$/i, '');
+      if (impHint) impHint.hidden = false;
+      impBtn.disabled = true;
+      try {
+        const res = await fetch('/user/api/presentations/import', {
+          method: 'POST',
+          headers: { 'X-CSRF-Token': csrf(), 'x-pptx-name': encodeURIComponent(f.name.replace(/\.pptx$/i, '')) },
+          body: f,
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) { say(data.error || 'PPTX import qilib bo‘lmadi'); if (impHint) impHint.hidden = true; impBtn.disabled = false; return; }
+        say((data.slideCount || 0) + ' slayd import qilindi');
+        setTimeout(() => loc('/user/presentations/' + data.key + '/edit'), 350);
+      } catch (e) { say(e.message || 'Xatolik'); if (impHint) impHint.hidden = true; impBtn.disabled = false; }
+    });
+  }
+
+  // ── Yuklab olish (PDF/PPTX/PNG/JPG) — 09/2026 ──
+  async function runExportMenu(key, hostBtn) {
+    try {
+      const d = await api('/user/api/presentations/' + key, {}, 'GET');
+      if (!d.deck) { say('Deck topilmadi'); return; }
+      const L = window.__PRS_COPY || {};
+      window.PresentExport.openAt(hostBtn.getBoundingClientRect().left, hostBtn.getBoundingClientRect().bottom + 6, d.deck, {
+        pdf: L.exportPdf || 'PDF', pptx: L.exportPptx || 'PPTX — PowerPoint',
+        png: L.exportPng || 'PNG — rasm', jpg: L.exportJpg || 'JPG — rasm',
+        busy: L.exportBusy || 'Tayyorlanmoqda…', fail: L.exportFail || 'Yuklab olishda xatolik',
+      }, hostBtn);
+    } catch (e) { say(e.message); }
+  }
+
   // ── Card click / actions ──
   document.addEventListener('click', (e) => {
     const closeBtn = e.target.closest('[data-close]');
@@ -118,6 +160,7 @@
       const pop = card.querySelector('.ps-pop');
       if (pop) pop.hidden = true;
       if (act === 'open') { loc('/user/presentations/' + key + '/edit'); return; }
+      if (act === 'export') { runExportMenu(key, actBtn); return; }
       if (act === 'unarchive') { runAct('archive', key, false); return; }
       if (act === 'archive') { runAct('archive', key, true); return; }
       if (act === 'dup') { runAct('duplicate', key); return; }

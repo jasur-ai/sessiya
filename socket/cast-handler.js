@@ -13,7 +13,7 @@
 
 import { fb } from '../firebase/admin.js';
 import crypto from 'crypto';
-import { CAST_COMMANDS, CAST_EVENTS, CAST_PHASES, CAST_TIMER_MODE, CAST_ROLES, CAST_ERROR_CODES, POWERUP_TYPE_LIST, CAST_LB_VISIBILITY, CAST_LB_FREQUENCY } from '../utils/cast-constants.js';
+import { CAST_COMMANDS, CAST_EVENTS, CAST_PHASES, CAST_TIMER_MODE, CAST_ROLES, CAST_ERROR_CODES, POWERUP_TYPE_LIST, CAST_LB_VISIBILITY, CAST_LB_FREQUENCY, CAST_ADVANCE_MODE } from '../utils/cast-constants.js';
 import { toCastError } from '../services/cast/errors.js';
 import { can, assertCan } from '../services/cast/permissions.js';
 import { applyEvent, assertCommandAllowed, assertPhaseTransition, initialState, replayEvents } from '../services/cast/state-machine.js';
@@ -333,6 +333,9 @@ export function setupCastHandlers(io, socket) {
   if (!castIoRef) castIoRef = io; // C5-07 (item 12): degradation emit uchun
   const log = (...args) => console.log(`[Cast ${socket.id.slice(0, 8)}]`, ...args);
   const rooms = (sessionId) => `cast:${sessionId}`;
+  // C4-09: participant-private room — shaxsiy proyeksiyalar faqat egasiga boradi.
+  // (Har socket o'z closure'ida ishlagani uchun per-socket Map'ga tayanib bo'lmaydi.)
+  const participantRoom = (sessionId, participantId) => `cast:${sessionId}:p:${participantId}`;
   const directorRoom = (sessionId) => `cast:${sessionId}:director`;
   // C3-10: moderator scoped room — faqat moderation content (wall + confusion aggregate)
   const moderationRoom = (sessionId) => `cast:${sessionId}:moderator`;
@@ -877,6 +880,7 @@ export function setupCastHandlers(io, socket) {
     socket.data.castTicket = membershipTicket;
     socket.data.castSessionId = sessionId;
     socket.join(rooms(sessionId));
+    socket.join(participantRoom(sessionId, participantId));
     // C3-13: participant socket'larini kuzatamiz — forge notification'lar uchun
     trackParticipantSocket(participantId, socket.id);
 
@@ -973,6 +977,7 @@ export function setupCastHandlers(io, socket) {
     socket.data.castTicket = ticket;
     socket.data.castSessionId = sessionId;
     socket.join(rooms(sessionId));
+    socket.join(participantRoom(sessionId, participantId));
     // C3-13: reconnect'da ham participant socket'ini kuzatamiz
     trackParticipantSocket(participantId, socket.id);
     await markPresence(sessionId, participantId, 'online');
@@ -1257,13 +1262,15 @@ export function setupCastHandlers(io, socket) {
     let next = applyEvent(state, previewEvent);
     let res = await commitEvent({ sessionId: cmd.sessionId, expectedRevision: cmd.expectedRevision, event: previewEvent, state: next });
 
-    // Broadcast preview
+    // Broadcast preview — think/staging bosqichi: savol kontenti ham boradi,
+    // shunda participant/projector savolni 3s staging'da ko'rsatib, countdown bildira oladi
     const pubQ = await getPublicQuestion(cmd.sessionId, questionId);
     io.to(rooms(cmd.sessionId)).emit(CAST_EVENTS.QUESTION_PREVIEW, {
       revision: res.revision,
       questionPosition: state.questionPosition,
       totalQuestions: state.totalQuestions,
       thinkSeconds: config?.playback?.thinkSeconds || 0,
+      question: pubQ ? participantQuestionProjection(pubQ, { phase: 'THINK_TIME', revision: res.revision }) : null,
       serverAt: res.event.serverAt,
     });
 
@@ -1321,6 +1328,7 @@ export function setupCastHandlers(io, socket) {
               const nx = applyEvent(st, ev);
               const r = await commitEvent({ sessionId: sid, expectedRevision: revision, event: ev, state: nx });
               io.to(rooms(sid)).emit(CAST_EVENTS.QUESTION_CLOSED, { revision: r.revision, softExpired: true, serverAt: r.event.serverAt });
+    scheduleAutoPodium(sid);
               await emitQuestionEvidence(sid, qid, 1);
             }
           },
@@ -1375,6 +1383,7 @@ export function setupCastHandlers(io, socket) {
           const nx = applyEvent(st, ev);
           const r = await commitEvent({ sessionId: sid, expectedRevision: revision, event: ev, state: nx });
           io.to(rooms(sid)).emit(CAST_EVENTS.QUESTION_CLOSED, { revision: r.revision, softExpired: true, serverAt: r.event.serverAt });
+    scheduleAutoPodium(sid);
           await emitQuestionEvidence(sid, qid, 1);
         },
       });
@@ -1414,6 +1423,7 @@ export function setupCastHandlers(io, socket) {
           const nx = applyEvent(st, ev);
           const r = await commitEvent({ sessionId: sid, expectedRevision: revision, event: ev, state: nx });
           io.to(rooms(sid)).emit(CAST_EVENTS.QUESTION_CLOSED, { revision: r.revision, softExpired: true, serverAt: r.event.serverAt });
+    scheduleAutoPodium(sid);
           await emitQuestionEvidence(sid, qid, 1);
         },
       });
@@ -1436,6 +1446,7 @@ export function setupCastHandlers(io, socket) {
     const next = applyEvent(state, event);
     const res = await commitEvent({ sessionId: cmd.sessionId, expectedRevision: cmd.expectedRevision, event, state: next });
     io.to(rooms(cmd.sessionId)).emit(CAST_EVENTS.QUESTION_CLOSED, { revision: res.revision, hostClosed: true, serverAt: res.event.serverAt });
+    scheduleAutoPodium(cmd.sessionId);
     // Teacher-private evidence → director room only
     if (state.voteRound === 2) {
       // Revote manual close → before/after matrix
@@ -1489,6 +1500,7 @@ export function setupCastHandlers(io, socket) {
       // distribution opsional — fail bo'lsa reveal baribir boradi
       console.error('[Cast] reveal distribution error:', err.message);
     }
+    cancelAutoPodium(cmd.sessionId);
     io.to(rooms(cmd.sessionId)).emit(CAST_EVENTS.QUESTION_REVEALED, reveal);
     ackSend({ ok: true, commandId: cmd.commandId, newRevision: res.revision, reveal });
   }
@@ -1515,14 +1527,111 @@ export function setupCastHandlers(io, socket) {
     const event = { type: 'cast:questionNext', payload: { questionPosition: nextPos, questionId: nextQ }, serverAt: Date.now() };
     const next = applyEvent(state, event);
     const res = await commitEvent({ sessionId: cmd.sessionId, expectedRevision: cmd.expectedRevision, event, state: next });
+    const pubQ2 = await getPublicQuestion(cmd.sessionId, nextQ);
+    const cfg2 = await getConfig(cmd.sessionId);
+    const thinkSeconds = cfg2?.playback?.thinkSeconds || 0;
     io.to(rooms(cmd.sessionId)).emit(CAST_EVENTS.QUESTION_PREVIEW, {
       revision: res.revision,
       questionPosition: nextPos,
       totalQuestions: state.totalQuestions,
-      thinkSeconds: (await getConfig(cmd.sessionId))?.playback?.thinkSeconds || 0,
+      thinkSeconds,
+      question: pubQ2 ? participantQuestionProjection(pubQ2, { phase: 'THINK_TIME', revision: res.revision }) : null,
       serverAt: res.event.serverAt,
     });
+    // C4-09 FULLY_AUTO: keyingi savol ham avtomatik ochiladi (thinkSeconds'dan so'ng)
+    // — direktor aralashuvi shart emas (reklama/demo uslubidagi to'liq avto oqim).
+    const cfgAdv = cfg2?.playback?.advanceMode;
+    if (cfgAdv === CAST_ADVANCE_MODE.FULLY_AUTO) {
+      const openIt = () => { openQuestionNow(cmd.sessionId, nextQ, res.revision).catch(() => {}); };
+      const thinkMs = Math.max(0, Math.round(Number(thinkSeconds) || 0)) * 1000;
+      if (thinkMs > 0) setTimeout(openIt, thinkMs);
+      else openIt();
+    }
     ackSend({ ok: true, commandId: cmd.commandId, newRevision: res.revision, questionPosition: nextPos });
+  }
+
+  // ── C4-09: AVTO-SHOHSUPA (podium) — savol yopilgach 3s dan keyin, avto-rejimda 5s ──
+  // Faqat har-savol leaderboard ochiq bo'lgan modlarda (CLASSIC_LIVE: top_n + every_question).
+  const podiumTimers = new Map();
+  function cancelAutoPodium(sessionId) {
+    const t = podiumTimers.get(sessionId);
+    if (t) { clearTimeout(t); podiumTimers.delete(sessionId); }
+  }
+  function autoPodiumEligible(config) {
+    const lb = (config && config.leaderboard) || {};
+    if ((lb.frequency || CAST_LB_FREQUENCY.MANUAL) !== CAST_LB_FREQUENCY.EVERY_QUESTION) return false;
+    const vis = lb.visibility || CAST_LB_VISIBILITY.OFF_DURING_LEARNING;
+    return vis === CAST_LB_VISIBILITY.TOP_N || vis === CAST_LB_VISIBILITY.RELATIVE_NEIGHBORS;
+  }
+  async function scheduleAutoPodium(sessionId) {
+    cancelAutoPodium(sessionId);
+    const t = setTimeout(async () => {
+      podiumTimers.delete(sessionId);
+      try {
+        const state = await getState(sessionId);
+        if (!state || !state.questionId || state.phase !== CAST_PHASES.QUESTION_LOCKED) return;
+        const config = await getConfig(sessionId).catch(() => null);
+        if (!config || !autoPodiumEligible(config)) return;
+        const parts = await listParticipants(sessionId).catch(() => ({}));
+        if (!parts || Object.keys(parts).length === 0) return;
+        const vis = config.leaderboard.visibility;
+        await emitLeaderboardProjections(sessionId, { visibility: vis }).catch(() => {});
+        // Server state → LEADERBOARD (direktor next/session-end buyruqlari ochiladi;
+        // phase LOCKED'da question:next yo'q — manual leaderboard bilan bir xil yo'l)
+        if (state.phase === CAST_PHASES.QUESTION_LOCKED) {
+          const evLb = { type: 'cast:leaderboardShown', payload: { shownAt: Date.now(), autoPodium: true }, serverAt: Date.now() };
+          const nextLb = applyEvent(state, evLb);
+          await commitEvent({ sessionId, expectedRevision: state.revision, event: evLb, state: nextLb }).catch((e) => console.error('[Cast] podium phase commit error:', e.message));
+        }
+        const adv = config.playback && config.playback.advanceMode;
+        const autoHoldMs = adv && adv !== CAST_ADVANCE_MODE.HOST_CONTROLLED ? 5000 : 0;
+        const serverAt = Date.now();
+        // Participant'larga shaxsiy podium (o'z o'rni + ball) — per-participant socket'ga
+        const scores = await getScores(sessionId).catch(() => ({}));
+        const ranked = buildLeaderboardFromStore(parts, scores);
+        for (const entry of ranked) {
+          const personal = personalProjection(ranked, entry.participantId, 1);
+          if (!personal) continue;
+          io.to(participantRoom(sessionId, entry.participantId)).emit('cast:podiumShow', {
+            questionId: state.questionId,
+            personal,
+            totalParticipants: ranked.length,
+            autoHoldMs,
+            serverAt,
+          });
+        }
+        // Public/overlay (projector + director): umumiy ko'rinish
+        io.to(rooms(sessionId)).emit('cast:podiumShow', {
+          questionId: state.questionId,
+          autoHoldMs,
+          serverAt,
+        });
+        // FULLY_AUTO: 5s shohsupadan so'ng avto next/session-end (direktor bosishini kutmaydi)
+        if (adv === CAST_ADVANCE_MODE.FULLY_AUTO && autoHoldMs > 0) {
+          const t2 = setTimeout(async () => {
+            podiumTimers.delete(sessionId);
+            try {
+              const st2 = await getState(sessionId).catch(() => null);
+              if (!st2) return;
+              const noop = () => {};
+              const auto = { actorId: 'auto-podium', role: 'system' };
+              const cmd = { sessionId, expectedRevision: st2.revision };
+              if (st2.questionPosition + 1 >= (st2.totalQuestions || 0)) {
+                await handleSessionEnd(cmd, auto, noop);
+              } else {
+                await handleNext(cmd, auto, noop);
+              }
+            } catch (err2) {
+              console.error('[Cast] auto advance after podium error:', err2.message);
+            }
+          }, autoHoldMs);
+          podiumTimers.set(sessionId, t2);
+        }
+      } catch (err) {
+        console.error('[Cast] auto podium error:', err.message);
+      }
+    }, 3000);
+    podiumTimers.set(sessionId, t);
   }
 
   // ── STYLE S32 — LEADERBOARD PROJECTIONS (shared emit) ──
@@ -1564,9 +1673,10 @@ export function setupCastHandlers(io, socket) {
     if (activeVisibility === CAST_LB_VISIBILITY.PERSONAL_ONLY || activeVisibility === CAST_LB_VISIBILITY.RELATIVE_NEIGHBORS || activeVisibility === CAST_LB_VISIBILITY.TOP_N) {
       for (const entry of ranked) {
         const personal = personalProjection(ranked, entry.participantId, 1);
-        const sockets = trackedSocketsFor(entry.participantId);
-        if (!sockets.length) continue;
-        io.to(sockets).emit(CAST_EVENTS.LEADERBOARD_UPDATED, {
+        if (!personal) continue;
+        // C4-09: private room orqali (per-socket Map har socket'da alohida — room
+        // join'lar bo'lsa ishonchli yetkaziladi)
+        io.to(participantRoom(sessionId, entry.participantId)).emit(CAST_EVENTS.LEADERBOARD_UPDATED, {
           mode: 'personal',
           visibility: activeVisibility,
           personal,
@@ -1580,6 +1690,7 @@ export function setupCastHandlers(io, socket) {
 
   // ── STYLE S32 — LEADERBOARD SHOW (director manual) ──
   async function handleLeaderboardShow(cmd, actor, ackSend) {
+    cancelAutoPodium(cmd.sessionId);
     const sessionId = cmd.sessionId;
     const state = await getState(sessionId);
     assertCommandAllowed(state, 'leaderboard:show');
@@ -1642,6 +1753,7 @@ export function setupCastHandlers(io, socket) {
       const nx = applyEvent(st, ev);
       const r = await commitEvent({ sessionId, expectedRevision: revision, event: ev, state: nx });
       io.to(rooms(sessionId)).emit(CAST_EVENTS.QUESTION_LOCKED, { revision: r.revision, questionId, serverAt: r.event.serverAt });
+      scheduleAutoPodium(sessionId);
       await emitQuestionEvidence(sessionId, questionId, 1);
     } catch (err) {
       console.error('[Cast] lockNow error:', err.message);
@@ -2711,6 +2823,7 @@ export function setupCastHandlers(io, socket) {
         const nx = applyEvent({ ...st, phase: CAST_PHASES.QUESTION_OPEN }, ev);
         const r = await commitEvent({ sessionId: sid, expectedRevision: revision, event: ev, state: nx });
         io.to(rooms(sid)).emit(CAST_EVENTS.QUESTION_CLOSED, { revision: r.revision, softExpired: true, serverAt: r.event.serverAt });
+    scheduleAutoPodium(sid);
         // Quick prompt result (director only) — quick prompt bilan bir xil
         await emitQuickPromptResult(sid, qid);
       },
@@ -3710,6 +3823,7 @@ export function setupCastHandlers(io, socket) {
           const nx = applyEvent({ ...st, phase: CAST_PHASES.QUESTION_OPEN }, ev);
           const r = await commitEvent({ sessionId: sid, expectedRevision: revision, event: ev, state: nx });
           io.to(rooms(sid)).emit(CAST_EVENTS.QUESTION_CLOSED, { revision: r.revision, softExpired: true, serverAt: r.event.serverAt });
+    scheduleAutoPodium(sid);
           // Quick prompt result (director only)
           await emitQuickPromptResult(sid, qid);
         },
@@ -3964,6 +4078,7 @@ export function setupCastHandlers(io, socket) {
           const nx = applyEvent({ ...st, phase: CAST_PHASES.QUESTION_OPEN }, ev);
           await commitEvent({ sessionId: sid, expectedRevision: revision, event: ev, state: nx });
           io.to(rooms(sid)).emit(CAST_EVENTS.QUESTION_CLOSED, { revision: nx.revision, softExpired: true, serverAt: Date.now() });
+          scheduleAutoPodium(sid);
         },
       });
     }

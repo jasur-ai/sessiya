@@ -261,9 +261,9 @@
 
     const idx = state.questions.indexOf(q);
     const qNum = idx + 1;
-    /* S34l KAHOOT: har variant shakl belgisi bilan (uchburchak/romb/doira/kvadrat),
+    /* S34l VIKTORINA: har variant shakl belgisi bilan (uchburchak/romb/doira/kvadrat),
        ranglar BIR XIL (binafsha) — qizil FAQAT xato uchun. Variant karta o'zini
-       bosish = to'g'ri javob belgilash (Kahoot mantiqi), alohida radio YO'Q. */
+       bosish = to'g'ri javob belgilash (jonli viktorina mantiqi), alohida radio YO'Q. */
     const SHAPES = ['▲', '◆', '●', '■', '★', '⬢'];
     const optsHtml = q.options.map((opt, oi) => `
       <div class="tb-opt${oi === q.correct ? ' is-correct' : ''}" data-opt-card="${oi}" role="radio" aria-checked="${oi === q.correct}" tabindex="0" title="${T('optCardTitle', "Bosib to'g'ri javob deb belgilang")}">
@@ -400,7 +400,7 @@
       });
     });
 
-    /* S34l KAHOOT: variant KARTASINI bosish = to'g'ri javob belgilash */
+    /* S34l VIKTORINA: variant KARTASINI bosish = to'g'ri javob belgilash */
     $$('[data-opt-card]', $('.tb-editor')).forEach(cardEl => {
       cardEl.addEventListener('click', (ev) => {
         if (ev.target.closest('input, button')) return; /* input/tugmaga tegsa aralashmaymiz */
