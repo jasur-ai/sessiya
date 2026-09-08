@@ -7,9 +7,9 @@
  *
  * Testlar:
  *   1. Admin login → VIP grant (sardor)
- *   2. VIP user (sardor) login → Mock/PRE ko'rinadi
+ *   2. VIP user (sardor) login → panel stealth (mock/pre izlari yo'q, 09/2026)
  *   3. Non-VIP user (user) login → Mock/PRE yashirin
- *   4. Non-VIP user → /host?source=mock → 404
+ *   4. Non-VIP user → /host?source=mock|pre → 404 (requireVip)
  */
 
 import http from 'http';
@@ -292,10 +292,12 @@ async function main() {
       return r.status === 200;
     });
 
-    await test('VIP user: Mock bo\'limi HTML da bor', async () => {
+    await test('VIP: panel stealth — mock/PRE bo\'limi ko\'rinmaydi', async () => {
       const r = await request('GET', '/user/panel');
-      // VIP user: isVip=true, fans.length>0 → "Mock" section renders
-      return r.body.includes('Mock') || r.body.includes('PRE Test');
+      // 09/2026 VIP stealth (user qarori, routes/user.js): panel'da VIP/mock/pre
+      // izlari yo'q — mock/pre faqat direct URL orqali (requireVip) ishlaydi.
+      const hasMockText = r.body.includes('Mock Fanlar') || r.body.includes('PRE Test');
+      return r.status === 200 && !hasMockText;
     });
 
     console.log('└─');
