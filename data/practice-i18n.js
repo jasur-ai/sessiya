@@ -8,6 +8,7 @@ export const PRACTICE_COPY = {
   uz: {
     pageTitle: '{title} — Deborah',
     topBadge: 'Yakka mashq',
+    untimed: 'Vaqtsiz',
     back: '← Panel',
     meta: "Har bir savoldan keyin darhol natijani ko'rasiz — xato bo'lsa to'g'ri javob ham ko'rsatiladi. Yakunda baho va tushuntirishlar chiqadi.",
     prev: '← Oldingi',
@@ -31,6 +32,7 @@ export const PRACTICE_COPY = {
   ru: {
     pageTitle: '{title} — Deborah',
     topBadge: 'Пробный тест',
+    untimed: 'Без таймера',
     back: '← Панель',
     meta: 'После каждого вопроса вы сразу видите результат — при ошибке показывается правильный ответ. В конце — оценка и пояснения.',
     prev: '← Назад',
@@ -54,6 +56,7 @@ export const PRACTICE_COPY = {
   en: {
     pageTitle: '{title} — Deborah',
     topBadge: 'Practice',
+    untimed: 'Untimed',
     back: '← Panel',
     meta: 'You will see the result right after each question — and the correct answer if you missed it. Score and explanations at the end.',
     prev: '← Previous',
@@ -77,6 +80,7 @@ export const PRACTICE_COPY = {
   'uz-cyrl': {
     pageTitle: '{title} — Deborah',
     topBadge: 'Якка машқ',
+    untimed: 'Вақтсиз',
     back: '← Панель',
     meta: 'Ҳар бир саволдан кейин дарҳол натижани кўрасиз — хато бўлса тўғри жавоб ҳам кўрсатилади. Якунда баҳо ва тушунтиришлар чиқади.',
     prev: '← Олдинги',

@@ -107,6 +107,11 @@
       transition: left .45s ease; pointer-events: none; }
     .act-cast:hover::after, .act-sinov:hover::after { left: 135%; }
     @media (prefers-reduced-motion: reduce) { .act-cast, .act-sinov { transition: none; } .act-cast::after, .act-sinov::after { display: none; } }
+    /* 09/2026: Testlarim bo'limi — sarlavha osti izohi + minor sarlavha */
+    .ws-sec-sub{font-size:.84rem;color:var(--deborah-semantic-color-text-muted);font-weight:600;margin-top:2px;}
+    .ws-sec-title--minor{font-size:.96rem !important;color:var(--deborah-semantic-color-text-secondary);letter-spacing:.01em;}
+    .ws-sec-hd--minor{margin-top:34px;}
+    .modal-time-opt.opt-untimed{outline:1.5px dashed var(--deborah-semantic-color-action-primary, #b8860b);outline-offset:1px;}
   </style>
 </head>
 <body>
@@ -220,31 +225,14 @@
           <button type="button" class="btn act-sinov" data-start-sinov data-name="<%= tests[0].name.replace(/'/g, "\\'") %>" data-count="<%= tests[0].count %>" data-url="/user/practice?source=user&key=<%= tests[0].key %>"><%- icon('zap', 15) %> <span><%= __p('act.practice') %></span></button>
         </div>
       </div>
-    <% } else { %>
-      <div class="ws-resume">
-        <div class="ws-resume-ico"><%- icon('plus', 22) %></div>
-        <div class="ws-resume-body">
-          <h2 class="ws-resume-title"><%= __p('rsEmpty.title') %></h2>
-          <p class="ws-resume-meta"><%= __p('rsEmpty.sub') %></p>
-        </div>
-        <% /* 09/2026: bo'sh holatda tugmalar olib tashlandi — 'Yangi test'
-              faqat kutubxonadagi yagona CTA'da ko'rinadi (dublikat yo'q). */ %>
-      </div>
     <% } %>
-
-    <!-- Search (S25.07: skeleton + error + empty) -->
-    <div class="ws-sec-hd">
-      <h2 class="ws-sec-title" data-i18n="search.title"><%= __p('search.title') %></h2>
-    </div>
-    <div class="ws-search" style="margin-bottom:14px">
-      <input class="ws-search-inp" id="search-inp" placeholder="<%= __p('search.ph') %>" aria-label="<%= __p('search.aria') %>">
-      <button type="button" class="ws-search-btn" id="ws-search-btn"><%- icon('search', 14) %> <span><%= __p('search.btn') %></span></button>
-    </div>
-    <div id="search-results"></div>
+    <% /* 09/2026 (user qarori): bo'sh holatda alohida eslatma-karta olib tashlandi —
+          bo'sh kutubxona Testlarim bo'limi ichida o'z CTA'sini ko'rsatadi (dublikat yo'q). */ %>
 
     <!-- ════ Test Library (S26) ════ -->
-    <div class="ws-sec-hd" style="margin-top:28px">
-      <h2 class="ws-sec-title" data-i18n="ws.library"><%= __p('lib.title') %></h2>
+    <div class="ws-sec-hd">
+      <h2 class="ws-sec-title" data-i18n="lib.title"><%= __p('lib.title') %></h2>
+      <div class="ws-sec-sub"><%= __p('lib.sub') %></div>
       <% /* 09/2026 (user qarori): 'Yangi test' faqat bitta joyda — testlar
             borida kutubxona sarlavhasida; bo'sh holatda kutubxona empty-CTA'si. */ %>
       <% if (tests.length > 0) { %>
@@ -342,6 +330,16 @@
         </div>
       <% }); %>
     </div>
+    <!-- Search (S25.07: skeleton + error + empty) -->
+    <div class="ws-sec-hd ws-sec-hd--minor">
+      <h2 class="ws-sec-title ws-sec-title--minor" data-i18n="search.title"><%= __p('search.title') %></h2>
+    </div>
+    <div class="ws-search" style="margin-bottom:14px">
+      <input class="ws-search-inp" id="search-inp" placeholder="<%= __p('search.ph') %>" aria-label="<%= __p('search.aria') %>">
+      <button type="button" class="ws-search-btn" id="ws-search-btn"><%- icon('search', 14) %> <span><%= __p('search.btn') %></span></button>
+    </div>
+    <div id="search-results"></div>
+
 
   </main>
 
@@ -614,23 +612,27 @@
 
     // ── Start Modal (CSP: delegation; vaqt ro'yxatida 20 qo'shildi, default 20) ──
     let startModalData = null;
-    const TIME_OPTS = [5, 10, 15, 20, 30, 45, 60, 90, 120];
+    const TIME_OPTS = [0, 5, 10, 15, 20, 30, 45, 60, 90, 120];
     const DEFAULT_TIME = 20;
 
     function renderTimeGrid(containerId, selected) {
       const el = document.getElementById(containerId);
       if (!el) return;
-      el.innerHTML = TIME_OPTS.map(t =>
-        '<button type="button" class="modal-time-opt' + (t === selected ? ' selected' : '') + '" data-time="' + t + '">' +
-        '<div class="tv">' + t + '</div><div class="tl">' + (window.__PT ? window.__PT('mod.unit', 'soniya') : 'soniya') + '</div></button>'
-      ).join('');
+      el.innerHTML = TIME_OPTS.map(t => {
+        const unt = t === 0;
+        const lab = unt
+          ? (window.__PT ? window.__PT('mod.untimed', 'Vaqtsiz') : 'Vaqtsiz')
+          : (window.__PT ? window.__PT('mod.unit', 'soniya') : 'soniya');
+        return '<button type="button" class="modal-time-opt' + (unt ? ' opt-untimed' : '') + (t === selected ? ' selected' : '') + '" data-time="' + t + '">' +
+          '<div class="tv">' + (unt ? '\u221e' : t) + '</div><div class="tl">' + lab + '</div></button>';
+      }).join('');
     }
 
     let selectedTimes = {};
     function selTime(containerId, val) {
       selectedTimes[containerId] = val;
       document.querySelectorAll('#' + containerId + ' .modal-time-opt').forEach(el => {
-        const tv = parseInt(el.querySelector('.tv').textContent);
+        const tv = parseInt(el.dataset.time, 10);
         el.classList.toggle('selected', tv === val);
       });
     }

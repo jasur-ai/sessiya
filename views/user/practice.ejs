@@ -3,193 +3,203 @@
 <head>
   <%- include('../partials/head') %>
   <style>
-    /* Yakka mashq (Sinov) — premium token uslubi (panel/workspace bilan bir xil
-       dizayn tili: light/dark temaga moslashadi, panel bilan bir xil ranglar). */
+    /* Yakka mashq (Sinov) — jonli sahna (reklama uslubi):
+       katta maydon, 2×2 rangli javob plitalari, darhol natija, vaqt/vaqtsiz.
+       Rasm: qora-jigarrang sahna + krem karta — Deborah vintage palitrasi. */
     *{box-sizing:border-box;}
     html,body{min-height:100%;}
     body{
-      font-family:var(--deborah-typography-font-body, 'Source Sans 3', system-ui, sans-serif);
-      background:var(--deborah-semantic-color-surface-default);
-      color:var(--deborah-semantic-color-text-primary);
       margin:0;padding:0;
+      font-family:'Source Sans 3',system-ui,-apple-system,'Segoe UI',sans-serif;
+      color:#f6ecd9;
+      background:
+        radial-gradient(1100px 520px at 50% -10%, rgba(201,165,101,.18), transparent 60%),
+        linear-gradient(160deg,#2b2013 0%, #1c140a 55%, #150e07 100%);
+      background-attachment:fixed;
     }
+    button{font-family:inherit;}
+
     .pr-top{
-      position:sticky;top:0;z-index:20;
-      display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-      padding:10px 16px;
-      background:var(--deborah-semantic-color-surface-raised);
-      border-bottom:1px solid var(--deborah-semantic-color-border-default);
-      backdrop-filter:blur(10px);
+      display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+      padding:14px 22px;
+      background:rgba(20,13,6,.55);
+      border-bottom:1px solid rgba(201,165,101,.28);
+      backdrop-filter:blur(8px);
+    }
+    .pr-top-l{display:flex;align-items:center;gap:12px;min-width:0;}
+    .pr-badge{
+      font-size:.66rem;font-weight:800;text-transform:uppercase;letter-spacing:.14em;
+      color:#1a1305;background:linear-gradient(135deg,#d9b465,#c9a565 55%,#a37f3a);
+      border-radius:50px;padding:4px 12px;flex-shrink:0;white-space:nowrap;
     }
     .pr-title{
-      font-family:var(--deborah-typography-font-display, var(--deborah-typography-font-body, inherit));
-      font-size:1rem;font-weight:800;margin:0;display:flex;align-items:center;gap:8px;min-width:0;
+      font-size:1.05rem;font-weight:800;margin:0;color:#f6ecd9;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:60vw;
     }
-    .pr-badge{
-      font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;
-      color:var(--deborah-semantic-color-action-on-action,#fff);
-      background:var(--deborah-semantic-color-action-primary);
-      border-radius:50px;padding:3px 10px;flex-shrink:0;
+    .pr-top-r{margin-left:auto;display:flex;align-items:center;gap:10px;}
+    .pr-chip{
+      display:inline-flex;align-items:center;gap:6px;
+      font-size:.8rem;font-weight:800;font-variant-numeric:tabular-nums;
+      color:#f6ecd9;background:rgba(201,165,101,.14);
+      border:1px solid rgba(201,165,101,.45);border-radius:50px;padding:6px 13px;
     }
+    .pr-chip .ico-untimed{color:#d9b465;}
     .pr-back{
-      margin-left:auto;text-decoration:none;font-size:.82rem;font-weight:700;
-      color:var(--deborah-semantic-color-text-secondary);
-      padding:8px 12px;border-radius:10px;border:1px solid var(--deborah-semantic-color-border-subtle);
-      background:var(--deborah-semantic-color-surface-nested);
+      text-decoration:none;font-size:.8rem;font-weight:700;color:#e9d9b8;
+      padding:8px 14px;border-radius:50px;
+      border:1px solid rgba(201,165,101,.35);background:rgba(201,165,101,.1);
     }
-    .pr-back:hover{color:var(--deborah-semantic-color-text-primary);border-color:var(--deborah-semantic-color-border-default);}
-    .pr-wrap{max-width:760px;margin:0 auto;padding:18px 16px 90px;}
-    .pr-meta{font-size:.84rem;color:var(--deborah-semantic-color-text-muted);font-weight:600;margin-bottom:10px;}
-    .pr-timer{
-      font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace;font-weight:800;
-      font-size:1.05rem;color:var(--deborah-semantic-color-status-warning, var(--deborah-semantic-color-action-primary));
-      margin-bottom:12px;min-height:26px;
-    }
-    .pr-dots{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 16px;}
-    .pr-dot{
-      width:32px;height:32px;border-radius:9px;border:1.5px solid var(--deborah-semantic-color-border-default);
-      background:var(--deborah-semantic-color-surface-raised);color:var(--deborah-semantic-color-text-secondary);
-      font-size:.74rem;font-weight:800;cursor:pointer;font-family:inherit;
-    }
-    .pr-dot.done{background:var(--deborah-semantic-color-action-primary-soft, color-mix(in srgb, var(--deborah-semantic-color-action-primary) 14%, transparent));border-color:var(--deborah-semantic-color-action-primary);color:var(--deborah-semantic-color-text-primary);}
-    .pr-dot.miss{background:rgba(180,83,9,.14);border-color:#b45309;color:#b45309;}
-    .pr-dot.cur{outline:2px solid var(--deborah-semantic-color-action-primary);outline-offset:1px;}
-    .pr-card{
-      background:var(--deborah-semantic-color-surface-raised);
-      border:1px solid var(--deborah-semantic-color-border-subtle);
-      border-radius:var(--deborah-radius-lg, 18px);
-      padding:20px;margin-bottom:14px;
-      box-shadow:var(--shadow-lg, 0 10px 30px rgba(0,0,0,.06));
-    }
-    .pr-q{font-weight:800;font-size:1.05rem;line-height:1.45;margin-bottom:14px;color:var(--deborah-semantic-color-text-primary);}
-    .pr-opt{
-      display:flex;align-items:flex-start;gap:11px;
-      border:1.5px solid var(--deborah-semantic-color-border-default);
-      background:var(--deborah-semantic-color-surface-default);
-      border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer;
-      font-size:.92rem;transition:border-color .12s ease, background-color .12s ease;
-    }
-    .pr-opt:hover{border-color:var(--deborah-semantic-color-action-primary);}
-    .pr-opt.sel{border-color:var(--deborah-semantic-color-action-primary);background:var(--deborah-semantic-color-action-primary-soft, color-mix(in srgb, var(--deborah-semantic-color-action-primary) 12%, transparent));}
-    .pr-opt input{margin-top:3px;accent-color:var(--deborah-semantic-color-action-primary);}
-    .pr-opt b{color:var(--deborah-semantic-color-text-secondary);}
-    .pr-nav{display:flex;gap:10px;justify-content:space-between;margin-top:16px;}
-    .btn{border:0;border-radius:11px;padding:11px 18px;font-weight:700;font-size:.9rem;cursor:pointer;min-height:44px;font-family:inherit;text-decoration:none;}
-    .btn-primary{background:var(--deborah-semantic-color-action-primary);color:var(--deborah-semantic-color-action-on-action,#fff);}
-    .btn-primary:hover{background:var(--deborah-semantic-color-action-primary-hover);}
-    .btn-quiet{background:var(--deborah-semantic-color-surface-nested);color:var(--deborah-semantic-color-text-secondary);border:1px solid var(--deborah-semantic-color-border-subtle);}
-    .btn-quiet:hover{color:var(--deborah-semantic-color-text-primary);}
-    .btn[disabled]{opacity:.5;cursor:not-allowed;}
-    .pr-res-score{font-size:2.6rem;font-weight:900;text-align:center;color:var(--deborah-semantic-color-status-success,#16a34a);}
-    .pr-res-sub{text-align:center;color:var(--deborah-semantic-color-text-muted);font-size:.9rem;font-weight:600;margin-bottom:18px;}
-    .pr-review{border:1px solid var(--deborah-semantic-color-border-default);border-radius:12px;padding:12px 14px;margin-bottom:10px;}
-    .pr-review.wrong{border-color:color-mix(in srgb, var(--deborah-semantic-color-text-danger) 45%, transparent);background:color-mix(in srgb, var(--deborah-semantic-color-text-danger) 7%, transparent);}
-    .pr-review.right{border-color:color-mix(in srgb, var(--deborah-semantic-color-status-success) 45%, transparent);background:color-mix(in srgb, var(--deborah-semantic-color-status-success) 7%, transparent);}
-    .pr-rv-q{font-weight:700;font-size:.9rem;margin-bottom:6px;}
-    .pr-rv-o{font-size:.84rem;margin-left:10px;color:var(--deborah-semantic-color-text-secondary);}
-    .pr-rv-o.ok{color:var(--deborah-semantic-color-status-success,#16a34a);font-weight:700;}
-    .pr-rv-o.no{color:var(--deborah-semantic-color-text-danger,#dc2626);}
-    .pr-rv-e{font-size:.78rem;color:var(--deborah-semantic-color-text-muted);margin-top:8px;border-top:1px dashed var(--deborah-semantic-color-border-subtle);padding-top:8px;}
-    @media (max-width:560px){ .pr-wrap{padding:14px 10px 80px;} .pr-q{font-size:.95rem;} }
-    @media print { .pr-top,.pr-nav,.no-print,.pr-dots{display:none !important;} body{background:#fff;} }
+    .pr-back:hover{background:rgba(201,165,101,.22);color:#fff;}
+    @media (max-width:640px){ .pr-title{max-width:44vw;font-size:.92rem;} }
 
-    /* ── 09/2026: Sinov — reklama-uslub yorqin sahna (Kahoot ruhida) ── */
-    .pr-top { border-bottom: 1px solid var(--deborah-semantic-color-border-subtle); }
-    .pr-opt {
-      position: relative; overflow: hidden;
-      border-left: 6px solid var(--accent, #4f46e5);
-      transition: border-color .14s ease, background-color .14s ease, transform .14s ease, box-shadow .14s ease;
+    .pr-stage{max-width:1040px;margin:0 auto;padding:22px 18px 60px;}
+    .pr-hud{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      margin-bottom:14px;
     }
-    .pr-opt:nth-child(4n+1) { --accent:#4f46e5; --g1:#3730a3; --g2:#4f46e5; }
-    .pr-opt:nth-child(4n+2) { --accent:#be123c; --g1:#9f1239; --g2:#be123c; }
-    .pr-opt:nth-child(4n+3) { --accent:#b45309; --g1:#92400e; --g2:#a16207; }
-    .pr-opt:nth-child(4n+4) { --accent:#7c3aed; --g1:#5b21b6; --g2:#7c3aed; }
-    .pr-opt b { color: var(--accent); font-weight: 800; }
-    .pr-opt:hover { transform: translateX(3px); box-shadow: 0 6px 16px rgba(0,0,0,.12); }
-    .pr-opt.sel {
-      border-left-color: transparent; color: #fff; font-weight: 700;
-      background: linear-gradient(135deg, var(--g1), var(--g2)) !important;
-      border-color: transparent; box-shadow: 0 10px 24px rgba(0,0,0,.22);
-      animation: pr-pop .22s ease;
-    }
-    .pr-opt.sel b { color: #fff; }
-    .pr-opt.sel input { accent-color: #fff; }
-    @keyframes pr-pop { 0% { transform: scale(1); } 55% { transform: scale(1.03); } 100% { transform: scale(1); } }
-    @media (prefers-reduced-motion: reduce) {
-      .pr-opt, .pr-opt.sel { transition: none; animation: none; }
-      .pr-opt:hover { transform: none; }
-    }
-
-    /* ── 09/2026 (user qarori): javobdan keyin DARHOL natija (Kahoot tarzi).
-       Oldinga o'tish faqat javob berilgach; noto'g'ri = issiq jigarrang,
-       to'g'ri = yashil. Qizil ko'z oladigan emas. ── */
+    .pr-qpos{font-size:.86rem;font-weight:800;color:#c9a565;letter-spacing:.08em;text-transform:uppercase;}
+    .pr-timer{min-height:1.4rem;font-size:.9rem;font-weight:800;color:#f6ecd9;}
+    .pr-timer:empty{display:none;}
     .pr-hint{
-      display:none;align-items:center;gap:8px;margin:0 0 12px;padding:8px 12px;
-      font-size:.82rem;font-weight:700;border-radius:10px;
-      color:#b45309;background:color-mix(in srgb,#b45309 9%,transparent);
-      border:1px solid rgba(180,83,9,.35);
+      margin:0 0 12px;padding:0;opacity:0;transform:translateY(-4px);
+      transition:opacity .15s ease, transform .15s ease;
+      color:#e2a464;font-weight:700;font-size:.88rem;text-align:center;
     }
-    .pr-hint.show{display:flex;}
-    .pr-opt[data-st="dim"]{opacity:.55;pointer-events:none;}
-    .pr-opt[data-st="right"]{
-      background:color-mix(in srgb, var(--deborah-semantic-color-status-success,#16a34a) 10%,transparent) !important;
-      border-color:var(--deborah-semantic-color-status-success,#16a34a) !important;
-      border-left-color:var(--deborah-semantic-color-status-success,#16a34a) !important;
-      box-shadow:0 0 0 1px var(--deborah-semantic-color-status-success,#16a34a);
-      pointer-events:none;
+    .pr-hint.show{opacity:1;transform:none;}
+
+    /* ── Savol kartasi ── */
+    .qcard{
+      background:#f7eeda;color:#241a0c;
+      border-radius:26px;padding:26px 26px 24px;
+      box-shadow:0 24px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.6);
     }
-    .pr-opt[data-st="right"] b{color:var(--deborah-semantic-color-status-success,#16a34a);}
-    .pr-opt[data-st="right"] .pr-chk{color:var(--deborah-semantic-color-status-success,#16a34a);}
-    .pr-opt[data-st="wrong"]{
-      background:color-mix(in srgb,#b45309 8%,transparent) !important;
-      border-color:#b45309 !important;border-left-color:#b45309 !important;
-      box-shadow:0 0 0 1px #b45309;
-      pointer-events:none;
+    .qtext{
+      margin:0 0 6px;font-size:clamp(1.15rem,2.6vw,1.7rem);line-height:1.35;font-weight:900;
+      text-align:center;word-break:break-word;
     }
-    .pr-opt[data-st="wrong"] b,.pr-opt[data-st="wrong"] .pr-chk{color:#b45309;}
-    .pr-opt .pr-chk{margin-left:auto;font-weight:900;font-size:1rem;align-self:center;}
+    .qtype-line{text-align:center;font-size:.72rem;font-weight:700;color:#8a6a3a;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;}
+
+    .qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:14px;}
+    .qtile{
+      position:relative;display:flex;align-items:center;justify-content:center;gap:10px;
+      min-height:96px;padding:16px 18px;border-radius:18px;cursor:pointer;
+      font-size:clamp(.95rem,1.7vw,1.15rem);font-weight:800;color:#fff;
+      background:var(--tile, #7a5c2e);border:0;text-align:center;line-height:1.3;
+      box-shadow:0 8px 0 rgba(0,0,0,.28);
+      transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+      user-select:none;overflow:hidden;word-break:break-word;
+      pointer-events:auto;
+    }
+    .qtile input{position:absolute;opacity:0;pointer-events:none;}
+    .qtile:hover{transform:translateY(-3px);box-shadow:0 11px 0 rgba(0,0,0,.3);filter:brightness(1.06);}
+    .qtile:active{transform:translateY(2px);box-shadow:0 3px 0 rgba(0,0,0,.3);}
+    .qtile .qt-let{
+      flex-shrink:0;font-size:.72rem;font-weight:900;letter-spacing:.06em;
+      background:rgba(0,0,0,.22);border-radius:9px;padding:4px 8px;
+    }
+    .qtile .qt-mark{position:absolute;top:8px;right:10px;font-size:1.05rem;opacity:0;}
+    /* Natijadan keyingi holatlar */
+    .qtile.is-locked{pointer-events:none;}
+    .qtile.is-right{background:#1e8a3c !important;box-shadow:0 8px 0 rgba(15,90,35,.5);animation:qpop .28s ease;}
+    .qtile.is-right .qt-mark{opacity:1;}
+    .qtile.is-wrong{background:#b13a2e !important;box-shadow:0 8px 0 rgba(90,20,12,.5);animation:qshake .3s ease;}
+    .qtile.is-wrong .qt-mark{opacity:1;}
+    .qtile.is-dim{filter:grayscale(.55) brightness(.78);box-shadow:0 6px 0 rgba(0,0,0,.18);}
+    @keyframes qpop{0%{transform:scale(1)}55%{transform:scale(1.05)}100%{transform:scale(1)}}
+    @keyframes qshake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
     .pr-fb{
-      display:flex;align-items:center;gap:10px;flex-wrap:wrap;
-      margin:4px 0 14px;padding:11px 14px;border-radius:13px;
-      font-weight:800;font-size:.92rem;
-      animation:pr-fb-in .18s ease;
+      margin:16px auto 2px;padding:12px 18px;border-radius:14px;
+      display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
+      font-weight:900;font-size:clamp(.9rem,1.6vw,1.05rem);text-align:center;
+      animation:qpop .22s ease;max-width:640px;
     }
-    @keyframes pr-fb-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
-    @media (prefers-reduced-motion: reduce){.pr-fb{animation:none}}
-    .pr-fb.is-ok{
-      color:var(--deborah-semantic-color-status-success,#16a34a);
-      background:color-mix(in srgb, var(--deborah-semantic-color-status-success,#16a34a) 9%,transparent);
-      border:1.5px solid color-mix(in srgb, var(--deborah-semantic-color-status-success,#16a34a) 45%,transparent);
+    .pr-fb.is-ok{color:#146b2c;background:#d9efd8;border:1.5px solid #7cc98a;}
+    .pr-fb.is-bad{color:#8a2c14;background:#f4dcd2;border:1.5px solid #d99c7c;}
+    .pr-fb-correct{font-size:.78rem;font-weight:700;}
+    .pr-fb-correct b{color:#8a5a1e;}
+
+    .pr-nav{display:flex;gap:12px;justify-content:space-between;align-items:center;margin-top:20px;}
+    .pr-nav button{border:0;border-radius:14px;padding:12px 22px;font-weight:800;font-size:.92rem;cursor:pointer;min-height:48px;}
+    #prev{background:#efe2c4;color:#5b4317;border:1px solid #d9c49a;}
+    #prev:hover:not(:disabled){background:#e6d5ae;}
+    #next,#finish{
+      margin-left:auto;
+      background:linear-gradient(135deg,#d9b465,#a37f3a);color:#1a1305;
+      box-shadow:0 6px 0 rgba(90,64,22,.55);
     }
-    .pr-fb.is-bad{
-      color:#b45309;background:color-mix(in srgb,#b45309 9%,transparent);
-      border:1.5px solid rgba(180,83,9,.4);
+    #next:hover:not(:disabled),#finish:hover:not(:disabled){filter:brightness(1.07);}
+    .btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none;}
+
+    /* progress segmentlar */
+    .pr-dots{display:flex;gap:6px;justify-content:center;margin-top:22px;flex-wrap:wrap;}
+    .pr-dot{
+      width:26px;height:6px;border-radius:4px;border:0;cursor:pointer;padding:0;
+      background:rgba(201,165,101,.28);transition:background .15s ease, transform .15s ease;
     }
-    [data-resolved-theme="dark"] .pr-fb.is-bad,
-    [data-theme="dark"] .pr-fb.is-bad{color:#e2a464;}
-    .pr-fb-correct{margin-left:auto;font-size:.78rem;font-weight:700;color:var(--deborah-semantic-color-text-muted);}
-    .pr-fb-correct b{color:var(--deborah-semantic-color-status-success,#16a34a);}
-    .pr-next-ready{animation:pr-glow 1.3s ease 2;}
-    @keyframes pr-glow{
-      0%,100%{box-shadow:0 0 0 0 rgba(79,70,229,.0)}
-      50%{box-shadow:0 0 0 7px rgba(79,70,229,.16)}
+    .pr-dot.done{background:rgba(201,165,101,.75);}
+    .pr-dot.miss{background:#b45309;}
+    .pr-dot.cur{transform:scaleY(2);background:#d9b465;}
+    .pr-dot.locked{cursor:default;}
+
+    /* ── Natija ── */
+    .res-card{
+      background:#f7eeda;color:#241a0c;border-radius:26px;padding:30px 26px;
+      box-shadow:0 24px 60px rgba(0,0,0,.45);
     }
-    @media (prefers-reduced-motion: reduce){.pr-next-ready{animation:none}}
+    .pr-res-wrap{text-align:center;}
+    .pr-res-score{
+      font-size:clamp(2.6rem,6vw,3.6rem);font-weight:900;line-height:1;
+      background:linear-gradient(135deg,#8a5a1e,#c9a565);-webkit-background-clip:text;background-clip:text;
+      -webkit-text-fill-color:transparent;
+    }
+    .pr-res-sub{font-size:1rem;color:#6b4a1e;font-weight:700;margin:8px 0 4px;}
+    .pr-res-done{font-size:.85rem;color:#8a6a3a;font-weight:600;margin-bottom:20px;}
+    .pr-res-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:6px;}
+    .pr-res-actions .btn{border:0;border-radius:14px;padding:12px 22px;font-weight:800;font-size:.92rem;cursor:pointer;min-height:48px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+    .btn-quiet{background:#efe2c4;color:#5b4317;}
+    .btn-primary{background:linear-gradient(135deg,#d9b465,#a37f3a);color:#1a1305;}
+    .pr-review{border:1px solid #d9c49a;border-radius:14px;padding:12px 16px;margin-bottom:10px;background:#fff8e8;}
+    .pr-review.right{border-color:#7cc98a;background:#f1fae9;}
+    .pr-review.wrong{border-color:#d99c7c;background:#fdf1ea;}
+    .pr-rv-q{font-weight:800;font-size:.95rem;margin-bottom:6px;}
+    .pr-rv-o{font-size:.86rem;margin-left:12px;color:#5b4317;font-weight:600;}
+    .pr-rv-o.ok{color:#1e8a3c;font-weight:800;}
+    .pr-rv-o.no{color:#b13a2e;}
+    .pr-rv-e{font-size:.8rem;color:#8a6a3a;margin-top:8px;border-top:1px dashed #d9c49a;padding-top:8px;}
+    @media (max-width:600px){ .pr-stage{padding:16px 12px 50px;} .qcard{padding:18px 14px 16px;} .qtile{min-height:72px;} }
+    @media (prefers-reduced-motion: reduce){
+      .qtile,.pr-fb,.pr-dot{transition:none;animation:none;}
+      .qtile:hover{transform:none;}
+    }
+    @media print {
+      .pr-top,.pr-hud,.pr-nav,.pr-dots,.pr-res-actions{display:none !important;}
+      body{background:#fff;color:#000;}
+      .qcard,.res-card,.pr-review{box-shadow:none;background:#fff;color:#000;border:1px solid #bbb;}
+    }
   </style>
 </head>
 <body>
   <header class="pr-top">
-    <h1 class="pr-title">🎯 <%= practiceTitle %></h1>
-    <span class="pr-badge"><%= pCopy.topBadge %></span>
-    <a class="pr-back" href="/user/panel"><%= pCopy.back %></a>
+    <div class="pr-top-l">
+      <span class="pr-badge"><%= pCopy.topBadge %></span>
+      <h1 class="pr-title"><%= practiceTitle %></h1>
+    </div>
+    <div class="pr-top-r">
+      <span class="pr-chip" id="mode-chip" hidden></span>
+      <a class="pr-back" href="/user/panel"><%= pCopy.back %></a>
+    </div>
   </header>
-  <main class="pr-wrap">
-    <div class="pr-meta"><%= pCopy.meta %></div>
-    <div class="pr-timer" id="qtimer" aria-live="polite"></div>
-    <div class="pr-dots" id="dots"></div>
+
+  <main class="pr-stage">
+    <div class="pr-hud">
+      <div class="pr-qpos" id="qpos"></div>
+      <div class="pr-timer" id="qtimer" aria-live="polite"></div>
+    </div>
     <div class="pr-hint" id="pr-hint" role="status" aria-live="polite"></div>
     <div id="quiz"></div>
     <div id="result" hidden></div>
+    <div class="pr-dots" id="dots"></div>
   </main>
 
   <script>
@@ -204,19 +214,22 @@
 
     /* 09/2026 (user qarori):
        — javobsiz savoldan oldinga o'tib bo'lmaydi (Next/Finish/dots bloklanadi);
-       — javob tanlansa DARHOL to'g'ri/noto'g'ri natija chiqadi (Kahoot tarzi);
-       — vaqt tugasa savol "o'tkazib yuborilgan" sifatida yopiladi va natija
-         ko'rsatiladi (javob -1 — serverda noto'g'ri hisoblanadi). */
-    /* S34o: URL'dan vaqt (soniya) — panel Sinov modalida tanlangan */
+       — javob tanlansa DARHOL to'g'ri/noto'g'ri natija chiqadi (reklama tarzi);
+       — vaqt tugasa savol "o'tkazib yuborilgan" sifatida yopiladi;
+       — ?time=0 yoki time yo'q = VAQTSIZ rejim (timer yo'q, shoshilish yo'q). */
     const PER_Q_TIME = Math.max(0, parseInt(new URLSearchParams(location.search).get('time'), 10) || 0);
-    const answers = new Array(QUESTIONS.length).fill(-1);  // tanlangan variant (yoki -1)
-    const revealed = new Array(QUESTIONS.length).fill(false); // savol yopilgan (javob yoki vaqt)
-    const missed = new Array(QUESTIONS.length).fill(false);   // vaqt tugab javobsiz qolgan
+    const UNTIMED = !(PER_Q_TIME > 0);
+    const answers = new Array(QUESTIONS.length).fill(-1);
+    const revealed = new Array(QUESTIONS.length).fill(false);
+    const missed = new Array(QUESTIONS.length).fill(false);
     let cur = 0;
     let timeLeft = PER_Q_TIME;
     let timerIv = null;
 
-    function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\"/g, '&quot;'); }
+    // Sahna plitalari uchun ranglar (reklama uslubi; index bo'yicha tsikl)
+    const TILE_COLORS = ['#cf3a2f', '#1f6fd6', '#df9f00', '#228b3c'];
+
+    function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
     function correctOf(i) {
       const c = QUESTIONS[i] && QUESTIONS[i].correct;
       const n = QUESTIONS[i] && QUESTIONS[i].options ? QUESTIONS[i].options.length : 0;
@@ -231,10 +244,19 @@
       hint._iv = setTimeout(() => h.classList.remove('show'), 2600);
     }
     function clearTimer() { clearInterval(timerIv); timerIv = null; }
+    function paintModeChip() {
+      const el = document.getElementById('mode-chip');
+      if (!el) return;
+      el.hidden = false;
+      el.innerHTML = UNTIMED
+        ? '<span class="ico-untimed">∞</span> ' + t('untimed', 'Vaqtsiz')
+        : '⏱ ' + String(PER_Q_TIME).padStart(2, '0') + ':00';
+    }
     function startTimer() {
       clearTimer();
       const el = document.getElementById('qtimer');
-      if (!PER_Q_TIME || revealed[cur]) { if (el && !PER_Q_TIME) el.textContent = ''; return; }
+      if (UNTIMED) { if (el) el.textContent = ''; return; }
+      if (revealed[cur]) { if (el) el.textContent = ''; return; }
       timeLeft = PER_Q_TIME;
       if (!el) return;
       const fmt = () => '⏱ ' + String(Math.floor(timeLeft / 60)).padStart(2, '0') + ':' + String(timeLeft % 60).padStart(2, '0');
@@ -264,7 +286,7 @@
         if (i === cur) cls += ' cur';
         const unlock = i === cur || revealed[i] || (i === cur + 1 && revealed[cur]);
         if (!unlock) cls += ' locked';
-        return `<button type="button" class="${cls}" data-i="${i}" ${unlock ? '' : 'tabindex="-1" aria-disabled="true"'} aria-label="${fill('dotAria', 'Savol {n}', { n: i + 1 })}">${i + 1}</button>`;
+        return `<button type="button" class="${cls}" data-i="${i}" ${unlock ? '' : 'tabindex="-1" aria-disabled="true"'} aria-label="${fill('dotAria', 'Savol {n}', { n: i + 1 })}"></button>`;
       }).join('');
       dots.querySelectorAll('.pr-dot').forEach((d) => d.addEventListener('click', () => {
         const i = +d.dataset.i;
@@ -274,34 +296,40 @@
     }
 
     const quiz = document.getElementById('quiz');
+    const qpos = document.getElementById('qpos');
     function renderQ() {
       startTimer();
+      if (qpos) qpos.textContent = (cur + 1) + ' / ' + QUESTIONS.length;
       const q = QUESTIONS[cur];
       const qc = correctOf(cur);
       const isRev = revealed[cur];
       const chosen = answers[cur];
+      const typeLabel = q.type === 'true_false' ? 'To\u2018g\u2018ri / Noto\u2018g\u2018ri'
+        : (q.type === 'short_answer' ? 'Qisqa javob' : '');
       const opts = q.options.map((o, j) => {
         let st = '';
+        let dis = false;
         if (isRev) {
-          if (j === qc) st = 'right';
-          else if (j === chosen) st = 'wrong';
-          else st = 'dim';
-        } else if (j === chosen) st = 'sel';
-        const mark = isRev && j === qc ? '<span class="pr-chk">✓</span>'
-          : (isRev && j === chosen && j !== qc ? '<span class="pr-chk">✗</span>' : '');
-        return `<label class="pr-opt${st ? ' ' + st : ''}"${st ? ` data-st="${st}"` : ''}>
+          if (j === qc) st = 'is-right';
+          else if (j === chosen) st = 'is-wrong';
+          else st = 'is-dim';
+          dis = true;
+        } else if (j === chosen) st = '';
+        const mark = isRev && j === qc ? '✓' : (isRev && j === chosen && j !== qc ? '✗' : '');
+        return `<label class="qtile ${st}${isRev ? ' is-locked' : ''}" style="--tile:${TILE_COLORS[j % TILE_COLORS.length]}">
           <input type="radio" name="q${cur}" value="${j}" ${(j === chosen && !isRev) ? 'checked' : ''} ${isRev ? 'disabled tabindex="-1"' : ''}>
-          <span><b>${String.fromCharCode(65 + j)})</b> ${esc(o)}</span>
-          ${mark}
+          <span class="qt-let">${String.fromCharCode(65 + j)}</span>
+          <span>${esc(o)}</span>
+          <span class="qt-mark">${mark}</span>
         </label>`;
       }).join('');
 
       let fb = '';
       if (isRev) {
-        const okTxt = qc >= 0 ? `${t('correctIs', 'To‘g‘ri javob')}: <b>${String.fromCharCode(65 + qc)}) ${esc(q.options[qc])}</b>` : '';
+        const okTxt = qc >= 0 ? `${t('correctIs', 'To\u2018g\u2018ri javob')}: <b>${String.fromCharCode(65 + qc)}) ${esc(q.options[qc])}</b>` : '';
         const who = missed[cur] ? 'miss' : (chosen === qc ? 'ok' : 'bad');
         const head = missed[cur] ? '⏱ ' + t('timedOut', 'Vaqt tugadi')
-          : (chosen === qc ? '✅ ' + t('ok', 'To‘g‘ri!') : '❌ ' + t('notOk', 'Noto‘g‘ri'));
+          : (chosen === qc ? '✅ ' + t('ok', 'To\u2018g\u2018ri!') : '❌ ' + t('notOk', 'Noto\u2018g\u2018ri'));
         fb = `<div class="pr-fb is-${who === 'ok' ? 'ok' : 'bad'}" role="status" aria-live="polite">
           <span>${head}</span>
           ${okTxt ? `<span class="pr-fb-correct">${okTxt}</span>` : ''}
@@ -310,19 +338,20 @@
 
       const isLast = cur === QUESTIONS.length - 1;
       const navBtn = isLast
-        ? `<button type="button" class="btn btn-primary" id="finish" ${isRev ? '' : 'disabled'}>${t('finish', '✅ Yakunlash')}</button>`
-        : `<button type="button" class="btn btn-primary${isRev ? ' pr-next-ready' : ''}" id="next" ${isRev ? '' : 'disabled'}>${t('next', 'Keyingi →')}</button>`;
+        ? `<button type="button" class="btn" id="finish" ${isRev ? '' : 'disabled'}>${t('finish', '✅ Yakunlash')}</button>`
+        : `<button type="button" class="btn" id="next" ${isRev ? '' : 'disabled'}>${t('next', 'Keyingi →')}</button>`;
 
       quiz.innerHTML = `
-        <div class="pr-card">
-          <div class="pr-q">${cur + 1} / ${QUESTIONS.length}. ${esc(q.text)}</div>
-          ${opts}
+        <section class="qcard" aria-label="${(cur + 1)} / ${QUESTIONS.length}">
+          <h2 class="qtext">${esc(q.text)}</h2>
+          ${typeLabel ? `<div class="qtype-line">${typeLabel}</div>` : ''}
+          <div class="qgrid">${opts}</div>
           ${fb}
           <div class="pr-nav">
-            <button type="button" class="btn btn-quiet" id="prev" ${cur === 0 ? 'disabled' : ''}>${t('prev', '← Oldingi')}</button>
+            <button type="button" class="btn" id="prev" ${cur === 0 ? 'disabled' : ''}>${t('prev', '← Oldingi')}</button>
             ${navBtn}
           </div>
-        </div>`;
+        </section>`;
       quiz.querySelectorAll('input[type=radio]').forEach((r) => r.addEventListener('change', () => {
         if (revealed[cur]) return;
         answers[cur] = +r.value;
@@ -362,28 +391,31 @@
       dots.hidden = true;
       const el = document.getElementById('result');
       el.hidden = false;
+      const correct = data.correct, total = data.total;
       el.innerHTML = `
-        <div class="pr-card">
-          <div class="pr-res-score">${data.percent}%</div>
-          <div class="pr-res-sub">${fill('resSub', '{correct} / {total} to\'g\'ri javob', { correct: data.correct, total: data.total })}</div>
-          <div style="text-align:center" class="no-print">
-            <button type="button" class="btn btn-quiet" id="pr-print">${t('print', '🖨️ Chop etish')}</button>
-            <a class="btn btn-primary" style="display:inline-block" href="/user/panel">${t('backPanel', '← Panelga qaytish')}</a>
+        <div class="res-card">
+          <div class="pr-res-wrap">
+            <div class="pr-res-score">${data.percent}%</div>
+            <div class="pr-res-sub">${fill('resSub', '{correct} / {total} to\u2018g\u2018ri javob', { correct, total })}</div>
+            <div class="pr-res-actions no-print">
+              <button type="button" class="btn btn-quiet" data-print>${t('print', '🖨️ Chop etish')}</button>
+              <a class="btn btn-primary" href="/user/panel">${t('backPanel', '← Panelga qaytish')}</a>
+            </div>
           </div>
-        </div>
-        ${data.results.map((r, i) => {
-          const q = QUESTIONS[i];
-          return `<div class="pr-review ${r.isCorrect ? 'right' : 'wrong'}">
-            <div class="pr-rv-q">${i + 1}. ${esc(q.text)} ${r.isCorrect ? '✅' : '❌'}</div>
-            ${q.options.map((o, j) => `<div class="pr-rv-o${j === r.correctIndex ? ' ok' : j === r.given ? ' no' : ''}">${String.fromCharCode(65 + j)}) ${esc(o)}${j === r.correctIndex ? ' ✓' : j === r.given ? ' ' + t('yourAnswer', '← sizning javobingiz') : ''}</div>`).join('')}
-            ${r.explanation ? `<div class="pr-rv-e">💡 ${esc(r.explanation)}</div>` : ''}
-          </div>`;
-        }).join('')}`;
+          ${data.results.map((r, i) => {
+            const q = QUESTIONS[i];
+            return `<div class="pr-review ${r.isCorrect ? 'right' : 'wrong'}">
+              <div class="pr-rv-q">${i + 1}. ${esc(q.text)} ${r.isCorrect ? '✅' : '❌'}</div>
+              ${q.options.map((o, j) => `<div class="pr-rv-o${j === r.correctIndex ? ' ok' : j === r.given ? ' no' : ''}">${String.fromCharCode(65 + j)}) ${esc(o)}${j === r.correctIndex ? ' ✓' : (j === r.given ? ' ' + t('yourAnswer', '← sizning javobingiz') : '')}</div>`).join('')}
+              ${r.explanation ? `<div class="pr-rv-e">💡 ${esc(r.explanation)}</div>` : ''}
+            </div>`;
+          }).join('')}
+        </div>`;
+      const prBtn = el.querySelector('[data-print]');
+      if (prBtn) prBtn.addEventListener('click', () => window.print());
     }
 
-    const prPrint = document.getElementById('pr-print');
-    if (prPrint) prPrint.addEventListener('click', () => window.print());
-
+    paintModeChip();
     renderDots();
     renderQ();
   </script>
