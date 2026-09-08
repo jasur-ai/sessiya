@@ -86,7 +86,7 @@
     // 09/2026: data-studio-simple=true → jonli viktorina uslubi (Classic Live) minimal
     studioState.simple = overlay.dataset.studioSimple === 'true';
     studioState.draftConfig = studioState.simple
-      ? { presetId: 'classic_live', overrides: {} }
+      ? { presetId: 'classic_live', overrides: { playback: { advanceMode: 'fully_auto', thinkSeconds: 3 } } }
       : { presetId: 'responsive_accuracy', overrides: {} };
 
     overlay.classList.add('open');
@@ -356,7 +356,7 @@
             <div class="cs-field">
               <label>Avtomatik o‘tkazish ${lockMark('cs-s-auto-chips')}</label>
               <div class="cast-chips" id="cs-s-auto-chips"></div>
-              <span class="cs-s-hint">Yoniq — vaqt tugagach savol o‘zi yopiladi va natija chiqadi; siz “Keyingisi”ni bosasiz.</span>
+              <span class="cs-s-hint">Yoniq — to‘liq avto: savol (20s/…), vaqt tugasa shohsupa 5s va keyingi savol o‘zi ochiladi. O‘chiq — siz boshqarasiz.</span>
             </div>
           </div>
           <div class="cast-row">
@@ -463,14 +463,26 @@
     renderChips('cs-s-timer-chips',
       [['10', '10s'], ['15', '15s'], ['20', '20s'], ['30', '30s'], ['45', '45s'], ['60', '60s'], ['0', 'Vaqtsiz']],
       timerSec, (v) => {
-        if (v === '0') { setOverride('timer', { mode: 'off' }); return; }
+        if (v === '0') { setOverride('timer', { mode: 'off' }); setOverride('playback', { advanceMode: 'host_controlled' }); return; }
         const mode = m('timer.mode', 'strict') === 'off' ? 'strict' : m('timer.mode', 'strict');
+        const adv = m('playback.advanceMode', 'fully_auto') === 'fully_auto' ? 'fully_auto' : 'host_controlled';
         setOverride('timer', { mode, defaultSeconds: Number(v) });
+        if (adv === 'fully_auto') setOverride('playback', { advanceMode: 'fully_auto', thinkSeconds: 3 });
       }, pf);
     renderChips('cs-s-auto-chips',
       [['strict', 'Yoniq'], ['soft', 'O‘chiq']],
       timerMode === 'off' ? 'soft' : timerMode,
-      (v) => setOverride('timer', { mode: v }), pf);
+      (v) => {
+        // C4-10 (user qarori): klassik avto-zanjir — savol yopilgach shohsupa
+        // (5s) ko'rinadi va keyingi savol O'ZI ochiladi (direktor bosmaydi).
+        if (v === 'strict') {
+          setOverride('timer', { mode: 'strict', defaultSeconds: Number(m('timer.defaultSeconds', 20)) || 20 });
+          setOverride('playback', { advanceMode: 'fully_auto', thinkSeconds: 3 });
+        } else {
+          setOverride('timer', { mode: 'soft' });
+          setOverride('playback', { advanceMode: 'host_controlled' });
+        }
+      }, pf);
     const lbVis = m('leaderboard.visibility', 'top_n');
     const lbFreq = m('leaderboard.frequency', 'every_question');
     const lbSel = lbVis === 'top_n' ? 'top_every' : (lbFreq === 'end_only' ? 'end' : 'off');
@@ -586,7 +598,11 @@
         studioState.simpleFallbackUsed = true;
         studioState.draftConfig = {
           presetId: 'responsive_accuracy',
-          overrides: { timer: { mode: 'strict', defaultSeconds: 20 }, presentation: { soundEffects: 'low' } },
+          overrides: {
+            timer: { mode: 'strict', defaultSeconds: 20 },
+            playback: { advanceMode: 'fully_auto', thinkSeconds: 3 },
+            presentation: { soundEffects: 'low' },
+          },
         };
         studioState.customized = false;
         runPreflight();

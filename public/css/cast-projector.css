@@ -80,7 +80,7 @@
   border-color: var(--cast-green);
   background: rgba(0, 255, 170, 0.12);
 }
-.proj-option.correct .symbol { background: var(--cast-green); color: #00241a; }
+.proj-option.correct .symbol { background: var(--cast-green); color: #1C140C; }
 
 .proj-timer {
   margin-top: 28px;
@@ -100,10 +100,10 @@
 
 /* Option symbols — rangga bog'liq bo'lmagan */
 .opt-sym-1 { background: rgba(255, 68, 102, 0.2); color: #ff4466; }
-.opt-sym-2 { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+.opt-sym-2 { background: rgba(56, 189, 248, 0.2); color: #D9B465; }
 .opt-sym-3 { background: rgba(255, 214, 10, 0.2); color: #ffd60a; }
-.opt-sym-4 { background: rgba(0, 255, 170, 0.2); color: #00ffaa; }
-.opt-sym-5 { background: rgba(192, 132, 252, 0.2); color: #c084fc; }
+.opt-sym-4 { background: rgba(0, 255, 170, 0.2); color: #7FA055; }
+.opt-sym-5 { background: rgba(192, 132, 252, 0.2); color: #B08D57; }
 
 /* ── C3-09 Class Goal (aggregate only) ── */
 .proj-goal {
@@ -169,7 +169,7 @@
 .proj-confusion-title, .proj-wall-title {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--cast-muted-text, #9ca3af);
+  color: var(--cast-muted-text, #A3967C);
   margin-bottom: 8px;
 }
 .proj-confusion-chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -187,7 +187,7 @@
   padding: 8px 12px;
   border-radius: var(--deborah-radius-md, 12px);
   background: rgba(255,255,255,0.06);
-  border-left: 3px solid var(--cast-accent, #6366f1);
+  border-left: 3px solid var(--cast-accent, #C9A565);
 }
 
 /* C3-11 POE */
@@ -207,7 +207,7 @@
 .proj-poe-title {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--cast-muted-text, #9ca3af);
+  color: var(--cast-muted-text, #A3967C);
   margin-bottom: 10px;
 }
 .proj-poe-img {
@@ -224,7 +224,7 @@
 .proj-poe-caption {
   margin-top: 8px;
   font-size: 0.9rem;
-  color: var(--cast-muted-text, #9ca3af);
+  color: var(--cast-muted-text, #A3967C);
 }
 .proj-poe-agg-line {
   font-weight: 700;
@@ -247,7 +247,7 @@
 .proj-orb-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; }
 .proj-orb-status {
   font-size: 0.95rem;
-  color: var(--cast-muted-text, #9ca3af);
+  color: var(--cast-muted-text, #A3967C);
   margin-bottom: 10px;
 }
 .proj-orb-grid {
@@ -364,7 +364,7 @@
   border-color: var(--cast-green);
   background: rgba(0, 255, 170, 0.12);
 }
-.proj-option.correct .symbol { background: var(--cast-green); color: #00241a; }
+.proj-option.correct .symbol { background: var(--cast-green); color: #1C140C; }
 
 .proj-timer {
   margin-top: 28px;
@@ -384,10 +384,10 @@
 
 /* Option symbols — rangga bog'liq bo'lmagan */
 .opt-sym-1 { background: rgba(255, 68, 102, 0.2); color: #ff4466; }
-.opt-sym-2 { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+.opt-sym-2 { background: rgba(56, 189, 248, 0.2); color: #D9B465; }
 .opt-sym-3 { background: rgba(255, 214, 10, 0.2); color: #ffd60a; }
-.opt-sym-4 { background: rgba(0, 255, 170, 0.2); color: #00ffaa; }
-.opt-sym-5 { background: rgba(192, 132, 252, 0.2); color: #c084fc; }
+.opt-sym-4 { background: rgba(0, 255, 170, 0.2); color: #7FA055; }
+.opt-sym-5 { background: rgba(192, 132, 252, 0.2); color: #B08D57; }
 
 /* ── C3-09 Class Goal (aggregate only) ── */
 .proj-goal {
@@ -453,7 +453,7 @@
 .proj-confusion-title, .proj-wall-title {
   font-size: 0.8rem;
   font-weight: 700;
-  color: var(--cast-muted-text, #9ca3af);
+  color: var(--cast-muted-text, #A3967C);
   margin-bottom: 8px;
 }
 .proj-confusion-chips { display: flex; flex-wrap: wrap; gap: 6px; }
@@ -471,7 +471,7 @@
   padding: 8px 12px;
   border-radius: var(--deborah-radius-md, 12px);
   background: rgba(255,255,255,0.06);
-  border-left: 3px solid var(--cast-accent, #6366f1);
+  border-left: 3px solid var(--cast-accent, #C9A565);
 }
 
 /* C3-11 POE */
@@ -491,7 +491,7 @@
 .proj-poe-title {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--cast-muted-text, #9ca3af);
+  color: var(--cast-muted-text, #A3967C);
   margin-bottom: 10px;
 }
 .proj-poe-img {
@@ -508,7 +508,7 @@
 .proj-poe-caption {
   margin-top: 8px;
   font-size: 0.9rem;
-  color: var(--cast-muted-text, #9ca3af);
+  color: var(--cast-muted-text, #A3967C);
 }
 .proj-poe-agg-line {
   font-weight: 700;
@@ -531,7 +531,7 @@
 .proj-orb-title { font-size: 1.4rem; font-weight: 700; margin-bottom: 8px; }
 .proj-orb-status {
   font-size: 0.95rem;
-  color: var(--cast-muted-text, #9ca3af);
+  color: var(--cast-muted-text, #A3967C);
   margin-bottom: 10px;
 }
 .proj-orb-grid {

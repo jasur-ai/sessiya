@@ -30,7 +30,7 @@
 .ql-title {
   font-weight: 700;
   font-size: 0.95rem;
-  color: var(--cast-text, #e5e7eb);
+  color: var(--cast-text, #E6DCC6);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -83,7 +83,7 @@
   font-weight: 600;
 }
 .ql-muted {
-  color: var(--cast-muted-text, #9ca3af);
+  color: var(--cast-muted-text, #A3967C);
   font-size: 0.8rem;
   flex: 1;
   min-width: 120px;
@@ -122,13 +122,13 @@
   font-weight: 600;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--cast-muted-text, #9ca3af);
+  color: var(--cast-muted-text, #A3967C);
 }
 .ql-input {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--cast-border, rgba(255, 255, 255, 0.15));
   border-radius: 8px;
-  color: var(--cast-text, #e5e7eb);
+  color: var(--cast-text, #E6DCC6);
   padding: 8px 10px;
   font-size: 0.88rem;
   font-family: inherit;
@@ -141,7 +141,7 @@
 .ql-bot-status {
   margin-top: 10px;
   font-size: 0.82rem;
-  color: var(--cast-muted-text, #9ca3af);
+  color: var(--cast-muted-text, #A3967C);
 }
 
 /* Findings */
@@ -152,7 +152,7 @@
 }
 .ql-empty {
   font-size: 0.85rem;
-  color: var(--cast-muted-text, #9ca3af);
+  color: var(--cast-muted-text, #A3967C);
   padding: var(--deborah-spacing-4, 16px) 0;
 }
 .ql-empty-err { color: #fca5a5; }
@@ -194,7 +194,7 @@
 .ql-find-code {
   font-size: 0.68rem;
   font-family: ui-monospace, monospace;
-  color: var(--cast-muted-text, #9ca3af);
+  color: var(--cast-muted-text, #A3967C);
 }
 .ql-find-status {
   margin-left: auto;
@@ -204,11 +204,11 @@
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
 }
-.ql-find-msg { font-size: 0.88rem; color: var(--cast-text, #e5e7eb); }
+.ql-find-msg { font-size: 0.88rem; color: var(--cast-text, #E6DCC6); }
 .ql-find-meta {
   margin-top: 4px;
   font-size: 0.7rem;
-  color: var(--cast-muted-text, #9ca3af);
+  color: var(--cast-muted-text, #A3967C);
 }
 .ql-find-actions {
   margin-top: 8px;

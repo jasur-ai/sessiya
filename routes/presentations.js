@@ -131,7 +131,10 @@ function sanitizeDeck(body, existing) {
       // rasm: data: (upload) yoki http(s) (URL) — masofaviy URL same-origin proxy'ga
       // aylantiriladi (CSP img-src 'self' data: blob: + export'da canvas taint bo'lmasligi).
       // Allaqachon proxy'langan src (saqlash idempotent) ham o'tadi.
-      let src = typeof e.src === 'string' ? e.src.slice(0, 2600) : '';
+      // C4-10 fix: dataURL'lar (upload rasm, ≤1600px/2.2MB) uzun — 2600 belgida
+      // kesilsa saqlangan rasm buzilardi (viewer/eksportda ochilmasdi). Proksi URL
+      // qisqa; data: uchun 3.1M belgi (~2.3MB) chegarasi yetarli (server 25mb body).
+      let src = typeof e.src === 'string' ? e.src.slice(0, 3100000) : '';
       if (src.startsWith('/user/api/img?u=')) src = src;
       else if (DATAIMG_RE.test(src)) src = src;
       else if (URL_RE.test(src)) src = '/user/api/img?u=' + encodeURIComponent(src);
@@ -654,6 +657,10 @@ function buildPdfJpeg(pages) {
   const offsets = [0];
   let objNum = 1;
   const add = (body) => { offsets[objNum] = Buffer.concat(chunks).length; push(objNum + ' 0 obj\n' + body + '\nendobj\n'); return objNum++; };
+  // Deterministik raqamlash: har slayd 3 obyekt (rasm, kontent, sahifa) →
+  // Pages obyekti = 3*n+1, Catalog = 3*n+2. (C4-10: /Root va /Pages endi
+  // hardcode emas — aks holda PDF yaroqsiz chiqadi.)
+  const pagesRefNum = 3 * pages.length + 1;
   const kids = [];
   for (let i = 0; i < pages.length; i++) {
     const imgRef = objNum;
@@ -666,19 +673,17 @@ function buildPdfJpeg(pages) {
     chunks.push(cont);
     push('endstream');
     const pageRef = objNum;
-    add(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 960 540] /Resources << /XObject << /Im${imgRef} ${imgRef} 0 R >> >> /Contents ${contRef} 0 R >>`);
+    add(`<< /Type /Page /Parent ${pagesRefNum} 0 R /MediaBox [0 0 960 540] /Resources << /XObject << /Im${imgRef} ${imgRef} 0 R >> >> /Contents ${contRef} 0 R >>`);
     kids.push(`${pageRef} 0 R`);
   }
-  const catalogRef = 1;
-  add('<< /Type /Catalog /Pages 2 0 R >>');
   add(`<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${kids.length} >>`);
+  const catalogRef = add('<< /Type /Catalog /Pages ' + pagesRefNum + ' 0 R >>');
   const xrefStart = Buffer.concat(chunks).length;
   let xref = `xref\n0 ${objNum}\n0000000000 65535 f \n`;
   for (let i = 1; i < objNum; i++) xref += String(offsets[i]).padStart(10, '0') + ' 00000 n \n';
   push(xref + `trailer\n<< /Size ${objNum} /Root ${catalogRef} 0 R >>\nstartxref\n${xrefStart}\n%%EOF\n`);
   return Buffer.concat(chunks);
 }
-
 router.post('/api/presentations/:id/export', async (req, res) => {
   try {
     const user = req.session.user;

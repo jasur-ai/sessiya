@@ -34,7 +34,7 @@
 .cast-btn:active { transform: translateY(0); }
 .cast-btn-ghost { background: transparent; color: var(--cast-text, #eef0ff); border: 1px solid var(--cast-border, #2a3050); }
 .cast-btn-outline { background: transparent; color: var(--cast-blue, #5aa7ff); border: 1px solid var(--cast-blue, #5aa7ff); }
-.cast-btn-secondary { background: var(--cast-purple, #8b5cf6); color: #fff; }
+.cast-btn-secondary { background: var(--cast-purple, #B08D57); color: #fff; }
 
 .res-layout { max-width: 1100px; margin: 0 auto; padding: 24px 18px 60px; display: flex; flex-direction: column; gap: 18px; }
 

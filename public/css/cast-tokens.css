@@ -6,16 +6,16 @@
  */
 
 :root {
-  --cast-page-bg: #07111f;
-  --cast-surface: #102033;
-  --cast-surface-2: #16283f;
-  --cast-text: #ffffff;
-  --cast-muted-text: #c5d2e0;
+  --cast-page-bg: #1A130B;
+  --cast-surface: #251C10;
+  --cast-surface-2: #2E2415;
+  --cast-text: #F6ECD9;
+  --cast-muted-text: #C4B48C;
   --cast-focus: #ffd60a;
-  --cast-green: #00ffaa;
+  --cast-green: #7FA055;
   --cast-red: #ff4466;
-  --cast-blue: #38bdf8;
-  --cast-purple: #c084fc;
+  --cast-blue: #D9B465;
+  --cast-purple: #B08D57;
   --cast-border: rgba(255, 255, 255, 0.12);
   --cast-radius: 14px;
   --cast-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
@@ -31,24 +31,24 @@
 
 /* ── Focus Dark (default) ── */
 [data-cast-theme='focus_dark'] {
-  --cast-page-bg: #07111f;
-  --cast-surface: #102033;
-  --cast-surface-2: #16283f;
-  --cast-text: #ffffff;
-  --cast-muted-text: #c5d2e0;
+  --cast-page-bg: #1A130B;
+  --cast-surface: #251C10;
+  --cast-surface-2: #2E2415;
+  --cast-text: #F6ECD9;
+  --cast-muted-text: #C4B48C;
   --cast-focus: #ffd60a;
 }
 
 /* ── Focus Light ── */
 [data-cast-theme='focus_light'] {
-  --cast-page-bg: #f4f7fb;
+  --cast-page-bg: #F8F2E2;
   --cast-surface: #ffffff;
-  --cast-surface-2: #eef2f8;
-  --cast-text: #0d1b2a;
-  --cast-muted-text: #4a5a6e;
+  --cast-surface-2: #F1E8D6;
+  --cast-text: #241A0E;
+  --cast-muted-text: #6E6150;
   --cast-focus: #e6a700;
-  --cast-border: rgba(13, 27, 42, 0.15);
-  --cast-shadow: 0 10px 30px rgba(13, 27, 42, 0.12);
+  --cast-border: rgba(58,42,14,0.2);
+  --cast-shadow: 0 10px 30px rgba(58,42,14,0.14);
 }
 
 /* ── High Contrast Dark ── */
@@ -56,7 +56,7 @@
   --cast-page-bg: #000000;
   --cast-surface: #0a0a0a;
   --cast-surface-2: #1a1a1a;
-  --cast-text: #ffffff;
+  --cast-text: #F6ECD9;
   --cast-muted-text: #ffff66;
   --cast-focus: #ffd60a;
   --cast-border: #ffffff;
@@ -128,7 +128,7 @@
 
 .cast-btn-primary {
   background: var(--cast-green);
-  color: #00241a;
+  color: #1C140C;
 }
 
 .cast-btn-danger {

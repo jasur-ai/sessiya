@@ -409,8 +409,9 @@ export const POWERUP_DEFAULT_INVENTORY = {
   private_redemption: 0,
 };
 
-// ── Join code alphabet (ambiguous chars excluded: 0/O/1/I/L) ──
-export const JOIN_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+// ── Join code alphabet — C4-10 (user qarori): kod faqat raqamlardan iborat
+// (klassik jonli viktorina uslubi — “faqat raqam” join kodi). 6 xonali. ──
+export const JOIN_CODE_ALPHABET = '0123456789';
 export const JOIN_CODE_LENGTH = 6;
 
 // ── Config bounds ──
