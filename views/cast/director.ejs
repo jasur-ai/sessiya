@@ -29,7 +29,7 @@
 
   <header class="dir-topbar">
     <div class="dir-topbar-left">
-      <span class="dir-logo"><%- icon('gamepad', 16) %> Cast</span>
+      <a class="dir-brand" href="/user/panel" aria-label="Deborah — Cast"><img class="brand-emblem" src="/images/logo-vintage.png" alt="Deborah"><span class="dir-brand-cast">Cast</span></a>
       <span class="dir-title" id="dir-title"><%= boot.title %></span>
       <span class="dir-code">Kod: <b id="dir-code-val">—</b></span>
       <span class="dir-phase-badge" id="dir-phase-badge" role="status">Lobbi</span>
@@ -168,12 +168,6 @@
               <div class="ev-title" style="margin-top:12px">📜 Event log</div>
               <div id="orb-events" class="orb-events"></div>
             </div>
-          </div>
-          <!-- C3-13 Student Question Forge (faqat sizga) -->
-          <div class="forge-panel cast-surface" id="dir-forge" hidden>
-            <div class="ev-title">✏️ Student Question Forge <span class="ev-private-badge">faqat sizga</span></div>
-            <div class="orb-status" id="forge-meta"></div>
-            <div id="forge-queue" class="forge-queue"></div>
           </div>
           <!-- C3-14 Session Choreography (composer + dashboard) -->
           <div class="choreo-panel cast-surface" id="dir-choreo" hidden>
@@ -376,7 +370,6 @@
         <button type="button" class="cast-btn" id="btn-goal"><%- icon('target', 16) %> Sinf maqsadi</button>
         <button type="button" class="cast-btn" id="btn-poe"><%- icon('search', 16) %> POE</button>
         <button type="button" class="cast-btn" id="btn-orb"><%- icon('folder', 16) %> Semantic Board</button>
-        <button type="button" class="cast-btn" id="btn-forge"><%- icon('edit', 16) %> Forge</button>
         <button type="button" class="cast-btn" id="btn-choreo"><%- icon('play', 16) %> Choreography</button>
         <button type="button" class="cast-btn" id="btn-sp" hidden><%- icon('clock', 16) %> Self-Paced</button>
         <button type="button" class="cast-btn" id="btn-powerups" hidden><%- icon('zap', 16) %> Power-up'lar</button>

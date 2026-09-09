@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="<%= htmlLang %>" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <%- include('../partials/head') %>
+  <title><%= pCopy.histTitle %> — Deborah</title>
+  <style>
+    /* C4-10 rev.4: Natijalarim (yakka mashq tarixi) — iliq professional palitra */
+    body { margin: 0; background: linear-gradient(180deg, #f8f2e2, #f1e6cd); color: #2a1d0a; font-family: system-ui, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; }
+    .ph-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 20px; background: #241a0c; color: #f6ecd9; flex-wrap: wrap; }
+    .ph-top-l { display: flex; align-items: center; gap: 12px; }
+    .ph-top-l img { height: 30px; width: auto; border-radius: 7px; }
+    .ph-top h1 { margin: 0; font-size: 1.15rem; font-weight: 800; letter-spacing: .01em; color: #f0d9a6; }
+    .ph-top a { color: #e3c98f; text-decoration: none; font-weight: 700; font-size: .9rem; }
+    .ph-top a:hover { text-decoration: underline; }
+    .ph-wrap { max-width: 880px; margin: 0 auto; padding: 22px 16px 70px; }
+    .ph-note { font-size: .84rem; color: #7d6e4e; font-weight: 600; margin: 4px 0 16px; line-height: 1.5; }
+    .ph-list { display: grid; gap: 10px; }
+    .ph-card { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; background: linear-gradient(180deg,#fdf8ec,#f4e7c9);
+      border: 1px solid #e0cf9f; border-radius: 16px; padding: 12px 16px; box-shadow: 0 2px 8px rgba(122,94,42,.08); }
+    .ph-score { flex: 0 0 auto; min-width: 74px; text-align: center; font-size: 1.5rem; font-weight: 900; color: #6b4a1e; line-height: 1.1; }
+    .ph-score small { display: block; font-size: .66rem; font-weight: 700; color: #8a7443; letter-spacing: .08em; }
+    .ph-main { flex: 1; min-width: 200px; }
+    .ph-name { font-weight: 800; font-size: .96rem; color: #3a2c12; margin: 0 0 4px; word-break: break-word; }
+    .ph-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: .76rem; color: #8a7443; font-weight: 600; }
+    .ph-badge { display: inline-block; padding: 2px 9px; border-radius: 50px; font-size: .68rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+    .ph-b-own { background: #e8d9ae; color: #5f430f; border: 1px solid #d5bf86; }
+    .ph-b-public { background: #d8cba4; color: #4a3a1c; border: 1px solid #c2b184; }
+    .ph-b-retry { background: #f0e3c2; color: #7c5a1d; border: 1px dashed #cbb170; }
+    .ph-b-official { background: #b98e4f; color: #fff7e6; border: 1px solid #a37f3a; }
+    .ph-time { color: #a08a4e; }
+    .ph-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .ph-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 11px; font-weight: 700; font-size: .8rem; text-decoration: none; cursor: pointer; border: 1px solid transparent; font-family: inherit; }
+    .ph-btn-go { background: linear-gradient(135deg,#d9b465,#a37f3a); color: #1a1305; box-shadow: 0 3px 0 rgba(90,64,22,.3); }
+    .ph-btn-go:hover { filter: brightness(1.06); }
+    .ph-btn-ghost { background: transparent; color: #6b5430; border-color: #c9b27c; }
+    .ph-btn-ghost:hover { background: #f6e9c8; }
+    .ph-empty { text-align: center; padding: 60px 20px; background: #fbf3df; border: 1.5px dashed #d5bf86; border-radius: 20px; color: #8a7443; font-weight: 600; }
+    .ph-empty a { color: #7c5a1d; font-weight: 800; }
+  </style>
+</head>
+<body>
+  <header class="ph-top">
+    <div class="ph-top-l">
+      <img src="/images/logo-vintage.png" alt="Deborah">
+      <h1><%= pCopy.histTitle %></h1>
+    </div>
+    <a href="/user/panel"><%= pCopy.back %></a>
+  </header>
+  <main class="ph-wrap">
+    <% if (entries.length === 0) { %>
+      <div class="ph-empty">
+        <div style="font-size:1.6rem;margin-bottom:8px">📊</div>
+        <%= pCopy.histEmpty || 'Hali natija yo‘q — test yechib ko‘ring, barcha natijalaringiz shu yerda saqlanadi.' %>
+        <div style="margin-top:14px"><a href="/user/tests"><%= pCopy.histOpen || 'Natijalarim' %></a></div>
+      </div>
+    <% } else { %>
+      <p class="ph-note"><%= pCopy.histNote || 'Bu yerda barcha yakka-mashq natijalaringiz saqlanadi. Ommaviy testda «Rasmiy» ball — birinchi to‘liq urinishdan va hammaga ochiq reytingga yoziladi; qolgan urinishlaringiz faqat sizga ko‘rinadi.' %></p>
+      <div class="ph-list">
+        <% entries.forEach((e) => { %>
+          <div class="ph-card">
+            <div class="ph-score"><%= e.percent %>%<small><%= e.correct %>/<%= e.total %></small></div>
+            <div class="ph-main">
+              <div class="ph-name"><%= e.title %></div>
+              <div class="ph-meta">
+                <% if (e.source === 'own') { %>
+                  <span class="ph-badge ph-b-own"><%= pCopy.badgeOwn || 'Shaxsiy' %></span>
+                <% } else { %>
+                  <span class="ph-badge ph-b-public"><%= pCopy.badgePublic || 'Ommaviy' %></span>
+                  <% if (e.officialPercent != null) { %>
+                    <span class="ph-badge ph-b-official"><%= pCopy.badgeOfficial || 'Rasmiy' %>: <%= e.officialPercent %>%</span>
+                  <% } %>
+                <% } %>
+                <% if (e.kind === 'retry') { %>
+                  <span class="ph-badge ph-b-retry"><%= pCopy.badgeRetry || 'Qayta' %></span>
+                <% } %>
+                <span class="ph-time"><%= new Date(e.at).toLocaleString() %></span>
+              </div>
+            </div>
+            <div class="ph-actions">
+              <a class="ph-btn ph-btn-go" href="/user/practice?source=user&key=<%= encodeURIComponent(e.key) %>">↻ <%= pCopy.again || 'Qayta yechish' %></a>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </main>
+</body>
+</html>

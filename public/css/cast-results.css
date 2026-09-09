@@ -74,3 +74,8 @@
 .res-modal h3 { margin-top: 0; }
 .res-pre { background: #0d101f; border: 1px solid var(--cast-border, #2a3050); border-radius: var(--deborah-radius-md, 12px); padding: var(--deborah-spacing-4, 16px); font-size: 12px; max-height: 45vh; overflow: auto; white-space: pre-wrap; word-break: break-word; }
 .res-modal-actions { display: flex; justify-content: flex-end; margin-top: 14px; }
+
+/* C4-10 rev.4: oltin brending */
+.res-logo{display:inline-flex;align-items:center;gap:9px;color:var(--cast-text, #eef0ff);text-decoration:none;font-weight:700;font-size:17px}
+.res-logo img{height:22px;width:auto;border-radius:5px}
+.res-logo span{letter-spacing:.02em}

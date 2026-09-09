@@ -125,7 +125,7 @@
 
   function show(view) {
     const prevActive = document.activeElement;
-    ['part-join', 'part-waiting', 'part-question', 'part-reveal', 'part-poe-obs', 'part-poe-exp', 'part-poe-analysis', 'part-orb', 'part-forge'].forEach((id) => {
+    ['part-join', 'part-waiting', 'part-question', 'part-reveal', 'part-poe-obs', 'part-poe-exp', 'part-poe-analysis', 'part-orb'].forEach((id) => {
       $(id).hidden = id !== view;
     });
     // C4-04 (item 24): focus phase o'zgarganda userni kutilmagan joyga ko'chirmaslik —
@@ -280,9 +280,7 @@
           aliasWrap.appendChild(document.createTextNode(displayAlias));
         }
       }
-      // C3-13: forge capability — session config + institution policy
-      forgeEnabled = Boolean(ack.forge?.enabled);
-      $('btn-forge-open').hidden = !forgeEnabled;
+      // C4-10 rev.4: "Savol taklif qilish" (Forge) ishtirokchilardan butunlay olib tashlandi
       show('part-waiting');
       setState(STATE.WAITING);
       if (ack.state && ack.state.phase === 'QUESTION_OPEN' && ack.question) {
@@ -1206,17 +1204,6 @@
         show('part-waiting');
         break;
       }
-      // C3-13 Student Question Forge
-      case 'cast:forgeRejected': {
-        forgeStatus = { kind: 'rejected', message: data.message || 'Savol qayta ishlandi' };
-        renderForgeStatus();
-        break;
-      }
-      case 'cast:forgeConfirmed': {
-        forgeStatus = { kind: 'confirmed', message: data.message || 'Savol qabul qilindi' };
-        renderForgeStatus();
-        break;
-      }
       // C3-17 Power-ups
       case 'cast:powerupGranted': {
         if (data.inventory) {
@@ -1472,175 +1459,6 @@
       }
     } catch (e) {
       $('part-orb-error').textContent = e.message || 'Xatolik';
-      btn.disabled = false;
-    }
-  });
-
-  // ── C3-13 Forge: UI logika ──
-  let forgeEnabled = false;
-  let forgeStatus = null;
-  let lastViewBeforeForge = null;
-
-  function renderForgeStatus() {
-    const el = $('forge-status');
-    if (!forgeStatus) { el.hidden = true; return; }
-    el.hidden = false;
-    el.className = 'part-forge-status ' + (forgeStatus.kind === 'rejected' ? 'forge-status-rejected' : 'forge-status-ok');
-    el.textContent = forgeStatus.message;
-  }
-
-  function forgeRenderOptions() {
-    const wrap = $('forge-options');
-    wrap.innerHTML = '';
-    for (let i = 0; i < 2; i++) {
-      const row = document.createElement('div');
-      row.className = 'forge-opt-row';
-      const input = document.createElement('input');
-      input.className = 'cast-input';
-      input.maxLength = 120;
-      input.placeholder = 'Variant ' + (i + 1);
-      row.appendChild(input);
-      wrap.appendChild(row);
-    }
-  }
-
-  function forgeRenderAnswerArea() {
-    const type = $('forge-type').value;
-    const area = $('forge-answer-area');
-    const short = $('forge-answer-short');
-    const label = $('forge-answer-label');
-    area.innerHTML = '';
-    if (type === 'short_answer') {
-      short.hidden = false;
-      label.textContent = 'Namunaviy javob';
-      return;
-    }
-    short.hidden = true;
-    label.textContent = 'To‘g‘ri javob';
-    if (type === 'true_false') {
-      const wrap = $('forge-tf-options');
-      wrap.innerHTML = '';
-      [['o_1', 'To‘g‘ri'], ['o_2', 'Noto‘g‘ri']].forEach(([id, txt]) => {
-        const lab = document.createElement('label');
-        lab.className = 'forge-tf-row';
-        const rb = document.createElement('input');
-        rb.type = 'radio'; rb.name = 'forge-answer'; rb.value = id;
-        lab.appendChild(rb); lab.appendChild(document.createTextNode(' ' + txt));
-        wrap.appendChild(lab);
-      });
-      return;
-    }
-    // single_choice / multiple_select — variantlar checkbox/radio
-    const multi = type === 'multiple_select';
-    const rows = $('forge-options').querySelectorAll('.forge-opt-row input');
-    rows.forEach((inp, idx) => {
-      const lab = document.createElement('label');
-      lab.className = 'forge-opt-answer';
-      const ctl = document.createElement('input');
-      ctl.type = multi ? 'checkbox' : 'radio';
-      ctl.name = 'forge-answer';
-      ctl.value = 'o_' + (idx + 1);
-      lab.appendChild(ctl);
-      lab.appendChild(document.createTextNode(' ' + (inp.value.trim() || 'Variant ' + (idx + 1))));
-      area.appendChild(lab);
-    });
-  }
-
-  function forgeCollectDraft() {
-    const type = $('forge-type').value;
-    const stem = $('forge-stem').value.trim();
-    const explanation = $('forge-explanation').value.trim();
-    const source = $('forge-source').value.trim();
-    const draft = { questionType: type, stem, explanation, source };
-    if (type === 'short_answer') {
-      draft.proposedAnswer = $('forge-answer-short').value.trim();
-    } else if (type === 'true_false') {
-      const sel = $('forge-tf-options').querySelector('input:checked');
-      draft.proposedAnswer = sel ? sel.value : '';
-      draft.options = [];
-    } else {
-      const rows = $('forge-options').querySelectorAll('.forge-opt-row input');
-      draft.options = [];
-      rows.forEach((inp) => { if (inp.value.trim()) draft.options.push({ text: inp.value.trim() }); });
-      const sel = Array.from($('forge-answer-area').querySelectorAll('input:checked'));
-      draft.proposedAnswer = sel.map((c) => c.value);
-    }
-    return draft;
-  }
-
-  $('btn-forge-open').addEventListener('click', () => {
-    if (!forgeEnabled) return;
-    lastViewBeforeForge = null;
-    forgeStatus = null;
-    renderForgeStatus();
-    $('forge-error').textContent = '';
-    $('forge-stem').value = '';
-    $('forge-explanation').value = '';
-    $('forge-source').value = '';
-    $('forge-answer-short').value = '';
-    $('forge-type').value = 'single_choice';
-    forgeRenderOptions();
-    forgeRenderAnswerArea();
-    $('forge-stem-chars').textContent = '0 / 500';
-    show('part-forge');
-  });
-
-  $('btn-forge-close').addEventListener('click', () => {
-    show('part-waiting');
-  });
-
-  $('forge-type').addEventListener('change', () => {
-    const type = $('forge-type').value;
-    $('forge-options-wrap').hidden = !(type === 'single_choice' || type === 'multiple_select');
-    $('forge-tf-wrap').hidden = type !== 'true_false';
-    $('forge-answer-short').hidden = type !== 'short_answer';
-    if (type === 'single_choice' || type === 'multiple_select') forgeRenderOptions();
-    forgeRenderAnswerArea();
-  });
-
-  $('forge-stem').addEventListener('input', () => {
-    $('forge-stem-chars').textContent = $('forge-stem').value.length + ' / 500';
-  });
-
-  $('forge-add-option').addEventListener('click', () => {
-    const wrap = $('forge-options');
-    const row = document.createElement('div');
-    row.className = 'forge-opt-row';
-    const input = document.createElement('input');
-    input.className = 'cast-input';
-    input.maxLength = 120;
-    input.placeholder = 'Variant ' + (wrap.querySelectorAll('.forge-opt-row').length + 1);
-    row.appendChild(input);
-    wrap.appendChild(row);
-    forgeRenderAnswerArea();
-  });
-
-  $('forge-options').addEventListener('input', () => forgeRenderAnswerArea());
-
-  $('forge-submit').addEventListener('click', async () => {
-    if (!client || !sessionId || !participantId) return;
-    const draft = forgeCollectDraft();
-    const btn = $('forge-submit');
-    btn.disabled = true;
-    try {
-      const commandId = 'forge_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-      const ack = await client.sendCommand('cast:forgeSubmit', { draft, commandId }, { ackTimeout: 6000 });
-      if (ack.ok) {
-        const msg = ack.duplicate
-          ? 'Shu kabi savol allaqachon yuborilgan — takrorlash shart emas.'
-          : ack.safeHold
-            ? 'Savol yuborildi, ammo maxfiy ma’lumot tufayli qo‘shimcha tekshiruvdan o‘tadi.'
-            : 'Savol yuborildi! O‘qituvchi ko‘rib chiqadi.';
-        forgeStatus = { kind: ack.safeHold ? 'rejected' : 'confirmed', message: msg };
-        renderForgeStatus();
-        $('forge-error').textContent = '';
-        setTimeout(() => show('part-waiting'), 1800);
-      } else {
-        $('forge-error').textContent = ack.error?.message || 'Xatolik yuz berdi';
-        btn.disabled = false;
-      }
-    } catch (e) {
-      $('forge-error').textContent = e.message || 'Xatolik yuz berdi';
       btn.disabled = false;
     }
   });

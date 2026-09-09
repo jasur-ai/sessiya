@@ -40,7 +40,7 @@
     <!-- Join form -->
     <div id="part-join" class="part-center">
       <div class="part-card cast-surface">
-        <h1 class="part-title" data-i18n="join.title">🎬 Cast</h1>
+        <div class="part-brand"><img class="part-brand-emblem" src="/images/logo-vintage.png" alt="Deborah"><h1 class="part-title" data-i18n="join.title">Cast</h1></div>
         <div class="part-sub" id="part-session-title">—</div>
         <!-- S31.01: join progress — aniq qadam ko'rsatkichi -->
         <ol class="join-steps" id="join-steps" aria-label="Qo‘shilish qadamlari">
@@ -84,55 +84,6 @@
         <h2 class="part-title">Qo‘shildingiz!</h2>
         <p class="part-sub" id="part-wait-alias">—</p>
         <p class="part-muted">O‘qituvchi sessiyani boshlashini kuting…</p>
-      </div>
-    </div>
-
-    <!-- C3-13 Forge: floating action button (join'dan keyin ko'rinadi) -->
-    <button class="forge-fab" id="btn-forge-open" hidden aria-label="Savol taklif qilish" title="Savol taklif qilish"><%- icon('edit', 22) %></button>
-
-    <!-- C3-13 Forge form -->
-    <div id="part-forge" class="part-center" hidden>
-      <div class="part-card cast-surface part-forge-card">
-        <div class="part-forge-head">
-          <h2 class="part-title">✏️ Savol taklif qilish</h2>
-          <button class="forge-close" id="btn-forge-close" aria-label="Yopish"><%- icon('close', 16) %></button>
-        </div>
-        <p class="part-muted">Yaxshi savol yozing — o‘qituvchi tasdiqlagach sinf bilan baham ko‘riladi.</p>
-        <label class="part-field">
-          <span>Savol turi</span>
-          <select class="cast-input" id="forge-type">
-            <option value="single_choice">Bir javobli (single choice)</option>
-            <option value="true_false">To‘g‘ri / Noto‘g‘ri</option>
-            <option value="multiple_select">Ko‘p javobli (multiple select)</option>
-            <option value="short_answer">Qisqa javob</option>
-          </select>
-        </label>
-        <label class="part-field">
-          <span>Savol matni</span>            <textarea class="cast-input" id="forge-stem" rows="3" maxlength="500" data-i18n="forge.stem.placeholder" placeholder="Savolingizni yozing…"></textarea>
-          <div class="part-orb-count" id="forge-stem-chars">0 / 500</div>
-        </label>
-        <div class="forge-options" id="forge-options-wrap" hidden>
-          <span>Variantlar</span>
-          <div id="forge-options"></div>
-          <button type="button" class="cast-btn cast-btn-ghost" id="forge-add-option">+ Variant qo‘shish</button>
-        </div>
-        <div class="forge-options" id="forge-tf-wrap" hidden>
-          <span>To‘g‘ri javob</span>
-          <div class="forge-tf-rows" id="forge-tf-options"></div>
-        </div>
-        <label class="part-field">
-          <span id="forge-answer-label">To‘g‘ri javob</span>
-          <div id="forge-answer-area"></div>            <textarea class="cast-input" id="forge-answer-short" rows="2" maxlength="280" data-i18n="forge.answerShort.placeholder" placeholder="Namunaviy javob…" hidden></textarea>
-        </label>
-        <label class="part-field">
-          <span>Izoh (ixtiyoriy)</span>            <textarea class="cast-input" id="forge-explanation" rows="2" maxlength="500" data-i18n="forge.explanation.placeholder" placeholder="Nima uchun bu javob to‘g‘ri?…"></textarea>
-        </label>
-        <label class="part-field">
-          <span>Manba (ixtiyoriy)</span>            <input class="cast-input" id="forge-source" maxlength="200" data-i18n="forge.source.placeholder" placeholder="Darslik, sayt, mavzu…">
-        </label>
-        <button class="cast-btn cast-btn-primary part-submit" id="forge-submit" data-i18n="forge.submit">Yuborish</button>
-        <div class="part-err" id="forge-error"></div>
-        <div class="part-forge-status" id="forge-status" hidden></div>
       </div>
     </div>
 

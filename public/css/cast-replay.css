@@ -70,3 +70,8 @@
   resize: vertical;
 }
 .rp-camera-note { border-style: dashed; opacity: 0.8; }
+
+/* C4-10 rev.4: oltin brending */
+.rp-logo{display:inline-flex;align-items:center;gap:9px;color:var(--cast-text, #eef0ff);text-decoration:none;font-weight:700;font-size:17px}
+.rp-logo img{height:22px;width:auto;border-radius:5px}
+.rp-logo span{letter-spacing:.02em}

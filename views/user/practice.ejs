@@ -188,6 +188,7 @@
     </div>
     <div class="pr-top-r">
       <span class="pr-chip" id="mode-chip" hidden></span>
+      <a class="pr-back" href="/user/practice-history"><%= pCopy.histOpen || 'Natijalarim' %></a>
       <a class="pr-back" href="/user/panel"><%= pCopy.back %></a>
     </div>
   </header>
@@ -226,6 +227,11 @@
     let cur = 0;
     let timeLeft = PER_Q_TIME;
     let timerIv = null;
+    // C4-10 rev.4: nav tartibi — yakunda «faqat xatolarni qayta yechish» uchun
+    // flow'ni xato savollar indekslariga toraytiramiz (retryMode).
+    let flow = QUESTIONS.map((_, i) => i);
+    let retryMode = false;
+    const flowPos = (i) => flow.indexOf(i);
 
     // Sahna plitalari uchun iliq ranglar (C4-10 rev.2: reklama uslubi olib
     // tashlandi) — terrakota/oltin/zaytun/g'isht, index bo'yicha tsikl
@@ -282,17 +288,19 @@
 
     const dots = document.getElementById('dots');
     function renderDots() {
-      dots.innerHTML = QUESTIONS.map((_, i) => {
+      dots.innerHTML = flow.map((i) => {
         let cls = 'pr-dot';
         if (revealed[i]) cls += ' done' + (missed[i] ? ' miss' : '');
         if (i === cur) cls += ' cur';
-        const unlock = i === cur || revealed[i] || (i === cur + 1 && revealed[cur]);
+        const nextUnlocked = i === flow[flowPos(cur) + 1] && revealed[cur];
+        const unlock = i === cur || revealed[i] || nextUnlocked;
         if (!unlock) cls += ' locked';
         return `<button type="button" class="${cls}" data-i="${i}" ${unlock ? '' : 'tabindex="-1" aria-disabled="true"'} aria-label="${fill('dotAria', 'Savol {n}', { n: i + 1 })}"></button>`;
       }).join('');
       dots.querySelectorAll('.pr-dot').forEach((d) => d.addEventListener('click', () => {
         const i = +d.dataset.i;
-        if (i === cur || revealed[i] || (i === cur + 1 && revealed[cur])) { cur = i; renderQ(); renderDots(); }
+        const unlocked = i === cur || revealed[i] || (i === flow[flowPos(cur) + 1] && revealed[cur]);
+        if (unlocked) { cur = i; renderQ(); renderDots(); }
         else hint(t('answerFirst', 'Avval savolga javob bering'));
       }));
     }
@@ -301,7 +309,7 @@
     const qpos = document.getElementById('qpos');
     function renderQ() {
       startTimer();
-      if (qpos) qpos.textContent = (cur + 1) + ' / ' + QUESTIONS.length;
+      if (qpos) qpos.textContent = (retryMode ? t('retryTag', 'Qayta: ') : '') + (flowPos(cur) + 1) + ' / ' + flow.length;
       const q = QUESTIONS[cur];
       const qc = correctOf(cur);
       const isRev = revealed[cur];
@@ -338,13 +346,13 @@
         </div>`;
       }
 
-      const isLast = cur === QUESTIONS.length - 1;
+      const isLast = flowPos(cur) === flow.length - 1;
       const navBtn = isLast
         ? `<button type="button" class="btn" id="finish" ${isRev ? '' : 'disabled'}>${t('finish', '✅ Yakunlash')}</button>`
         : `<button type="button" class="btn" id="next" ${isRev ? '' : 'disabled'}>${t('next', 'Keyingi →')}</button>`;
 
       quiz.innerHTML = `
-        <section class="qcard" aria-label="${(cur + 1)} / ${QUESTIONS.length}">
+        <section class="qcard" aria-label="${(retryMode ? t('retryTag', 'Qayta: ') : '')}${flowPos(cur) + 1} / ${flow.length}">
           <h2 class="qtext">${esc(q.text)}</h2>
           ${typeLabel ? `<div class="qtype-line">${typeLabel}</div>` : ''}
           <div class="qgrid">${opts}</div>
@@ -366,21 +374,33 @@
         renderDots();
       }));
       const prev = quiz.querySelector('#prev');
-      if (prev) prev.addEventListener('click', () => { if (cur > 0) { cur--; renderQ(); renderDots(); } });
+      if (prev) prev.addEventListener('click', () => {
+        const p = flowPos(cur);
+        if (p > 0) { cur = flow[p - 1]; renderQ(); renderDots(); }
+      });
       const next = quiz.querySelector('#next');
-      if (next) next.addEventListener('click', () => { if (revealed[cur] && cur < QUESTIONS.length - 1) { cur++; renderQ(); renderDots(); } });
+      if (next) next.addEventListener('click', () => {
+        const p = flowPos(cur);
+        const nxt = flow[p + 1];
+        if (revealed[cur] && nxt != null) { cur = nxt; renderQ(); renderDots(); }
+      });
       const fin = quiz.querySelector('#finish');
       if (fin) fin.addEventListener('click', () => { if (revealed[cur]) finish(); });
     }
 
     async function finish() {
-      const unanswered = answers.filter((a) => a < 0).length;
+      const unanswered = flow.filter((i) => answers[i] < 0).length;
       if (unanswered > 0 && !confirm(fill('finishAsk', '{n} ta savol javobsiz qoldi. Yakunlaymizmi?', { n: unanswered }))) return;
       try {
         const res = await fetch('/user/api/practice/grade', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF },
-          body: JSON.stringify({ answers, source: SOURCE, key: KEY, chunk: CHUNK }),
+          body: JSON.stringify({
+            answers, source: SOURCE, key: KEY, chunk: CHUNK,
+            // C4-10 rev.4: retry — faqat xato savollar baholanadi va «retry» sifatida saqlanadi
+            subset: retryMode ? flow : undefined,
+            kind: retryMode ? 'retry' : 'full',
+          }),
         });
         const data = await res.json();
         if (!res.ok || !data.ok) { alert(t('errPrefix', 'Xato: ') + (data.error || res.status)); return; }
@@ -394,20 +414,32 @@
       const el = document.getElementById('result');
       el.hidden = false;
       const correct = data.correct, total = data.total;
+      const wrongList = (data.results || []).filter((r) => !r.isCorrect).map((r) => r.id);
+      const hasWrong = wrongList.length > 0;
+      // C4-10 rev.4: yakun — natija saqlangani tasdig'i + qayta yechish + tarix
+      const savedNote = hasWrong
+        ? t('retryNote', 'Avvalgi xatolaringiz aynan shu savollardan qayta beriladi.')
+        : t('emptyNote', 'Xatolarsiz yakunladingiz — zo‘r natija! 🎉');
       el.innerHTML = `
         <div class="res-card">
           <div class="pr-res-wrap">
             <div class="pr-res-score">${data.percent}%</div>
             <div class="pr-res-sub">${fill('resSub', '{correct} / {total} to\u2018g\u2018ri javob', { correct, total })}</div>
+            <div class="pr-res-saved">✓ ${t('savedOk', 'Natija saqlandi')}</div>
+            <div class="pr-res-note">${esc(savedNote)}</div>
             <div class="pr-res-actions no-print">
               <button type="button" class="btn btn-quiet" data-print>${t('print', '🖨️ Chop etish')}</button>
-              <a class="btn btn-primary" href="/user/panel">${t('backPanel', '← Panelga qaytish')}</a>
+              ${hasWrong ? `<button type="button" class="btn act-sinov" id="retry-wrong" style="margin:0">${fill('retryWrong', 'Qayta yechish — faqat xatolar ({n})', { n: wrongList.length })}</button>` : ''}
+              <button type="button" class="btn btn-quiet" id="retry-all">${t('retryAll', 'Boshidan qayta yechish')}</button>
+              <a class="btn btn-primary" href="/user/practice-history">${t('histOpen', 'Natijalarim')}</a>
+              <a class="btn btn-quiet" href="/user/panel">${t('backPanel', '← Panelga qaytish')}</a>
             </div>
           </div>
-          ${data.results.map((r, i) => {
-            const q = QUESTIONS[i];
+          ${data.results.map((r) => {
+            const q = QUESTIONS[r.id];
+            if (!q) return '';
             return `<div class="pr-review ${r.isCorrect ? 'right' : 'wrong'}">
-              <div class="pr-rv-q">${i + 1}. ${esc(q.text)} ${r.isCorrect ? '✅' : '❌'}</div>
+              <div class="pr-rv-q">${r.id + 1}. ${esc(q.text)} ${r.isCorrect ? '✅' : '❌'}</div>
               ${q.options.map((o, j) => `<div class="pr-rv-o${j === r.correctIndex ? ' ok' : j === r.given ? ' no' : ''}">${String.fromCharCode(65 + j)}) ${esc(o)}${j === r.correctIndex ? ' ✓' : (j === r.given ? ' ' + t('yourAnswer', '← sizning javobingiz') : '')}</div>`).join('')}
               ${r.explanation ? `<div class="pr-rv-e">💡 ${esc(r.explanation)}</div>` : ''}
             </div>`;
@@ -415,6 +447,33 @@
         </div>`;
       const prBtn = el.querySelector('[data-print]');
       if (prBtn) prBtn.addEventListener('click', () => window.print());
+      const rw = el.querySelector('#retry-wrong');
+      if (rw) rw.addEventListener('click', () => beginRetry(wrongList));
+      const ra = el.querySelector('#retry-all');
+      if (ra) ra.addEventListener('click', () => { location.href = location.pathname + location.search; });
+    }
+
+    // C4-10 rev.4: faqat xato savollardan qayta mashq (majburiy emas — istalgan
+    // payt chiqib ketish mumkin; nav qismi flow'da torayadi).
+    function beginRetry(wrongIdx) {
+      if (!wrongIdx.length) return;
+      retryMode = true;
+      flow = wrongIdx.slice().sort((a, b) => a - b);
+      answers.fill(-1);
+      revealed.fill(false);
+      missed.fill(false);
+      cur = flow[0];
+      document.getElementById('result').hidden = true;
+      const quizEl = document.getElementById('quiz');
+      quizEl.hidden = false;
+      dots.hidden = false;
+      const h = document.getElementById('pr-hint');
+      if (h) { h.textContent = '↻ ' + t('retryNote', 'Avvalgi xatolaringiz aynan shu savollardan qayta beriladi.'); h.classList.add('show'); }
+      clearTimeout(hint._iv);
+      hint._iv = setTimeout(() => { if (h) h.classList.remove('show'); }, 4200);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      renderDots();
+      renderQ();
     }
 
     paintModeChip();

@@ -39,6 +39,19 @@
       </header>
 
       <section class="adm-card">
+        <h2>Kalitlarni qanday to‘ldirish (3 qadam)</h2>
+        <ol class="adm-hint" style="line-height:1.9;padding-left:20px">
+          <li><b>canva.com/developer</b> → «Create an app» → <b>Connect APIs (Canva Connect)</b> yoki <b>Canva Button</b> turini tanlang.</li>
+          <li>App sozlamasida <b>Redirect URI</b> ni qo‘ying: <code>https://SIZNING-DOMAIN/api/admin/canva/callback</code> (localhost: <code>http://localhost:3000/api/admin/canva/callback</code>).</li>
+          <li>Appning <b>Client ID</b> va <b>Client Secret</b>ini serveringiz <b>.env</b> fayliga qo‘ying:
+            <pre class="adm-env-pre">CANVA_CLIENT_ID=…
+CANVA_CLIENT_SECRET=…
+CANVA_REDIRECT_URI=https://SIZNING-DOMAIN/api/admin/canva/callback</pre>
+            So‘ng serverni qayta ishga tushiring — bu sahifada «Configured ✓» chiqadi va «Link Canva (OAuth)» ishlay boshlaydi.
+          </li>
+        </ol>
+      </section>
+      <section class="adm-card">
         <h2>Canva Button / Connect</h2>
         <p class="adm-hint">Modal (Button) create/edit + Connect OAuth (PKCE). Minimal scopes: design:create:edit, design:content:read, design:export — full account scope yo'q (research §9.8). Token vault encrypted.</p>
         <div class="adm-row">
@@ -47,6 +60,8 @@
           <span class="adm-hint" id="linkStatus"></span>
         </div>
       </section>
+
+
 
       <section class="adm-card">
         <h2>Button Callback</h2>

@@ -25,8 +25,8 @@ async function build() {
   console.log(`  Source:  logo-icon.svg (${(svgBuffer.length / 1024).toFixed(1)} KB)`);
 
   // S34.10: maskable safe area — mark 80% ichida, safe zone'da hech narsa kesilmaydi.
-  // Evidence Mark optical variant: solid cobalt rounded square + white mark (logo-icon.svg).
-  // Background: final Ink #0C1426 (maskable circle markazida 80% maydon).
+  // Oltin DEBORAH mark variant (logo-icon.svg, 2026-09 qarori).
+  // Background: final Ink #241A0C (maskable circle markazida 80% maydon).
   const MASKABLE_PAD = 0.10; // 10% padding har tomonda → mark 80% ichida
 
   for (const size of SIZES) {
@@ -35,14 +35,14 @@ async function build() {
       .resize(target, target, {
         fit: 'contain',
         kernel: 'lanczos3',
-        background: { r: 12, g: 20, b: 38, alpha: 1 }, // Ink #0C1426
+        background: { r: 36, g: 26, b: 12, alpha: 1 }, // Ink #241A0C
       })
       .extend({
         top: Math.round(size * MASKABLE_PAD),
         bottom: Math.round(size * MASKABLE_PAD),
         left: Math.round(size * MASKABLE_PAD),
         right: Math.round(size * MASKABLE_PAD),
-        background: { r: 12, g: 20, b: 38, alpha: 1 }, // Ink #0C1426 safe zone
+        background: { r: 36, g: 26, b: 12, alpha: 1 }, // Ink #241A0C (issiq to'q jigarrang) safe zone
       })
       .png({ compressionLevel: 9 })
       .toBuffer();
@@ -52,7 +52,7 @@ async function build() {
     console.log(`  pwa-icon-${size}.png — ${(pngBuffer.length / 1024).toFixed(1)} KB`);
   }
 
-  console.log(`\n  ✅ PWA icons built (maskable-safe, Ink #0C1426 bg)`);
+  console.log(`\n  ✅ PWA icons built (maskable-safe, Ink #241A0C bg)`);
 }
 
 build().catch(err => {

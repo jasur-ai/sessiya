@@ -1009,3 +1009,9 @@
   font-size:2.6rem;font-weight:800;letter-spacing:.18em;color:#f6ecd9;line-height:1}
 .qr-modal-box img{border-radius:10px;background:#fff;padding:8px}
 @media (max-width:560px){.qr-modal-code{font-size:1.9rem;letter-spacing:.12em}}
+
+/* C4-10 rev.4: yangi oltin brending — eski ko'k gamepad logotipi o'rniga DEBORAH oltin belgisi */
+.dir-brand{display:inline-flex;align-items:center;gap:9px;text-decoration:none;color:inherit}
+.dir-brand:hover{opacity:.92}
+.dir-brand-cast{font-weight:800;letter-spacing:.12em;text-transform:uppercase;font-size:.9rem;color:#E3C98F}
+.dir-brand .brand-emblem{height:26px;width:auto;border-radius:6px;box-shadow:0 2px 6px rgba(0,0,0,.35)}

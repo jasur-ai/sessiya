@@ -38,6 +38,23 @@
         <span class="adm-chip" id="connStatus">Tekshirilmoqda…</span>
       </header>
 
+
+      <section class="adm-card">
+        <h2>Kalitlarni qanday to‘ldirish (3 qadam)</h2>
+        <ol class="adm-hint" style="line-height:1.9;padding-left:20px">
+          <li><b>console.cloud.google.com</b> → loyihani tanlang (yoki yangi yarating) → «APIs & Services» → <b>Library</b> → <b>Google Slides API</b> → Enable.</li>
+          <li>«OAuth consent screen»ni to‘ldiring (External, tester email) → «Credentials» → <b>Create OAuth client ID</b> → turi <b>Web</b>.
+            <br>Redirect URI: <code>https://SIZNING-DOMAIN/api/admin/google-slides/callback</code> (localhost: <code>http://localhost:3000/api/admin/google-slides/callback</code>).</li>
+          <li>Client ID va Client Secretni serveringiz <b>.env</b> fayliga qo‘ying:
+            <pre class="adm-env-pre">GOOGLE_CLIENT_ID=…
+GOOGLE_CLIENT_SECRET=…
+GOOGLE_REDIRECT_URI=https://SIZNING-DOMAIN/api/admin/google-slides/callback
+# GOOGLE_HD=domain.uz  (ixtiyoriy — faqat shu domenga cheklash)</pre>
+            So‘ng serverni qayta ishga tushiring — «Configured ✓» chiqadi va «Link Google (OAuth)» ishlay boshlaydi.
+          </li>
+        </ol>
+      </section>
+
       <section class="adm-card">
         <h2>Google OAuth (PKCE)</h2>
         <p class="adm-hint">drive.file minimal scope — faqat ilova yaratgan fayllarga kirish. Token vault encrypted, refresh token aylantiriladi (research §9.9).</p>

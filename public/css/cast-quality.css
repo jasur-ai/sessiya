@@ -216,3 +216,8 @@
   gap: 6px;
   flex-wrap: wrap;
 }
+
+/* C4-10 rev.4: oltin brending */
+.ql-logo{display:inline-flex;align-items:center;gap:9px;font-weight:800}
+.ql-logo img{height:22px;width:auto;border-radius:5px}
+.ql-logo span{letter-spacing:.02em}

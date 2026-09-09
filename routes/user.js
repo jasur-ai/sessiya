@@ -934,13 +934,70 @@ router.get('/practice', async (req, res) => {
   });
 });
 
+// ── C4-10 rev.4: «Natijalarim» — yakka mashq tarixi (shaxsiy: hamma urinish;
+// ommaviy testda ham o'ziga barcha urinish; «rasmiy» — birinchi to'liq urinish balli)
+router.get('/practice-history', async (req, res) => {
+  const user = req.session.user;
+  let pRaw = 'uz';
+  try {
+    const pSnap = await fb.get(`users/${user.safeKey}/settings/lang`);
+    if (pSnap.exists() && pSnap.val()) pRaw = pSnap.val();
+  } catch (_) {}
+  const pLang = resolvePanelLang(pRaw);
+  const pCopy = practiceCopyFor(pLang);
+  let entries = [];
+  try {
+    const snap = await fb.get(`users/${user.safeKey}/practice_history`);
+    const all = Object.entries(snap.val() || {});
+    for (const [id, v] of all.sort((a, b) => ((b[1] && b[1].at) || 0) - ((a[1] && a[1].at) || 0)).slice(0, 200)) {
+      const r = v || {};
+      let official = null;
+      if (r.source === 'public' && r.testOwner && r.key) {
+        try {
+          const o = await fb.get(`public_scores/${r.testOwner}__${r.key}/${user.safeKey}`);
+          if (o.exists()) official = o.val();
+        } catch (_) {}
+      }
+      entries.push({
+        id,
+        key: r.key || '',
+        title: r.title || 'Test',
+        correct: r.correct || 0,
+        total: r.total || 0,
+        percent: r.percent || 0,
+        at: r.at || 0,
+        kind: r.kind === 'retry' ? 'retry' : 'full',
+        source: r.source === 'public' ? 'public' : 'own',
+        officialPercent: official ? official.percent : null,
+      });
+    }
+  } catch (_) {}
+  res.render('user/practice-history', {
+    title: pCopy.histTitle + ' — Deborah',
+    pCopy,
+    htmlLang: htmlLangOf(pLang),
+    pLang,
+    entries,
+    csrfToken: res.locals.csrfToken || req.session.csrfToken || '',
+  });
+});
+
 router.post('/api/practice/grade', async (req, res) => {
   const loaded = await loadPracticeQuestions(req, res);
   if (loaded.err) return;
+  const user = req.session.user;
   const answers = Array.isArray(req.body?.answers) ? req.body.answers : [];
+  const kind = req.body?.kind === 'retry' ? 'retry' : 'full';
+  // C4-10 rev.4: qayta yechish (faqat xatolar) — subset shu orig-indekslar bo'yicha
+  // baholanadi. Full urinishda subset yo'q → hamma savol baholanadi.
+  const subset = Array.isArray(req.body?.subset)
+    ? req.body.subset.filter((v) => Number.isInteger(+v) && +v >= 0).map((v) => +v)
+    : null;
+  const testKey = String(req.body?.key || req.query.key || '');
   const results = [];
   let correct = 0;
   (loaded.questions || []).forEach((q, i) => {
+    if (subset && !subset.includes(i)) return; // faqat xato savollar
     const meta = practiceOptionMeta(q);
     const correctIdx = Math.max(0, meta.correctIdx);
     const given = Number.isInteger(answers[i]) ? answers[i] : -1;
@@ -955,17 +1012,43 @@ router.post('/api/practice/grade', async (req, res) => {
     });
   });
   const total = results.length || 1;
-  // Natijani saqlash (o'z testi bo'lsa — progress kuzatuvi)
+  // ── C4-10 rev.4: natijalarni saqlash.
+  //   • Shaxsiy test → o'z tarixida HAR bir urinish (faqat o'ziga ko'rinadi).
+  //   • Ommaviy test → o'z tarixida ham barcha urinish; «ommaviy/rasmiy» ball
+  //     faqat BIRINCHI (to'liq) urinishdan yoziladi va hammaga ochiq
+  //     public_scores reytingida saqlanadi (keyingi urinishlar uni o'zgartirmaydi).
   try {
-    const user = req.session.user;
-    const src = String(req.body?.source || req.query.source || 'user');
-    if (user && src === 'user') {
-      await fb.set(`users/${user.safeKey}/practice_history/${Date.now().toString(36)}`, {
-        key: String(req.body?.key || req.query.key || ''),
+    if (user && String(req.body?.source || req.query.source || 'user') === 'user') {
+      const ownSnap = await fb.get(`users/${user.safeKey}/tests/${testKey}`);
+      const isOwn = ownSnap.exists();
+      let testOwner = null;
+      if (!isOwn) {
+        const pub = await fb.get('public_tests');
+        if (pub.exists()) {
+          for (const [gk, meta] of Object.entries(pub.val() || {})) {
+            if (meta && meta.testKey === testKey && meta.authorUid) { testOwner = meta.authorUid; break; }
+          }
+        }
+      }
+      const histId = Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+      const record = {
+        key: testKey,
         title: loaded.title,
         correct, total, percent: Math.round((correct / total) * 100),
         at: Date.now(),
-      });
+        kind, // full | retry (qayta yechish)
+        source: isOwn ? 'own' : 'public',
+        testOwner: testOwner || null,
+      };
+      await fb.set(`users/${user.safeKey}/practice_history/${histId}`, record);
+      // Ommaviy «rasmiy» ball — faqat birinchi to'liq urinish (attempt #1)
+      if (!isOwn && testOwner && kind === 'full' && user.safeKey !== testOwner) {
+        const scorePath = `public_scores/${testOwner}__${testKey}/${user.safeKey}`;
+        const ex = await fb.get(scorePath);
+        if (!ex.exists()) {
+          await fb.set(scorePath, { percent: record.percent, correct, total, at: record.at, username: user.username || user.safeKey });
+        }
+      }
     }
   } catch (_) { /* non-critical */ }
   res.json({ ok: true, correct, total, percent: Math.round((correct / total) * 100), results });

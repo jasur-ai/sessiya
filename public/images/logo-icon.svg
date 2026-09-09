@@ -1,15 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none" role="img" aria-label="Deborah">
-  <!-- Deborah Evidence Mark app icon (STYLE STEP 05)
-       Solid cobalt rounded square + white mark — 16px favicon'da legible.
-       Gradient'siz (S05.09: product UI'da gradient yo'q). -->
-  <rect x="4" y="4" width="120" height="120" rx="26" fill="#1746D1"/>
-  <!-- Signal node -->
-  <circle cx="51" cy="37" r="11" fill="#FFFFFF"/>
-  <circle cx="51" cy="37" r="4" fill="#FFFFFF" opacity="0.3"/>
-  <!-- Vertical rail -->
-  <rect x="45.5" y="54.5" width="11" height="48" rx="5.5" fill="#FFFFFF"/>
-  <!-- Evidence ticks (o'suvchi — 17/25/34) -->
-  <rect x="62.5" y="62.5" width="17" height="8" rx="4" fill="#FFFFFF"/>
-  <rect x="62.5" y="75.5" width="25" height="8" rx="4" fill="#FFFFFF"/>
-  <rect x="62.5" y="88.5" width="33" height="8" rx="4" fill="#FFFFFF"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Deborah">
+  <!-- Deborah favicon/app mark — oltin vintage uslub (2026-09 qarori: ko'k legacy
+       evidence mark o'rniga issiq oltin/jigarrang DEBORAH belgisi). -->
+  <defs>
+    <linearGradient id="gGold" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0%" stop-color="#8A6228"/>
+      <stop offset="100%" stop-color="#5E4317"/>
+    </linearGradient>
+    <linearGradient id="gD" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0%" stop-color="#F0D9A6"/>
+      <stop offset="55%" stop-color="#E3C98F"/>
+      <stop offset="100%" stop-color="#B98E4F"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="120" height="120" rx="26" fill="url(#gGold)"/>
+  <rect x="6.5" y="6.5" width="115" height="115" rx="23.5" fill="none" stroke="#D9B465" stroke-opacity="0.55" stroke-width="2"/>
+  <text x="64" y="92" font-family="Georgia,'Times New Roman',serif" font-size="78" font-weight="700" fill="url(#gD)" text-anchor="middle">D</text>
 </svg>

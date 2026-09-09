@@ -85,10 +85,13 @@ describe('STYLE STEP 05 — Brand assets', () => {
   });
 
   describe('S05.09-11 — Policy + alt', () => {
-    it('logo-icon.svg yangi Evidence Mark (solid cobalt, gradient yo\'q)', () => {
+    it('logo-icon.svg — oltin DEBORAH favicon (2026-09 qarori: legacy cobalt o\'rniga)', () => {
       const s = readFileSync(join(ROOT, 'public', 'images', 'logo-icon.svg'), 'utf8');
-      expect(s).toContain('#1746D1');
-      expect(s).not.toMatch(/linearGradient/);
+      // Eski ko'k evidence-mark chiqarildi — endi oltin/jigarrang brending
+      expect(s).not.toContain('#1746D1');
+      expect(s).toMatch(/#E3C98F/); // oltin harf gradienti
+      expect(s).toMatch(/#8A6228|#5E4317/); // to'q jigarrang asos
+      expect(s).toContain('Deborah');
     });
 
     it('barcha logo img alt="Deborah" (hech qanday alt="E")', () => {
