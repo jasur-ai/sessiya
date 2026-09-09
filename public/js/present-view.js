@@ -24,14 +24,12 @@
   function thumbMini(slide) {
     return (slide.elements || []).map((e) => {
       const st = 'position:absolute;left:' + e.x + 'px;top:' + e.y + 'px;width:' + e.w + 'px;height:' + e.h + 'px;';
-      if (e.type === 'text') return '<div style="' + st + 'font-size:' + (e.fontSize || 20) + 'px;font-weight:' + (e.bold ? 800 : 400) + ';color:' + hex(e.color, '#241a0c') + ';text-align:' + (e.align || 'left') + ';white-space:pre-wrap;overflow:hidden;line-height:1.25">' + esc(e.text || '') + '</div>';
+      if (e.type === 'text') return '<div style="' + st + 'font-size:' + (e.fontSize || 20) + 'px;font-weight:' + (e.bold ? 800 : 400) + ';color:' + hex(e.color, '#241a0c') + ';text-align:' + (e.align || 'left') + ';' + (e.font === 'display' ? "font-family:Georgia,'Times New Roman',serif;" : '') + 'white-space:pre-wrap;overflow:hidden;line-height:1.25">' + esc(e.text || '') + '</div>';
       if (e.type === 'list') return '<div style="' + st + 'font-size:' + (e.fontSize || 18) + 'px;color:' + hex(e.color, '#241a0c') + ';overflow:hidden">' + (e.items || []).map((it) => '<div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">• ' + esc((it && it.txt) || '') + '</div>').join('') + '</div>';
       if (e.type === 'shape') {
         const k = e.kind || 'rect';
-        if (k === 'circle') return '<div style="' + st + 'border-radius:50%;background:' + hex(e.fill, '#c9a565') + '"></div>';
-        if (k === 'triangle') return '<div style="' + st + 'background:' + hex(e.fill, '#c9a565') + ';clip-path:polygon(50% 0,100% 100%,0 100%)"></div>';
-        if (k === 'diamond') return '<div style="' + st + 'background:' + hex(e.fill, '#c9a565') + ';border-radius:6px;transform:scale(.8) rotate(45deg)"></div>';
-        return '<div style="' + st + 'border-radius:4px;background:' + hex(e.fill, '#c9a565') + '"></div>';
+        const sc = k === 'circle' ? 'border-radius:50%' : k === 'rounded' ? 'border-radius:26%' : k === 'triangle' ? 'clip-path:polygon(50% 0,100% 100%,0 100%)' : k === 'diamond' ? 'border-radius:6px;transform:scale(.8) rotate(45deg)' : k === 'star' ? 'clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)' : k === 'arrow' ? 'clip-path:polygon(0 20%,75% 20%,75% 0,100% 50%,75% 100%,75% 80%,0 80%)' : '';
+        return '<div style="' + st + ';' + (sc || 'border-radius:4px') + ';background:' + hex(e.fill, '#c9a565') + '"></div>';
       }
       if (e.type === 'image') return '<div style="' + st + 'background:#efe2c4"></div>';
       return '';
@@ -47,7 +45,7 @@
     return (slide.elements || []).map((e) => {
       const st = 'position:absolute;left:' + e.x + 'px;top:' + e.y + 'px;width:' + e.w + 'px;height:' + e.h + 'px;';
       if (e.type === 'text') {
-        return '<div style="' + st + 'font-size:' + (e.fontSize || 24) + 'px;font-weight:' + (e.bold ? 800 : 400) + ';font-style:' + (e.italic ? 'italic' : 'normal') + ';color:' + hex(e.color, '#241a0c') + ';text-align:' + (e.align || 'left') + ';white-space:pre-wrap;word-break:break-word;line-height:1.25">' + esc(e.text) + '</div>';
+        return '<div style="' + st + 'font-size:' + (e.fontSize || 24) + 'px;font-weight:' + (e.bold ? 800 : 400) + ';font-style:' + (e.italic ? 'italic' : 'normal') + ';color:' + hex(e.color, '#241a0c') + ';text-align:' + (e.align || 'left') + ';' + (e.font === 'display' ? "font-family:Georgia,'Times New Roman',serif;" : '') + 'white-space:pre-wrap;word-break:break-word;line-height:1.25">' + esc(e.text) + '</div>';
       }
       if (e.type === 'list') {
         return '<div style="' + st + 'font-size:' + (e.fontSize || 22) + 'px;color:' + hex(e.color, '#241a0c') + ';display:flex;flex-direction:column;gap:' + (e.gap || 12) + 'px">' + (e.items || []).map((it) => '<div style="display:flex;gap:12px"><span style="flex:0 0 9px;height:9px;border-radius:50%;background:currentColor;margin-top:.58em;opacity:.8"></span><span>' + esc((it && it.txt) || '') + '</span></div>').join('') + '</div>';
@@ -55,7 +53,7 @@
       if (e.type === 'shape') {
         const k = e.kind || 'rect';
         if (k === 'line') return '<div style="' + st + 'height:' + Math.max(4, e.h || 8) + 'px;border-radius:999px;background:' + hex(e.fill, '#8a5a1e') + '"></div>';
-        const shape = k === 'circle' ? 'border-radius:50%' : (k === 'triangle' ? 'clip-path:polygon(50% 0,100% 100%,0 100%)' : (k === 'diamond' ? 'border-radius:6px;transform:scale(.8) rotate(45deg)' : 'border-radius:4px'));
+        const shape = k === 'circle' ? 'border-radius:50%' : (k === 'rounded' ? 'border-radius:26%' : (k === 'triangle' ? 'clip-path:polygon(50% 0,100% 100%,0 100%)' : (k === 'diamond' ? 'border-radius:6px;transform:scale(.8) rotate(45deg)' : (k === 'star' ? 'clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)' : (k === 'arrow' ? 'clip-path:polygon(0 20%,75% 20%,75% 0,100% 50%,75% 100%,75% 80%,0 80%)' : 'border-radius:4px')))));
         return '<div style="' + st + shape + ';background:' + hex(e.fill, '#c9a565') + '"></div>';
       }
       if (e.type === 'image' && e.src) return '<img style="' + st + 'object-fit:contain" src="' + esc(dispSrc(e.src)) + '" alt="">';

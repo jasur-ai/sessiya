@@ -113,7 +113,10 @@
         { kind: 'triangle', x: 560, y: 300, w: 180, h: 160 },
         { kind: 'diamond', x: 570, y: 310, w: 150, h: 150 },
         { kind: 'line', x: 340, y: 355, w: 600, h: 10 },
-      ][Math.floor(Math.random() * 5)] || { kind: 'rect', x: 480, y: 260, w: 320, h: 200 };
+        { kind: 'rounded', x: 460, y: 240, w: 360, h: 220 },
+        { kind: 'star', x: 520, y: 240, w: 220, h: 220 },
+        { kind: 'arrow', x: 300, y: 330, w: 680, h: 90 },
+      ][Math.floor(Math.random() * 8)] || { kind: 'rect', x: 480, y: 260, w: 320, h: 200 };
       return { id: elId(), type: 'shape', x: shapes.x, y: shapes.y, w: shapes.w, h: shapes.h, kind: shapes.kind, fill: PALETTE_FILL[Math.floor(Math.random() * 4)], stroke: 'transparent', strokeW: 0 };
     }
     return defaultText();
@@ -255,7 +258,7 @@
     const els = (slide.elements || []).map((e) => {
       const l = Math.round(e.x) + 'px', t = Math.round(e.y) + 'px', w = Math.round(e.w) + 'px', h = Math.round(e.h) + 'px';
       if (e.type === 'text') {
-        const style = 'left:' + l + ';top:' + t + ';width:' + w + ';height:' + h + ';font-size:' + (e.fontSize || 24) + 'px;font-weight:' + (e.bold ? 800 : 400) + ';font-style:' + (e.italic ? 'italic' : 'normal') + ';color:' + hex(e.color, '#241a0c') + ';text-align:' + (e.align || 'left') + ';';
+        const style = 'left:' + l + ';top:' + t + ';width:' + w + ';height:' + h + ';font-size:' + (e.fontSize || 24) + 'px;font-weight:' + (e.bold ? 800 : 400) + ';font-style:' + (e.italic ? 'italic' : 'normal') + ';color:' + hex(e.color, '#241a0c') + ';text-align:' + (e.align || 'left') + ';' + (e.font === 'display' ? "font-family:Georgia,'Times New Roman',serif;" : '');
         const ph = e.text ? '' : (e.font === 'display' ? T('dfltTitle', 'Sarlavha qo\u2018shing') : T('dfltBody', 'Matn qo\u2018shing…'));
         const vert = e.align === 'center' && e.bold ? 'display:flex;align-items:center;justify-content:center;' : '';
         return '<div class="ps-el" data-id="' + e.id + '" data-i data-el="' + e.id + '" style="' + style + '"><div class="ps-el-text' + (e.text ? '' : ' empty') + '" data-ph="' + esc(ph) + '" style="white-space:pre-wrap;line-height:1.22;width:100%;height:100%;' + (e.align === 'center' ? 'text-align:center;' : '') + vert + '">' + esc(e.text) + '</div><span class="ps-handle" data-resize="' + e.id + '"></span></div>';
@@ -268,7 +271,15 @@
       if (e.type === 'shape') {
         const style = 'left:' + l + ';top:' + t + ';width:' + w + ';height:' + h + ';';
         const kind = e.kind || 'rect';
-        let inner = '<div class="ps-el-shape ' + kind + '" style="background:' + hex(e.fill, '#c9a565') + ';' + (e.stroke && e.stroke !== 'transparent' ? 'border:' + (e.strokeW || 2) + 'px solid ' + hex(e.stroke, '#241a0c') : '') + '"></div>';
+        const shapeCss = kind === 'circle' ? 'border-radius:50%'
+          : kind === 'rounded' ? 'border-radius:26%'
+          : kind === 'triangle' ? 'clip-path:polygon(50% 0,100% 100%,0 100%)'
+          : kind === 'diamond' ? 'border-radius:6px;transform:scale(.8) rotate(45deg)'
+          : kind === 'star' ? 'clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)'
+          : kind === 'arrow' ? 'clip-path:polygon(0 20%,75% 20%,75% 0,100% 50%,75% 100%,75% 80%,0 80%)'
+          : '';
+        const borderable = kind === 'rect' || kind === 'circle' || kind === 'rounded';
+        let inner = '<div class="ps-el-shape ' + kind + '" style="background:' + hex(e.fill, '#c9a565') + ';' + shapeCss + ';' + (borderable && e.stroke && e.stroke !== 'transparent' ? 'border:' + (e.strokeW || 2) + 'px solid ' + hex(e.stroke, '#241a0c') : '') + '"></div>';
         if (kind === 'line') inner = '<div class="ps-el-shape line" style="height:' + Math.max(4, e.h || 8) + 'px;width:100%;background:' + hex(e.fill, '#8a5a1e') + ';border-radius:999px"></div>';
         return '<div class="ps-el" data-id="' + e.id + '" data-i style="' + style + '">' + inner + '<span class="ps-handle" data-resize="' + e.id + '"></span></div>';
       }
@@ -332,18 +343,16 @@
     return (slide.elements || []).map((e) => {
       const style = 'position:absolute;left:' + e.x + 'px;top:' + e.y + 'px;width:' + e.w + 'px;height:' + e.h + 'px;';
       if (e.type === 'text') {
-        return '<div style="' + style + ';font-size:' + (e.fontSize || 20) + 'px;font-weight:' + (e.bold ? 800 : 400) + ';color:' + hex(e.color, '#241a0c') + ';text-align:' + (e.align || 'left') + ';white-space:pre-wrap;overflow:hidden;line-height:1.25">' + esc(e.text || '') + '</div>';
+        return '<div style="' + style + ';font-size:' + (e.fontSize || 20) + 'px;font-weight:' + (e.bold ? 800 : 400) + ';color:' + hex(e.color, '#241a0c') + ';text-align:' + (e.align || 'left') + ';' + (e.font === 'display' ? "font-family:Georgia,'Times New Roman',serif;" : '') + 'white-space:pre-wrap;overflow:hidden;line-height:1.25">' + esc(e.text || '') + '</div>';
       }
       if (e.type === 'list') {
         return '<div style="' + style + ';font-size:' + (e.fontSize || 18) + 'px;color:' + hex(e.color, '#241a0c') + ';overflow:hidden">' + (e.items || []).map((it) => '<div style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">• ' + esc((it && it.txt) || '') + '</div>').join('') + '</div>';
       }
       if (e.type === 'shape') {
         const k = e.kind || 'rect';
-        if (k === 'circle') return '<div style="' + style + ';border-radius:50%;background:' + hex(e.fill, '#c9a565') + '"></div>';
-        if (k === 'triangle') return '<div style="' + style + ';background:' + hex(e.fill, '#c9a565') + ';clip-path:polygon(50% 0,100% 100%,0 100%)"></div>';
+        const sc = k === 'circle' ? 'border-radius:50%' : k === 'rounded' ? 'border-radius:26%' : k === 'triangle' ? 'clip-path:polygon(50% 0,100% 100%,0 100%)' : k === 'diamond' ? 'border-radius:6px;transform:scale(.8) rotate(45deg)' : k === 'star' ? 'clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)' : k === 'arrow' ? 'clip-path:polygon(0 20%,75% 20%,75% 0,100% 50%,75% 100%,75% 80%,0 80%)' : '';
         if (k === 'line') return '<div style="' + style + ';background:' + hex(e.fill, '#8a5a1e') + ';border-radius:99px"></div>';
-        if (k === 'diamond') return '<div style="' + style + ';background:' + hex(e.fill, '#c9a565') + ';border-radius:6px;transform:scale(.8) rotate(45deg)"></div>';
-        return '<div style="' + style + ';border-radius:4px;background:' + hex(e.fill, '#c9a565') + '"></div>';
+        return '<div style="' + style + ';' + (sc || 'border-radius:4px') + ';background:' + hex(e.fill, '#c9a565') + '"></div>';
       }
       if (e.type === 'image' && e.src) return '<div style="' + style + ';background:#efe2c4"></div>';
       return '';
@@ -465,6 +474,9 @@
       + '<button type="button" class="ps-r-ins" data-ins="shape" data-kind="circle">●</button>'
       + '<button type="button" class="ps-r-ins" data-ins="shape" data-kind="triangle">△</button>'
       + '<button type="button" class="ps-r-ins" data-ins="shape" data-kind="diamond">◇</button>'
+      + '<button type="button" class="ps-r-ins" data-ins="shape" data-kind="rounded">◧</button>'
+      + '<button type="button" class="ps-r-ins" data-ins="shape" data-kind="star">★</button>'
+      + '<button type="button" class="ps-r-ins" data-ins="shape" data-kind="arrow">➤</button>'
       + '<button type="button" class="ps-r-ins wide" data-ins="shape" data-kind="line">— ' + esc(T('insLine', 'Chiziq')) + '</button>';
     h += '<div class="ps-r-ins-grid">' + ins + '</div></div>';
 
@@ -479,7 +491,11 @@
             + '<select class="ps-r-select" data-p="fontSize" style="flex:1">' + [16, 18, 20, 22, 24, 28, 32, 36, 40, 48, 56, 64, 72, 88].map((f) => '<option value="' + f + '"' + (selEl.fontSize === f ? ' selected' : '') + '>' + f + '</option>').join('') + '</select>'
             + '<button type="button" class="ps-r-btn' + (selEl.bold ? ' on' : '') + '" data-toggle="bold"><b>B</b></button>'
             + '<button type="button" class="ps-r-btn' + (selEl.italic ? ' on' : '') + '" data-toggle="italic"><i>I</i></button>'
-            + '</div>';
+            h += '<label class="ps-r-label">' + esc(T('fontLbl', 'Shrift')) + '</label>';
+          h += '<select class="ps-r-select" data-p="font" style="width:100%">'
+            + '<option value="body"' + ((selEl.font || 'body') === 'body' ? ' selected' : '') + '>' + esc(T('fontBody', 'Asosiy matn')) + '</option>'
+            + '<option value="display"' + (selEl.font === 'display' ? ' selected' : '') + '>' + esc(T('fontDisplay', 'Ta’kid sarlavhasi')) + '</option>'
+            + '</select>';
           h += '<div class="ps-r-row">'
             + '<button type="button" class="ps-r-btn' + (selEl.align === 'left' ? ' on' : '') + '" data-align="left">⬅</button>'
             + '<button type="button" class="ps-r-btn' + (selEl.align === 'center' ? ' on' : '') + '" data-align="center">⬌</button>'
@@ -500,6 +516,14 @@
         h += '<label class="ps-r-label">' + esc(T('fillLbl', 'To‘ldirish')) + '</label>';
         h += swatchRow(PALETTE_FILL, selEl.fill, 'fill', 'hex');
         h += customColorRow(selEl.fill, 'fill', T('customColor', 'Ixtiyoriy rang'));
+        if (selEl.kind === 'rect' || selEl.kind === 'circle' || selEl.kind === 'rounded') {
+          h += '<label class="ps-r-label">' + esc(T('strokeLbl', 'Kontur')) + '</label>';
+          h += '<div class="ps-r-row">'
+            + '<input class="ps-r-input" type="number" min="0" max="24" value="' + (selEl.strokeW || 0) + '" data-p="strokeW" style="width:72px" aria-label="' + esc(T('strokeLbl', 'Kontur')) + ' qalinlik">'
+            + '<button type="button" class="ps-r-btn' + (!selEl.stroke || selEl.stroke === 'transparent' ? ' on' : '') + '" data-stroke-none="1">' + esc(T('strokeNone', 'Yo‘q')) + '</button>'
+            + '</div>';
+          h += swatchRow(['#241a0c', '#ffffff', '#5b4317', '#8a5a1e', '#a37f3a', '#c9a565', '#37474f', '#2e7d32', '#c62828'], selEl.stroke || 'transparent', 'stroke', 'hex');
+        }
         if (selEl.kind === 'line') {
           h += '<label class="ps-r-label">' + esc(T('sizeLbl', 'O‘lcham')) + '</label>';
           h += '<input class="ps-r-input" type="number" min="4" max="60" value="' + Math.max(4, selEl.h || 8) + '" data-p="thick" style="width:100px">';
@@ -566,6 +590,9 @@
         if (kind === 'triangle') { rnd.w = 200; rnd.h = 180; rnd.x = 540; rnd.y = 280; }
         if (kind === 'diamond') { rnd.w = 170; rnd.h = 170; rnd.x = 555; rnd.y = 285; }
         if (kind === 'line') { rnd.w = 640; rnd.h = 10; rnd.x = 320; rnd.y = 355; }
+        if (kind === 'rounded') { rnd.w = 340; rnd.h = 200; }
+        if (kind === 'star') { rnd.w = 200; rnd.h = 200; rnd.x = 540; rnd.y = 260; }
+        if (kind === 'arrow') { rnd.w = 620; rnd.h = 90; rnd.x = 330; rnd.y = 315; }
         el = { id: elId(), type: 'shape', x: rnd.x, y: rnd.y, w: rnd.w, h: rnd.h, kind, fill: PALETTE_FILL[Math.floor(Math.random() * 3)], stroke: 'transparent', strokeW: 0 };
       } else {
         el = addEl(b.dataset.ins, slide2);
@@ -590,6 +617,8 @@
       else if (key === 'fontSize') { selEl.fontSize = +inp.value; }
       else if (key === 'src') { selEl.src = inp.value.trim(); }
       else if (key === 'thick') { selEl.h = Math.max(4, Math.min(200, +inp.value || 8)); }
+      else if (key === 'font') { selEl.font = inp.value === 'display' ? 'display' : 'body'; }
+      else if (key === 'strokeW') { selEl.strokeW = Math.max(0, Math.min(24, +inp.value || 0)); }
       else if (key === 'bgdeg') { if (slide.bg && slide.bg.type === 'gradient') slide.bg.deg = +inp.value; }
       renderCanvas();
       renderThumbs();
@@ -611,6 +640,7 @@
         selectBg();
       } else if (key === 'color') { if (selEl) { selEl.color = val; renderCanvas(); renderThumbs(); renderInspector(); markDirty(); } }
       else if (key === 'fill') { if (selEl) { selEl.fill = val; renderCanvas(); renderThumbs(); renderInspector(); markDirty(); } }
+      else if (key === 'stroke') { if (selEl) { selEl.stroke = val === 'transparent' ? 'transparent' : hex(val, '#241a0c'); renderCanvas(); renderThumbs(); renderInspector(); markDirty(); } }
     }));
 
     // custom color input (type=color) — bg / matn / to'ldirish / gradient uchlar
@@ -642,6 +672,11 @@
     if (upBtn) upBtn.addEventListener('click', () => { attachFileInput(selEl); });
 
     // bold/italic/align toggles
+    box.querySelectorAll('[data-stroke-none]').forEach((b) => b.addEventListener('click', () => {
+      if (!selEl) return;
+      selEl.stroke = 'transparent'; selEl.strokeW = 0;
+      renderCanvas(); renderThumbs(); renderInspector(); markDirty();
+    }));
     box.querySelectorAll('[data-toggle="bold"]').forEach((b) => b.addEventListener('click', () => {
       if (!selEl) return; selEl.bold = !selEl.bold; renderCanvas(); renderThumbs(); renderInspector(); markDirty();
     }));
@@ -886,6 +921,42 @@
     const el = slide.elements.find((x) => x.id === node.dataset.id);
     if (!el || el.type !== 'text') return;
     startInlineEdit(el.id);
+  });
+
+  // ── Clipboard paste: rasm (fayl kabi downscale) yoki matn → yangi element ──
+  document.addEventListener('paste', (e) => {
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+    const items = (e.clipboardData && e.clipboardData.items) ? Array.from(e.clipboardData.items) : [];
+    const imgItem = items.find((it) => it.type && it.type.indexOf('image/') === 0);
+    const txt = e.clipboardData ? e.clipboardData.getData('text/plain') : '';
+    if (!imgItem && !txt) return;
+    const slide = curSlide();
+    if (!slide) return;
+    e.preventDefault();
+    if (imgItem) {
+      const f = imgItem.getAsFile();
+      if (!f) return;
+      downscaleFile(f).then((src) => {
+        if (!src) { alert(T('imgFail', 'Rasm o‘qilmadi')); return; }
+        const el = { id: elId(), type: 'image', x: 320, y: 160, w: 640, h: 400, src };
+        slide.elements = slide.elements || [];
+        slide.elements.push(el);
+        state.sel = { kind: 'el', id: el.id };
+        renderCanvas(); renderThumbs(); renderInspector(); markDirty();
+      });
+      return;
+    }
+    if (txt) {
+      const clean = txt.trim();
+      if (!clean) return;
+      const el = { id: elId(), type: 'text', x: 340, y: 300, w: 600, h: 80, text: clean.length > 3000 ? clean.slice(0, 3000) : clean, fontSize: 26, bold: false, italic: false, color: '#241a0c', align: 'left', font: 'body' };
+      slide.elements = slide.elements || [];
+      slide.elements.push(el);
+      state.sel = { kind: 'el', id: el.id };
+      renderCanvas(); renderThumbs(); renderInspector(); markDirty();
+      startInlineEdit(el.id);
+    }
   });
 
   // resize

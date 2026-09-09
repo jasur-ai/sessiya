@@ -210,98 +210,134 @@
       </div>
     </div>
 
-      <!-- C4-10: Umumiy ma'lumot (overview) — testlar kutubxonasi pastda buklangan -->
+      <!-- C4-10 rev.2: Umumiy ma'lumot (overview) — iliq palitra, xulosaviy kartalar.
+           Testlar/Taqdimotlar kartasi boshqa sahifaga o'tkazmaydi — o'sha yerda
+           kichik xulosa ro'yxatini ochadi. To'liq boshqaruv chap menyu orqali. -->
   <section class="ov-sec" aria-label="Umumiy ma'lumot">
+    <div class="ov-head">
+      <h2 class="ov-title">Umumiy ma'lumot</h2>
+      <p class="ov-sub">So'nggi ishlaringiz — batafsil sahifalar chap menyuda</p>
+    </div>
     <div class="ov-grid">
-      <a class="ov-card" href="/user/tests">
-        <span class="ov-ico"><%- icon('fileText', 18) %></span>
-        <span class="ov-num" data-ov="tests"><%= typeof testsCount !== 'undefined' ? testsCount : 0 %></span>
-        <span class="ov-lbl"><%= __p('myPanel', 'Testlar') %></span>
-      </a>
+      <details class="ov-card ov-xpand" id="ov-xpand-tests">
+        <summary>
+          <span class="ov-card-ic"><%- icon('fileText', 18) %></span>
+          <span class="ov-card-body">
+            <span class="ov-num"><%= typeof testsCount !== 'undefined' ? testsCount : 0 %></span>
+            <span class="ov-lbl">Testlarim</span>
+          </span>
+          <span class="ov-x-arrow" aria-hidden="true"><%- icon('chevronDown', 15) %></span>
+        </summary>
+        <div class="ov-mini">
+          <% if (typeof recentTests !== 'undefined' && recentTests.length) { %>
+            <div class="ov-mini-hd">So'nggi testlar</div>
+            <ul class="ov-mini-list">
+              <% recentTests.forEach(function (t) { %>
+              <li><span class="ov-mi-name"><%- t.name %></span><span class="ov-mi-meta"><%= t.count %> ta savol · <%= fmtDate(t.updatedAt) %></span></li>
+              <% }); %>
+            </ul>
+            <a class="ov-mini-go" href="/user/tests">Barchasi Testlar sahifasida →</a>
+          <% } else { %>
+            <div class="ov-mini-empty">Testlar hali yo'q — chap menyudagi Testlar bo'limidan yarating.</div>
+          <% } %>
+        </div>
+      </details>
+
       <div class="ov-card">
-        <span class="ov-ico"><%- icon('layers', 18) %></span>
-        <span class="ov-num"><%= typeof totalQuestions !== 'undefined' ? totalQuestions : 0 %></span>
-        <span class="ov-lbl"><%= __p('lib.qCount', 'Savollar') %></span>
+        <span class="ov-card-ic"><%- icon('layers', 18) %></span>
+        <span class="ov-card-body">
+          <span class="ov-num"><%= typeof totalQuestions !== 'undefined' ? totalQuestions : 0 %></span>
+          <span class="ov-lbl">Savollar</span>
+        </span>
       </div>
-      <a class="ov-card" href="/user/presentations">
-        <span class="ov-ico"><%- icon('monitor', 18) %></span>
-        <span class="ov-num"><%= typeof presentationsCount !== 'undefined' ? presentationsCount : 0 %></span>
-        <span class="ov-lbl"><%= __p('presentations', 'Taqdimotlar') %></span>
-      </a>
-      <div class="ov-card">
-        <span class="ov-ico"><%- icon('clock', 18) %></span>
-        <span class="ov-num ov-num--sm"><%= (typeof lastActivityAt !== 'undefined' && lastActivityAt) ? fmtDate(lastActivityAt) : '—' %></span>
-        <span class="ov-lbl"><%= __p('ov.lastAct', 'Oxirgi ishlangan') %></span>
+
+      <details class="ov-card ov-xpand" id="ov-xpand-pres">
+        <summary>
+          <span class="ov-card-ic"><%- icon('monitor', 18) %></span>
+          <span class="ov-card-body">
+            <span class="ov-num"><%= typeof presentationsCount !== 'undefined' ? presentationsCount : 0 %></span>
+            <span class="ov-lbl">Taqdimotlar</span>
+          </span>
+          <span class="ov-x-arrow" aria-hidden="true"><%- icon('chevronDown', 15) %></span>
+        </summary>
+        <div class="ov-mini">
+          <% if (typeof presentationsRecent !== 'undefined' && presentationsRecent.length) { %>
+            <div class="ov-mini-hd">So'nggi taqdimotlar</div>
+            <ul class="ov-mini-list">
+              <% presentationsRecent.forEach(function (pr) { %>
+              <li><span class="ov-mi-name"><%- pr.name %></span><span class="ov-mi-meta"><%= pr.slides %> ta slayd · <%= fmtDate(pr.updatedAt) %></span></li>
+              <% }); %>
+            </ul>
+            <a class="ov-mini-go" href="/user/presentations">Barchasi Taqdimotlar sahifasida →</a>
+          <% } else { %>
+            <div class="ov-mini-empty">Taqdimotlar hali yo'q — chap menyudagi Taqdimotlar bo'limidan yarating.</div>
+          <% } %>
+        </div>
+      </details>
+
+      <div class="ov-card ov-card--last">
+        <span class="ov-card-ic"><%- icon('clock', 18) %></span>
+        <span class="ov-card-body">
+          <span class="ov-num ov-num--sm"><%= (typeof lastActivityAt !== 'undefined' && lastActivityAt) ? fmtDate(lastActivityAt) : '—' %></span>
+          <span class="ov-lbl">Oxirgi ishlangan</span>
+        </span>
       </div>
     </div>
-    <div class="ov-actions">
-      <a class="btn btn-primary" href="/user/tests" style="text-decoration:none"><%- icon('fileText', 14) %> <span>Testlarim</span></a>
-      <a class="btn" href="/user/create-test" style="text-decoration:none"><%- icon('plus', 14) %> <span>Yangi test</span></a>
-      <a class="btn" href="/user/presentations" style="text-decoration:none"><%- icon('monitor', 14) %> <span>Taqdimotlar</span></a>
-    </div>
-    <% if (typeof recentTests !== 'undefined' && recentTests.length) { %>
-    <div class="ov-recent">
-      <div class="ov-recent-hd">So'nggi testlar</div>
-      <ul class="ov-recent-list">
-        <% recentTests.slice(0, 4).forEach(function (t) { %>
-        <li><a href="/user/tests" style="text-decoration:none"><span class="ov-rt-name"><%- t.name %></span><span class="ov-rt-meta"><%= t.count %> ta savol · <%= fmtDate(t.updatedAt) %></span></a></li>
-        <% }); %>
-      </ul>
-    </div>
-    <% } %>
   </section>
   <style>
-    .ov-sec{display:grid;gap:14px;margin:6px 0 22px}
-    .ov-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
-    .ov-card{display:flex;flex-direction:column;gap:4px;padding:16px 18px;border-radius:14px;background:var(--deborah-surface-elevated,#fff);border:1px solid var(--deborah-border-subtle,#e4e2da);color:inherit;text-decoration:none;box-shadow:0 1px 2px rgba(20,13,3,.05)}
-    .ov-card:hover{text-decoration:none;border-color:var(--deborah-border-strong,#c9c4b4)}
-    .ov-ico{opacity:.85}
-    .ov-num{font-size:1.6rem;font-weight:800;line-height:1;color:var(--deborah-text-primary,#241a0c)}
-    .ov-num--sm{font-size:1rem;line-height:1.4;padding-top:2px}
-    .ov-lbl{font-size:.82rem;color:var(--deborah-text-secondary,#6a6252)}
-    .ov-actions{display:flex;flex-wrap:wrap;gap:8px}
-    .ov-recent{border:1px solid var(--deborah-border-subtle,#e4e2da);border-radius:14px;background:var(--deborah-surface,#fffdf7);padding:12px 16px}
-    .ov-recent-hd{font-size:.78rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--deborah-text-secondary,#6a6252);margin-bottom:6px}
-    .ov-recent-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
-    .ov-recent-list a{display:flex;justify-content:space-between;gap:12px;align-items:baseline;color:inherit}
-    .ov-rt-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .ov-rt-meta{font-size:.78rem;color:var(--deborah-text-secondary,#6a6252);flex:0 0 auto}
-    .ws-lib-fold{border-top:1px solid var(--deborah-border-subtle,#e4e2da);padding-top:10px;margin-top:4px}
-    .ws-lib-fold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-size:.95rem;font-weight:700;color:var(--deborah-text-primary,#241a0c);padding:6px 2px;user-select:none}
+    /* ── C4-10 rev.2: iliq (qaymoq/oltin/zaytun) umumiy-ma'lumot kartalari.
+          Oq (#fff) ishlatilmaydi — oppoq bloklar tuzatildi. */
+    .ov-sec{display:grid;gap:14px;margin:4px 0 20px}
+    .ov-head{display:flex;flex-direction:column;gap:2px}
+    .ov-title{margin:0;font-size:1.05rem;font-weight:800;color:#2a1d0a;letter-spacing:.01em}
+    .ov-sub{margin:0;font-size:.8rem;color:#7d6e4e}
+    .ov-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+    .ov-card{display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-radius:16px;
+      background:linear-gradient(180deg,#fdf8ec 0%,#f6ecd6 100%);
+      border:1px solid #e4d3a8;box-shadow:0 2px 10px rgba(122,94,42,.08);color:inherit}
+    .ov-card>summary{list-style:none;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none}
+    .ov-card>summary::-webkit-details-marker{display:none}
+    .ov-card>summary:focus-visible{outline:2px solid #b08d3f;outline-offset:2px;border-radius:10px}
+    a.ov-card{text-decoration:none}
+    a.ov-card:hover{text-decoration:none;border-color:#c9a55c}
+    .ov-xpand[open]{border-color:#cbb170;background:linear-gradient(180deg,#fdf8ec,#f2e4c4)}
+    .ov-card-ic{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:11px;flex:0 0 auto;
+      background:#efe1bd;color:#6d4c13;border:1px solid #e2cf9d}
+    .ov-card-body{display:flex;flex-direction:column;gap:2px;min-width:0}
+    .ov-num{font-size:1.45rem;font-weight:800;line-height:1.1;color:#5f430f}
+    .ov-num--sm{font-size:.9rem;line-height:1.5;padding-top:3px;font-weight:700}
+    .ov-lbl{font-size:.8rem;color:#7d6e4e}
+    .ov-x-arrow{margin-left:auto;color:#a08a4e;transition:transform .15s ease}
+    .ov-xpand[open]>summary .ov-x-arrow{transform:rotate(180deg)}
+    .ov-mini{border-top:1px dashed #dcc894;margin-top:4px;padding-top:10px;display:grid;gap:8px}
+    .ov-mini-hd{font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#8a7443}
+    .ov-mini-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+    .ov-mini-list li{display:flex;justify-content:space-between;gap:10px;align-items:baseline;padding:7px 10px;border-radius:10px;
+      background:#fbf3df;border:1px solid #eee0bb;font-size:.84rem}
+    .ov-mini-list li:hover{background:#f6e9c8}
+    .ov-mi-name{font-weight:600;color:#3a2c12;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .ov-mi-meta{font-size:.74rem;color:#8a7443;flex:0 0 auto}
+    .ov-mini-empty{font-size:.82rem;color:#8a7443;background:#fbf3df;border:1px dashed #dcc894;border-radius:10px;padding:10px 12px}
+    .ov-mini-go{font-size:.8rem;font-weight:700;color:#7c5a1d;text-decoration:none}
+    .ov-mini-go:hover{text-decoration:underline;color:#5f430f}
+    .ov-card--last .ov-num--sm{white-space:nowrap}
+    .ws-lib-fold{border-top:1px solid #e4d3a8;padding-top:10px;margin-top:2px}
+    .ws-lib-fold>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;font-size:.9rem;font-weight:700;
+      color:#4a3a1c;padding:6px 2px;user-select:none}
     .ws-lib-fold>summary::-webkit-details-marker{display:none}
     .ws-lib-fold[open]>summary{margin-bottom:10px}
-    .ws-lib-fold-sum{color:var(--deborah-text-secondary,#6a6252);font-weight:600}
+    .ws-lib-fold-sum{color:#8a7443;font-weight:600}
   </style>
   <div class="ws-live" role="status" aria-live="polite" id="ws-live"></div>
 
-    <!-- First fold (S25.03) -->
-    <% if (tests.length > 0) { %>
-      <div class="ws-resume">
-        <div class="ws-resume-ico"><%- icon('gamepad', 22) %></div>
-        <div class="ws-resume-body">
-          <h2 class="ws-resume-title"><%= tests[0].name %></h2>
-          <p class="ws-resume-meta"><%= __pf('rsMeta.qcount', tests[0].count) %></p>
-        </div>
-        <div class="ws-resume-actions">
-          <button type="button" class="btn act-cast" data-source="user" data-key="<%= tests[0].key %>"><%- icon('gamepad', 15) %> <span data-i18n="ws.cast"><%= __p('ws.cast') %></span></button>
-          <button type="button" class="btn act-sinov" data-start-sinov data-name="<%= tests[0].name.replace(/'/g, "\\'") %>" data-count="<%= tests[0].count %>" data-url="/user/practice?source=user&key=<%= tests[0].key %>"><%- icon('zap', 15) %> <span><%= __p('act.practice') %></span></button>
-        </div>
-      </div>
-    <% } %>
-    <% /* 09/2026 (user qarori): bo'sh holatda alohida eslatma-karta olib tashlandi —
-          bo'sh kutubxona Testlarim bo'limi ichida o'z CTA'sini ko'rsatadi (dublikat yo'q). */ %>
-
-    <!-- ════ Test Library (S26) ════ -->
+        <!-- ════ Test Library (S26) ════ -->
     <details class="ws-lib-fold" id="ws-lib-fold">
-    <summary><%- icon('chevronDown', 14) %> <span>Testlarim</span> <span class="ws-lib-fold-sum">(<%= typeof testsCount !== 'undefined' ? testsCount : 0 %>)</span></summary>
+    <summary><%- icon('chevronDown', 14) %> <span>Barcha testlar va qidiruv</span> <span class="ws-lib-fold-sum">(<%= typeof testsCount !== 'undefined' ? testsCount : 0 %>)</span></summary>
     <div class="ws-sec-hd">
       <h2 class="ws-sec-title" data-i18n="lib.title"><%= __p('lib.title') %></h2>
       <div class="ws-sec-sub"><%= __p('lib.sub') %></div>
-      <% /* 09/2026 (user qarori): 'Yangi test' faqat bitta joyda — testlar
-            borida kutubxona sarlavhasida; bo'sh holatda kutubxona empty-CTA'si. */ %>
-      <% if (tests.length > 0) { %>
-      <a href="/user/create-test" class="ws-sec-action"><%- icon('plus', 13) %> <span data-i18n="ws.newTest"><%= __p('ws.newTest') %></span></a>
-      <% } %>
+      <% /* 09/2026 (user qarori): panelda 'Yangi test' tugmasi yo'q —
+            yaratish faqat Testlar sahifasida (panel = umumiy ma'lumot). */ %>
     </div>
 
     <!-- S26.06: Filter toolbar (STEP 18 filter-bar asosida) -->
@@ -344,7 +380,6 @@
     <div id="lib-empty" class="ws-lib-empty" hidden>
       <div class="ws-lib-empty-title" data-i18n="ws.empty"><%= __p('ws.empty') %></div>
       <div class="ws-lib-empty-sub"><%= __p('lib.emptySub') %></div>
-      <a href="/user/create-test" class="ws-state-action" style="margin-top:12px"><%- icon('plus', 14) %> <%= __p('lib.emptyCta') %></a>
     </div>
     <div id="lib-none" class="ws-lib-empty" hidden>
       <div class="ws-lib-empty-title"><%= __p('lib.noneTitle') %></div>

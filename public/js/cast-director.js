@@ -199,7 +199,23 @@
     // S29.09: Add Time faqat timer yurganda (question open)
     if (addTime) addTime.setAttribute('aria-disabled', ['QUESTION_OPEN', 'REVOTE_OPEN'].includes(phase) ? 'false' : 'true');
 
+    syncClosePill(close);
     renderPhaseBadge();
+  }
+
+  // C4-10: oddiy rejimda yagona markaziy pill — savolni yopish (avto oqim
+  // uchun kerak bo'lgan yagona boshqaruv; rail'ning o'zi yashirin).
+  function syncClosePill(closeBtn) {
+    const pill = $('btn-close-pill');
+    if (!pill) return;
+    const simple = document.body.classList.contains('cast-simple');
+    const canClose = closeBtn && !closeBtn.disabled;
+    if (!simple || !canClose) { pill.hidden = true; return; }
+    pill.hidden = false;
+    const label = pill.querySelector('[data-close-label]');
+    if (label) {
+      label.textContent = phase === 'REVOTE_OPEN' ? 'Ovozni yopish' : 'Savolni yopish';
+    }
   }
 
   // ── Timer (C5-05 item 14: 10fps yoki second-level — 250ms→1000ms, long-task yuk kamayadi) ──
@@ -207,10 +223,16 @@
     stopTimerUI();
     const render = () => {
       const el = $('dir-timer-val');
-      if (!closesAt) { el.textContent = '—'; return; }
+      const box = $('dir-timer');
+      if (!closesAt) {
+        el.textContent = '—';
+        if (box) box.classList.remove('has-timer');
+        return;
+      }
       const remaining = Math.max(0, Math.round((closesAt - Date.now()) / 1000));
       el.textContent = remaining + 's';
       el.classList.toggle('urgent', remaining <= 10);
+      if (box) box.classList.add('has-timer');
       if (remaining <= 0) stopTimerUI();
     };
     render();
@@ -218,6 +240,8 @@
   }
   function stopTimerUI() {
     if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    const box = $('dir-timer');
+    if (box) box.classList.remove('has-timer');
   }
 
   // ── Lobby ──
@@ -279,13 +303,37 @@
     if (!wrap) return;
     wrap.innerHTML = '';
     const entries = [...dirParticipants.entries()];
-    const visible = entries.slice(0, DIR_PARTICIPANT_VIRTUAL_LIMIT);
-    for (const [pid, p] of visible) {
-      const row = document.createElement('div');
-      row.className = 'dir-participant-row';
-      row.innerHTML = participantRowHtml(pid, p);
-      attachParticipantActions(row);
-      wrap.appendChild(row);
+    // C4-10: Sinfda/Uzoqdan guruhlanishi — faqat ikki guruh ham bo'lsa
+    // (yoki faqat uzoqdan bo'lsa) sarlavhalar chiqadi; aks holda oddiy ro'yxat.
+    const groups = { in_room: [], remote: [] };
+    for (const e of entries) {
+      const p = e[1] || {};
+      groups[p.delivery === 'remote' ? 'remote' : 'in_room'].push(e);
+    }
+    const remoteOnly = groups.remote.length > 0 && groups.in_room.length === 0;
+    const showHeaders = groups.remote.length > 0 && groups.in_room.length > 0;
+    const order = showHeaders || remoteOnly ? ['in_room', 'remote'] : ['in_room'];
+    let added = 0;
+    for (const key of order) {
+      const g = groups[key];
+      if (!g.length) continue;
+      if (showHeaders) {
+        const hd = document.createElement('div');
+        hd.className = 'dir-part-group';
+        hd.innerHTML = key === 'remote'
+          ? `<span class="dir-part-group-dot dir-part-group-dot--remote"></span><span>Uzoqdan (${g.length})</span>`
+          : `<span class="dir-part-group-dot dir-part-group-dot--room"></span><span>Sinfda (${g.length})</span>`;
+        wrap.appendChild(hd);
+      }
+      for (const [pid, p] of g) {
+        if (added >= DIR_PARTICIPANT_VIRTUAL_LIMIT) break;
+        const row = document.createElement('div');
+        row.className = 'dir-participant-row';
+        row.innerHTML = participantRowHtml(pid, p);
+        attachParticipantActions(row);
+        wrap.appendChild(row);
+        added++;
+      }
     }
     updateDirParticipantVirtualCount();
   }
@@ -318,7 +366,7 @@
         // C4-06: participant tracking
         if (eventName === 'cast:participantJoined' && data.participantId) {
           const wasEmpty = dirParticipants.size === 0;
-          dirParticipants.set(data.participantId, { displayAlias: data.displayAlias || 'Ishtirokchi' });
+          dirParticipants.set(data.participantId, { displayAlias: data.displayAlias || 'Ishtirokchi', delivery: data.delivery || 'in_room' });
           // C5-05 (item 15): to'liq rebuild emas — yangi row'ni append qilamiz
           const wrap = $('dir-participant-items');
           const total = dirParticipants.size;
@@ -327,7 +375,7 @@
           } else if (wrap && total <= DIR_PARTICIPANT_VIRTUAL_LIMIT) {
             const row = document.createElement('div');
             row.className = 'dir-participant-row';
-            row.innerHTML = participantRowHtml(data.participantId, { displayAlias: data.displayAlias || 'Ishtirokchi' });
+            row.innerHTML = participantRowHtml(data.participantId, { displayAlias: data.displayAlias || 'Ishtirokchi', delivery: data.delivery || 'in_room' });
             attachParticipantActions(row);
             wrap.appendChild(row);
           } else if (wrap) {
@@ -1176,6 +1224,13 @@
     });
   });
 
+  const closePill = $('btn-close-pill');
+  if (closePill) {
+    closePill.addEventListener('click', async () => {
+      const c = $('btn-close');
+      if (c && !c.disabled) c.click();
+    });
+  }
   $('btn-close').addEventListener('click', async () => {
     try { await send('cast:questionClose', {}); } catch (e) { announce(e.message || 'Xatolik', true); }
   });
@@ -2493,7 +2548,7 @@
     client.sendCommand('cast:directorJoin', {}).then((ack) => {
       // BUG-230db143d fix: ochilishda mavjud ishtirokchilar (refresh holati)
       if (ack && Array.isArray(ack.participants) && ack.participants.length) {
-        ack.participants.forEach((p) => dirParticipants.set(p.participantId, { displayAlias: p.displayAlias || 'Ishtirokchi' }));
+        ack.participants.forEach((p) => dirParticipants.set(p.participantId, { displayAlias: p.displayAlias || 'Ishtirokchi', delivery: p.delivery || 'in_room' }));
         const cnt = $('dir-player-count');
         if (cnt) cnt.textContent = String(dirParticipants.size);
         renderDirParticipants();

@@ -99,6 +99,37 @@ describe('C4-10 cast director: oddiy rejim + QR', () => {
     await page.close().catch(() => {});
   }, 60000);
 
+  it('simple oqim: o‘ng boshqaruv yashirin, yagona pill bilan savol yopiladi', async () => {
+    const { sessionId } = await mkSession({ title: 'Oddiy oqim', ui: 'simple' });
+    const { page, errs } = await openDirector(sessionId);
+    // Rail'ning o'zi yashirin (primary + secondary group'lar)
+    expect(await page.locator('.rail-primary').first().isVisible(), 'rail-primary yashirin').toBe(false);
+    expect(await page.locator('.rail-secondary').first().isVisible(), 'rail-secondary yashirin').toBe(false);
+    // Lobbi bosqichida pill ko'rinmaydi
+    expect(await page.locator('#btn-close-pill').isVisible(), 'pill lobbida yashirin').toBe(false);
+    // Sessiyani boshlash
+    await page.click('#btn-start-session');
+    await page.waitForFunction(() => {
+      const pill = document.getElementById('btn-close-pill');
+      return pill && !pill.hidden;
+    }, null, { timeout: 12000 });
+    const pillLabel = await page.locator('#btn-close-pill [data-close-label]').textContent();
+    expect(pillLabel.trim(), 'pill matni').toBe('Savolni yopish');
+    // Savol ochilgach timer chipi ko'rinadi (soft 90s)
+    const timerBox = page.locator('#dir-timer');
+    expect(await timerBox.evaluate((el) => el.classList.contains('has-timer')), 'timer chip has-timer').toBe(true);
+    expect(await timerBox.isVisible(), 'timer chip ko‘rinadi').toBe(true);
+    await page.screenshot({ path: `${SHOTS}/simple-question-pill.png` }).catch(() => {});
+    // Pill orqali savolni yopamiz → pill yana yashirin
+    await page.click('#btn-close-pill');
+    await page.waitForFunction(() => {
+      const pill = document.getElementById('btn-close-pill');
+      return pill && pill.hidden;
+    }, null, { timeout: 10000 });
+    expect(errs, 'pageerror/console-error yo‘q').toEqual([]);
+    await page.close().catch(() => {});
+  }, 60000);
+
   it('to‘liq rejim: rail-tools va muhokama tugmasi ko‘rinadi, QR ham bor', async () => {
     const { sessionId } = await mkSession({ title: 'To‘liq rejim' });
     const { page, errs } = await openDirector(sessionId);

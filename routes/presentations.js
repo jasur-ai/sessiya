@@ -35,7 +35,7 @@ const URL_RE = /^https?:\/\/[^\s"<>]{5,400}$/i;
 // qo'llab-quvvatlanadi. Hajm cheki ~2.4MB base64 (client 1280px gacha downscale qiladi).
 const DATAIMG_RE = /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=\s]{100,2400000}$/;
 const LAYOUTS = ['blank', 'title', 'titlebody'];
-const KINDS = ['rect', 'circle', 'triangle', 'diamond', 'line'];
+const KINDS = ['rect', 'circle', 'rounded', 'triangle', 'diamond', 'star', 'arrow', 'line'];
 const EL_TYPES = ['text', 'list', 'shape', 'image'];
 const FONTS = ['body', 'display'];
 const ALIGNS = ['left', 'center', 'right'];

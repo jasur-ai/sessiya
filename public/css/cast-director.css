@@ -955,3 +955,49 @@
 .cast-simple #btn-resume,
 .cast-simple #btn-discuss,
 .cast-simple #btn-revote{display:none}
+
+/* ── C4-10 rev.2: oddiy (simple) director — professional minimal sirt ── */
+/* O'ng rail: asosiy va ikkilamchi boshqaruv oddiy oqimda ko'rinmaydi (faqat
+   zarur boshqaruv markaziy pill; timer pastki-o'ng kichik chip sifatida). */
+.cast-simple .rail-primary,
+.cast-simple .rail-secondary{display:none}
+.cast-simple .dir-pane{display:none}                 /* dalillar/metrikalar faqat to'liq rejimda */
+.cast-simple #btn-results,
+.cast-simple #dir-role-chip{display:none}            /* natijalar/replay oddiy user ko'rmaydi */
+.cast-simple #btn-replay{display:none}
+.cast-simple .dir-part-act{display:none}             /* lobbi ro'yxati — faqat ismlar */
+/* Topbar: a11y (contrast/klaviatura) tugmalari yozuvlar ustiga tushmasligi */
+.dir-topbar{padding-right:118px}
+.dir-topbar-right{flex-wrap:wrap}
+@media (max-width: 1100px){ .dir-topbar{padding-right:106px} }
+@media (max-width: 760px){
+  .dir-topbar{padding-right:8px}
+  .dir-topbar-left,.dir-topbar-right{gap:8px;flex-wrap:wrap}
+}
+/* Markaziy yagona pill — savolni yopish (faqat oddiy rejim, kerak paytda) */
+.dir-close-pill{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:900;
+  display:inline-flex;align-items:center;gap:8px;box-shadow:0 8px 22px rgba(0,0,0,.38)}
+.dir-close-pill[hidden]{display:none}
+/* Pastki-o'ng: qolgan vaqt chipi (rail yashirilgach ham timer ko'rinadi) */
+.cast-simple .dir-timer{position:fixed;right:16px;bottom:16px;z-index:899;margin:0;
+  padding:8px 16px;border-radius:14px;display:none;align-items:center;gap:8px;min-width:auto}
+.cast-simple .dir-timer.has-timer{display:flex}
+.cast-simple .dir-timer .timer-label{font-size:.62rem;letter-spacing:.1em}
+/* Lobby ishtirokchilar: Sinfda/Uzoqdan guruh sarlavhalari */
+.dir-part-group{display:flex;align-items:center;gap:6px;margin:10px 0 4px;padding-top:8px;
+  border-top:1px solid var(--cast-border, rgba(246,236,217,.14));
+  font-size:.68rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--cast-muted,#c4b48c)}
+.dir-part-group:first-child{margin-top:0;padding-top:0;border-top:none}
+.dir-part-group-ico{display:inline-flex;opacity:.8}
+@media (max-width: 640px){
+  .cast-simple .dir-timer{right:8px;bottom:auto;top:64px;padding:5px 10px}
+}
+
+/* Simple: pan yashirin — asosiy maydon to'liq kenglikda, bo'sh rail qatori ham
+   qulab tushadi (timer/yarim boshqaruv pastda suzuvchi chip sifatida). */
+.cast-simple .dir-layout{grid-template-columns:1fr;grid-template-areas:'main' 'rail';}
+.cast-simple .dir-rail{border:0;background:transparent;box-shadow:none}
+.cast-simple .dir-main{grid-column:1}
+.dir-part-group-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex:0 0 auto}
+.dir-part-group-dot--room{background:#7FA055}
+.dir-part-group-dot--remote{background:#C9A565}

@@ -86,7 +86,16 @@
     // 09/2026: data-studio-simple=true → jonli viktorina uslubi (Classic Live) minimal
     studioState.simple = overlay.dataset.studioSimple === 'true';
     studioState.draftConfig = studioState.simple
-      ? { presetId: 'classic_live', overrides: { playback: { advanceMode: 'fully_auto', thinkSeconds: 3 } } }
+      ? {
+          presetId: 'classic_live',
+          overrides: {
+            playback: { advanceMode: 'fully_auto', thinkSeconds: 3 },
+            // C4-10: oddiy rejimda Sinfda/Uzoqdan guruhlanishi ishlashi uchun
+            // hybrid delivery (join'da har ishtirokchi o'zini belgilaydi)
+            participation: { delivery: 'hybrid' },
+            accessibility: { showQuestionOnDevice: true },
+          },
+        }
       : { presetId: 'responsive_accuracy', overrides: {} };
 
     overlay.classList.add('open');
@@ -604,6 +613,8 @@
           overrides: {
             timer: { mode: 'strict', defaultSeconds: 20 },
             playback: { advanceMode: 'fully_auto', thinkSeconds: 3 },
+            participation: { delivery: 'hybrid' },
+            accessibility: { showQuestionOnDevice: true },
             presentation: { soundEffects: 'low' },
           },
         };

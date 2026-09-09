@@ -888,6 +888,7 @@ export function setupCastHandlers(io, socket) {
     io.to(rooms(sessionId)).emit(CAST_EVENTS.PARTICIPANT_JOINED, {
       participantId,
       displayAlias,
+      delivery: deliveryType,
       count: Object.keys(await listParticipants(sessionId)).length,
     });
 
@@ -1107,6 +1108,7 @@ export function setupCastHandlers(io, socket) {
         participantId: p.participantId,
         displayAlias: p.displayAlias,
         presence: p.presence || 'online',
+        delivery: p.delivery || 'in_room',
       }));
     } catch (_) {}
     ackSend({ ok: true, commandId: cmd.commandId, joined: true, scoped: isModerator, joinCode, participants });
