@@ -67,6 +67,13 @@ describe('C4-10 cast director: oddiy rejim + QR', () => {
     const { page, errs, qrResp } = await openDirector(sessionId);
     // body.cast-simple
     expect(await page.evaluate(() => document.body.classList.contains('cast-simple')), 'simple klass').toBe(true);
+    // C4-10 rev.3: yorliq «Cast qilish» + yangi favicon (logo-icon.svg)
+    const startTxt = (await page.locator('#btn-start-session').textContent() || '').replace(/\s+/g, ' ').trim();
+    expect(startTxt, 'start tugmasi «Cast qilish»').toContain('Cast qilish');
+    const iconHref = await page.locator('link[rel="icon"]').first().getAttribute('href');
+    expect(iconHref, 'favicon yangi logo').toContain('logo-icon.svg');
+    const hasOldFav = await page.locator('link[rel="icon"][href*="vintage"], link[rel="icon"][href*="favicon"]').count();
+    expect(hasOldFav, 'eski favicon yo\u2018q').toBe(0);
     // Yashirilgan boshqaruv: display:none (CSS) → isVisible false
     for (const sel of ['#btn-pause', '#btn-resume', '#btn-discuss', '#btn-revote', '.rail-tools']) {
       expect(await page.locator(sel).first().isVisible(), `${sel} simple rejimda yashirin`).toBe(false);
@@ -94,6 +101,14 @@ describe('C4-10 cast director: oddiy rejim + QR', () => {
     expect(modalUrl, 'modal havola').toBe(`${serverUrl}/play?code=${joinCode}`);
     const dims = await page.locator('#dir-qr-big').evaluate((el) => ({ w: el.width, h: el.height }));
     expect(dims.w, 'katta QR kenglik').toBeGreaterThan(200);
+    // C4-10 rev.3: katta ekranda ham kod raqami ko'rinadi — yarim-shaffof fon ustida
+    const codeTxt = (await page.locator('#dir-qr-code').textContent() || '').trim();
+    expect(codeTxt, 'modal katta kod raqami').toBe(joinCode);
+    const codeFont = await page.locator('#dir-qr-code').evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+    expect(codeFont, 'kod shrifti katta').toBeGreaterThanOrEqual(26);
+    const modalBg = await page.locator('#qr-modal').evaluate((el) => getComputedStyle(el).backgroundColor);
+    const alpha = Number(String(modalBg).match(/[\d.]+\s*\)\s*$/)?.[0].replace(/[^\d.]/g, '') || 0);
+    expect(alpha, 'modal foni yarim-shaffof (kod orqada xira ko\u2018rinadi)').toBeGreaterThanOrEqual(0.5);
     await page.screenshot({ path: `${SHOTS}/simple-qr-modal.png` }).catch(() => {});
     expect(errs, 'pageerror/console-error yo‘q').toEqual([]);
     await page.close().catch(() => {});

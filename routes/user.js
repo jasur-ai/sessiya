@@ -819,6 +819,23 @@ router.patch('/api/settings/profile', async (req, res) => {
 // mock/pre to'plamlar (faqat VIP). Javob kaliti klientga TUSHMAYDI —
 // grade serverda.
 // ═══════════════════════════════════════════════════════════════════
+// C4-10 rev.3: variantlar 2 xil shaklda saqlanishi mumkin — string yoki
+// {id,text,isCorrect}. To'g'ri javob ham `correct` (indeks) yoki isCorrect
+// bayrog'i orqali. Bu yerda bittasiga normalizatsiya qilinadi (eski seed
+// testlar {text,isCorrect} shaklida — 'Mening Testlarim' kabi).
+function practiceOptionMeta(q) {
+  const opts = Array.isArray(q?.options) ? q.options : [];
+  const texts = opts.map((o) => (typeof o === 'string' ? o : (o && typeof o.text === 'string' ? o.text : String(o ?? ''))));
+  let correctIdx = -1;
+  const ci = Number(q?.correct);
+  if (Number.isInteger(ci) && ci >= 0 && ci < opts.length) correctIdx = ci;
+  else {
+    const flag = opts.findIndex((o) => o && typeof o === 'object' && o.isCorrect === true);
+    if (flag >= 0) correctIdx = flag;
+  }
+  return { texts, correctIdx };
+}
+
 async function loadPracticeQuestions(req, res) {
   const source = String(req.query.source || req.body?.source || 'user');
   const key = String(req.query.key || req.body?.key || '');
@@ -879,17 +896,16 @@ router.get('/practice', async (req, res) => {
   const loaded = await loadPracticeQuestions(req, res);
   if (loaded.err) return;
   const qs = (loaded.questions || []).map((q, i) => {
-    const nOpts = Array.isArray(q?.options) ? q.options.length : 0;
-    const cIdx = Number(q?.correct);
+    const meta = practiceOptionMeta(q);
     return {
       id: i,
       text: String(q?.text || ''),
       type: q?.type || 'single_choice',
-      options: Array.isArray(q?.options) ? q.options.map((o) => String(o || '')) : [],
+      options: meta.texts,
       // 09/2026 (user qarori): har savoldan keyin darhol to'g'ri/noto'g'ri
       // natija chiqishi uchun correct clientga yuboriladi (jonli viktorina tarzi).
       // Yakuniy baho baribir server (/user/api/practice/grade) hisoblaydi.
-      correct: Number.isInteger(cIdx) && cIdx >= 0 && cIdx < nOpts ? cIdx : -1,
+      correct: meta.correctIdx,
       explanation: String(q?.explanation || ''),
     };
   }).filter((q) => q.text && q.options.length >= 2);
@@ -925,8 +941,8 @@ router.post('/api/practice/grade', async (req, res) => {
   const results = [];
   let correct = 0;
   (loaded.questions || []).forEach((q, i) => {
-    const opts = Array.isArray(q?.options) ? q.options : [];
-    const correctIdx = Math.max(0, Math.min(Number.isFinite(+q?.correct) ? Math.floor(+q.correct) : 0, opts.length - 1));
+    const meta = practiceOptionMeta(q);
+    const correctIdx = Math.max(0, meta.correctIdx);
     const given = Number.isInteger(answers[i]) ? answers[i] : -1;
     const isCorrect = given === correctIdx;
     if (isCorrect) correct++;

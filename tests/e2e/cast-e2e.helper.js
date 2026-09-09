@@ -43,7 +43,7 @@ export async function stopE2E() {
 // ochmaydi — vaqt va resurs tejaydi.
 export async function newContext() {
   if (!browser) {
-    browser = await chromium.launch({ headless: true });
+    browser = await chromium.launch({ headless: true, executablePath: process.env.CHROMIUM_PATH || undefined });
   }
   return browser.newContext();
 }

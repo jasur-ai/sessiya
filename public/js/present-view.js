@@ -9,7 +9,7 @@
   const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   const hex = (v, f) => (typeof v === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(v) ? v : f);
   // masofaviy URL → same-origin proksi (CSP + export taint)
-  const dispSrc = (s) => { if (!s) return ''; return /^https?:/i.test(s) ? '/user/api/img?u=' + encodeURIComponent(s) : s; };
+  const dispSrc = (s) => { if (!s) return ''; return /^https?:/i.test(s) ? '/user/api/img?u=' + encodeURIComponent(s).replace(/'/g, '%27') : s; };
 
   const slides = deck.slides || [];
   let cur = 0;
@@ -37,6 +37,9 @@
   }
 
   function bgStyle(bg) {
+    if (bg && bg.type === 'image' && bg.src) {
+      return "background:#241a0c url('" + dispSrc(bg.src) + "') center/cover no-repeat"; // C4-10 rev.3: url("") HTML atributini buzardi
+    }
     if (bg && bg.type === 'gradient') return 'background:linear-gradient(' + (bg.deg || 135) + 'deg,' + hex(bg.c1, '#f6ecd9') + ',' + hex(bg.c2, '#c9a565') + ')';
     return 'background:' + hex(bg && bg.c1, '#f7eeda');
   }
@@ -56,7 +59,7 @@
         const shape = k === 'circle' ? 'border-radius:50%' : (k === 'rounded' ? 'border-radius:26%' : (k === 'triangle' ? 'clip-path:polygon(50% 0,100% 100%,0 100%)' : (k === 'diamond' ? 'border-radius:6px;transform:scale(.8) rotate(45deg)' : (k === 'star' ? 'clip-path:polygon(50% 0%,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)' : (k === 'arrow' ? 'clip-path:polygon(0 20%,75% 20%,75% 0,100% 50%,75% 100%,75% 80%,0 80%)' : 'border-radius:4px')))));
         return '<div style="' + st + shape + ';background:' + hex(e.fill, '#c9a565') + '"></div>';
       }
-      if (e.type === 'image' && e.src) return '<img style="' + st + 'object-fit:contain" src="' + esc(dispSrc(e.src)) + '" alt="">';
+      if (e.type === 'image' && e.src) return '<img style="' + st + 'object-fit:contain;' + (e.stroke && e.stroke !== 'transparent' ? 'border:' + (e.strokeW || 3) + 'px solid ' + hex(e.stroke, '#241a0c') + ';border-radius:14px;' : '') + '" src="' + esc(dispSrc(e.src)) + '" alt="">';
       return '';
     }).join('');
   }
@@ -87,8 +90,30 @@
   function next() { show(Math.min(cur + 1, slides.length - 1)); }
   function prev() { show(Math.max(cur - 1, 0)); }
 
+  // C4-10 rev.3: to'liq ekran (F) — birinchi Esc fullscreen'dan chiqadi,
+  // ikkinchi Esc taqdimotdan chiqadi.
+  const fsBtn = document.getElementById('ps-v-fs');
+  function isFs() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+  function toggleFs() {
+    const el = document.documentElement;
+    if (isFs()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+    const req = el.requestFullscreen || el.webkitRequestFullscreen;
+    if (req) req.call(el).catch(() => {});
+  }
+  if (fsBtn) fsBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleFs(); });
+  document.addEventListener('fullscreenchange', () => {
+    if (fsBtn) {
+      fsBtn.innerHTML = isFs() ? '<span>⛶</span> To\u2018liq ekrandan chiqish' : '<span>⛶</span> To\u2018liq ekran';
+    }
+  });
+
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' || e.key === 'ArrowLeft' && e.altKey) { exit(); return; }
+    if (e.key === 'Escape') {
+      if (isFs()) { (document.exitFullscreen || document.webkitExitFullscreen).call(document); return; }
+      exit(); return;
+    }
+    if (e.key === 'f' || e.key === 'F' || e.key === 'а' || e.key === 'А') { toggleFs(); return; }
+    if (e.key === 'ArrowLeft' && e.altKey) { exit(); return; }
     if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown' || e.key === 'Enter') { e.preventDefault(); next(); }
     else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
     else if (e.key === 'Home') { e.preventDefault(); show(0); }
@@ -104,7 +129,8 @@
 
   // click: o'ng yarmi next, chap yarmi prev
   document.addEventListener('click', (e) => {
-    if (e.target.closest('#ps-v-exit')) return;
+    if (e.target.closest('#ps-v-exit') || e.target.closest('#ps-v-fs') || e.target.closest('#ps-v-export')) return;
+    if (e.target.closest('.ps-v-bar, button, a, input, select, .ps-pop')) return;
     if (e.clientX > window.innerWidth / 2) next(); else prev();
   });
 

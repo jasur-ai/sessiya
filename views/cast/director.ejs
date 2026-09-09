@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title><%= title %></title>
+  <link rel="icon" type="image/svg+xml" href="/images/logo-icon.svg">
   <link rel="stylesheet" href="/css/cast-tokens.css">
   <link rel="stylesheet" href="/css/cast-director.css">
   <link rel="stylesheet" href="/design/foundations/typography.css">
@@ -78,7 +79,7 @@
           <div class="ev-title"><%- icon("users", 14) %> Ishtirokchilar</div>
           <div id="dir-participant-items"></div>
         </div>
-        <button class="cast-btn cast-btn-primary cast-btn-lg" id="btn-start-session" data-i18n="director.start">Sessiyani boshlash</button>
+        <button class="cast-btn cast-btn-primary cast-btn-lg" id="btn-start-session" data-i18n="director.start">Cast qilish</button>
       </div>
 
       <div id="dir-question" class="dir-question" hidden>
@@ -393,7 +394,9 @@
   <!-- C4-10: QR kattalashtirilgan ko'rinish -->
   <div class="qr-modal" id="qr-modal" role="dialog" aria-modal="true" aria-label="QR kod" hidden>
     <div class="qr-modal-box cast-surface">
-      <img id="dir-qr-big" width="360" height="360" alt="QR kod">
+      <div class="qr-modal-code-label">QO'SHILISH KODI</div>
+      <div class="qr-modal-code" id="dir-qr-code">—</div>
+      <img id="dir-qr-big" width="340" height="340" alt="QR kod">
       <div class="qr-modal-url" id="dir-qr-url"></div>
       <div class="qr-modal-hint">Telefon kamerasi bilan skanerlang — sahifa o'zi ochiladi</div>
       <button type="button" class="cast-btn cast-btn-primary" id="btn-qr-close"><%- icon('x', 15) %> Yopish</button>

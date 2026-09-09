@@ -90,6 +90,9 @@
           presetId: 'classic_live',
           overrides: {
             playback: { advanceMode: 'fully_auto', thinkSeconds: 3 },
+            // C4-10 rev.2: classic_live scoring=speed — hybrid+speed preflight
+            // blokeri (bosish hech narsa qilmasdi) — balanced ga o'tkazildi.
+            scoring: { mode: 'balanced' },
             // C4-10: oddiy rejimda Sinfda/Uzoqdan guruhlanishi ishlashi uchun
             // hybrid delivery (join'da har ishtirokchi o'zini belgilaydi)
             participation: { delivery: 'hybrid' },
@@ -585,7 +588,7 @@
     if (launchBtn) {
       launchBtn.disabled = true;
       launchBtn.setAttribute('aria-busy', 'true');
-      launchBtn.innerHTML = '<span class="cs-launch-spinner"></span><span data-cs-launch-label>Lobbi ochish</span>';
+      launchBtn.innerHTML = '<span class="cs-launch-spinner"></span><span data-cs-launch-label>Cast qilish</span>';
     }
 
     try {
@@ -627,7 +630,7 @@
       if (launchBtn) {
         launchBtn.disabled = (studioState.preflight && (studioState.preflight.blockers || []).length > 0);
         launchBtn.removeAttribute('aria-busy');
-        launchBtn.innerHTML = '<span data-cs-launch-label>Lobbi ochish</span>';
+        launchBtn.innerHTML = '<span data-cs-launch-label>Cast qilish</span>';
       }
       const body = el('cast-studio-body');
       if (body) {
@@ -649,7 +652,7 @@
     if (!status) return;
     const hasBlockers = studioState.preflight && (studioState.preflight.blockers || []).length > 0;
     if (studioState.submitting) {
-      status.textContent = 'Lobbi ochilmoqda…';
+      status.textContent = 'Cast tayyorlanmoqda…';
     } else if (hasBlockers) {
       status.innerHTML = '<span class="cs-dirty-dot"></span>Blokerdan oldin ishga tushirib bo‘lmaydi';
     } else if (studioState.customized) {
@@ -664,7 +667,7 @@
       const hasBlocker = studioState.preflight ? hasBlockers : true;
       launchBtn.disabled = hasBlocker || studioState.submitting;
       if (!studioState.submitting && !launchBtn.querySelector('[data-cs-launch-label]')) {
-        launchBtn.innerHTML = '<span data-cs-launch-label>Lobbi ochish</span>';
+        launchBtn.innerHTML = '<span data-cs-launch-label>Cast qilish</span>';
       }
     }
   }

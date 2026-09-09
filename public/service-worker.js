@@ -28,7 +28,7 @@ const PRECACHE_URLS = [
   '/js/landing.js',
   '/js/landing-demo.js',
   '/design/generated/tokens.css',
-  '/images/favicon-vintage.png',
+  '/images/logo-icon.svg',
   '/images/logo-vintage.png',
   '/images/logo-text.svg',
   '/images/og-image.svg',

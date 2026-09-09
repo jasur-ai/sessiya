@@ -34,6 +34,15 @@ const URL_RE = /^https?:\/\/[^\s"<>]{5,400}$/i;
 // 09/2026 (user qarori): rasm endi nafaqat URL — fayl upload (data:image) ham
 // qo'llab-quvvatlanadi. Hajm cheki ~2.4MB base64 (client 1280px gacha downscale qiladi).
 const DATAIMG_RE = /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+/=\s]{100,2400000}$/;
+// C4-10 rev.3: bg/src normalizatsiyasi (data URL / proksi URL / tashqi URL)
+function normImgSrc(raw) {
+  let src = typeof raw === 'string' ? raw.slice(0, 3100000) : '';
+  if (!src) return '';
+  if (src.startsWith('/user/api/img?u=')) return src;
+  if (DATAIMG_RE.test(src)) return src;
+  if (/^https?:\/\//i.test(src)) return '/user/api/img?u=' + encodeURIComponent(src);
+  return '';
+}
 const LAYOUTS = ['blank', 'title', 'titlebody'];
 const KINDS = ['rect', 'circle', 'rounded', 'triangle', 'diamond', 'star', 'arrow', 'line'];
 const EL_TYPES = ['text', 'list', 'shape', 'image'];
@@ -104,10 +113,12 @@ function sanitizeDeck(body, existing) {
   const out = slides.map((s, i) => {
     if (!s || typeof s !== 'object') return null;
     const layout = LAYOUTS.includes(s.layout) ? s.layout : 'blank';
-    const bgT = s.bg && s.bg.type === 'gradient' ? 'gradient' : 'solid';
+    const bgT = s.bg && s.bg.type === 'gradient' ? 'gradient' : (s.bg && s.bg.type === 'image' ? 'image' : 'solid');
     const bg = bgT === 'gradient'
       ? { type: 'gradient', c1: hexOr(s.bg && s.bg.c1, '#f6ecd9'), c2: hexOr(s.bg && s.bg.c2, '#c9a565'), deg: num(s.bg && s.bg.deg, 0, 360, 135) }
-      : { type: 'solid', c1: hexOr(s.bg && s.bg.c1, '#f7eeda') };
+      : bgT === 'image'
+        ? { type: 'image', c1: hexOr(s.bg && s.bg.c1, '#241a0c'), src: normImgSrc(s.bg && s.bg.src) }
+        : { type: 'solid', c1: hexOr(s.bg && s.bg.c1, '#f7eeda') };
     const elements = (Array.isArray(s.elements) ? s.elements : []).slice(0, MAX_ELS).map((e) => {
       if (!e || typeof e !== 'object' || !EL_TYPES.includes(e.type)) return null;
       const base = {
@@ -139,7 +150,9 @@ function sanitizeDeck(body, existing) {
       else if (DATAIMG_RE.test(src)) src = src;
       else if (URL_RE.test(src)) src = '/user/api/img?u=' + encodeURIComponent(src);
       else src = '';
-      return { ...base, src };
+      // C4-10 rev.3: rasm ramkasi (rang + qalinlik)
+      const st = typeof e.stroke === 'string' && (e.stroke === 'transparent' || /^#[0-9a-fA-F]{3,8}$/.test(e.stroke)) ? e.stroke : 'transparent';
+      return { ...base, src, stroke: st, strokeW: st === 'transparent' ? 0 : num(e.strokeW, 0, 30, 3) };
     }).filter(Boolean);
     return { id: safeKey(String(s.id || '')) || 'sl' + uid(), layout, bg, elements };
   }).filter(Boolean);
@@ -205,6 +218,10 @@ router.get('/presentations', async (req, res) => {
     csrfToken: req.session.csrfToken,
     fmtDate: (ts) => new Date(ts || Date.now()).toLocaleDateString(localeOf(lang)),
     username: user.username,
+    // C4-10 rev.3: rasmiy (OAuth) integratsiya holati — env kalitlariga qarab
+    canvaConfigured: Boolean(process.env.CANVA_CLIENT_ID && process.env.CANVA_CLIENT_SECRET && process.env.CANVA_REDIRECT_URI),
+    googleSlidesConfigured: Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.GOOGLE_REDIRECT_URI),
+    canManageProviders: ['admin', 'board'].includes(user.role),
   });
 });
 

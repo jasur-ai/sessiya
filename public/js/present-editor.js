@@ -38,7 +38,7 @@
   const hex = (v, f) => (typeof v === 'string' && /^#[0-9a-fA-F]{3,8}$/.test(v) ? v : f);
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   // ko'rsatish manzili: masofaviy URL → same-origin proksi (CSP + export taint)
-  const dispSrc = (s) => { if (!s) return ''; return /^https?:/i.test(s) ? '/user/api/img?u=' + encodeURIComponent(s) : s; };
+  const dispSrc = (s) => { if (!s) return ''; return /^https?:/i.test(s) ? '/user/api/img?u=' + encodeURIComponent(s).replace(/'/g, '%27') : s; };
   // tahrir uchun saqlanadigan "asl" manzil (proksi'dan URL'ni qaytarish)
   const rawSrc = (s) => { if (!s) return ''; if (s.indexOf('/user/api/img?u=') === 0) { try { return decodeURIComponent(s.slice('/user/api/img?u='.length)); } catch (_) { return s; } } return s; };
 
@@ -81,10 +81,12 @@
   function slideBgStyle(bg) {
     if (!bg) return 'background:' + PALETTE_BG[0];
     if (bg.type === 'gradient') return 'background:linear-gradient(' + (bg.deg || 135) + 'deg,' + hex(bg.c1, '#f6ecd9') + ',' + hex(bg.c2, '#c9a565') + ')';
+    if (bg.type === 'image' && bg.src) return "background:#241a0c url('" + dispSrc(bg.src) + "') center/cover no-repeat"; // C4-10 rev.3: 'url("")' HTML atributini buzardi
     return 'background:' + hex(bg.c1, '#f7eeda');
   }
   function bgModelOf(bg) {
     if (bg && bg.type === 'gradient') return { type: 'gradient', c1: hex(bg.c1, '#f6ecd9'), c2: hex(bg.c2, '#c9a565'), deg: bg.deg || 135 };
+    if (bg && bg.type === 'image') return { type: 'image', src: bg.src || '', c1: hex(bg.c1, '#241a0c') };
     return { type: 'solid', c1: hex(bg && bg.c1, '#f7eeda') };
   }
 
@@ -285,7 +287,8 @@
       }
       if (e.type === 'image') {
         const style = 'left:' + l + ';top:' + t + ';width:' + w + ';height:' + h + ';';
-        const img = e.src ? '<img class="ps-el-img" src="' + esc(dispSrc(e.src)) + '" alt="" loading="lazy">' : '<div class="ps-el-img-wrap ps-el-text empty" data-ph="' + T('imgPh', 'Rasm — yuklang yoki URL') + '"></div>';
+        const framed = e.stroke && e.stroke !== 'transparent' ? 'border:' + (e.strokeW || 3) + 'px solid ' + hex(e.stroke, '#241a0c') + ';border-radius:14px;box-sizing:border-box;' : '';
+        const img = e.src ? '<img class="ps-el-img" style="' + framed + '" src="' + esc(dispSrc(e.src)) + '" alt="" loading="lazy">' : '<div class="ps-el-img-wrap ps-el-text empty" data-ph="' + T('imgPh', 'Rasm — yuklang yoki URL') + '"></div>';
         return '<div class="ps-el" data-id="' + e.id + '" data-i style="' + style + '">' + img + '<span class="ps-handle" data-resize="' + e.id + '"></span></div>';
       }
       return '';
@@ -368,6 +371,9 @@
       tEl.dataset.num = String(i + 1);
       tEl.setAttribute('role', 'option');
       tEl.setAttribute('aria-selected', i === state.cur ? 'true' : 'false');
+      // C4-10 rev.3: slayd tartibini drag bilan o'zgartirish
+      tEl.draggable = true;
+      tEl.title = T('dragSlide', 'Tartibni o‘zgartirish uchun sudrang');
       renderThumbInto(tEl, sl);
       thumbs.appendChild(tEl);
     });
@@ -541,6 +547,15 @@
           + '<button type="button" class="ps-r-btn big" data-upfile="1">' + esc(T('imgUpBtn', 'Rasm faylini tanlang…')) + '</button>'
           + '<div class="ps-r-hint" style="margin-top:5px">' + esc(T('imgUpPh', 'PNG/JPG/WebP — avtomatik kichraytiriladi')) + '</div></div>';
         if (isData) { h += '<div class="ps-up-thumb"><img src="' + esc(selEl.src) + '" alt=""></div>'; }
+        if (selEl.src) {
+          h += '<label class="ps-r-label">' + esc(T('imgFrameLbl', 'Ramka')) + '</label>';
+          h += '<div class="ps-r-row">'
+            + '<input class="ps-r-input" type="number" min="0" max="30" value="' + (selEl.strokeW || 0) + '" data-p="strokeW" style="width:76px" aria-label="Ramka qalinligi">'
+            + '<button type="button" class="ps-r-btn' + (!selEl.stroke || selEl.stroke === 'transparent' ? ' on' : '') + '" data-stroke-none="1">' + esc(T('strokeNone', 'Yo‘q')) + '</button>'
+            + '</div>';
+          h += swatchRow(['#241a0c', '#ffffff', '#5b4317', '#8a5a1e', '#a37f3a', '#c9a565', '#d9b465', '#efe2c4'], selEl.stroke || 'transparent', 'stroke', 'hex');
+          h += '<button type="button" class="ps-r-btn big" data-to-bg="1" style="margin-top:8px">' + esc(T('toBg', '🖼 Bu rasmni orqa fonga qo‘yish')) + '</button>';
+        }
       }
       h += '<div style="height:10px"></div><button type="button" class="ps-r-btn big ps-r-danger" data-del-el="1">✕ ' + esc(T('delEl', 'Elementni o‘chirish')) + '</button>';
       h += '</div>';
@@ -567,6 +582,17 @@
       h += '<div class="ps-r-row"><span class="ps-r-label-inline">1</span><input type="color" class="ps-cpick" data-ck="bgc1" value="' + hex(bg.c1, '#f6ecd9') + '" aria-label="Gradient 1"><span class="ps-r-label-inline">2</span><input type="color" class="ps-cpick" data-ck="bgc2" value="' + hex(bg.c2, '#c9a565') + '" aria-label="Gradient 2"></div>';
       h += '<div class="ps-r-row"><span class="ps-r-label-inline">' + esc(T('gradDeg', 'Burchak')) + '</span><select class="ps-r-select" data-p="bgdeg" style="flex:1">' + [0, 45, 90, 135, 180, 225, 270, 315].map((d) => '<option value="' + d + '"' + ((bg.deg || 135) === d ? ' selected' : '') + '>' + d + '°</option>').join('') + '</select></div>';
     }
+    // Orqa fon rasmi (C4-10 rev.3): fayl yoki tanlangan rasmni fon qilish
+    h += '<div class="ps-r-sec">' + inspectorTitle(T('bgImgLbl', 'Orqa fon rasmi'));
+    if (bg.type === 'image' && bg.src) {
+      h += '<div class="ps-r-hint" style="margin-bottom:6px">Rasmli fon o‘rnatilgan</div>'
+        + '<button type="button" class="ps-r-btn big" data-bgimg-clear="1">' + esc(T('bgImgClear', 'Rasmli fonni olib tashlash')) + '</button>';
+    } else {
+      h += '<div class="ps-r-hint" style="margin-bottom:6px">PNG/JPG — slayd to‘liq qoplanadi</div>'
+        + '<button type="button" class="ps-r-btn big" data-bgimg="1">' + esc(T('bgImgPick', 'Rasm tanlash…')) + '</button>';
+    }
+    h += '</div>';
+
     h += '</div>';
 
     box.innerHTML = h;
@@ -670,6 +696,37 @@
     }));
     const upBtn = box.querySelector('[data-upfile]');
     if (upBtn) upBtn.addEventListener('click', () => { attachFileInput(selEl); });
+    // C4-10 rev.3: tanlangan rasmni orqa fonga qo'yish
+    const toBg = box.querySelector('[data-to-bg]');
+    if (toBg) toBg.addEventListener('click', () => {
+      if (!selEl || !selEl.src) return;
+      slide.bg = { type: 'image', src: selEl.src, c1: '#241a0c' };
+      state.sel = { kind: 'bg' };
+      renderCanvas(); renderThumbs(); renderInspector(); markDirty();
+    });
+    // Orqa fon rasmi tanlash (fayl → downscale → bg)
+    const bgImgBtn = box.querySelector('[data-bgimg]');
+    if (bgImgBtn) bgImgBtn.addEventListener('click', () => {
+      const fi = document.createElement('input');
+      fi.type = 'file'; fi.accept = 'image/*'; fi.style.display = 'none';
+      document.body.appendChild(fi);
+      fi.addEventListener('change', async () => {
+        const f = fi.files && fi.files[0]; fi.remove();
+        if (!f) return;
+        const src = await downscaleFile(f);
+        if (!src) { alert(T('imgFail', 'Rasm o‘qilmadi')); return; }
+        slide.bg = { type: 'image', src, c1: '#241a0c' };
+        state.sel = { kind: 'bg' };
+        renderCanvas(); renderThumbs(); renderInspector(); markDirty();
+      });
+      fi.click();
+    });
+    const bgImgClear = box.querySelector('[data-bgimg-clear]');
+    if (bgImgClear) bgImgClear.addEventListener('click', () => {
+      slide.bg = { type: 'solid', c1: '#f7eeda' };
+      state.sel = { kind: 'bg' };
+      renderCanvas(); renderThumbs(); renderInspector(); markDirty();
+    });
 
     // bold/italic/align toggles
     box.querySelectorAll('[data-stroke-none]').forEach((b) => b.addEventListener('click', () => {
@@ -961,6 +1018,40 @@
 
   // resize
   window.addEventListener('resize', () => { layoutStage(); });
+
+  // ── C4-10 rev.3: slayd tartibi — drag & drop (bitta delegatsiya) ──
+  let dragFrom = -1;
+  thumbs.addEventListener('dragstart', (e) => {
+    const t = e.target.closest('.ps-thumb');
+    if (!t) return;
+    dragFrom = Number(t.dataset.i);
+    if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move';
+    t.classList.add('ps-thumb-dragging');
+  });
+  thumbs.addEventListener('dragend', (e) => {
+    const t = e.target.closest('.ps-thumb');
+    if (t) t.classList.remove('ps-thumb-dragging');
+    dragFrom = -1;
+  });
+  thumbs.addEventListener('dragover', (e) => {
+    if (dragFrom < 0) return;
+    e.preventDefault();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+  });
+  thumbs.addEventListener('drop', (e) => {
+    const t = e.target.closest('.ps-thumb');
+    if (!t || dragFrom < 0) return;
+    e.preventDefault();
+    const to = Number(t.dataset.i);
+    const arr = state.deck.slides;
+    if (Number.isInteger(to) && to >= 0 && to < arr.length && to !== dragFrom) {
+      const moved = arr.splice(dragFrom, 1)[0];
+      arr.splice(to, 0, moved);
+      state.cur = to;
+      renderThumbs(); renderCanvas(); renderInspector(); markDirty();
+    }
+    dragFrom = -1;
+  });
   // Enter to rename commit & blur
   nameInp.addEventListener('blur', () => { saveNow(); });
 

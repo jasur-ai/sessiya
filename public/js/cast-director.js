@@ -45,6 +45,8 @@
     if (big) big.src = src;
     const urlEl = document.getElementById('dir-qr-url');
     if (urlEl) urlEl.textContent = u;
+    const codeEl = document.getElementById('dir-qr-code');
+    if (codeEl) codeEl.textContent = (code && code !== '—') ? code : '';
   }
   (function wireQrModal() {
     const openBtn = document.getElementById('btn-qr-open');

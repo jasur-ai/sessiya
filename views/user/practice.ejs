@@ -3,8 +3,8 @@
 <head>
   <%- include('../partials/head') %>
   <style>
-    /* Yakka mashq (Sinov) — jonli sahna (reklama uslubi):
-       katta maydon, 2×2 rangli javob plitalari, darhol natija, vaqt/vaqtsiz.
+    /* Yakka mashq (Sinov) — jonli sahna (C4-10 rev.2: reklama uslubi yo'q):
+       katta maydon, iliq 2×2 javob plitalari, darhol natija, vaqt/vaqtsiz.
        Rasm: qora-jigarrang sahna + krem karta — Deborah vintage palitrasi. */
     *{box-sizing:border-box;}
     html,body{min-height:100%;}
@@ -79,7 +79,8 @@
     }
     .qtype-line{text-align:center;font-size:.72rem;font-weight:700;color:#8a6a3a;letter-spacing:.1em;text-transform:uppercase;margin-bottom:14px;}
 
-    .qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:14px;}
+    .qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px;margin:14px auto 0;max-width:900px}
+    @media (max-width:720px){.qgrid{grid-template-columns:1fr;max-width:520px}}
     .qtile{
       position:relative;display:flex;align-items:center;justify-content:center;gap:10px;
       min-height:96px;padding:16px 18px;border-radius:18px;cursor:pointer;
@@ -214,7 +215,7 @@
 
     /* 09/2026 (user qarori):
        — javobsiz savoldan oldinga o'tib bo'lmaydi (Next/Finish/dots bloklanadi);
-       — javob tanlansa DARHOL to'g'ri/noto'g'ri natija chiqadi (reklama tarzi);
+       — javob tanlansa DARHOL to'g'ri/noto'g'ri natija chiqadi;
        — vaqt tugasa savol "o'tkazib yuborilgan" sifatida yopiladi;
        — ?time=0 yoki time yo'q = VAQTSIZ rejim (timer yo'q, shoshilish yo'q). */
     const PER_Q_TIME = Math.max(0, parseInt(new URLSearchParams(location.search).get('time'), 10) || 0);
@@ -226,8 +227,9 @@
     let timeLeft = PER_Q_TIME;
     let timerIv = null;
 
-    // Sahna plitalari uchun ranglar (reklama uslubi; index bo'yicha tsikl)
-    const TILE_COLORS = ['#cf3a2f', '#1f6fd6', '#df9f00', '#228b3c'];
+    // Sahna plitalari uchun iliq ranglar (C4-10 rev.2: reklama uslubi olib
+    // tashlandi) — terrakota/oltin/zaytun/g'isht, index bo'yicha tsikl
+    const TILE_COLORS = ['#a4572a', '#a8892a', '#567a33', '#96423a'];
 
     function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
     function correctOf(i) {

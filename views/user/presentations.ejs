@@ -56,6 +56,29 @@
       <button type="button" class="ps-hub-cta" id="prs-create-open"><span>+</span> <%= pCopy.newDeck %></button>
     </div>
 
+    <% /* C4-10 rev.3: Canva / Google Slides — rasmiy (OAuth) ulanish holati.
+           Server kalitlari kiritilmagan bo'lsa halol xabar; kiritilgan bo'lsa
+           o'shanda haqiqiy ulanish yoqiladi (kod tayyor — src/modules/*). */ %>
+    <% if (!canvaConfigured || !googleSlidesConfigured) { %>
+    <div class="ps-prov" role="note">
+      <div class="ps-prov-ico"><%- icon('globe', 15) %></div>
+      <div class="ps-prov-body">
+        <div class="ps-prov-title">Canva / Google Slides — rasmiy ulanish</div>
+        <div class="ps-prov-line">
+          Canva: <%= canvaConfigured ? 'ulanish yoqilgan ✓' : 'kalitlar kiritilmagan (CANVA_CLIENT_ID / CANVA_CLIENT_SECRET / CANVA_REDIRECT_URI)' %>
+          · Google Slides: <%= googleSlidesConfigured ? 'ulanish yoqilgan ✓' : 'kalitlar kiritilmagan (GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET / GOOGLE_REDIRECT_URI)' %>
+        </div>
+        <div class="ps-prov-sub">Deborah taqdimotlarini tashqi Canva/Google orqali ochish/export qilish uchun server .env faylida yuqoridagi OAuth kalitlari kerak — kalitlar kiritilishi bilan bu bo'lim yoqiladi va taqdimot kartalarida «Canva'da ochish / Google Slides'ga yuborish» tugmalari chiqadi.</div>
+        <% if (canManageProviders) { %>
+        <div class="ps-prov-acts">
+          <a href="/admin/canva"><%- icon('settings', 13) %> Canva sozlamalari</a>
+          <a href="/admin/google-slides"><%- icon('settings', 13) %> Google Slides sozlamalari</a>
+        </div>
+        <% } %>
+      </div>
+    </div>
+    <% } %>
+
     <% const visible = decks.filter(d => !d.archived); %>
     <% if (visible.length === 0) { %>
       <div class="ps-empty">
