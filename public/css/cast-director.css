@@ -149,7 +149,8 @@
 .dir-overflow-menu .dir-overflow-danger:hover { background: rgba(255, 60, 80, 0.12); }
 
 /* Lobby */
-.lobby-code-card { padding: 24px; margin-bottom: 20px; }
+.lobby-code-card { position: relative; padding: 24px 170px 24px 24px; margin-bottom: 20px; }
+@media (max-width: 640px){ .lobby-code-card{ padding:24px; } .lobby-qr-wrap{ position:static; margin:10px auto 0; } }
 .lobby-label { font-size: 0.8rem; letter-spacing: 2px; color: var(--cast-muted-text); }
 .lobby-code {
   font-size: var(--cast-code-size);
@@ -933,3 +934,24 @@
     min-height: 24px;
   }
 }
+
+/* ── C4-10: QR (lobby) + kattalashtirilgan modal ── */
+.lobby-qr-wrap{position:absolute;right:16px;top:16px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.lobby-qr-wrap[hidden]{display:none}
+.lobby-qr-btn{cursor:pointer;border:1px solid rgba(246,236,217,.35);border-radius:12px;background:rgba(246,236,217,.08);padding:6px;line-height:0;transition:transform .12s ease, background .12s ease}
+.lobby-qr-btn:hover{transform:scale(1.05);background:rgba(246,236,217,.16)}
+.lobby-qr-btn img{display:block;border-radius:6px;background:#fff}
+.lobby-qr-hint{font-size:.68rem;letter-spacing:.04em;color:#c4b48c;text-align:center;max-width:124px}
+.qr-modal{position:fixed;inset:0;z-index:150;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(12,8,3,.72);backdrop-filter:blur(4px)}
+.qr-modal[hidden]{display:none}
+.qr-modal-box{display:flex;flex-direction:column;align-items:center;gap:14px;padding:26px 30px;text-align:center}
+.qr-modal-box img{border-radius:10px;background:#fff;padding:8px}
+.qr-modal-url{font-family:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;font-size:.8rem;color:#c4b48c;word-break:break-all;max-width:420px}
+.qr-modal-hint{font-size:.86rem;color:#f6ecd9}
+
+/* ── C4-10: oddiy (simple) sessiya — ilg'or vositalar professional minimal ko'rinish uchun yashirin ── */
+.cast-simple .rail-tools{display:none}
+.cast-simple #btn-pause,
+.cast-simple #btn-resume,
+.cast-simple #btn-discuss,
+.cast-simple #btn-revote{display:none}

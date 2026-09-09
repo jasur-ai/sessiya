@@ -15,7 +15,8 @@
     window.__CSRF_TOKEN = '<%= boot.csrfToken %>';
   </script>
 </head>
-<body class="cast-page" data-cast-theme="focus_dark">
+<% const SIMPLE = !!(boot && boot.simple); %>
+<body class="cast-page<% if (SIMPLE) { %> cast-simple<% } %>" data-cast-theme="focus_dark">
   <div class="cast-live-region" aria-live="polite" id="status-live"></div>
   <div class="cast-live-region" aria-live="assertive" id="alert-live"></div>
 
@@ -57,6 +58,13 @@
           <div class="lobby-label">JOIN KODI</div>
           <div class="lobby-code" id="dir-code-big">—</div>
           <div class="lobby-link" id="dir-join-link"></div>
+          <!-- C4-10: QR — telefon bilan kirish (skaner → /play?code=) -->
+          <div class="lobby-qr-wrap" id="dir-qr-wrap" hidden>
+            <button type="button" class="lobby-qr-btn" id="btn-qr-open" aria-label="QR kodni kattalashtirish">
+              <img id="dir-qr" width="124" height="124" alt="QR kod">
+            </button>
+            <div class="lobby-qr-hint">Telefon bilan kirish — skanerlang</div>
+          </div>
           <!-- C4-06: raid paytida kod aylantirish (item 16) -->
           <div class="poe-ctl-row" style="margin-top:10px">
             <button class="cast-btn" id="btn-rotate-code" data-i18n="director.rotateCode"><%- icon('refresh', 16) %> Kodni almashtirish</button>
@@ -67,7 +75,7 @@
         </div>
         <!-- C4-06: participant boshqaruvi (remove vs block alohida — item 15) -->
         <div class="lobby-participants cast-surface" id="dir-participant-list">
-          <div class="ev-title">👥 Ishtirokchilar</div>
+          <div class="ev-title"><%- icon("users", 14) %> Ishtirokchilar</div>
           <div id="dir-participant-items"></div>
         </div>
         <button class="cast-btn cast-btn-primary cast-btn-lg" id="btn-start-session" data-i18n="director.start">Sessiyani boshlash</button>
@@ -355,7 +363,7 @@
         <button type="button" class="cast-btn" id="btn-discuss" data-i18n="director.discuss" disabled><%- icon('users', 16) %> Muhokama</button>
         <button type="button" class="cast-btn" id="btn-revote" data-i18n="director.revote" disabled><%- icon('refresh', 16) %> Qayta ovoz</button>
       </div>
-      <!-- Tools (doim mavjud, quiet) -->
+      <!-- Tools (doim mavjud, quiet) — oddiy rejimda CSS orqali yashirinadi (C4-10) -->
       <div class="rail-group rail-tools" aria-label="Qo'shimcha vositalar">
         <button type="button" class="cast-btn" id="btn-quick-prompt"><%- icon('zap', 16) %> Tezkor savol</button>
         <button type="button" class="cast-btn" id="btn-transfer"><%- icon('refresh', 16) %> Transfer</button>
@@ -375,6 +383,16 @@
         <div class="timer-value" id="dir-timer-val">—</div>
       </div>
     </nav>
+  </div>
+
+  <!-- C4-10: QR kattalashtirilgan ko'rinish -->
+  <div class="qr-modal" id="qr-modal" role="dialog" aria-modal="true" aria-label="QR kod" hidden>
+    <div class="qr-modal-box cast-surface">
+      <img id="dir-qr-big" width="360" height="360" alt="QR kod">
+      <div class="qr-modal-url" id="dir-qr-url"></div>
+      <div class="qr-modal-hint">Telefon kamerasi bilan skanerlang — sahifa o'zi ochiladi</div>
+      <button type="button" class="cast-btn cast-btn-primary" id="btn-qr-close"><%- icon('x', 15) %> Yopish</button>
+    </div>
   </div>
 
   <!-- End confirmation dialog -->

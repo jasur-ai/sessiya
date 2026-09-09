@@ -352,11 +352,12 @@
             <div class="cs-field">
               <label>Savol vaqti ${lockMark('cs-s-timer-chips')}</label>
               <div class="cast-chips" id="cs-s-timer-chips"></div>
+              <span class="cs-s-hint">Vaqtsiz — vaqt umuman sanalmaydi, savolni o‘zingiz yopasiz.</span>
             </div>
             <div class="cs-field">
               <label>Avtomatik o‘tkazish ${lockMark('cs-s-auto-chips')}</label>
               <div class="cast-chips" id="cs-s-auto-chips"></div>
-              <span class="cs-s-hint">Yoniq — to‘liq avto: savol (20s/…), vaqt tugasa shohsupa 5s va keyingi savol o‘zi ochiladi. O‘chiq — siz boshqarasiz.</span>
+              <span class="cs-s-hint">Yoniq — to‘liq avto: vaqt tugagach shohsupa 5s ko‘rinadi, keyingi savol o‘zi ochiladi. O‘chiq — siz yopasiz va “Keyingi savol”ni bosasiz.</span>
             </div>
           </div>
           <div class="cast-row">
@@ -463,23 +464,23 @@
     renderChips('cs-s-timer-chips',
       [['10', '10s'], ['15', '15s'], ['20', '20s'], ['30', '30s'], ['45', '45s'], ['60', '60s'], ['0', 'Vaqtsiz']],
       timerSec, (v) => {
-        if (v === '0') { setOverride('timer', { mode: 'off' }); setOverride('playback', { advanceMode: 'host_controlled' }); return; }
+        // C4-10: 'Savol vaqti' chip — vaqt rejimining YAGONA manbai:
+        // Vaqtsiz(0) → timer off (hech qachon sanamaydi); >0 → strict + soniya.
+        if (v === '0') { setOverride('timer', { mode: 'off' }); return; }
         const mode = m('timer.mode', 'strict') === 'off' ? 'strict' : m('timer.mode', 'strict');
-        const adv = m('playback.advanceMode', 'fully_auto') === 'fully_auto' ? 'fully_auto' : 'host_controlled';
         setOverride('timer', { mode, defaultSeconds: Number(v) });
-        if (adv === 'fully_auto') setOverride('playback', { advanceMode: 'fully_auto', thinkSeconds: 3 });
       }, pf);
     renderChips('cs-s-auto-chips',
       [['strict', 'Yoniq'], ['soft', 'O‘chiq']],
       timerMode === 'off' ? 'soft' : timerMode,
       (v) => {
-        // C4-10 (user qarori): klassik avto-zanjir — savol yopilgach shohsupa
-        // (5s) ko'rinadi va keyingi savol O'ZI ochiladi (direktor bosmaydi).
+        // C4-10: 'Avtomatik o'tkazish' faqat keyingi savol oqimini boshqaradi:
+        // Yoniq — to'liq avto zanjir (shohsupa 5s → keyingi savol o'zi ochiladi).
+        // O'chiq — siz boshqarasiz. Timer rejimiga TEGILMAYDI (Vaqtsiz tanlansa
+        // vaqt o'z-o'zidan qaytib kelmaydi).
         if (v === 'strict') {
-          setOverride('timer', { mode: 'strict', defaultSeconds: Number(m('timer.defaultSeconds', 20)) || 20 });
           setOverride('playback', { advanceMode: 'fully_auto', thinkSeconds: 3 });
         } else {
-          setOverride('timer', { mode: 'soft' });
           setOverride('playback', { advanceMode: 'host_controlled' });
         }
       }, pf);
@@ -587,6 +588,8 @@
           source: { type: ref.source, key: ref.key, chunk: ref.chunk || null },
           presetId: studioState.draftConfig.presetId,
           overrides: studioState.draftConfig.overrides,
+          // C4-10: oddiy-rejim markeri (director UI ni soddalashtirish uchun)
+          simple: !!studioState.simple,
         }),
       });
       window.location.assign(data.directorUrl);

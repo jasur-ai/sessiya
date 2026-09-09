@@ -125,7 +125,7 @@ const _nT = (k, fb) => {
       <a href="/teacher?tab=assessments" class="shell-nav-link<%= _active === 'assessments' ? ' active' : '' %>"><span class="shell-nav-ico"><%- icon('target', 16) %></span><span><%= _st('assessments', 'Baholashlar') %></span></a>
       <a href="/teacher?tab=grading" class="shell-nav-link<%= _active === 'grading' ? ' active' : '' %>"><span class="shell-nav-ico"><%- icon('clipboard', 16) %></span><span><%= _st('gradingQueue', 'Baholash navbati') %></span></a>
       <div class="shell-nav-sec"><%= _st('secTools', 'Asboblar') %></div>
-      <a href="/user/panel" class="shell-nav-link"><span class="shell-nav-ico"><%- icon('book', 16) %></span><span><%= _st('myTests', 'Testlarim') %></span></a>
+      <a href="/user/tests" class="shell-nav-link"><span class="shell-nav-ico"><%- icon('book', 16) %></span><span><%= _st('myTests', 'Testlarim') %></span></a>
       <a href="/user/create-test" class="shell-nav-link"><span class="shell-nav-ico"><%- icon('plus', 16) %></span><span><%= _st('newTest', 'Yangi test') %></span></a>
       <a href="/user/presentations" class="shell-nav-link"><span class="shell-nav-ico"><%- icon('monitor', 16) %></span><span><%= _st('presentations', 'Taqdimotlar') %></span></a>
       <a href="/user/ai-studio" class="shell-nav-link"><span class="shell-nav-ico"><%- icon('sparkles', 16) %></span><span>AI Studiya</span></a>
@@ -134,6 +134,8 @@ const _nT = (k, fb) => {
              'Ish maydoni' bo'limi ichida workspace (Panelim) turadi; Xavfsizlik Akkaunt'ga o'tdi. */ %>
       <div class="shell-nav-sec">Ish maydoni</div>
       <a href="/user/panel" class="shell-nav-link<%= _active === 'panel' ? ' active' : '' %>"><span class="shell-nav-ico"><%- icon('grid', 16) %></span><span><%= _st('myPanel', 'Ish maydonim') %></span></a>
+      <% /* C4-10: Testlar alohida bo'lim — Taqdimotlar kabi (panel = umumiy ko'rinish) */ %>
+      <a href="/user/tests" class="shell-nav-link<%= _active === 'tests' ? ' active' : '' %>"><span class="shell-nav-ico"><%- icon('fileText', 16) %></span><span><%= _st('myTests', 'Testlar') %></span></a>
       <% /* 09/2026: Taqdimotlar bo'limi — Google Slides/Canva uslubi, sayt ichida */ %>
       <a href="/user/presentations" class="shell-nav-link<%= _active === 'presentations' ? ' active' : '' %>"><span class="shell-nav-ico"><%- icon('monitor', 16) %></span><span><%= _st('presentations', 'Taqdimotlar') %></span></a>
     <% } else if (_role === 'proctor') { %>

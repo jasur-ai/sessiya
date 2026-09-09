@@ -444,6 +444,8 @@ router.post('/api/cast/sessions', requireAuth, async (req, res) => {
         status: 'lobby',
         lobbyLocked: false,
         ownerActorId: actorId,
+        // C4-10: oddiy (simple studio) sessiya — director'da ilg'or vositalar yashirinadi
+        ui: req.body?.simple ? 'simple' : 'full',
         // C3-15: rehearsal session — simulation data production metriclarga kirmaydi
         environment: environment === 'simulation' ? 'simulation' : 'production',
         rehearsal: environment === 'simulation',
@@ -769,6 +771,9 @@ router.get('/cast/:sessionId/quality-lab', requireAuth, async (req, res) => {
       boot: {
         sessionId,
         joinCode: meta.joinCode || null,
+        // C4-10: oddiy rejim + QR uchun join link
+        simple: meta.ui === 'simple',
+        joinUrl: `${req.protocol}://${req.get('host')}/play?code=${encodeURIComponent(meta.joinCode || '')}`,
         actor: { id: actorId, role: role.role },
         csrfToken: req.session.csrfToken,
         title: meta.title || 'Cast',
@@ -839,6 +844,9 @@ router.get('/cast/:sessionId/director', requireAuth, async (req, res) => {
       boot: {
         sessionId,
         joinCode: meta.joinCode || null,
+        // C4-10: oddiy rejim + QR join link
+        simple: meta.ui === 'simple',
+        joinUrl: `${req.protocol}://${req.get('host')}/play?code=${encodeURIComponent(meta.joinCode || '')}`,
         actor: { id: actorId, role: role.role },
         csrfToken: req.session.csrfToken,
         // C4-05: UI locale config'dan

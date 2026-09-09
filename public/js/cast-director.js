@@ -33,6 +33,30 @@
   });
 
   let code = (window.__BOOT__ && window.__BOOT__.joinCode) || '—'; // BUG-230db143b: boot'dan boshlang'ich kod
+  // ── C4-10: QR (join link) yangilash + kattalashtirish modal ──
+  function refreshJoinQr() {
+    const u = (code && code !== '—') ? location.origin + '/play?code=' + encodeURIComponent(code) : '';
+    const w = document.getElementById('dir-qr-wrap');
+    if (w) w.hidden = !u;
+    const src = u ? '/cast/qr?d=' + encodeURIComponent(u) : '';
+    const q = document.getElementById('dir-qr');
+    const big = document.getElementById('dir-qr-big');
+    if (q) q.src = src;
+    if (big) big.src = src;
+    const urlEl = document.getElementById('dir-qr-url');
+    if (urlEl) urlEl.textContent = u;
+  }
+  (function wireQrModal() {
+    const openBtn = document.getElementById('btn-qr-open');
+    const modal = document.getElementById('qr-modal');
+    if (!openBtn || !modal) return;
+    openBtn.addEventListener('click', () => { refreshJoinQr(); modal.hidden = false; });
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal || (e.target.closest && e.target.closest('#btn-qr-close'))) modal.hidden = true;
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modal.hidden) modal.hidden = true; });
+  })();
+
   // BUG-230db143b fix: boot kodini DOM'ga darhol yozamiz (updateControls faqat eventda yozardi)
   (function renderInitCode() {
     if (code && code !== '—') {
@@ -41,7 +65,8 @@
       const jl = document.getElementById('dir-join-link');
       if (cv) cv.textContent = code;
       if (cb) cb.textContent = code;
-      if (jl) jl.textContent = 'https://' + location.host + '/play?code=' + code;
+      if (jl) jl.textContent = location.origin + '/play?code=' + code;
+      refreshJoinQr();
     }
   })();
   let phase = 'LOBBY_OPEN';
@@ -289,7 +314,7 @@
       case 'cast:participantJoined': {
         const countEl = $('dir-player-count');
         if (data.count !== undefined) countEl.textContent = data.count;
-        if (data.joinCode) { code = data.joinCode; $('dir-code-val').textContent = code; $('dir-code-big').textContent = code; $('dir-join-link').textContent = `https://${location.host}/play?code=${code}`; }
+        if (data.joinCode) { code = data.joinCode; $('dir-code-val').textContent = code; $('dir-code-big').textContent = code; $('dir-join-link').textContent = `${location.origin}/play?code=${code}`; refreshJoinQr(); }
         // C4-06: participant tracking
         if (eventName === 'cast:participantJoined' && data.participantId) {
           const wasEmpty = dirParticipants.size === 0;
@@ -324,7 +349,8 @@
           code = data.joinCode;
           $('dir-code-val').textContent = code;
           $('dir-code-big').textContent = code;
-          $('dir-join-link').textContent = `https://${location.host}/play?code=${code}`;
+          $('dir-join-link').textContent = `${location.origin}/play?code=${code}`;
+          refreshJoinQr();
           announce('Kod yangilandi: ' + code, true);
         }
         break;
@@ -1086,7 +1112,8 @@
         code = ack.joinCode;
         $('dir-code-val').textContent = code;
         $('dir-code-big').textContent = code;
-        $('dir-join-link').textContent = `https://${location.host}/play?code=${code}`;
+        $('dir-join-link').textContent = `${location.origin}/play?code=${code}`;
+        refreshJoinQr();
         announce('Kod yangilandi: ' + code, true);
       }
     } catch (e) { announce(e.message || 'Xatolik', true); }

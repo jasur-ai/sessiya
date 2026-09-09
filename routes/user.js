@@ -137,7 +137,7 @@ router.use((req, res, next) => {
 });
 
 // ── User Panel ──
-router.get('/panel', async (req, res) => {
+async function renderWorkspace(req, res, activeKey, viewName, fallbackTitle) {
   const user = req.session.user;
   try {
     // VIP stealth (user qarori 09/2026): panel'da VIP izlari YO'Q — mock/pre
@@ -179,9 +179,32 @@ router.get('/panel', async (req, res) => {
     const plangResolved = resolvePanelLang(plang);
     const panelCopy = PANEL_COPY[plangResolved] || PANEL_COPY.uz;
 
-    res.render('user/panel', {
-      title: (panelCopy['ws.title'] || 'Ish maydonim') + ' — Deborah',
-      active: 'panel',
+    // Umumiy ma'lumot uchun statistika (C4-10: panel → overview, testlar alohida bo'lim)
+    let presentations = {};
+    try {
+      const ps = await fb.get(`users/${user.safeKey}/presentations`);
+      presentations = ps.val() || {};
+    } catch (_) { /* fail-soft */ }
+
+    // Testlar ro'yxati (yagona manba — testsList)
+    const testsList = Object.entries(tests)
+      .sort((a, b) => (b[1].created_at || b[1].created || 0) - (a[1].created_at || a[1].created || 0))
+      .map(([key, t]) => ({
+        key,
+        name: t.name || t.title || 'Testsiz',
+        count: t.questions?.length || t.count || 0,
+        createdAt: t.created_at || t.created || 0,
+        updatedAt: t.updated_at || t.created_at || t.created || 0,
+        isPublic: !!t.isPublic,
+        archived: !!t.archived,
+        subject: t.subject || t.tag || null,
+        type: t.type || (Array.isArray(t.questions) && t.questions.length && t.questions.every(q => Array.isArray(q.options)) ? 'variant' : null),
+        lastUse: t.lastUsedAt || t.last_used_at || 0,
+      }));
+
+    res.render(viewName, {
+      title: fallbackTitle + ' — Deborah',
+      active: activeKey,
       panelLang: plangResolved,
       panelLangRaw: plang,
       htmlLang: htmlLangOf(plangResolved),
@@ -200,20 +223,17 @@ router.get('/panel', async (req, res) => {
       verifyCopy,
       breachFlagged,
       consentStale,
-      tests: Object.entries(tests)
-        .sort((a, b) => (b[1].created_at || b[1].created || 0) - (a[1].created_at || a[1].created || 0))
-        .map(([key, t]) => ({
-          key,
-          name: t.name || t.title || 'Testsiz',
-          count: t.questions?.length || t.count || 0,
-          createdAt: t.created_at || t.created || 0,
-          updatedAt: t.updated_at || t.created_at || t.created || 0,
-          isPublic: !!t.isPublic,
-          archived: !!t.archived,
-          subject: t.subject || t.tag || null,
-          type: t.type || (Array.isArray(t.questions) && t.questions.length && t.questions.every(q => Array.isArray(q.options)) ? 'variant' : null),
-          lastUse: t.lastUsedAt || t.last_used_at || 0,
-        })),
+      tests: testsList,
+      // C4-10 overview statistikasi
+      testsCount: testsList.length,
+      totalQuestions: testsList.reduce((a, t) => a + (Number(t.count) || 0), 0),
+      lastActivityAt: Math.max(0, ...testsList.map((t) => Number(t.updatedAt) || 0)),
+      recentTests: testsList.slice(0, 5),
+      presentationsCount: Object.keys(presentations).length,
+      presentationsRecent: Object.entries(presentations)
+        .map(([key, p]) => ({ key, name: p?.name || 'Taqdimot', slides: Array.isArray(p?.slides) ? p.slides.length : 0, updatedAt: p?.updatedAt || p?.created_at || p?.createdAt || 0 }))
+        .sort((a, b) => (Number(b.updatedAt) || 0) - (Number(a.updatedAt) || 0))
+        .slice(0, 5),
       fmtDate: (ts) => new Date(ts || Date.now()).toLocaleDateString(localeOf(plangResolved)),
       username: user.username,
       // 09/2026: Cast studio — VIP userlargina to'liq sozlamalar (studioSimple=false)
@@ -225,10 +245,10 @@ router.get('/panel', async (req, res) => {
     // Update session with fresh isVip value
     req.session.user.isVip = isVip;
   } catch (err) {
-    console.error('User panel error:', err);
-    res.render('user/panel', {
-      title: 'Ish maydonim — Deborah',
-      active: 'panel',
+    console.error('User workspace error:', err);
+    res.render(viewName, {
+      title: fallbackTitle + ' — Deborah',
+      active: activeKey,
       panelLang: 'uz',
       panelLangRaw: 'uz',
       htmlLang: 'uz',
@@ -245,6 +265,14 @@ router.get('/panel', async (req, res) => {
       riskCopy: {},
     });
   }
+}
+
+// ── Workspace sahifalari (C4-10): /user/panel = umumiy ko'rinish, /user/tests = testlar kutubxonasi ──
+router.get('/panel', async (req, res) => {
+  await renderWorkspace(req, res, 'panel', 'user/panel', 'Ish maydonim');
+});
+router.get('/tests', async (req, res) => {
+  await renderWorkspace(req, res, 'tests', 'user/tests', 'Testlar');
 });
 
 // ── Student Assignments (Prompt 28) ──
